@@ -9,7 +9,7 @@ const NAV = [
 const ROLES = ["Software Engineer", "Data Analyst", "AI Engineer"];
 
 const S = {
-  screen: "login",          // login | signup | onboarding | analyzing | app
+  screen: "login",          // login | signup | onboarding  | app
   view: "dashboard",
   menu: false,
   copilot: false,
@@ -111,17 +111,6 @@ function onboardingView() {
     <button class="btn primary block" type="submit">Analyze My Career Profile</button>
   </form></div>`;
 }
-function analyzingView() {
-  const steps = ["Resume analyzed", "64 relevant jobs retrieved", "21 recurring skills identified", "Student evidence compared", "3 high-priority gaps detected", "Personalized roadmap generated"];
-  return `<div class="center-page"><div class="onb"><h1>Analyzing your career profile…</h1><p style="color:var(--muted)">Four agents are working on your results.</p>
-  <ul class="analyzing">${steps.map((t, i) => `<li id="st${i}">${t}</li>`).join("")}</ul></div></div>`;
-}
-function runAnalyzing(next) {
-  S.screen = "analyzing"; render();
-  for (let i = 0; i < 6; i++) setTimeout(() => { const el = document.getElementById("st" + i); if (el) el.classList.add("on"); }, 350 * (i + 1));
-  setTimeout(() => { S.onboarded = true; S.screen = "app"; S.view = "dashboard"; render(); }, 350 * 7 + 200);
-}
-
 /* ---------- SHELL ---------- */
 function shell(body) {
   const s = D.student;
@@ -293,7 +282,7 @@ function openDrawer(h) { S.copilot = false; drawerHTML = h; renderDrawer(); }
 /* ---------- RENDER ---------- */
 function render() {
   const sc = S.screen;
-  $app.innerHTML = sc === "login" ? loginView() : sc === "signup" ? signupView() : sc === "onboarding" ? onboardingView() : sc === "analyzing" ? analyzingView() : shell(PAGES[S.view]());
+  $app.innerHTML = sc === "login" ? loginView() : sc === "signup" ? signupView() : sc === "onboarding" ? onboardingView() : shell(PAGES[S.view]());
   renderDrawer();
 }
 
@@ -348,7 +337,7 @@ document.addEventListener("submit", e => {
   } else if (f === "onboard") {
     Object.assign(D.student, { role: document.getElementById("o1").value, gradYear: document.getElementById("o2").value, location: document.getElementById("o3").value,
       level: document.querySelector("input[name=lvl2]:checked").value });
-    runAnalyzing();
+    S.onboarded = true; S.screen = "app"; S.view = "dashboard"; render();
   } else if (f === "chat") {
     const i = document.getElementById("cq"); if (i.value.trim()) ask(i.value.trim());
   }
