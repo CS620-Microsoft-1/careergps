@@ -31,7 +31,7 @@ const MSFT = `<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"
 
 const NAV = [
   ["dashboard", "grid", "Dashboard"], ["analysis", "target", "Career Analysis"], ["gaps", "bars", "Skill Gaps", 3],
-  ["opps", "case", "Opportunities"], ["plan", "list", "Action Plan"], ["projects", "code", "Projects"]
+  ["opps", "case", "Resources"], ["plan", "list", "Action Plan"]
 ];
 const ROLES = ["Software Engineer", "Data Analyst", "AI Engineer"];
 
@@ -272,7 +272,7 @@ function plan() {
 function projects() {
   const colors = ["#2f5f59", "#56657a", "#7a6a55", "#665a7a"], icons = ["spark", "code", "bars", "search"];
   const gapTag = p => { const n = parseInt(p.impact.match(/\d+/)); return `<span class="tag ${n >= 2 ? "red" : "brand"}">${n} high-priority gap${n > 1 ? "s" : ""}</span>`; };
-  return head("Built for your goal", "Projects Worth Building", "Every recommendation is tied to the career gaps it helps you close.") +
+  return secHead("code", "Projects Worth Building", "Every recommendation is tied to the career gaps it helps you close.") +
   `<div class="banner"><div><span class="tag violet">Top recommendation</span><h2>Build evidence employers can see.</h2><p class="p">The best next project is not the trendiest. It's the one that adds credible evidence where your profile needs it most.</p></div>
     <div class="plus"><b>+11</b><small>estimated readiness points</small></div></div>
   <div class="grid g2">${D.projects.map((p, i) => `<div class="card proj"><div class="pl" style="background:${colors[i]}">${I[icons[i]](30)}<span>0${i + 1}</span></div>
@@ -290,7 +290,8 @@ function opps() {
     <p class="desc"><b style="color:var(--ink)">Why CareerGPS recommends it:</b> ${c.why}</p></div>`;
   const hack = h => `<div class="card row-c"><div><span class="tag ${h.status === "Open" ? "green" : "amber"}">${h.status}</span><h4>${h.title}</h4><small>${h.name} · Team of ${h.team} · ${h.skills.join(" · ")}</small></div><span class="d">${h.date}</span></div>`;
   const learn = l => `<div class="card row-c"><div><h4 style="margin-top:0">${l[0]}</h4><small>${l[1]} · Recommended because ${l[2]} is ${D.gaps.some(g => g.skill === l[2] && g.pri === "High") ? "one of your highest-priority gaps" : "worth strengthening"}</small></div><span class="cite">[Free]</span></div>`;
-  return head("UW–Madison", "Opportunities Around You", "Courses, communities, and experiences that can turn your gaps into demonstrated skills.") +
+  return head("UW–Madison", "Resources", "Projects, courses, communities, and experiences that can turn your gaps into demonstrated skills.") +
+  projects() +
   secHead("book", "Recommended Courses", "Available through your university catalog", "View course catalog") +
   `<div class="grid g3">${D.courses.map(course).join("")}</div>` +
   secHead("bank", "Clubs &amp; Student Organizations", "Build with peers and create evidence outside the classroom") +
@@ -299,7 +300,7 @@ function opps() {
     <div>${secHead("book", "Free Learning Resources", "Mapped to your gaps")}${D.learning.map(learn).join("")}</div></div>`;
 }
 
-const PAGES = { dashboard, analysis, profile, gaps, plan, projects, opps };
+const PAGES = { dashboard, analysis, profile, gaps, plan, opps };
 
 /* ---------- COPILOT & DRAWERS ---------- */
 const closeBtn = a => `<button class="iconbtn" data-a="${a}" aria-label="Close">${I.x(20)}</button>`;
