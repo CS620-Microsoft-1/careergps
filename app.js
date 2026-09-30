@@ -36,12 +36,9 @@ function toast(m) { const t = document.createElement("div"); t.className = "toas
 function authLeft() {
   return `<div class="auth-left">
     <div class="logo"><i>➤</i>CareerGPS</div>
-    <div><h1>Your AI-powered career intelligence platform</h1></div>
+    <h1>Your AI-powered career intelligence platform</h1>
     <p class="sub">Understand where you stand, what employers are looking for, and what you should do next to become a stronger candidate.</p>
     <div class="flow"><span>Your Profile</span><b>→</b><span>Job Market</span><b>→</b><span>Skill Gaps</span><b>→</b><span>Action Plan</span></div>
-    <ul class="benefits"><li>Understand your career readiness</li><li>Discover high-priority skill gaps</li><li>Get personalized projects, courses, and action plans</li></ul>
-    <div class="mini"><div class="top"><div class="ring sm" style="--p:72"><div>72%</div></div><div><b>Career readiness</b><div class="desc" style="color:var(--muted);font-size:13px">AI Engineer · New Grad 2027</div></div></div>
-    <div class="chips"><span class="tag green">Python</span><span class="tag green">LLM APIs</span><span class="tag red">Docker</span><span class="tag red">CI/CD</span></div></div>
   </div>`;
 }
 function loginView() {
