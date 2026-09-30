@@ -107,8 +107,6 @@ function onboardingView() {
     <div class="field"><span class="lbl">Experience Level</span><div class="seg"><label><input type="radio" name="lvl2" value="Internship">Internship</label><label><input type="radio" name="lvl2" value="Full-time" checked>Full-time</label></div></div>
     <div class="field"><span class="lbl">Upload Résumé</span>
       <label class="upload ${S.resume ? "done" : ""}" id="up">${S.resume ? "✓ " + esc(S.resume) : "Click to upload your résumé (PDF or DOCX)"}<input type="file" id="resume" accept=".pdf,.doc,.docx" hidden></label></div>
-    <div class="field"><label for="o4">Add coursework <span style="color:var(--muted);font-weight:400">(optional)</span></label><textarea id="o4" rows="2" placeholder="CS 540, CS 544, STAT 324…"></textarea></div>
-    <div class="field"><label for="o5">Add projects <span style="color:var(--muted);font-weight:400">(optional)</span></label><textarea id="o5" rows="2" placeholder="Describe a project you've built…"></textarea></div>
     <div class="note">CareerGPS compares your experience against real labor-market data to identify what you already demonstrate, what employers are looking for, and what you should work on next.</div>
     <button class="btn primary block" type="submit">Analyze My Career Profile</button>
   </form></div>`;
