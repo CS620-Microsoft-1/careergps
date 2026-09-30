@@ -34,10 +34,21 @@ function toast(m) { const t = document.createElement("div"); t.className = "toas
 
 /* ---------- AUTH ---------- */
 function authLeft() {
+  const ic = p => `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`;
+  const steps = ["Your Profile", "Job Market", "Skill Gaps", "Action Plan"];
+  const perks = [
+    [ic('<path d="M5 12l5 5 9-10"/>'), "Understand your career readiness"],
+    [ic('<path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/>'), "Discover high-priority skill gaps"],
+    [ic('<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/>'), "Get personalized projects, courses, and action plans"]
+  ];
   return `<div class="auth-left">
-    <div class="logo"><i>➤</i>CareerGPS</div>
-    <h1>Know where you stand.<br>Know what to do next.</h1>
-    <p class="sub">Your AI-powered career intelligence platform.</p>
+    <div class="logo"><i>${ic('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="1"/>')}</i>CareerGPS</div>
+    <div class="intro">
+      <p class="tagline">Your AI-powered career intelligence platform</p>
+      <blockquote>"Understand where you stand, what employers are looking for, and what you should do next to become a stronger candidate."</blockquote>
+    </div>
+    <div class="steps">${steps.map((t, i) => `<span class="step"><em>${i + 1}</em>${t}</span>${i < 3 ? '<b>›</b>' : ""}`).join("")}</div>
+    <ul class="perks">${perks.map(p => `<li><i>${p[0]}</i>${p[1]}</li>`).join("")}</ul>
   </div>`;
 }
 function loginView() {

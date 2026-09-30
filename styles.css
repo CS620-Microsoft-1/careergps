@@ -209,3 +209,19 @@ a{color:var(--brand)}
   .bar{grid-template-columns:100px 1fr 40px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* login intro (dark, flat) */
+.auth-left{background:#1d4a44;gap:40px;justify-content:flex-start;padding:44px 48px}
+.auth-left .logo{font-size:30px;gap:16px}
+.auth-left .logo i{width:68px;height:68px;border-radius:16px;background:#256158;color:#fff}
+.auth-left .logo i svg{width:30px;height:30px}
+.intro{margin-top:70px;display:grid;gap:20px}
+.tagline{font-size:20px;color:#a9d3cb}
+blockquote{margin:0;border-left:4px solid #4f7e76;padding-left:20px;font-size:20px;line-height:1.6;color:#e6f2ef;max-width:560px}
+.steps{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.step{display:flex;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.1);border-radius:99px;padding:8px 22px 8px 8px;font-weight:700}
+.step em{width:34px;height:34px;border-radius:50%;background:#3b8d80;display:grid;place-items:center;font-style:normal;font-size:14px}
+.steps b{opacity:.55;font-size:20px}
+.perks{list-style:none;padding:0;margin:0;display:grid;gap:18px}
+.perks li{display:flex;align-items:center;gap:16px;color:#d4e8e4}
+.perks i{width:50px;height:50px;border-radius:12px;background:#2a5c54;display:grid;place-items:center;color:#8fd0c4;flex:none}
