@@ -1,6 +1,6 @@
 # ADR-002: Backend Technology Stack for CareerGPS
 
-- **Status:** Draft
+- **Status:** Pending Approval
 - **Date:** 2026-10-07
 - **Decision Owners:** CareerGPS Development Team
 - **Project:** CareerGPS
@@ -62,12 +62,12 @@ The main factors influencing the backend technology decision are:
 
 CareerGPS will use:
 
-| Technology | Role |
-|---|---|
-| **Python 3.12+** | Primary backend programming language |
-| **FastAPI** | Backend API framework |
-| **Pydantic** | Request, response, and structured data validation within the FastAPI layer |
-| **SQLAlchemy** | Preferred Python database access toolkit and ORM for structured relational data |
+| Technology       | Role                                                                            |
+| ---------------- | ------------------------------------------------------------------------------- |
+| **Python 3.12+** | Primary backend programming language                                            |
+| **FastAPI**      | Backend API framework                                                           |
+| **Pydantic**     | Request, response, and structured data validation within the FastAPI layer      |
+| **SQLAlchemy**   | Preferred Python database access toolkit and ORM for structured relational data |
 
 The backend will communicate with the Next.js frontend through HTTP APIs and potentially streaming mechanisms where needed.
 
@@ -677,13 +677,13 @@ will be defined in separate ADRs.
 
 ## 7. Component Responsibilities
 
-| Technology | Primary Responsibility |
-|---|---|
-| **Python** | Backend application and AI-oriented logic |
-| **FastAPI** | HTTP API layer and routing |
-| **Pydantic** | Request, response, and structured data validation |
-| **SQLAlchemy** | Python-side access to structured relational data |
-| **Next.js** | External frontend client consuming the backend API |
+| Technology     | Primary Responsibility                             |
+| -------------- | -------------------------------------------------- |
+| **Python**     | Backend application and AI-oriented logic          |
+| **FastAPI**    | HTTP API layer and routing                         |
+| **Pydantic**   | Request, response, and structured data validation  |
+| **SQLAlchemy** | Python-side access to structured relational data   |
+| **Next.js**    | External frontend client consuming the backend API |
 
 The responsibilities should remain clearly separated.
 
@@ -749,14 +749,8 @@ The backend may eventually respond with:
 ```json
 {
   "target_role": "AI Engineer",
-  "strengths": [
-    "Python",
-    "REST APIs"
-  ],
-  "gaps": [
-    "Docker",
-    "CI/CD"
-  ]
+  "strengths": ["Python", "REST APIs"],
+  "gaps": ["Docker", "CI/CD"]
 }
 ```
 
