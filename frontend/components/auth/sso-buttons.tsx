@@ -1,4 +1,4 @@
-import { ComingSoon } from "@/components/auth/coming-soon";
+import { ComingSoon } from "@/components/common/coming-soon";
 import { GoogleIcon, MicrosoftIcon, UwBadge } from "@/components/common/provider-icons";
 import { Button } from "@/components/ui/button";
 

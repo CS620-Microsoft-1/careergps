@@ -6,9 +6,11 @@ type LogoProps = {
   /** "light" for dark backgrounds (auth panel), "default" elsewhere. */
   tone?: "default" | "light";
   className?: string;
+  /** Extra classes for the "CareerGPS" wordmark, e.g. to hide it on small screens. */
+  nameClassName?: string;
 };
 
-export function Logo({ tone = "default", className }: LogoProps) {
+export function Logo({ tone = "default", className, nameClassName }: LogoProps) {
   return (
     <div
       className={cn(
@@ -28,7 +30,7 @@ export function Logo({ tone = "default", className }: LogoProps) {
       >
         <Target className="size-4.5" />
       </span>
-      CareerGPS
+      <span className={nameClassName}>CareerGPS</span>
     </div>
   );
 }

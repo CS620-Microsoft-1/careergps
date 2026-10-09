@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
-import { ComingSoon } from "@/components/auth/coming-soon";
+import { ComingSoon } from "@/components/common/coming-soon";
 import { SsoButtons } from "@/components/auth/sso-buttons";
 import { TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";

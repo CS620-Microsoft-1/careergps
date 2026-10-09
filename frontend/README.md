@@ -28,11 +28,11 @@ Open http://localhost:3000.
 ```text
 app/                 routes, layouts, global styles
 components/ui/       shadcn/ui primitives (owned source, restyle freely)
-components/layout/   app shell: sidebar, topbar, navigation
+components/layout/   app shell: sidebar, topbar, mobile nav, user menu, page header
 components/auth/     login, signup, onboarding pieces
 components/panels/   side panels (Copilot, sources, explanations)
 components/common/   shared building blocks (logo, form fields, empty states)
-lib/                 utilities, form options, validation schemas
+lib/                 nav items, form options, validation schemas, utilities
 types/               shared TypeScript types
 ```
 
