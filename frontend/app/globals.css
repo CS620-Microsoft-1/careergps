@@ -71,6 +71,20 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
 
+  /*
+   * Type scale in rem so text follows the browser's font-size setting.
+   * control = buttons, labels, nav, tabs (13px); title = card/panel titles (15px);
+   * page-title = page headings (26px); display = auth hero, fluid 30px → 40px.
+   */
+  --text-control: 0.8125rem;
+  --text-control--line-height: 1.5;
+  --text-title: 0.9375rem;
+  --text-title--line-height: 1.4;
+  --text-page-title: 1.625rem;
+  --text-page-title--line-height: 1.25;
+  --text-display: clamp(1.875rem, 1.25rem + 1.6vw, 2.5rem);
+  --text-display--line-height: 1.15;
+
   --shadow-card: 0 1px 2px rgb(19 43 39 / 0.04);
   --shadow-popover: 0 12px 32px rgb(19 43 39 / 0.12);
   --shadow-fab: 0 8px 24px rgb(29 74 68 / 0.3);

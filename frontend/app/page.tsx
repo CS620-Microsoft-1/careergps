@@ -61,21 +61,21 @@ const SWATCHES = [
 
 export default function DesignPreview() {
   return (
-    <main className="mx-auto grid max-w-[1160px] gap-6 px-4 py-8 sm:px-8">
+    <main className="mx-auto grid max-w-290 gap-6 px-4 py-8 sm:px-8">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="mb-3 flex items-center gap-2.5 text-lg font-bold tracking-[-0.01em]">
-            <span className="grid size-8 place-items-center rounded-[9px] bg-primary text-primary-foreground">
-              <Target className="size-[18px]" />
+            <span className="grid size-8 place-items-center rounded-[0.5625rem] bg-primary text-primary-foreground">
+              <Target className="size-4.5" />
             </span>
             CareerGPS
           </div>
-          <h1 className="text-[26px] tracking-[-0.02em]">Design system preview</h1>
+          <h1 className="text-page-title tracking-[-0.02em]">Design system preview</h1>
           <p className="mt-1 text-muted-foreground">
             Prototype theme ported to Tailwind + shadcn/ui. Temporary page.
           </p>
         </div>
-        <div className="flex items-center gap-2.5 rounded-lg border bg-card py-1.5 pr-1.5 pl-3 text-[13px]">
+        <div className="flex items-center gap-2.5 rounded-lg border bg-card py-1.5 pr-1.5 pl-3 text-control">
           <Target className="size-4" />
           <b className="font-semibold">AI Engineer · New Grad 2027</b>
           <Button size="sm" variant="secondary" className="bg-background">
@@ -104,7 +104,7 @@ export default function DesignPreview() {
           (label) => (
             <Card key={label}>
               <CardContent>
-                <div className="text-[13px] font-medium text-muted-foreground">{label}</div>
+                <div className="text-control font-medium text-muted-foreground">{label}</div>
                 <div className="mt-1.5 text-3xl leading-tight font-semibold tracking-[-0.03em]">
                   —
                 </div>
@@ -119,11 +119,11 @@ export default function DesignPreview() {
 
       <div className="flex flex-wrap items-center gap-4 rounded-xl bg-deep px-5 py-[18px] text-deep-foreground">
         <span className="grid size-9 place-items-center rounded-lg bg-white/12">
-          <Sparkles className="size-[18px]" />
+          <Sparkles className="size-4.5" />
         </span>
         <div className="flex-1">
           <small className="text-xs text-deep-muted">Recommended next step</small>
-          <b className="block text-[15px] font-semibold">Deep surface (banner, auth panel, FAB)</b>
+          <b className="block text-title font-semibold">Deep surface (banner, auth panel, FAB)</b>
         </div>
         <Button variant="outline" className="border-0 text-foreground">
           View plan
@@ -162,7 +162,7 @@ export default function DesignPreview() {
                 ["Cloud / DevOps", 46],
               ].map(([label, value]) => (
                 <div key={label}>
-                  <div className="mb-1.5 flex justify-between text-[13px] text-ink-2">
+                  <div className="mb-1.5 flex justify-between text-control text-ink-2">
                     <span>{label}</span>
                     <b className="font-semibold text-foreground">{value}%</b>
                   </div>
@@ -182,13 +182,13 @@ export default function DesignPreview() {
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid gap-1.5">
-              <Label htmlFor="preview-email" className="text-[13px] font-semibold text-ink-2">
+              <Label htmlFor="preview-email" className="text-control font-semibold text-ink-2">
                 Email
               </Label>
               <Input id="preview-email" type="email" placeholder="student@wisc.edu" />
             </div>
             <div className="grid gap-1.5">
-              <Label className="text-[13px] font-semibold text-ink-2">Target role</Label>
+              <Label className="text-control font-semibold text-ink-2">Target role</Label>
               <Select defaultValue="ai">
                 <SelectTrigger className="w-full">
                   <SelectValue />
