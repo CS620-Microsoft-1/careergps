@@ -1,5 +1,7 @@
 # CareerGPS Supabase Database Test Plan
 
+[![Backend baseline checks](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml/badge.svg?branch=test%2Fdatabase-rls)](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml)
+
 This is the living test document for the shared CareerGPS PostgreSQL database hosted on Supabase. Update it whenever the schema, authentication model, database role, RLS policies, or migration state changes.
 
 ## Current verified state
@@ -132,4 +134,5 @@ When a database-related PR changes the schema or security model:
 - Added seven credential-free baseline configuration tests.
 - Added a GitHub Actions workflow for pushes to the test branch and relevant PRs targeting `dev`.
 - Ran all seven tests locally; all passed.
+- Confirmed the first GitHub Actions run completed successfully.
 - Confirmed the tests do not connect to the shared database or expose `DATABASE_URL`.
