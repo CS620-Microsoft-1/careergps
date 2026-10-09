@@ -9,7 +9,7 @@ const STATUS: Record<AgentStatus, { label: string; icon: typeof Check; className
   waiting: { label: "Waiting", icon: Circle, className: "border bg-card text-muted-foreground" },
 };
 
-/** Vertical list of analysis agents with a connecting line, as in the prototype. */
+/** Vertical list of analysis agents, joined by a connecting line, with their status. */
 export function AgentPipeline({ steps }: { steps: AgentStep[] }) {
   return (
     <ol className="grid gap-3.5">

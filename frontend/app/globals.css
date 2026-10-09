@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 
 /*
- * CareerGPS ships a single light theme (ported from the original prototype).
+ * CareerGPS ships a single light theme.
  * Scoping `dark:` to a `.dark` ancestor that is never set keeps shadcn's
  * dark-mode classes inert instead of following the OS preference.
  */
@@ -47,11 +47,11 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* CareerGPS brand colors (prototype names in comments) */
-  --color-ink-2: var(--ink-2); /* --ink2: secondary body text */
-  --color-line-soft: var(--line-soft); /* --line2: row dividers, bar tracks */
-  --color-brand-dark: var(--brand-dark); /* --brand-d: hover, active nav text */
-  --color-deep: var(--deep); /* --dark: auth panel, next-step banner, FAB */
+  /* CareerGPS brand colors */
+  --color-ink-2: var(--ink-2); /* secondary body text */
+  --color-line-soft: var(--line-soft); /* row dividers, bar tracks */
+  --color-brand-dark: var(--brand-dark); /* hover, active nav text */
+  --color-deep: var(--deep); /* auth panel, next-step banner, Ask button */
   --color-deep-foreground: var(--deep-foreground);
   --color-deep-muted: var(--deep-muted);
   --color-success: var(--success);

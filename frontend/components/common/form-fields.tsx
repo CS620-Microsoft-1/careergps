@@ -95,7 +95,7 @@ export function SelectField<T extends FieldValues>({
   );
 }
 
-/** Two-or-more option toggle styled like the prototype's segmented control. */
+/** Segmented control: a radio group rendered as side-by-side toggle buttons. */
 export function SegmentedField<T extends FieldValues>({
   control,
   name,

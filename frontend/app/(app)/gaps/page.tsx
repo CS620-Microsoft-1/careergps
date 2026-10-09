@@ -20,7 +20,7 @@ export default function GapsPage() {
       />
 
       <Card className="gap-0 py-0">
-        {/* Column headings match the future table; hidden on small screens like the prototype. */}
+        {/* Column headings for the future table; hidden on small screens where rows stack. */}
         <div
           aria-hidden
           className="hidden grid-cols-[1.1fr_0.9fr_1fr_1.8fr_7rem] gap-5 rounded-t-xl border-b border-line-soft bg-[#fafbfb] px-5 py-2.5 text-xs font-medium text-muted-foreground md:grid"
