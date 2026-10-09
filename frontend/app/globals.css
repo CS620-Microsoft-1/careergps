@@ -149,6 +149,20 @@
   html {
     @apply font-sans;
   }
+  /*
+   * Large monitors: grow every rem-based size a little. Percentages multiply the
+   * browser's own font-size setting, so user preferences still apply.
+   */
+  @media (min-width: 120rem) {
+    html {
+      font-size: 106.25%;
+    }
+  }
+  @media (min-width: 160rem) {
+    html {
+      font-size: 112.5%;
+    }
+  }
   body {
     @apply bg-background text-sm/normal text-foreground antialiased;
   }

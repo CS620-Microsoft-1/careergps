@@ -31,8 +31,8 @@ components/ui/       shadcn/ui primitives (owned source, restyle freely)
 components/layout/   app shell: sidebar, topbar, navigation
 components/auth/     login, signup, onboarding pieces
 components/panels/   side panels (Copilot, sources, explanations)
-components/common/   shared building blocks (empty states, stat cards)
-lib/                 utilities
+components/common/   shared building blocks (logo, form fields, empty states)
+lib/                 utilities, form options, validation schemas
 types/               shared TypeScript types
 ```
 
