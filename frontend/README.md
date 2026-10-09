@@ -30,7 +30,7 @@ app/                 routes, layouts, global styles
 components/ui/       shadcn/ui primitives (owned source, restyle freely)
 components/layout/   app shell: sidebar, topbar, mobile nav, user menu, page header
 components/auth/     login, signup, onboarding pieces
-components/panels/   side panels (Copilot, sources, explanations)
+components/panels/   Copilot panel and the hook to open it from anywhere
 components/common/   shared building blocks (logo, form fields, empty states)
 lib/                 nav items, form options, validation schemas, utilities
 types/               shared TypeScript types
@@ -61,3 +61,12 @@ browser's font-size setting. Follow these rules when building pages:
 
 Check each new screen at 320, 390, 768, 1024, 1366×650 (short laptop), 1920 and 2560 wide,
 plus with the browser's default font size raised to 20px. No page may scroll horizontally.
+
+## Copilot
+
+The **Ask CareerGPS** panel (`components/panels/`) is the single place for questions,
+explanations and sources: there are no separate "why", source or analysis-detail panels.
+Each answer will carry its citations and the agent steps behind it. Any component can open
+it with `useCopilot().openCopilot("Why is Docker a high-priority gap?")`.
+The answer format is designed together with the backend Copilot API; until then the
+panel is a shell with the input disabled.

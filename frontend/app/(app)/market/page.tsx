@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { ChartColumn, ChevronRight, ListChecks } from "lucide-react";
+import { ChartColumn, ListChecks } from "lucide-react";
 
 import { AgentPipeline } from "@/components/common/agent-pipeline";
 import { ComingSoon } from "@/components/common/coming-soon";
 import { EmptyState } from "@/components/common/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardHeader,
@@ -77,13 +75,6 @@ export default function MarketPage() {
             <CardHeader>
               <CardTitle>How this was generated</CardTitle>
               <CardDescription>Four agents, run in sequence</CardDescription>
-              <CardAction>
-                <ComingSoon>
-                  <Button variant="link" disabled className="h-auto p-0">
-                    Details <ChevronRight data-icon="inline-end" />
-                  </Button>
-                </ComingSoon>
-              </CardAction>
             </CardHeader>
             <CardContent>
               <AgentPipeline steps={INITIAL_PIPELINE} />
