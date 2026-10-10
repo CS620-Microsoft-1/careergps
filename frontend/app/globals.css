@@ -1,0 +1,186 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/*
+ * CareerGPS ships a single light theme.
+ * Scoping `dark:` to a `.dark` ancestor that is never set keeps shadcn's
+ * dark-mode classes inert instead of following the OS preference.
+ */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--font-inter), "Segoe UI", system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* shadcn semantic colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* CareerGPS brand colors */
+  --color-ink-2: var(--ink-2); /* secondary body text */
+  --color-line-soft: var(--line-soft); /* row dividers, bar tracks */
+  --color-brand-dark: var(--brand-dark); /* hover, active nav text */
+  --color-deep: var(--deep); /* auth panel, next-step banner, Ask button */
+  --color-deep-foreground: var(--deep-foreground);
+  --color-deep-muted: var(--deep-muted);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-fill: var(--warning-fill); /* below-threshold readiness bars */
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  /* --radius is 10px: rounded-lg = buttons/inputs, rounded-xl = cards (14px) */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /*
+   * Type scale in rem so text follows the browser's font-size setting.
+   * control = buttons, labels, nav, tabs (13px); title = card/panel titles (15px);
+   * page-title = page headings (26px); display = auth hero, fluid 30px → 40px.
+   */
+  --text-control: 0.8125rem;
+  --text-control--line-height: 1.5;
+  --text-title: 0.9375rem;
+  --text-title--line-height: 1.4;
+  --text-page-title: 1.625rem;
+  --text-page-title--line-height: 1.25;
+  --text-display: clamp(1.875rem, 1.25rem + 1.6vw, 2.5rem);
+  --text-display--line-height: 1.15;
+
+  --shadow-card: 0 1px 2px rgb(19 43 39 / 0.04);
+  --shadow-popover: 0 12px 32px rgb(19 43 39 / 0.12);
+  --shadow-fab: 0 8px 24px rgb(29 74 68 / 0.3);
+}
+
+:root {
+  --radius: 0.625rem;
+
+  --background: #f6f8f7;
+  --foreground: #132b27;
+  --card: #ffffff;
+  --card-foreground: #132b27;
+  --popover: #ffffff;
+  --popover-foreground: #132b27;
+  --primary: #1f5c55;
+  --primary-foreground: #ffffff;
+  --secondary: #eef2f1;
+  --secondary-foreground: #3f5451;
+  --muted: #eef2f1;
+  --muted-foreground: #74858a;
+  --accent: #e8f3f0;
+  --accent-foreground: #174741;
+  --destructive: #b8412f;
+  --border: #e5ebe9;
+  --input: #e5ebe9;
+  --ring: #1f5c55;
+
+  --chart-1: #1f5c55;
+  --chart-2: #2c7a6a;
+  --chart-3: #d19a36;
+  --chart-4: #b8412f;
+  --chart-5: #74858a;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #3f5451;
+  --sidebar-primary: #1f5c55;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8f3f0;
+  --sidebar-accent-foreground: #174741;
+  --sidebar-border: #e5ebe9;
+  --sidebar-ring: #1f5c55;
+
+  --ink-2: #3f5451;
+  --line-soft: #eef2f1;
+  --brand-dark: #174741;
+  --deep: #1d4a44;
+  --deep-foreground: #ffffff;
+  --deep-muted: #b9d5ce;
+  --success: #2c7a6a;
+  --success-soft: #e3f2ed;
+  --warning: #a86a0c;
+  --warning-soft: #fbf3e3;
+  --warning-fill: #d19a36;
+  --danger: #b8412f;
+  --danger-soft: #fbeae6;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+  }
+  /*
+   * Large monitors: grow every rem-based size a little. Percentages multiply the
+   * browser's own font-size setting, so user preferences still apply.
+   */
+  @media (min-width: 120rem) {
+    html {
+      font-size: 106.25%;
+    }
+  }
+  @media (min-width: 160rem) {
+    html {
+      font-size: 112.5%;
+    }
+  }
+  body {
+    @apply bg-background text-sm/normal text-foreground antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-semibold tracking-[-0.01em];
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
