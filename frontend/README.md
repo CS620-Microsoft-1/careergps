@@ -4,7 +4,7 @@ Next.js (App Router) + TypeScript + Tailwind CSS + shadcn/ui, per [ADR-001](../d
 
 ## Run locally
 
-Requires Node.js 18.18 or newer.
+Requires Node.js 20.9 or newer (the minimum for Next.js 16).
 
 ```bash
 cd frontend
