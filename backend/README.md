@@ -1,6 +1,6 @@
 # CareerGPS Backend
 
-Python 3.12+ · SQLAlchemy · Alembic · PostgreSQL (hosted on Supabase). See [ADR-002](../docs/decisions/ADR-002-CareerGPS-Backend.md).
+Python 3.12+ · FastAPI · SQLAlchemy · Alembic · PostgreSQL (hosted on Supabase). See [ADR-002](../docs/decisions/ADR-002-CareerGPS-Backend.md).
 
 The whole team shares **one Supabase Postgres database**. There is no local database to set up.
 
@@ -14,7 +14,8 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Paste the shared `DATABASE_URL` into `.env` (ask Abanish for it privately). Then check:
+Paste the shared `DATABASE_URL` into `.env` (ask Abanish for it privately). `CORS_ORIGINS` can stay
+as `http://localhost:3000`. Then check:
 
 ```bash
 python -m app.db.check_connection   # should print "Connected ✅"
@@ -28,16 +29,48 @@ alembic current                     # should print the latest revision with "(he
 
 ```text
 app/
+├── main.py                  # FastAPI app: CORS + routers (entry point for uvicorn)
+├── core/
+│   └── config.py            # Settings read from .env (DATABASE_URL, CORS_ORIGINS)
+├── api/
+│   ├── deps.py              # get_db: one DB session per request, always closed
+│   └── routes/
+│       └── health.py        # GET /health, GET /health/db
 ├── db/
 │   ├── base.py              # SQLAlchemy Base; every model inherits from it
-│   ├── session.py           # engine + SessionLocal, built from DATABASE_URL
+│   ├── session.py           # engine + SessionLocal, built from settings
 │   └── check_connection.py  # connectivity test
 └── models/
     ├── __init__.py          # import every model here so Alembic can see it
     └── user.py
 migrations/
-├── env.py                   # Alembic setup: reads .env, loads models
+├── env.py                   # Alembic setup: reads settings, loads models
 └── versions/                # migration files (committed, never edited once applied)
+tests/                       # unittest; run by CI on every PR to dev, no DB needed
+```
+
+## Run the API
+
+```bash
+uvicorn app.main:app --reload            # http://localhost:8000
+uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
+```
+
+| URL | What it shows |
+|---|---|
+| `/health` | `{"status": "ok"}` when the API is running (no database access) |
+| `/health/db` | `{"status": "ok", "database": "connected"}`, or **503** if the database is unreachable |
+| `/docs` | Interactive API docs (Swagger UI), generated from the code |
+| `/openapi.json` | The API contract; the source of truth for frontend types (ADR-002) |
+
+New endpoints go in their own router under `app/api/routes/` and are registered in `app/main.py`.
+Use `db: Session = Depends(get_db)` for database access; keep business logic out of the route
+function. Only origins listed in `CORS_ORIGINS` can call the API from a browser; never use `*`.
+
+## Run the tests
+
+```bash
+python -m unittest discover -s tests -v
 ```
 
 ## Changing the schema
@@ -66,9 +99,11 @@ migrations/
 
 | Error                                                | Likely cause                                                            |
 | ---------------------------------------------------- | ----------------------------------------------------------------------- |
-| `DATABASE_URL is not set`                            | `.env` missing, or you're not running from `backend/`                   |
+| `validation error for Settings` … `database_url`     | `.env` missing or has no `DATABASE_URL`                                 |
 | `failed to resolve host`                             | Placeholder left in `.env`, or `@` in the password                      |
 | `No module named 'app'`                              | Run commands from `backend/`, not the repo root                         |
 | Connection refused / timeout after a quiet week      | Free Supabase project paused; resume it from the dashboard              |
 | `Multiple head revisions`                            | Two migrations branched from the same parent; run `alembic merge heads` |
 | VS Code: `Import "sqlalchemy" could not be resolved` | Select `backend/.venv/bin/python` as the interpreter                    |
+| `address already in use` when starting uvicorn       | Another app uses that port; add `--port 8010`                           |
+| Browser: `blocked by CORS policy`                    | Add the frontend's origin to `CORS_ORIGINS` in `.env` and restart       |
