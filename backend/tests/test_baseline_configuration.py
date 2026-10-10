@@ -65,7 +65,15 @@ class BackendConfigurationTests(unittest.TestCase):
     def test_required_dependencies_are_declared(self) -> None:
         requirements = (BACKEND_ROOT / "requirements.txt").read_text(encoding="utf-8")
 
-        for dependency in ("sqlalchemy", "psycopg", "alembic", "python-dotenv"):
+        for dependency in (
+            "sqlalchemy",
+            "psycopg",
+            "alembic",
+            "python-dotenv",
+            "fastapi",
+            "uvicorn",
+            "pydantic-settings",
+        ):
             with self.subTest(dependency=dependency):
                 self.assertIn(dependency, requirements.lower())
 
