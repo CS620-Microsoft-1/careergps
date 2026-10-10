@@ -1,6 +1,6 @@
 # CareerGPS Supabase Database Test Plan
 
-[![Backend baseline checks](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml/badge.svg?branch=test%2Fdatabase-rls)](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml)
+[![Backend baseline checks](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml/badge.svg?branch=dev)](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml)
 
 This is the living test document for the shared CareerGPS PostgreSQL database hosted on Supabase. Update it whenever the schema, authentication model, database role, RLS policies, or migration state changes.
 
@@ -54,7 +54,7 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 The workflow at `.github/workflows/backend-baseline-tests.yml` runs on:
 
 - Pushes to `test/database-rls` that change backend, test-document, or workflow files.
-- Pull requests targeting `dev` that change those files.
+- Every pull request targeting `dev`, including frontend-only pull requests, so the required `baseline` status check is always created.
 
 It performs seven checks without loading the real `.env` file or connecting to the shared database:
 
@@ -136,3 +136,11 @@ When a database-related PR changes the schema or security model:
 - Ran all seven tests locally; all passed.
 - Confirmed the first GitHub Actions run completed successfully.
 - Confirmed the tests do not connect to the shared database or expose `DATABASE_URL`.
+
+### 2026-10-09 — Required-check trigger coverage updated
+
+- Updated the workflow so every pull request targeting `dev` creates the required `baseline` status check, including frontend-only pull requests.
+- Kept the existing path filter for direct pushes to `test/database-rls`.
+- Updated the workflow badge to report the protected `dev` branch.
+- Ran all seven baseline configuration tests locally; all passed.
+- Did not connect to or modify the shared Supabase database.
