@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { ChevronRight } from "lucide-react";
 
 import { Logo } from "@/components/common/logo";
+import { BackendStatus } from "@/components/layout/backend-status";
 import { Progress } from "@/components/ui/progress";
 import { NAV_ITEMS, isActive } from "@/lib/nav";
 import { cn } from "@/lib/utils";
@@ -42,7 +43,10 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto rounded-xl border p-3.5">
+      {/* Above the card: the bottom-left corner is covered by the Next.js dev indicator. */}
+      <BackendStatus className="mx-2 mt-auto -mb-3" />
+
+      <div className="rounded-xl border p-3.5">
         <div className="mb-2 flex justify-between text-control text-ink-2">
           <span>Profile strength</span>
           <b className="font-semibold text-foreground">—</b>
