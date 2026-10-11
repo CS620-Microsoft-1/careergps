@@ -90,6 +90,11 @@ New endpoints go in their own router under `app/api/routes/` and are registered 
 Use `db: Session = Depends(get_db)` for database access; keep business logic out of the route
 function. Only origins listed in `CORS_ORIGINS` can call the API from a browser; never use `*`.
 
+The frontend calls each router from a file with the same name in `frontend/lib/api/`
+(`routes/health.py` ↔ `lib/api/health.ts`). When you add a router, add its frontend file too.
+The frontend finds the API through `NEXT_PUBLIC_API_URL` in `frontend/.env.local`; if you run
+the API on another port, update it there and restart `npm run dev`.
+
 ## Run the tests
 
 ```bash
