@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowLeftRight, ChevronDown, LogOut, User } from "lucide-react";
 
+import { BackendStatus } from "@/components/layout/backend-status";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -31,8 +32,9 @@ export function UserMenu() {
         <span className="sr-only">Open account menu</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
-        <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+        <DropdownMenuLabel className="grid gap-1.5 text-xs font-normal text-muted-foreground">
           Preview mode · no account yet
+          <BackendStatus interactive={false} />
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
