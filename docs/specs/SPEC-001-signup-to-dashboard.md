@@ -40,13 +40,13 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 
 | # | Task | Basis |
 |---|---|---|
-| P0-1 | Sign up with **email** + password | Decided (how: OPEN-7) |
-| P0-2 | Log in, log out, session (§8.1) | Decided (how: OPEN-7) |
-| P0-3 | Create the profile at sign-up (goal fields); onboarding adds location (`PATCH /me/profile`) | Decided |
+| P0-1 | Sign up with **email** + password, using **Supabase Auth**, with **email confirmation on** (§8.1) | Decided |
+| P0-2 | Log in, log out, session via Supabase Auth; FastAPI verifies the Supabase JWT (§8.1) | Decided |
+| P0-3 | Create `users` + `profiles` rows on the first login after email confirmation (`POST /me`, goal fields saved at sign-up); onboarding adds location (`PATCH /me/profile`) | Decided |
 | P0-4 | Route guard: not logged in → `/login`; onboarding not finished → `/onboarding` | Decided |
 | P0-5 | Upload a résumé, **PDF only**, ≤ 10 MB, checked by content (§7.1) | Decided |
 | P0-6 | **One résumé per user** (unique `resumes.user_id`) | Decided |
-| P0-7 | Store the file privately (§7.1) | Decided (where: OPEN-3) |
+| P0-7 | Store the file in a private **Supabase Storage** bucket (§7.1) | Decided |
 | P0-8 | Text extraction with `pdfplumber` (text, pages, links); scanned PDFs fail with `no_text` for now | Decided (OCR: OPEN-4) |
 | P0-9 | LLM extraction with **Azure OpenAI** into `ResumeExtraction`, schema-validated, one retry (§7.3) | Decided |
 | P0-10 | Run parsing with FastAPI `BackgroundTasks`; frontend polls (§7.4) | Decided |
@@ -55,7 +55,7 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P0-13 | A `failed` résumé can be replaced; a confirmed one **cannot** | Decided |
 | P0-14 | Frontend: DOCX removed from upload | Decided |
 | P0-15 | Goal fields (target role, graduation year, experience level) **only on sign-up**; remove them from onboarding | Decided |
-| P0-16 | Rate limit sign-up and login | Decided |
+| P0-16 | Rate limit sign-up and login (Supabase Auth's built-in limits, configured in the dashboard) | Decided |
 | P0-17 | Security checklist (§10) and tests (§11) | Decided |
 
 ### P1
@@ -63,8 +63,8 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | # | Task | Basis |
 |---|---|---|
 | P1-0 | Replace the résumé after confirming; confirm overwrites the structured rows | Decided |
-| P1-1 | Password reset by email | Decided |
-| P1-2 | Email verification | Proposed |
+| P1-1 | Password reset by email (Supabase Auth built-in; needs custom SMTP) | Decided |
+| P1-2 | Custom SMTP so confirmation and reset emails reach real users | Proposed |
 | P1-3 | Skip re-parsing an identical upload (`resumes.sha256`) | Proposed |
 | P1-4 | Parser quality set: sample résumés with expected output (§11) | Proposed |
 
@@ -77,12 +77,16 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P2-3 | OCR for scanned PDFs (may move up after the team's OCR test) | Pending (OPEN-4) |
 | P2-4 | Real job queue (e.g. arq + Redis) instead of `BackgroundTasks` | Proposed |
 | P2-5 | Push (SSE) instead of polling | Proposed |
-| P2-6 | SSO login (buttons exist as UI only) | Proposed |
+| P2-6 | SSO login via Supabase Auth OAuth providers (buttons exist as UI only) | Proposed |
 
 ## 4. End-to-end flow
 
 ```text
-/signup ──POST /auth/signup──▶ users + profiles created, session cookie set
+/signup ──supabase.auth.signUp()──▶ Supabase Auth creates the account and emails a confirmation link
+   │                                  (profile fields saved in user_metadata)
+   │
+confirmation link ──▶ /auth/confirm ──▶ session created
+   │    ──POST /me (Bearer JWT)──▶ users + profiles rows created from user_metadata
    │
 /onboarding ──PATCH /me/profile──▶ profile updated
    │        ──POST /resumes (multipart)──▶ file stored, resumes row = pending
@@ -110,11 +114,15 @@ Migrations follow the shared database rules in `backend/README.md`: generated wi
 
 ### 5.1 `users` (change)
 
-| Column | Type | Notes |
-|---|---|---|
-| `password_hash` | `text NOT NULL` | argon2id hash string (includes salt and parameters). Added with a migration; the table is empty today. |
+**[DECIDED] Users sign up and log in with email + password through Supabase Auth.** Supabase keeps accounts and password hashes in its own `auth.users` table; our database never stores passwords.
 
-**[DECIDED] Users sign up and log in with email** + password. The existing `email` column (unique, not null) is the login identifier, so the baseline CI test stays as it is. `email` is stored lower-cased and trimmed before the uniqueness check. Password reset is P1, so in P0 a user who forgets their password cannot recover the account on their own.
+| Change | Notes |
+|---|---|
+| `users.id` = `auth.users.id` | No default UUID for new rows; the id comes from the JWT `sub` claim. Add `FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE` **by hand** in the migration (autogenerate doesn't know the `auth` schema). |
+| `users.email` | Kept (unique, not null), copied from the JWT `email` claim when the row is created, so the baseline CI test stays as it is. `auth.users.email` is the source of truth; P1 email changes must update both. |
+| `users.full_name` | From the sign-up form (via `user_metadata` and `POST /me`). |
+
+Password reset is P1, so in P0 a user who forgets their password cannot recover the account on their own.
 
 ### 5.2 `profiles` (new, 1:1 with `users`)
 
@@ -194,7 +202,12 @@ Rules:
 
 **[DECIDED] PDF only.** The frontend currently also accepts DOCX, so `RESUME_ACCEPT` / `RESUME_MIME_TYPES` in `frontend/lib/options.ts`, the zod message and the dropzone text change to PDF only.
 
-**[OPEN-3] Object storage.** Where the PDF files live is an open problem. Whatever is chosen must be private (no public URLs), reachable only by the backend, with credentials only in backend `.env`. Candidates: a private Supabase Storage bucket (same vendor as the database; fits if OPEN-7 picks Supabase Auth), or Azure Blob Storage (same vendor as the LLM).
+**[DECIDED] Object storage: Supabase Storage.**
+- One **private** bucket, `resumes`. No public URLs; the frontend never reads files directly.
+- Only the backend reads and writes it, using the Supabase service-role/secret key from backend `.env`.
+- The bucket is created in the Supabase dashboard (it is project configuration, not schema) and recorded in `backend/README.md`, like the auth settings (§8.1).
+- Bucket file size limit set to 10 MB and allowed type to `application/pdf`, as a second check behind the backend's own checks.
+- Deleting a user must also delete their files: database cascades don't reach Storage, so the backend deletes the object explicitly.
 
 ### 7.2 Text extraction
 
@@ -236,14 +249,12 @@ The frontend polls (§8). No WebSockets or SSE in P0 (SSE is P2-5).
 
 ## 8. API
 
-All endpoints except signup/login need a valid session. Every `/resumes/{id}` endpoint checks `resume.user_id == current_user.id` and returns **404** (not 403) otherwise.
+Sign-up, login and logout are not FastAPI endpoints: the frontend calls Supabase Auth directly (§8.1). Every FastAPI endpoint below needs a valid Supabase JWT (`Authorization: Bearer <access_token>`). Every `/resumes/{id}` endpoint checks `resume.user_id == current_user.id` and returns **404** (not 403) otherwise.
 
 | Method & path | Body | Success | Errors |
 |---|---|---|---|
-| `POST /auth/signup` | full_name, email, password, target_role, graduation_year, university, experience_level, accept_terms | `201` + session cookie, returns `{user, profile}` | `409` email already registered, `422` validation |
-| `POST /auth/login` | email, password, remember | `200` + session cookie | `401` with a generic message (don't reveal whether the email is registered) |
-| `POST /auth/logout` | — | `204`, cookie cleared | |
-| `GET /me` | — | `{user, profile, latest_resume}` | `401` |
+| `POST /me` | full_name, target_role, graduation_year, university, experience_level, accept_terms | `201` `{user, profile}`; creates the `users` and `profiles` rows | `401`, `409` already created, `422` |
+| `GET /me` | — | `{user, profile, latest_resume}`; `profile` is `null` if `POST /me` never succeeded | `401` |
 | `PATCH /me/profile` | location (P0); goal fields once a settings page exists | `200` profile | `422` |
 | `POST /resumes` | multipart `file` | `202` `{id, status: "pending"}` | `409` already has a résumé that is not `failed` (P0), `413`, `415`, `422` |
 | `GET /resumes/{id}` | — | `{id, status, error_code, parsed_data}` | `404` |
@@ -254,34 +265,54 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 
 ### 8.1 Auth and sessions
 
-- Password hashing: **argon2id** via `argon2-cffi` (default parameters). Re-hash on login if parameters change.
-- Passwords are never logged, returned, or stored in plain text. Request logging must drop the body for `/auth/*`.
-- **[OPEN-7] Build auth ourselves, or use Supabase Auth?** Open problem. It decides the first PR.
-  - **Own:** argon2id hashes in `users.password_hash`; a random session token in an `HttpOnly`, `Secure`, `SameSite=Lax` cookie; a `sessions` table storing only the token's SHA-256, user_id and expiry (7 days, or 30 with "remember me"). Full control; P1 password reset and email verification need our own email-sending service.
-  - **Supabase Auth:** we never store passwords; password reset and email verification (P1) come mostly built in. FastAPI must verify Supabase JWTs, `users.id` must link to `auth.users.id`, and we depend more on Supabase. §5.1 (`password_hash`) and the `sessions` table go away.
-- **[DECIDED] P0:** rate limit `POST /auth/login` and `POST /auth/signup` per IP (e.g. 10/minute).
+**[DECIDED] Supabase Auth** (2026-10-11).
+
+**Frontend**
+- Uses `@supabase/supabase-js` with `@supabase/ssr`, so the Supabase session lives in cookies that Next.js can read (route guard, §9).
+- Sign-up: `supabase.auth.signUp({ email, password, options: { data: <profile fields>, emailRedirectTo: <site>/auth/confirm } })`. No session is returned until the email is confirmed; the page says "Check your email".
+- `/auth/confirm` (new Next.js route) exchanges the link's token for a session, then calls `POST /me` with the fields from `user_metadata` and sends the user to `/onboarding`. The backend validates them like any other input. Login: `signInWithPassword`. Logout: `signOut`. "Remember me" has no direct Supabase equivalent; P0 drops the checkbox or keeps it as UI only (to agree in PR 1).
+- Calls to FastAPI go through `frontend/lib/api/client.ts` (PR #9), which adds `Authorization: Bearer <access_token>` from the current session. No cross-site cookies are sent to FastAPI, so `credentials: "include"` is not needed.
+- New env vars: `NEXT_PUBLIC_SUPABASE_URL` and the project's publishable (anon) key. These are designed to be public; the service-role/secret key never goes to the frontend.
+
+**Backend**
+- A `get_current_user` dependency verifies the JWT on every request: signature (via the project's JWKS endpoint, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, if the project uses asymmetric signing keys; otherwise the legacy JWT secret from `.env`), `exp`, and `aud == "authenticated"`. Which of the two the project uses is checked in PR 1. Library: `PyJWT`.
+- It returns the user id (`sub`) and email. Endpoints other than `POST /me` return `403` if the `users` row doesn't exist yet.
+- New env var: `SUPABASE_URL` (plus `SUPABASE_JWT_SECRET` only if the project uses the legacy secret).
+
+**Rules**
+- Passwords never reach our backend or database. They go from the browser straight to Supabase Auth.
+- Tokens are never logged.
+- **[DECIDED] P0 rate limiting** on sign-up and login uses Supabase Auth's built-in rate limits (configured in the Supabase dashboard), since those requests don't go through FastAPI.
+- Auth settings (rate limits, email confirmation, redirect URLs) are changed in the Supabase dashboard, not by migrations. Whoever changes one records it in `backend/README.md`.
+- The Supabase Data API is disabled (backend README); Supabase Auth is a separate service. PR 1 must confirm sign-up works with that setting.
+
+**[DECIDED] Email confirmation is on in P0.** P0 is used for testing only, so Supabase's built-in email sender is enough. Limits to know:
+- The built-in sender is meant for testing: it has a low hourly limit, and may only deliver to the project's team members' addresses. Testers sign up with their own (team) emails; to check the current limits, see Supabase's Auth → Emails docs.
+- The confirmation link needs the right Site URL and redirect URL (`http://localhost:3000/auth/confirm` for local work) in Supabase Auth → URL Configuration.
+- Real users (P1) need custom SMTP (P1-2).
 
 ## 9. Frontend changes
 
-1. `signup-form.tsx`: call `POST /auth/signup` with `credentials: "include"`; show `409` as a field error on email. `login-form.tsx` calls `POST /auth/login`.
-2. `onboarding-form.tsx`: drop target role, graduation year and experience level (they are on sign-up only); keep location and résumé. `PATCH /me/profile`, then `POST /resumes`, then go to a new `/onboarding/review?resume={id}`.
+1. `signup-form.tsx`: `supabase.auth.signUp` with the profile fields as `user_metadata`, then a "Check your email" state. New `/auth/confirm` route (§8.1). `login-form.tsx`: `signInWithPassword`. Add a logout action to the user menu.
+2. `onboarding-form.tsx` (upload needs a longer timeout than the 5 s default in `lib/api/client.ts`; a 10 MB file can take longer on a slow connection): drop target role, graduation year and experience level (they are on sign-up only); keep location and résumé. `PATCH /me/profile`, then `POST /resumes`, then go to a new `/onboarding/review?resume={id}`.
 3. New `/onboarding/review` page:
    - Polls `GET /resumes/{id}` every 2 s, up to 2 minutes; shows a progress state.
    - `parsed`: an editable form built from `parsed_data` ("Here is what we identified"). Users can add, edit and delete items in each section.
    - `failed`: the message from §6, with "Try again" (retry) and "Upload a different file".
    - "Looks right" → `POST /resumes/{id}/confirm` → `/dashboard`.
-4. `(app)` routes: if `GET /me` says onboarding isn't complete, redirect to `/onboarding`; if `401`, redirect to `/login`.
+4. Route guard: no Supabase session → `/login`; session but `profile` is `null` → back to the sign-up profile fields; onboarding not complete → `/onboarding`.
 5. API types come from FastAPI's `/openapi.json` (ADR-002), not written by hand.
 
 **[DECIDED] Goal fields only on sign-up.** Target role, graduation year and experience level stay on sign-up and are removed from onboarding. Onboarding keeps location and the résumé.
 
 ## 10. Security and privacy checklist
 
-- [ ] No plaintext passwords anywhere (DB, logs, error responses, Sentry-style reports)
+- [ ] Passwords only ever go to Supabase Auth; access tokens are never logged
+- [ ] Supabase service-role/secret key only in backend `.env`; only the publishable key in the frontend
 - [ ] Résumé text and `parsed_data` are not written to logs either
 - [ ] Upload type checked by file content; storage key never derived from user input
 - [ ] Ownership checked on every résumé endpoint (404 for other users' IDs)
-- [ ] Storage bucket is private; service-role key only in backend `.env`
+- [ ] `resumes` bucket is private; service-role key only in backend `.env`
 - [ ] LLM prompt treats résumé text as untrusted data
 - [ ] CORS stays limited to `CORS_ORIGINS` (already the case)
 - [ ] Deleting a user removes their profile, résumés, structured rows (cascade) **and** stored files
@@ -290,8 +321,8 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 
 | Level | What |
 |---|---|
-| Unit | password hashing/verify; upload validation (wrong magic bytes, too big, too many pages); `ResumeExtraction` validation; status transitions (illegal ones rejected) |
-| API (FastAPI `TestClient`, LLM and storage faked) | signup → login → upload → poll → confirm happy path; 409 duplicate email; 404 on another user's résumé; confirm while `pending` → 409; `no_text` path |
+| Unit | JWT verification (valid, expired, wrong `aud`, bad signature) with a locally generated key; upload validation (wrong magic bytes, too big, too many pages); `ResumeExtraction` validation; status transitions (illegal ones rejected) |
+| API (FastAPI `TestClient`; auth, LLM and storage faked) | `POST /me` → upload → poll → confirm happy path; `401` without a token; `409` on a second `POST /me`; 404 on another user's résumé; confirm while `pending` → 409; `no_text` path |
 | Parser quality | 5–10 sample résumés (fake people) in `backend/tests/fixtures/` with expected output; reported as field-level match rate, not pass/fail, so it can run without CI calling the LLM |
 | Manual | full flow in the browser against the shared Supabase DB before merging to `dev` |
 
@@ -301,8 +332,8 @@ Existing CI (`unittest`, no DB) must keep passing; tests that need a DB or the L
 
 Team workflow: one Jira ticket per PR, set to *In progress* before starting so two people don't build the same thing. Each PR is a feature branch into `dev`, includes its own tests, and must pass the required CI checks.
 
-1. **Auth** (shape depends on OPEN-7): migration (`profiles`, plus `password_hash` and `sessions` if we build auth ourselves), `/auth/*`, `/me`, `PATCH /me/profile`; signup and login forms call the API; route guard.
-2. **Upload:** `resumes` table, storage client, `POST /resumes`, `GET /resumes/{id}`; onboarding form uploads.
+1. **Auth:** migration (`users.id` → `auth.users` FK, `profiles`); `get_current_user` JWT check; `POST /me`, `GET /me`, `PATCH /me/profile`; Supabase client in the frontend, sign-up/login/logout, `/auth/confirm`, bearer token in `lib/api/client.ts`; route guard; Supabase Auth settings (email confirmation, redirect URLs, rate limits).
+2. **Upload:** `resumes` table, `resumes` Storage bucket and storage client, `POST /resumes`, `GET /resumes/{id}`; onboarding form uploads.
 3. **Parsing:** text extraction, `LLMClient`, `ResumeExtraction`, background task, retry, stuck-job recovery.
 4. **Review & confirm:** structured tables migration, `POST /resumes/{id}/confirm`, `/onboarding/review` page.
 
@@ -312,6 +343,4 @@ PRs 1 and 2 touch different files and can be built in parallel; 3 depends on 2; 
 
 | # | Problem | Notes |
 |---|---|---|
-| OPEN-3 | Where résumé files are stored | Private Supabase Storage bucket, or Azure Blob Storage (§7.1) |
 | OPEN-4 | OCR for scanned PDFs | Waiting for the team's OCR model test (§7.2) |
-| OPEN-7 | Build auth ourselves, or use Supabase Auth | Blocks PR 1 (§8.1) |
