@@ -43,11 +43,11 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P0-1 | Sign up with **email** + password | Decided (how: OPEN-7) |
 | P0-2 | Log in, log out, session (§8.1) | Decided (how: OPEN-7) |
 | P0-3 | Create the profile at sign-up (goal fields); onboarding adds location (`PATCH /me/profile`) | Decided |
-| P0-4 | Route guard: not logged in → `/login`; onboarding not finished → `/onboarding` | Proposed |
+| P0-4 | Route guard: not logged in → `/login`; onboarding not finished → `/onboarding` | Decided |
 | P0-5 | Upload a résumé, **PDF only**, ≤ 10 MB, checked by content (§7.1) | Decided |
 | P0-6 | **One résumé per user** (unique `resumes.user_id`) | Decided |
-| P0-7 | Store the file privately (§7.1) | Open (OPEN-3: where) |
-| P0-8 | Text extraction with `pdfplumber` (text, pages, links); scanned PDFs fail with `no_text` for now | Proposed (OPEN-4) |
+| P0-7 | Store the file privately (§7.1) | Decided (where: OPEN-3) |
+| P0-8 | Text extraction with `pdfplumber` (text, pages, links); scanned PDFs fail with `no_text` for now | Decided (OCR: OPEN-4) |
 | P0-9 | LLM extraction with **Azure OpenAI** into `ResumeExtraction`, schema-validated, one retry (§7.3) | Decided |
 | P0-10 | Run parsing with FastAPI `BackgroundTasks`; frontend polls (§7.4) | Decided |
 | P0-11 | Status machine, retry from `failed`, recover rows stuck in `parsing` (§6) | Proposed |
@@ -56,7 +56,7 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P0-14 | Frontend: DOCX removed from upload | Decided |
 | P0-15 | Goal fields (target role, graduation year, experience level) **only on sign-up**; remove them from onboarding | Decided |
 | P0-16 | Rate limit sign-up and login | Decided |
-| P0-17 | Security checklist (§10) and tests (§11) | Proposed |
+| P0-17 | Security checklist (§10) and tests (§11) | Decided |
 
 ### P1
 
