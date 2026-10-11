@@ -320,16 +320,3 @@ PRs 1 and 2 touch different files and can be built in parallel; 3 depends on 2; 
 | OPEN-3 | Where résumé files are stored | Private Supabase Storage bucket, or Azure Blob Storage (§7.1) |
 | OPEN-4 | OCR for scanned PDFs | Waiting for the team's OCR model test (§7.2) |
 | OPEN-7 | Build auth ourselves, or use Supabase Auth | Blocks PR 1 (§8.1) |
-
-## 14. Decisions log (2026-10-10)
-
-| Topic | Decision |
-|---|---|
-| Login identifier | Email + password in P0 |
-| Password reset | P1 |
-| File types | PDF only |
-| Résumés per user | One in P0 (a failed one can be replaced; a confirmed one cannot); replacing after confirm in P1; multiple in P2 |
-| Goal fields | Only on sign-up |
-| LLM provider | Azure OpenAI ([ADR-003](../decisions/ADR-003-CareerGPS-LLM-Provider.md), pending approval) |
-| Background jobs | FastAPI `BackgroundTasks` in P0 |
-| Rate limiting | Sign-up and login, P0 |
