@@ -41,7 +41,7 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | # | Task | Basis |
 |---|---|---|
 | P0-1 | Sign up with **email** + password | Decided (how: OPEN-7) |
-| P0-2 | Log in, log out, session (§8.1) | Proposed (OPEN-7) |
+| P0-2 | Log in, log out, session (§8.1) | Decided (how: OPEN-7) |
 | P0-3 | Create the profile at sign-up (goal fields); onboarding adds location (`PATCH /me/profile`) | Decided |
 | P0-4 | Route guard: not logged in → `/login`; onboarding not finished → `/onboarding` | Proposed |
 | P0-5 | Upload a résumé, **PDF only**, ≤ 10 MB, checked by content (§7.1) | Decided |
@@ -78,11 +78,6 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P2-4 | Real job queue (e.g. arq + Redis) instead of `BackgroundTasks` | Proposed |
 | P2-5 | Push (SSE) instead of polling | Proposed |
 | P2-6 | SSO login (buttons exist as UI only) | Proposed |
-
-### Not in this spec
-
-- Dashboard content beyond "profile exists and is confirmed"
-- Analysis that uses the parsed résumé (skill gaps, market, roadmap)
 
 ## 4. End-to-end flow
 
