@@ -5,7 +5,7 @@ from app.api.deps import get_current_db_user, get_current_user, get_db
 from app.core.security import AuthenticatedUser
 from app.models import User
 from app.schemas.me import AccountCreate, MeRead, ProfileRead, ProfileUpdate
-from app.services import accounts
+from app.services import accounts, resumes
 
 router = APIRouter(prefix="/me", tags=["me"])
 
@@ -31,7 +31,10 @@ def read_me(
 ) -> MeRead:
     """The logged-in user's account and profile; both null if sign-up isn't finished yet."""
     user, profile = accounts.get_account(db, auth_user.id)
-    return MeRead.model_validate({"user": user, "profile": profile}, from_attributes=True)
+    resume = resumes.get_for_user(db, auth_user.id) if user else None
+    return MeRead.model_validate(
+        {"user": user, "profile": profile, "latest_resume": resume}, from_attributes=True
+    )
 
 
 @router.patch("/profile", response_model=ProfileRead)

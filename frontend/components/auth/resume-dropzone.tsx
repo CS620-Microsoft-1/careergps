@@ -14,7 +14,7 @@ type ResumeDropzoneProps = {
   invalid?: boolean;
 };
 
-/** Click or drop a résumé. Only keeps the File in form state; nothing is uploaded. */
+/** Click or drop a résumé. Only keeps the File in form state; the form uploads it on submit. */
 export function ResumeDropzone({ id, value, onChange, onBlur, invalid }: ResumeDropzoneProps) {
   const [dragging, setDragging] = useState(false);
 
@@ -46,7 +46,7 @@ export function ResumeDropzone({ id, value, onChange, onBlur, invalid }: ResumeD
       <b className="max-w-full truncate text-sm font-semibold text-foreground">
         {value ? value.name : "Upload your résumé"}
       </b>
-      {value ? "Click to replace" : "PDF or DOCX, up to 10 MB"}
+      {value ? "Click to replace" : "PDF, up to 10 MB"}
       <input
         id={id}
         type="file"

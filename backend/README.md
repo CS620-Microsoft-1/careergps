@@ -40,7 +40,8 @@ app/
 │   ├── deps.py              # get_db, get_current_user (token), get_current_db_user (token + users row)
 │   └── routes/
 │       ├── health.py        # GET /health, GET /health/db
-│       └── me.py            # POST /me, GET /me, PATCH /me/profile
+│       ├── me.py            # POST /me, GET /me, PATCH /me/profile
+│       └── resumes.py       # upload, poll, retry, confirm
 ├── db/
 │   ├── base.py              # SQLAlchemy Base; every model inherits from it
 │   ├── session.py           # engine + SessionLocal, built from settings
@@ -48,9 +49,15 @@ app/
 ├── models/
 │   ├── __init__.py          # import every model here so Alembic can see it
 │   ├── user.py              # id = Supabase Auth account id
-│   └── profile.py
+│   ├── profile.py
+│   ├── resume.py            # one uploaded PDF + parsing status
+│   └── resume_data.py       # educations, experiences, skills, projects (written on confirm)
 ├── schemas/                 # Pydantic request/response models
 └── services/                # business logic, called by the routes
+    ├── pdf.py               # PDF checks + pdfplumber text/link extraction
+    ├── storage.py           # Supabase Storage (private bucket)
+    ├── llm.py               # Azure OpenAI; the only module that knows the provider (ADR-003)
+    └── parsing.py           # background job: PDF → text → LLM → parsed_data
 migrations/
 ├── env.py                   # Alembic setup: reads settings, loads models
 └── versions/                # migration files (committed, never edited once applied)
@@ -71,6 +78,10 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 | `POST /me` | Finish sign-up: creates the `users` and `profiles` rows for the logged-in account. **409** if they exist |
 | `GET /me` | `{user, profile}` for the logged-in account; both `null` until `POST /me` succeeds |
 | `PATCH /me/profile` | Update `location`. **403** until `POST /me` succeeds |
+| `POST /resumes` | Upload a PDF (multipart `file`, ≤ 10 MB, ≤ 10 pages). **202**; parsing runs in the background. **409** if the user already has a résumé that isn't `failed` |
+| `GET /resumes/{id}` | Status (`pending` → `parsing` → `parsed` / `failed` → `confirmed`), `error_code`, `parsed_data`. Poll this |
+| `POST /resumes/{id}/retry` | Parse a `failed` résumé again |
+| `POST /resumes/{id}/confirm` | Save the user-checked data to the structured tables. Only from `parsed` |
 | `/docs` | Interactive API docs (Swagger UI), generated from the code |
 | `/openapi.json` | The API contract; the source of truth for frontend types (ADR-002) |
 

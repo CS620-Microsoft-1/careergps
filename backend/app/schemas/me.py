@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.core.options import GRADUATION_YEARS_AHEAD, ExperienceLevel, TargetRole
+from app.schemas.resume import ResumeSummary
 
 # Requests: strip whitespace, reject unknown fields. Mirrors frontend/lib/validation/auth.ts,
 # which only exists for user experience; these checks are the real ones.
@@ -59,11 +60,14 @@ class ProfileRead(BaseModel):
     graduation_year: int
     university: str
     location: str | None
+    phone: str | None
+    links: list[str] | None
     onboarding_completed_at: datetime | None
 
 
 class MeRead(BaseModel):
-    """Both are null until POST /me succeeds; the frontend uses that to finish sign-up."""
+    """user and profile are null until POST /me succeeds; the frontend uses that to finish sign-up."""
 
     user: UserRead | None
     profile: ProfileRead | None
+    latest_resume: ResumeSummary | None = None

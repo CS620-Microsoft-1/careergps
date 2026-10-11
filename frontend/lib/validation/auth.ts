@@ -52,14 +52,12 @@ export const signupSchema = z
   });
 export type SignupValues = z.infer<typeof signupSchema>;
 
+// Goal fields (role, graduation year, experience) are asked at sign-up only.
 export const onboardingSchema = z.object({
-  targetRole,
-  graduationYear,
   location: z.string().trim().min(1, "Enter a preferred location.").max(100),
-  experienceLevel,
   resume: z
     .instanceof(File, { error: "Upload your résumé." })
-    .refine((f) => RESUME_MIME_TYPES.includes(f.type), "Upload a PDF or DOCX file.")
+    .refine((f) => RESUME_MIME_TYPES.includes(f.type), "Upload a PDF file.")
     .refine((f) => f.size <= RESUME_MAX_BYTES, "File must be 10 MB or smaller."),
 });
 export type OnboardingValues = z.infer<typeof onboardingSchema>;

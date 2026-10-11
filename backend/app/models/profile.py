@@ -5,6 +5,7 @@ from sqlalchemy import DateTime, ForeignKey, SmallInteger, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
+from app.db.types import JSONType
 
 
 class Profile(Base):
@@ -22,6 +23,9 @@ class Profile(Base):
     graduation_year: Mapped[int] = mapped_column(SmallInteger, nullable=False)
     university: Mapped[str] = mapped_column(String(150), nullable=False)
     location: Mapped[str | None] = mapped_column(String(100))
+    # From the confirmed résumé's contact section.
+    phone: Mapped[str | None] = mapped_column(String(50))
+    links: Mapped[list[str] | None] = mapped_column(JSONType)
     terms_accepted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     onboarding_completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = mapped_column(

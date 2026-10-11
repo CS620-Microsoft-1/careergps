@@ -2,18 +2,17 @@ import type { Metadata } from "next";
 
 import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
 import { OnboardingForm } from "@/components/auth/onboarding-form";
-import { getGraduationYears } from "@/lib/graduation-years";
 
-export const metadata: Metadata = { title: "Your career goal" };
+export const metadata: Metadata = { title: "Upload your résumé" };
 
-export default async function OnboardingPage() {
+export default function OnboardingPage() {
   return (
     <AuthShell
       title="Where do you want your career to go?"
-      description="Tell us your goal. We'll compare your experience with real job-market data and map the clearest path forward."
+      description="Share your résumé. We'll compare your experience with real job-market data and map the clearest path forward."
     >
-      <AuthHeading title="Your career goal" subtitle="You can change this anytime." />
-      <OnboardingForm graduationYears={await getGraduationYears()} />
+      <AuthHeading title="Upload your résumé" subtitle="You'll check what we found before anything is saved." />
+      <OnboardingForm />
     </AuthShell>
   );
 }

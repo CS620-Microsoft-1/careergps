@@ -18,6 +18,15 @@ class Settings(BaseSettings):
     supabase_url: str | None = None
     # Only for projects still on the legacy shared JWT secret (HS256). Leave unset with signing keys.
     supabase_jwt_secret: str | None = None
+    # Supabase secret (service-role) key: lets the backend read and write the private résumé bucket.
+    supabase_secret_key: str | None = None
+    resume_bucket: str = "resumes"
+
+    # Azure OpenAI (ADR-003). Résumé parsing fails with llm_unavailable until these are set.
+    azure_openai_endpoint: str | None = None
+    azure_openai_api_key: str | None = None
+    azure_openai_deployment: str | None = None
+    azure_openai_api_version: str | None = None
 
     @property
     def cors_origin_list(self) -> list[str]:

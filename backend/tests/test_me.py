@@ -91,7 +91,7 @@ class MeApiTests(unittest.TestCase):
         response = self.client.get("/me", headers=self.headers)
 
         self.assertEqual(200, response.status_code)
-        self.assertEqual({"user": None, "profile": None}, response.json())
+        self.assertEqual({"user": None, "profile": None, "latest_resume": None}, response.json())
 
     def test_second_sign_up_conflicts(self) -> None:
         self.client.post("/me", json=valid_signup(), headers=self.headers)
