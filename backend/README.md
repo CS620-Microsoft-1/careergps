@@ -122,13 +122,13 @@ python -m unittest discover -s tests -v
 3. **Review the generated file.** Autogenerate treats a rename as drop + add (data loss) and ignores RLS, triggers and functions; add those by hand.
 4. Preview the SQL without touching the database: `alembic upgrade head --sql`
 5. Open a PR. The migration is reviewed like any other code.
-6. **After merge**, the migration owner runs `alembic upgrade head` from `main`.
+6. **After the PR is merged into `dev`**, one person runs `alembic upgrade head` from an up-to-date `dev`.
 
 ## Shared database rules
 
 1. **Schema changes only go through Alembic.** Never create or alter tables in the Supabase dashboard. Viewing and editing rows there is fine.
 2. **Never edit a migration that has been applied.** Write a new one.
-3. **Only apply migrations from `main`, after merge, by one person.** Announce it in the team chat.
+3. **Only apply migrations from `dev`, after the PR is merged, by one person.** Never from a feature branch: a migration may still change in review, and applied migrations must never be edited (rule 2). Announce it in the team chat.
 4. **No `alembic downgrade` on the shared database** without telling the team first. It can drop tables and their data.
 5. **No real personal data** until authentication is in place. Use fake test users.
 6. **Enable RLS on every new table** in its migration (`ALTER TABLE <name> ENABLE ROW LEVEL SECURITY`). The Supabase Data API is disabled; RLS is a second layer of protection.

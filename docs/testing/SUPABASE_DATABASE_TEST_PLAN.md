@@ -48,7 +48,7 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-011 | Client changes a user ID in the request | Backend authorization rejects cross-user access | PASS — automated API tests on in-memory SQLite (`tests/test_resumes.py`: another user's résumé → 404); not yet run against the shared DB |
 | DB-012 | Limited application database role connects | Required operations work without administrator privileges | BLOCKED — role not created |
 | DB-013 | Secret scan and Git status | `.env` and credentials are absent from tracked files | PASS |
-| DB-014 | Apply migrations `6786f26fc026` and `4d5da22c5814` from `main` | `alembic current` shows `4d5da22c5814 (head)` | NOT RUN — waiting for merge to `main` |
+| DB-014 | Apply migrations `6786f26fc026` and `4d5da22c5814` from `dev` | `alembic current` shows `4d5da22c5814 (head)` | NOT RUN — waiting for merge to `dev` |
 | DB-015 | Inspect RLS flags on `profiles`, `resumes`, `educations`, `experiences`, `skills`, `projects` | RLS enabled on all six | NOT RUN — needs DB-014 |
 | DB-016 | Inspect `users.id` foreign key | References `auth.users(id)` with `ON DELETE CASCADE` | NOT RUN — needs DB-014 |
 | DB-017 | Delete a test account in Supabase Auth | Its `users`, `profiles`, `resumes` and structured rows are deleted by cascade | NOT RUN — needs DB-014 and Supabase Auth |
@@ -163,3 +163,8 @@ When a database-related PR changes the schema or security model:
 - Added migrations `6786f26fc026` (`profiles`; `users.id` → `auth.users`) and `4d5da22c5814` (`resumes`, `educations`, `experiences`, `skills`, `projects`; `profiles.phone`, `profiles.links`). All new tables enable RLS. Reviewed with `alembic upgrade head --sql` only; **not applied**, per the rule to apply migrations from `main` after merge.
 - Added DB-014 to DB-018 to the matrix; all NOT RUN until the migrations are applied.
 - Ran the backend test suite locally without `.env`; all tests passed.
+
+### 2026-10-11 — Migration rule changed to `dev`
+
+- Abanish agreed that migrations may be applied from `dev` instead of `main`: after the PR is merged into `dev`, by one person, announced in the team chat (backend README, shared database rules).
+- DB-014 now waits for the merge into `dev`.

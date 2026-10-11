@@ -110,7 +110,7 @@ confirmation link ──▶ /auth/confirm ──▶ session created
 All tables get RLS enabled with no policies, as with `users` (the backend is the only client).
 All new migrations are additive.
 
-Migrations follow the shared database rules in `backend/README.md`: generated with Alembic and reviewed in the PR, never created in the Supabase dashboard, applied from `main` after merge by the migration owner only, and `ENABLE ROW LEVEL SECURITY` in every new table's migration.
+Migrations follow the shared database rules in `backend/README.md`: generated with Alembic and reviewed in the PR, never created in the Supabase dashboard, applied from `dev` after the PR is merged, by one person who announces it in the team chat, and `ENABLE ROW LEVEL SECURITY` in every new table's migration.
 
 ### 5.1 `users` (change)
 
