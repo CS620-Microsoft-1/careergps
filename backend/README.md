@@ -15,7 +15,9 @@ cp .env.example .env
 ```
 
 Paste the shared `DATABASE_URL` into `.env` (ask Abanish for it privately). `CORS_ORIGINS` can stay
-as `http://localhost:3000`. Then check:
+as `http://localhost:3000`. Set `SUPABASE_URL` to `https://<project-ref>.supabase.co` (the project ref
+is the part after `postgres.` in `DATABASE_URL`); without it, endpoints that need login return 503.
+Then check:
 
 ```bash
 python -m app.db.check_connection   # should print "Connected ✅"
@@ -31,18 +33,24 @@ alembic current                     # should print the latest revision with "(he
 app/
 ├── main.py                  # FastAPI app: CORS + routers (entry point for uvicorn)
 ├── core/
-│   └── config.py            # Settings read from .env (DATABASE_URL, CORS_ORIGINS)
+│   ├── config.py            # Settings read from .env (DATABASE_URL, CORS_ORIGINS, SUPABASE_URL)
+│   ├── options.py           # sign-up choices (target roles, experience levels); mirrors the frontend
+│   └── security.py          # verifies Supabase Auth access tokens (JWTs)
 ├── api/
-│   ├── deps.py              # get_db: one DB session per request, always closed
+│   ├── deps.py              # get_db, get_current_user (token), get_current_db_user (token + users row)
 │   └── routes/
-│       └── health.py        # GET /health, GET /health/db
+│       ├── health.py        # GET /health, GET /health/db
+│       └── me.py            # POST /me, GET /me, PATCH /me/profile
 ├── db/
 │   ├── base.py              # SQLAlchemy Base; every model inherits from it
 │   ├── session.py           # engine + SessionLocal, built from settings
 │   └── check_connection.py  # connectivity test
-└── models/
-    ├── __init__.py          # import every model here so Alembic can see it
-    └── user.py
+├── models/
+│   ├── __init__.py          # import every model here so Alembic can see it
+│   ├── user.py              # id = Supabase Auth account id
+│   └── profile.py
+├── schemas/                 # Pydantic request/response models
+└── services/                # business logic, called by the routes
 migrations/
 ├── env.py                   # Alembic setup: reads settings, loads models
 └── versions/                # migration files (committed, never edited once applied)
@@ -60,8 +68,23 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 |---|---|
 | `/health` | `{"status": "ok"}` when the API is running (no database access) |
 | `/health/db` | `{"status": "ok", "database": "connected"}`, or **503** if the database is unreachable |
+| `POST /me` | Finish sign-up: creates the `users` and `profiles` rows for the logged-in account. **409** if they exist |
+| `GET /me` | `{user, profile}` for the logged-in account; both `null` until `POST /me` succeeds |
+| `PATCH /me/profile` | Update `location`. **403** until `POST /me` succeeds |
 | `/docs` | Interactive API docs (Swagger UI), generated from the code |
 | `/openapi.json` | The API contract; the source of truth for frontend types (ADR-002) |
+
+### Authentication
+
+Sign-up, login and logout happen in the frontend with Supabase Auth; the API never sees passwords.
+The frontend sends the Supabase access token as `Authorization: Bearer <token>`. The API checks its
+signature (Supabase's public signing keys, or `SUPABASE_JWT_SECRET` on legacy projects), expiry,
+audience and issuer. Missing or invalid token → **401**.
+
+- `Depends(get_current_user)`: the Supabase account (id, email). Use for `/me` sign-up.
+- `Depends(get_current_db_user)`: also requires the `users` row; **403** if sign-up isn't finished.
+  Use this for everything else.
+- Never log tokens.
 
 New endpoints go in their own router under `app/api/routes/` and are registered in `app/main.py`.
 Use `db: Session = Depends(get_db)` for database access; keep business logic out of the route
