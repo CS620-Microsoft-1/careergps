@@ -47,7 +47,7 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P0-5 | Upload a résumé, **PDF only**, ≤ 10 MB, checked by content (§7.1) | Decided |
 | P0-6 | **One résumé per user** (unique `resumes.user_id`) | Decided |
 | P0-7 | Store the file in a private **Supabase Storage** bucket (§7.1) | Decided |
-| P0-8 | Text extraction with `pdfplumber` (text, pages, links); scanned PDFs fail with `no_text` for now | Decided (OCR: OPEN-4) |
+| P0-8 | Text extraction with `pdfplumber` (text, pages, links); scanned PDFs fail with `no_text` for now | Decided (OCR in P1: P1-5) |
 | P0-9 | LLM extraction with **Azure OpenAI** into `ResumeExtraction`, schema-validated, one retry (§7.3) | Decided |
 | P0-10 | Run parsing with FastAPI `BackgroundTasks`; frontend polls (§7.4) | Decided |
 | P0-11 | Status machine, retry from `failed`, stuck rows marked `failed` when read (§6) | Proposed |
@@ -67,6 +67,7 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P1-2 | Custom SMTP so confirmation and reset emails reach real users | Proposed |
 | P1-3 | Skip re-parsing an identical upload (`resumes.sha256`) | Proposed |
 | P1-4 | Parser quality set: sample résumés with expected output (§11) | Proposed |
+| P1-5 | OCR for scanned PDFs: when text extraction finds too little text, run OCR instead of failing with `no_text`; failed `no_text` résumés can then be retried (the original PDF is kept). Model chosen from the team's OCR test | Decided |
 
 ### P2
 
@@ -74,7 +75,6 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 |---|---|---|
 | P2-1 | Multiple résumés per user | Decided |
 | P2-2 | DOCX upload (`python-docx`) | Proposed |
-| P2-3 | OCR for scanned PDFs (may move up after the team's OCR test) | Pending (OPEN-4) |
 | P2-4 | Real job queue (e.g. arq + Redis) instead of `BackgroundTasks` | Proposed |
 | P2-5 | Push (SSE) instead of polling | Proposed |
 | P2-6 | SSO login via Supabase Auth OAuth providers (buttons exist as UI only) | Proposed |
@@ -221,7 +221,7 @@ The plan named `unpdf` / `pdfjs-dist`, but those are JavaScript libraries and pa
 - Store this in a new `resumes.extracted` column (`jsonb`: `full_text`, `pages[]`, `links[]`) so a parse can be re-run or debugged without re-reading the file. It is personal data: same handling as `parsed_data`, never logged.
 - If extracted text is under 200 characters, treat it as scanned: `failed` / `no_text`.
 
-**[OPEN-4] OCR for scanned PDFs.** The team is testing OCR models for accuracy and layout handling; priority waits for those results. Until then: P0 shows the `no_text` message. The `no_text` check is the hook where OCR plugs in later, so P0 code doesn't change when OCR is added.
+**[DECIDED] OCR for scanned PDFs is P1** (P1-5). P0 shows the `no_text` message. The `no_text` check is where OCR plugs in, so the rest of the pipeline doesn't change when OCR is added. Which OCR model to use comes from the team's OCR test.
 
 ### 7.3 LLM extraction
 
@@ -346,4 +346,4 @@ PRs 1 and 2 touch different files and can be built in parallel; 3 depends on 2; 
 
 | # | Problem | Notes |
 |---|---|---|
-| OPEN-4 | OCR for scanned PDFs | Waiting for the team's OCR model test (§7.2) |
+| P0-11 | Résumé status machine, incl. stuck jobs marked `failed` when read | Implemented as in §6; waiting for confirmation |
