@@ -9,10 +9,12 @@ Requires Node.js 20.9 or newer (the minimum for Next.js 16).
 ```bash
 cd frontend
 npm install
+cp .env.example .env.local   # then set NEXT_PUBLIC_API_URL if the API isn't on port 8000
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000. Start the backend too (see `backend/README.md`) so the app can
+reach the API.
 
 ## Scripts
 
@@ -28,15 +30,60 @@ Open http://localhost:3000.
 ```text
 app/                 routes, layouts, global styles
 components/ui/       shadcn/ui primitives (owned source, restyle freely)
-components/layout/   app shell: sidebar, topbar, mobile nav, user menu, page header
+components/layout/   app shell: sidebar, topbar, mobile nav, user menu, page header, backend status
 components/auth/     login, signup, onboarding pieces
 components/panels/   Copilot panel and the hook to open it from anywhere
 components/common/   shared building blocks (logo, form fields, empty states)
 lib/                 nav items, form options, validation schemas, utilities
-types/               shared TypeScript types
+lib/api/             every call to the backend API (see "Connect to the backend")
+types/               shared TypeScript types (types/api.ts: API response shapes)
 ```
 
 Add more shadcn components with `npx shadcn@latest add <name>`.
+
+## Connect to the backend
+
+The app calls the FastAPI backend at `NEXT_PUBLIC_API_URL`, set in `.env.local` (copied from
+`.env.example`; defaults to `http://localhost:8000`).
+
+- **Restart `npm run dev` after changing `.env.local`.** `NEXT_PUBLIC_` values are built into
+  the browser code when the dev server starts.
+- **Never put secrets in a `NEXT_PUBLIC_` variable.** Anyone can read them in the browser.
+- The backend only accepts browser calls from origins listed in `CORS_ORIGINS` in
+  `backend/.env` (default `http://localhost:3000`). Running the frontend on another port means
+  adding it there.
+
+The **backend status badge** (bottom of the sidebar, and in the account menu on small screens)
+shows whether the app can reach the API and database. Hover it for details.
+
+| Badge | Meaning | Fix |
+| --- | --- | --- |
+| 🟢 Backend connected | API and database both reachable | — |
+| 🟠 Database unreachable | API is up, database isn't | Check `DATABASE_URL` in `backend/.env`; resume the Supabase project if it paused |
+| 🔴 Backend unreachable | No answer from the API | Start it (`uvicorn app.main:app --reload`); check `NEXT_PUBLIC_API_URL` and `CORS_ORIGINS` |
+
+### Calling the API
+
+All backend calls go through `lib/api/`. Components never call `fetch()` directly.
+
+```text
+lib/api/client.ts    shared plumbing: base URL, timeout, errors (ApiError)
+lib/api/health.ts    one file per backend router, same name: backend/app/api/routes/health.py
+```
+
+To add a call, put a small function in the matching file (create it if the router is new) and
+type the response in `types/api.ts`:
+
+```ts
+// lib/api/health.ts
+export function getDatabaseHealth() {
+  return apiGet<DatabaseHealthResponse>("/health/db");
+}
+```
+
+`ApiError.status` is the HTTP status (e.g. `503`), or `0` when no response arrived at all (API
+down, timeout, or blocked by CORS). Response types are hand-written for now and will be
+generated from the API's `/openapi.json` later.
 
 ## Responsive rules
 
