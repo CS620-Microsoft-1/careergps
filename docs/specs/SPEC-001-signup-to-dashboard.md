@@ -50,7 +50,7 @@ The **Basis** column says whether the priority was decided by the team (**Decide
 | P0-8 | Text extraction with `pdfplumber` (text, pages, links); scanned PDFs fail with `no_text` for now | Decided (OCR: OPEN-4) |
 | P0-9 | LLM extraction with **Azure OpenAI** into `ResumeExtraction`, schema-validated, one retry (§7.3) | Decided |
 | P0-10 | Run parsing with FastAPI `BackgroundTasks`; frontend polls (§7.4) | Decided |
-| P0-11 | Status machine, retry from `failed`, recover rows stuck in `parsing` (§6) | Proposed |
+| P0-11 | Status machine, retry from `failed`, stuck rows marked `failed` when read (§6) | Proposed |
 | P0-12 | Review page: show, edit, confirm; confirm writes the structured tables (§5.4, §9) | Decided |
 | P0-13 | A `failed` résumé can be replaced; a confirmed one **cannot** | Decided |
 | P0-14 | Frontend: DOCX removed from upload | Decided |
@@ -96,7 +96,7 @@ confirmation link ──▶ /auth/confirm ──▶ session created
    │                          parsing → text → LLM → parsed_data, status = parsed
    │                                         (or failed + error_code)
    ▼
-/onboarding/review ──GET /resumes/{id} every 2 s until parsed/failed
+/onboarding/review ──GET /me (résumé id), then GET /resumes/{id} every 2 s until parsed/failed
    │   "Here is what we identified" — user edits fields
    │
    └──POST /resumes/{id}/confirm──▶ one transaction: write structured tables,
@@ -134,6 +134,8 @@ Password reset is P1, so in P0 a user who forgets their password cannot recover 
 | `graduation_year` | `smallint NOT NULL` | current year … current year + 4 |
 | `university` | `text NOT NULL` | ≤ 150 chars |
 | `location` | `text NULL` | ≤ 100 chars; filled in onboarding |
+| `phone`, `links` | `text NULL`, `jsonb NULL` | from the confirmed résumé's contact section |
+| `terms_accepted_at` | `timestamptz NOT NULL` | when the user accepted the terms at sign-up (résumés go to Azure OpenAI, so we keep a record of consent) |
 | `onboarding_completed_at` | `timestamptz NULL` | set when a résumé is confirmed |
 | `created_at`, `updated_at` | `timestamptz` | same pattern as `users` |
 
@@ -143,7 +145,7 @@ Password reset is P1, so in P0 a user who forgets their password cannot recover 
 |---|---|---|
 | `id` | `uuid PK` | |
 | `user_id` | `uuid FK users.id ON DELETE CASCADE`, indexed | |
-| `storage_key` | `text NOT NULL` | `resumes/{user_id}/{resume_id}.pdf`. Never built from the uploaded file name. |
+| `storage_key` | `text NOT NULL` | `{user_id}/{resume_id}.pdf` inside the `resumes` bucket. Never built from the uploaded file name. |
 | `original_filename` | `text NOT NULL` | shown in the UI only, ≤ 255 chars |
 | `content_type` | `text NOT NULL` | |
 | `size_bytes` | `integer NOT NULL` | |
@@ -160,9 +162,9 @@ Password reset is P1, so in P0 a user who forgets their password cannot recover 
 | Table | Columns (besides `id`, `user_id`, `resume_id`, timestamps) |
 |---|---|
 | `educations` | `school`, `degree`, `field_of_study`, `start_date`, `end_date`, `gpa` |
-| `experiences` | `company`, `title`, `location`, `start_date`, `end_date`, `is_current`, `description` |
+| `experiences` | `company`, `title`, `location`, `start_date`, `end_date`, `is_current`, `description` (the bullet points, one per line) |
 | `skills` | `name`, `category` (`language` / `framework` / `tool` / `other`); unique on (`user_id`, lower(`name`)) |
-| `projects` | `name`, `description`, `url`, `technologies text[]` |
+| `projects` | `name`, `description`, `url`, `technologies jsonb` (list of strings) |
 
 Contact info (name, email, phone, links) from the résumé is shown for confirmation but not copied over `users.full_name`. Phone and links go into `profiles` as nullable columns (`phone`, `links jsonb`).
 
@@ -189,7 +191,7 @@ pending ──▶ parsing ──▶ parsed ──▶ confirmed
 
 Rules:
 - Only the transition `parsed → confirmed` writes the structured tables.
-- A row stuck in `parsing` for more than 10 minutes (e.g. the server restarted) is set back to `pending` on the next startup and re-queued.
+- A row still `pending` or `parsing` more than 10 minutes after its last update (e.g. the server restarted mid-job) is marked `failed` / `internal` the next time it is read (`GET /resumes/{id}`, `GET /me`), so the user can retry. Nothing runs at server startup.
 
 ## 7. Parsing pipeline
 
@@ -254,7 +256,7 @@ Sign-up, login and logout are not FastAPI endpoints: the frontend calls Supabase
 | Method & path | Body | Success | Errors |
 |---|---|---|---|
 | `POST /me` | full_name, target_role, graduation_year, university, experience_level, accept_terms | `201` `{user, profile}`; creates the `users` and `profiles` rows | `401`, `409` already created, `422` |
-| `GET /me` | — | `{user, profile, latest_resume}`; `profile` is `null` if `POST /me` never succeeded | `401` |
+| `GET /me` | — | `{user, profile, latest_resume}`; all `null` until `POST /me` succeeds; `latest_resume` is the user's résumé summary (`id`, `status`, `error_code`, `original_filename`) | `401` |
 | `PATCH /me/profile` | location (P0); goal fields once a settings page exists | `200` profile | `422` |
 | `POST /resumes` | multipart `file` | `202` `{id, status: "pending"}` | `409` already has a résumé that is not `failed` (P0), `413`, `415`, `422` |
 | `GET /resumes/{id}` | — | `{id, status, error_code, parsed_data}` | `404` |
@@ -294,11 +296,12 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 ## 9. Frontend changes
 
 1. `signup-form.tsx`: `supabase.auth.signUp` with the profile fields as `user_metadata`, then a "Check your email" state. New `/auth/confirm` route (§8.1). `login-form.tsx`: `signInWithPassword`. Add a logout action to the user menu.
-2. `onboarding-form.tsx` (upload needs a longer timeout than the 5 s default in `lib/api/client.ts`; a 10 MB file can take longer on a slow connection): drop target role, graduation year and experience level (they are on sign-up only); keep location and résumé. `PATCH /me/profile`, then `POST /resumes`, then go to a new `/onboarding/review?resume={id}`.
+2. `onboarding-form.tsx` (upload needs a longer timeout than the 5 s default in `lib/api/client.ts`; a 10 MB file can take longer on a slow connection): drop target role, graduation year and experience level (they are on sign-up only); keep location and résumé. `PATCH /me/profile`, then `POST /resumes`, then go to the new `/onboarding/review` page. A `409` from the upload (a résumé already exists) also goes there.
 3. New `/onboarding/review` page:
-   - Polls `GET /resumes/{id}` every 2 s, up to 2 minutes; shows a progress state.
+   - Finds the résumé through `GET /me` (`latest_resume`; P0 has one per user), so the URL needs no id and survives a refresh. No résumé → back to `/onboarding`; already confirmed → `/dashboard`.
+   - Polls `GET /resumes/{id}` every 2 s, up to 2 minutes; shows a progress state, then "Check again".
    - `parsed`: an editable form built from `parsed_data` ("Here is what we identified"). Users can add, edit and delete items in each section.
-   - `failed`: the message from §6, with "Try again" (retry) and "Upload a different file".
+   - `failed`: the message from §6, with "Try again" (retry) and "Upload a different file". For `no_text` only "Upload a different file" is shown: the same file would fail again.
    - "Looks right" → `POST /resumes/{id}/confirm` → `/dashboard`.
 4. Route guard: no Supabase session → `/login`; session but `profile` is `null` → back to the sign-up profile fields; onboarding not complete → `/onboarding`.
 5. API types come from FastAPI's `/openapi.json` (ADR-002), not written by hand.
@@ -334,7 +337,7 @@ Team workflow: one Jira ticket per PR, set to *In progress* before starting so t
 
 1. **Auth:** migration (`users.id` → `auth.users` FK, `profiles`); `get_current_user` JWT check; `POST /me`, `GET /me`, `PATCH /me/profile`; Supabase client in the frontend, sign-up/login/logout, `/auth/confirm`, bearer token in `lib/api/client.ts`; route guard; Supabase Auth settings (email confirmation, redirect URLs, rate limits).
 2. **Upload:** `resumes` table, `resumes` Storage bucket and storage client, `POST /resumes`, `GET /resumes/{id}`; onboarding form uploads.
-3. **Parsing:** text extraction, `LLMClient`, `ResumeExtraction`, background task, retry, stuck-job recovery.
+3. **Parsing:** text extraction, `LLMClient`, `ResumeExtraction`, background task, retry, stuck rows marked failed on read.
 4. **Review & confirm:** structured tables migration, `POST /resumes/{id}/confirm`, `/onboarding/review` page.
 
 PRs 1 and 2 touch different files and can be built in parallel; 3 depends on 2; 4 depends on 3 for real data but can start against a fake `parsed_data`.
