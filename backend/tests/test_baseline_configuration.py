@@ -100,6 +100,16 @@ class BackendConfigurationTests(unittest.TestCase):
 
         self.assertIn("ALTER TABLE users ENABLE ROW LEVEL SECURITY", migration_text)
 
+    def test_job_posting_migration_enables_rls(self) -> None:
+        migration_text = "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in (BACKEND_ROOT / "migrations" / "versions").glob("*.py")
+        )
+
+        for table in ("job_postings", "ingest_runs"):
+            with self.subTest(table=table):
+                self.assertIn(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY", migration_text)
+
 
 if __name__ == "__main__":
     unittest.main()

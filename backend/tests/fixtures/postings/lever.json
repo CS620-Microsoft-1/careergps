@@ -1,0 +1,51 @@
+[
+  {
+    "id": "l1",
+    "text": "Forward Deployed Software Engineer",
+    "country": "US",
+    "workplaceType": "onsite",
+    "categories": {
+      "commitment": "Full-time",
+      "location": "Washington, D.C.",
+      "team": "Engineering",
+      "allLocations": [
+        "Washington, D.C."
+      ]
+    },
+    "createdAt": 1788000000000,
+    "descriptionPlain": "A World-Changing Company\n \nWe build software.",
+    "description": "<div>A World-Changing Company</div>",
+    "lists": [
+      {
+        "text": "Core Requirements",
+        "content": "\n<li>Java or Python</li>\n<li>Active U.S. security clearance</li>\n"
+      }
+    ],
+    "additionalPlain": "Equal opportunity employer.",
+    "additional": "<div>Equal opportunity employer.</div>",
+    "hostedUrl": "https://jobs.example.test/l1",
+    "applyUrl": "https://jobs.example.test/l1/apply",
+    "salaryRange": {
+      "min": 120000,
+      "max": 160000,
+      "currency": "USD",
+      "interval": "per-year-salary"
+    }
+  },
+  {
+    "id": "l2",
+    "text": "Software Engineer Internship",
+    "country": "GB",
+    "workplaceType": "unspecified",
+    "categories": {
+      "commitment": "Internship",
+      "location": "London",
+      "team": "Engineering"
+    },
+    "createdAt": null,
+    "descriptionPlain": "Summer internship.",
+    "lists": [],
+    "additionalPlain": "",
+    "hostedUrl": "https://jobs.example.test/l2"
+  }
+]
