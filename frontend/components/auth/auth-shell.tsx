@@ -9,6 +9,7 @@ type AuthShellProps = {
   description: string;
   /** Show the four-step "how CareerGPS works" strip under the description. */
   showJourney?: boolean;
+  contentClassName?: string;
   children: React.ReactNode;
 };
 
@@ -22,6 +23,7 @@ export function AuthShell({
   title,
   description,
   showJourney = false,
+  contentClassName = "max-w-100",
   children,
 }: AuthShellProps) {
   return (
@@ -60,7 +62,7 @@ export function AuthShell({
         </p>
       </aside>
       <main className="flex justify-center px-6 py-10 sm:px-10 lg:items-center lg:py-12">
-        <div className="w-full max-w-100">{children}</div>
+        <div className={`w-full ${contentClassName}`}>{children}</div>
       </main>
     </div>
   );

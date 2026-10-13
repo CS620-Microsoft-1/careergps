@@ -6,15 +6,44 @@ Next.js (App Router) + TypeScript + Tailwind CSS + shadcn/ui, per [ADR-001](../d
 
 Requires Node.js 20.9 or newer (the minimum for Next.js 16).
 
+### Windows
+
+Install [Node.js 20 or newer](https://nodejs.org/en/download), open a new PowerShell window, and
+verify the installation:
+
+```powershell
+node --version
+npm --version
+```
+
+### macOS
+
+With Homebrew, install the current supported Node.js release. The project accepts Node.js 20.9 or
+newer:
+
+```bash
+brew install node
+node --version
+npm --version
+```
+
 ```bash
 cd frontend
-npm install
+npm ci
 cp .env.example .env.local   # then set NEXT_PUBLIC_API_URL if the API isn't on port 8000
 npm run dev
 ```
 
+Use `npm install` instead of `npm ci` only when intentionally changing dependencies or updating
+`package-lock.json`.
+
 Open http://localhost:3000. Start the backend too (see `backend/README.md`) so the app can
 reach the API.
+
+During the current test phase, onboarding uploads the selected PDF or DOCX to the transient
+`POST /resumes/analyze` endpoint and shows the extracted text plus an editable Agent
+classification. Choosing **Looks right, continue** discards the in-memory result and navigates
+to the existing placeholder dashboard. Refreshing during Review also discards the result.
 
 ## Scripts
 

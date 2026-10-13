@@ -11,6 +11,7 @@ export default async function OnboardingPage() {
     <AuthShell
       title="Where do you want your career to go?"
       description="Tell us your goal. We'll compare your experience with real job-market data and map the clearest path forward."
+      contentClassName="max-w-3xl"
     >
       <AuthHeading title="Your career goal" subtitle="You can change this anytime." />
       <OnboardingForm graduationYears={await getGraduationYears()} />
