@@ -1,0 +1,234 @@
+# Job boards ingested daily by scripts/ingest_postings.py.
+# Generated with scripts/probe_boards.py from data/company_candidates.yaml, then reviewed by hand.
+companies:
+- name: Airbnb
+  tier: fortune500
+  boards:
+  - source: greenhouse
+    slug: airbnb
+- name: Block
+  tier: fortune500
+  boards:
+  - source: greenhouse
+    slug: block
+- name: Stripe
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: stripe
+- name: Databricks
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: databricks
+- name: Snowflake
+  tier: other
+  boards:
+  - source: ashby
+    slug: snowflake
+- name: Palantir
+  tier: other
+  boards:
+  - source: lever
+    slug: palantir
+- name: OpenAI
+  tier: other
+  boards:
+  - source: ashby
+    slug: openai
+- name: Anthropic
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: anthropic
+- name: Coinbase
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: coinbase
+- name: Robinhood
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: robinhood
+- name: Lyft
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: lyft
+- name: Pinterest
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: pinterest
+- name: Spotify
+  tier: other
+  boards:
+  - source: lever
+    slug: spotify
+- name: Reddit
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: reddit
+- name: Discord
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: discord
+- name: Figma
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: figma
+- name: Notion
+  tier: other
+  boards:
+  - source: ashby
+    slug: notion
+- name: Ramp
+  tier: other
+  boards:
+  - source: ashby
+    slug: ramp
+- name: Plaid
+  tier: other
+  boards:
+  - source: ashby
+    slug: plaid
+- name: Dropbox
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: dropbox
+- name: Twilio
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: twilio
+- name: Cloudflare
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: cloudflare
+- name: Datadog
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: datadog
+- name: MongoDB
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: mongodb
+- name: Okta
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: okta
+- name: Instacart
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: instacart
+- name: Roblox
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: roblox
+- name: Duolingo
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: duolingo
+- name: Airtable
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: airtable
+- name: Asana
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: asana
+- name: GitLab
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: gitlab
+- name: Elastic
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: elastic
+- name: Scale AI
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: scaleai
+- name: Perplexity
+  tier: other
+  boards:
+  - source: ashby
+    slug: perplexity
+- name: Vercel
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: vercel
+- name: Brex
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: brex
+- name: Chime
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: chime
+- name: Affirm
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: affirm
+- name: SoFi
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: sofi
+- name: Toast
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: toast
+- name: Samsara
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: samsara
+- name: Gusto
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: gusto
+- name: SpaceX
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: spacex
+- name: Waymo
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: waymo
+- name: Cohere
+  tier: other
+  boards:
+  - source: ashby
+    slug: cohere
+- name: Lucid Motors
+  tier: other
+  boards:
+  - source: greenhouse
+    slug: lucidmotors
+

@@ -1,0 +1,96 @@
+# Companies to look for with scripts/probe_boards.py.
+# tier: big_tech, fortune500 (on the Fortune 500 list), or other.
+# slugs: optional board names to try instead of the ones guessed from the company name.
+candidates:
+  # Big tech. Most run their own career sites, so few are expected to match.
+  - {name: Apple, tier: big_tech}
+  - {name: Microsoft, tier: big_tech}
+  - {name: Amazon, tier: big_tech}
+  - {name: Google, tier: big_tech}
+  - {name: Meta, tier: big_tech}
+  - {name: Netflix, tier: big_tech}
+  - {name: Nvidia, tier: big_tech}
+
+  # Fortune 500 technology and finance companies.
+  - {name: Salesforce, tier: fortune500}
+  - {name: Oracle, tier: fortune500}
+  - {name: Intel, tier: fortune500}
+  - {name: Cisco, tier: fortune500}
+  - {name: IBM, tier: fortune500}
+  - {name: Adobe, tier: fortune500}
+  - {name: Qualcomm, tier: fortune500}
+  - {name: AMD, tier: fortune500}
+  - {name: Tesla, tier: fortune500}
+  - {name: Uber, tier: fortune500}
+  - {name: Airbnb, tier: fortune500}
+  - {name: DoorDash, tier: fortune500}
+  - {name: PayPal, tier: fortune500}
+  - {name: Block, tier: fortune500}
+  - {name: Intuit, tier: fortune500}
+  - {name: ServiceNow, tier: fortune500}
+  - {name: Workday, tier: fortune500}
+  - {name: eBay, tier: fortune500}
+  - {name: Booking Holdings, tier: fortune500, slugs: [bookingholdings, booking]}
+  - {name: Visa, tier: fortune500}
+  - {name: Mastercard, tier: fortune500}
+  - {name: Capital One, tier: fortune500}
+  - {name: Dell, tier: fortune500, slugs: [dell, delltechnologies]}
+
+  # Other well-known technology employers.
+  - {name: Stripe, tier: other}
+  - {name: Databricks, tier: other}
+  - {name: Snowflake, tier: other}
+  - {name: Palantir, tier: other}
+  - {name: OpenAI, tier: other}
+  - {name: Anthropic, tier: other}
+  - {name: Coinbase, tier: other}
+  - {name: Robinhood, tier: other}
+  - {name: Lyft, tier: other}
+  - {name: Pinterest, tier: other}
+  - {name: Snap, tier: other}
+  - {name: Spotify, tier: other}
+  - {name: Reddit, tier: other}
+  - {name: Discord, tier: other}
+  - {name: Figma, tier: other}
+  - {name: Notion, tier: other}
+  - {name: Ramp, tier: other}
+  - {name: Plaid, tier: other}
+  - {name: Dropbox, tier: other}
+  - {name: Twilio, tier: other}
+  - {name: Cloudflare, tier: other}
+  - {name: Datadog, tier: other}
+  - {name: MongoDB, tier: other}
+  - {name: Okta, tier: other}
+  - {name: HubSpot, tier: other}
+  - {name: Instacart, tier: other}
+  - {name: Roblox, tier: other}
+  - {name: Duolingo, tier: other}
+  - {name: Airtable, tier: other}
+  - {name: Asana, tier: other}
+  - {name: GitLab, tier: other}
+  - {name: Elastic, tier: other}
+  - {name: Confluent, tier: other}
+  - {name: Scale AI, tier: other}
+  - {name: Perplexity, tier: other}
+  - {name: Vercel, tier: other}
+  - {name: Brex, tier: other}
+  - {name: Chime, tier: other}
+  - {name: Affirm, tier: other}
+  - {name: SoFi, tier: other}
+  - {name: Toast, tier: other}
+  - {name: Samsara, tier: other}
+  - {name: Rippling, tier: other}
+  - {name: Gusto, tier: other}
+  - {name: Grammarly, tier: other}
+  - {name: Atlassian, tier: other}
+  - {name: Zoom, tier: other}
+  - {name: Shopify, tier: other}
+  - {name: Etsy, tier: other}
+  - {name: Wayfair, tier: other}
+  - {name: Rivian, tier: other}
+  - {name: Anduril, tier: other}
+  - {name: SpaceX, tier: other}
+  - {name: Waymo, tier: other}
+  - {name: Cohere, tier: other}
+  - {name: Glean, tier: other}
+  - {name: Lucid Motors, tier: other, slugs: [lucidmotors, lucid]}
