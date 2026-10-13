@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     database_url: str
     # Comma-separated list of frontend origins allowed to call the API from a browser.
     cors_origins: str = "http://localhost:3000"
+    # Existing Microsoft Foundry resume-classification Agent. Authentication uses
+    # DefaultAzureCredential (Azure CLI locally; managed identity when deployed).
+    foundry_project_endpoint: str | None = None
+    foundry_agent_name: str | None = None
 
     @property
     def cors_origin_list(self) -> list[str]:

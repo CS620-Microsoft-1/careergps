@@ -1,29 +1,70 @@
 "use client";
 
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronRight } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
 import { ResumeDropzone } from "@/components/auth/resume-dropzone";
+import { ResumeReview } from "@/components/onboarding/resume-review";
 import { SegmentedField, SelectField, TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field";
 import { EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
+import { analyzeResume } from "@/lib/api/resumes";
+import { ApiError } from "@/lib/api/client";
 import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
+import type { ResumeAnalysis, ResumeClassification } from "@/types/api";
 
 export function OnboardingForm({ graduationYears }: { graduationYears: string[] }) {
   const router = useRouter();
+  const [analysis, setAnalysis] = useState<ResumeAnalysis>();
+  const [classification, setClassification] = useState<ResumeClassification>();
+  const [submitError, setSubmitError] = useState<string>();
   const form = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: { graduationYear: "", location: "" },
   });
 
-  // No backend yet: the résumé is not uploaded and nothing is analyzed.
-  const onSubmit = () => router.push("/dashboard");
+  const onSubmit = async ({ resume }: OnboardingValues) => {
+    setSubmitError(undefined);
+    try {
+      const result = await analyzeResume(resume);
+      setAnalysis(result);
+      setClassification(result.classification);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setSubmitError(error.detail ?? error.message);
+      } else {
+        setSubmitError("Something went wrong while reading the résumé.");
+      }
+    }
+  };
+
+  if (analysis && classification) {
+    return (
+      <ResumeReview
+        result={analysis}
+        classification={classification}
+        onChange={setClassification}
+        onStartOver={() => {
+          setAnalysis(undefined);
+          setClassification(undefined);
+          form.resetField("resume");
+        }}
+        onConfirm={() => {
+          setAnalysis(undefined);
+          setClassification(undefined);
+          form.resetField("resume");
+          router.push("/dashboard");
+        }}
+      />
+    );
+  }
 
   return (
-    <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
+    <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="mx-auto max-w-100">
       <FieldGroup>
         <SelectField
           control={form.control}
@@ -71,8 +112,18 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
             </Field>
           )}
         />
-        <Button type="submit" size="lg" className="w-full">
-          Analyze My Career Profile
+        {submitError && (
+          <p role="alert" className="text-control text-destructive">
+            {submitError}
+          </p>
+        )}
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? "Reading résumé…" : "Analyze My Career Profile"}
           <ChevronRight data-icon="inline-end" />
         </Button>
       </FieldGroup>

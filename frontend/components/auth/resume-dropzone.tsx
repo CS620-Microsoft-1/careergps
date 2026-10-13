@@ -14,7 +14,7 @@ type ResumeDropzoneProps = {
   invalid?: boolean;
 };
 
-/** Click or drop a résumé. Only keeps the File in form state; nothing is uploaded. */
+/** Click or drop a résumé. The selected File stays in form state until analysis starts. */
 export function ResumeDropzone({ id, value, onChange, onBlur, invalid }: ResumeDropzoneProps) {
   const [dragging, setDragging] = useState(false);
 

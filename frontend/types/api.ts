@@ -11,3 +11,40 @@ export type DatabaseHealthResponse = {
   status: "ok";
   database: "connected";
 };
+
+export type ResumeFieldValue = string | null | string[];
+export type ResumeRecord = Record<string, ResumeFieldValue>;
+
+export type ResumeClassification = {
+  personal_information: ResumeRecord;
+  research_interests: string[];
+  education: ResumeRecord[];
+  work_experience: ResumeRecord[];
+  research_experience: ResumeRecord[];
+  projects: ResumeRecord[];
+  technical_skills: string[];
+  languages: ResumeRecord[];
+  publications: ResumeRecord[];
+  awards_honors: ResumeRecord[];
+  certifications: ResumeRecord[];
+  leadership_activities: ResumeRecord[];
+  other: ResumeRecord[];
+};
+
+/** POST /resumes/analyze: transient result; the backend stores none of these fields. */
+export type ResumeAnalysis = {
+  filename: string;
+  extraction: {
+    parser: string;
+    ocr_pages: number[];
+    characters: number;
+    seconds: number;
+    text: string;
+  };
+  agent: {
+    name: string;
+    seconds: number;
+    validated: boolean;
+  };
+  classification: ResumeClassification;
+};

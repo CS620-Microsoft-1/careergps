@@ -1,0 +1,83 @@
+{
+  "personal_information": {
+    "name": "Avery Chen",
+    "emails": [
+      "avery.chen.0001@example.test",
+      "achen@northlake.example"
+    ],
+    "phones": [
+      "(555) 010-1000"
+    ],
+    "location": null,
+    "linkedin": null,
+    "github": null,
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "Northlake University",
+      "degree": "B.S.",
+      "major": "Computer Science",
+      "start_date": null,
+      "end_date": "2014",
+      "gpa": null,
+      "content": []
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Northstar Labs",
+      "title": "Data Analyst",
+      "start_date": "2022",
+      "end_date": "Present",
+      "location": null,
+      "content": [
+        "Built measurable workflows that reduced manual review time by 18 percent.",
+        "Partnered with product and engineering teams using Python and SQL."
+      ]
+    },
+    {
+      "company": "Cedar Works",
+      "title": "Associate Data Analyst",
+      "start_date": "2019",
+      "end_date": "2022",
+      "location": null,
+      "content": [
+        "Automated weekly reporting and documented quality checks for shared datasets.",
+        "Presented findings to technical and nontechnical stakeholders."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Career Insights Dashboard",
+      "url": null,
+      "technologies": [
+        "Python",
+        "SQL",
+        "Tableau"
+      ],
+      "content": [
+        "Created a production-style prototype using Python, SQL, and Tableau."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Python",
+    "SQL",
+    "Tableau",
+    "Statistics"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": [
+    {
+      "content": "PROFESSIONAL SUMMARY\nData Analyst with experience delivering reliable analysis, automation, and clear stakeholder communication."
+    }
+  ]
+}

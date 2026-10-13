@@ -51,6 +51,33 @@ export async function apiGet<T>(path: string): Promise<T> {
   return (await response.json()) as T;
 }
 
+/** POST multipart form data. The browser supplies the boundary in Content-Type. */
+export async function apiPostForm<T>(
+  path: string,
+  form: FormData,
+  timeoutMs = TIMEOUT_MS,
+): Promise<T> {
+  const url = `${API_BASE_URL}${path}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      body: form,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch {
+    throw new ApiError(0, `Couldn't reach the API at ${API_BASE_URL}`);
+  }
+
+  if (!response.ok) {
+    const detail = await readDetail(response);
+    throw new ApiError(response.status, `POST ${path} failed with ${response.status}`, detail);
+  }
+
+  return (await response.json()) as T;
+}
+
 async function readDetail(response: Response): Promise<string | undefined> {
   try {
     const body: unknown = await response.json();
