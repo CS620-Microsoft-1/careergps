@@ -1,0 +1,63 @@
+{
+  "jobs": [
+    {
+      "absolute_url": "https://example.test/jobs?gh_jid=1001",
+      "data_compliance": [],
+      "education": "education_optional",
+      "internal_job_id": 501,
+      "location": {
+        "name": "San Francisco, CA"
+      },
+      "metadata": null,
+      "id": 1001,
+      "updated_at": "2026-10-07T19:02:27-04:00",
+      "requisition_id": "R-1",
+      "title": "Software Engineer, New Grad ",
+      "company_name": "Example Payments",
+      "first_published": "2026-09-03T13:30:34-04:00",
+      "language": "en",
+      "application_deadline": null,
+      "content": "&lt;h2&gt;&lt;strong&gt;About the role&lt;/strong&gt;&lt;/h2&gt;&lt;p&gt;Build payment APIs&amp;nbsp;used by millions.&lt;/p&gt;&lt;h3&gt;Requirements&lt;/h3&gt;&lt;ul&gt;&lt;li&gt;Python or Go&lt;/li&gt;&lt;li&gt;Experience with  PostgreSQL&lt;/li&gt;&lt;/ul&gt;&lt;p&gt;We are unable to sponsor visas for this role.&lt;/p&gt;",
+      "departments": [
+        {
+          "id": 1,
+          "name": "Engineering",
+          "child_ids": [],
+          "parent_id": null
+        }
+      ],
+      "offices": [
+        {
+          "id": 2,
+          "name": "San Francisco",
+          "location": null,
+          "child_ids": [],
+          "parent_id": null
+        }
+      ]
+    },
+    {
+      "absolute_url": "https://example.test/jobs?gh_jid=1002",
+      "data_compliance": [],
+      "internal_job_id": 502,
+      "location": {
+        "name": ""
+      },
+      "metadata": null,
+      "id": 1002,
+      "updated_at": "2026-10-01T10:00:00-04:00",
+      "requisition_id": "R-2",
+      "title": "Data Analyst",
+      "company_name": "Example Payments",
+      "first_published": null,
+      "language": "en",
+      "application_deadline": null,
+      "content": "",
+      "departments": [],
+      "offices": []
+    }
+  ],
+  "meta": {
+    "total": 2
+  }
+}

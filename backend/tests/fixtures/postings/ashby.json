@@ -1,0 +1,86 @@
+{
+  "apiVersion": "1",
+  "jobs": [
+    {
+      "id": "a1",
+      "title": "Machine Learning Engineer",
+      "department": "Research",
+      "team": "Applied ML",
+      "employmentType": "FullTime",
+      "location": "New York",
+      "shouldDisplayCompensationOnJobPostings": true,
+      "secondaryLocations": [],
+      "publishedAt": "2026-09-12T16:38:15.322+00:00",
+      "isListed": true,
+      "isRemote": true,
+      "workplaceType": "Hybrid",
+      "address": {
+        "postalAddress": {
+          "addressRegion": "New York",
+          "addressCountry": "United States",
+          "addressLocality": "New York"
+        }
+      },
+      "jobUrl": "https://jobs.example.test/a1",
+      "applyUrl": "https://jobs.example.test/a1/application",
+      "descriptionHtml": "<p>Train models.</p>",
+      "descriptionPlain": "Train and ship models. \n\n\n\nRequirements:  PyTorch",
+      "compensation": {
+        "compensationTierSummary": "$150K - $190K",
+        "summaryComponents": [
+          {
+            "compensationType": "EquityCashValue",
+            "interval": "1 YEAR",
+            "currencyCode": "USD",
+            "minValue": null,
+            "maxValue": null
+          },
+          {
+            "compensationType": "Salary",
+            "interval": "1 YEAR",
+            "currencyCode": "USD",
+            "minValue": 150000,
+            "maxValue": 190000
+          }
+        ]
+      }
+    },
+    {
+      "id": "a2",
+      "title": "Software Engineering Intern",
+      "department": null,
+      "team": "Platform",
+      "employmentType": "Intern",
+      "location": "Remote",
+      "secondaryLocations": [],
+      "publishedAt": null,
+      "isListed": true,
+      "isRemote": true,
+      "workplaceType": null,
+      "address": null,
+      "jobUrl": "https://jobs.example.test/a2",
+      "descriptionHtml": "<ul><li>Write code</li></ul>",
+      "descriptionPlain": "",
+      "compensation": {
+        "summaryComponents": [
+          {
+            "compensationType": "Salary",
+            "interval": "1 HOUR",
+            "currencyCode": "USD",
+            "minValue": 45,
+            "maxValue": 55
+          }
+        ]
+      }
+    },
+    {
+      "id": "a3",
+      "title": "Unlisted Role",
+      "employmentType": "FullTime",
+      "location": "London",
+      "isListed": false,
+      "jobUrl": "https://jobs.example.test/a3",
+      "descriptionPlain": "Hidden"
+    }
+  ]
+}
