@@ -1,46 +1,27 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import { ComingSoon } from "@/components/common/coming-soon";
+import { SsoButtons } from "@/components/auth/sso-buttons";
 import { TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
-import { FieldGroup } from "@/components/ui/field";
-import { errorMessage } from "@/lib/api/client";
-import { ensureAccount } from "@/lib/auth/account";
-import { authErrorMessage } from "@/lib/auth/errors";
-import { getSupabase } from "@/lib/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Field, FieldGroup, FieldLabel, FieldSeparator } from "@/components/ui/field";
 import { loginSchema, type LoginValues } from "@/lib/validation/auth";
 
 export function LoginForm() {
   const router = useRouter();
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email: "", password: "", remember: false },
   });
 
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  async function onSubmit(values: LoginValues) {
-    setSubmitError(null);
-    const { data, error } = await getSupabase().auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
-    if (error) return setSubmitError(authErrorMessage(error));
-
-    try {
-      // First login after confirming by a link that didn't reach /auth/confirm: finish sign-up here.
-      const { created } = await ensureAccount(data.user);
-      router.replace(created ? "/onboarding" : "/dashboard");
-    } catch (accountError) {
-      setSubmitError(errorMessage(accountError));
-    }
-  }
+  // No backend yet: a valid form simply continues into the app.
+  const onSubmit = () => router.push("/dashboard");
 
   return (
     <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
@@ -50,7 +31,7 @@ export function LoginForm() {
           name="email"
           label="Email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="student@wisc.edu"
           autoComplete="email"
         />
         <TextField
@@ -61,26 +42,34 @@ export function LoginForm() {
           placeholder="Enter your password"
           autoComplete="current-password"
         />
-        <div className="flex justify-end">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Controller
+            control={form.control}
+            name="remember"
+            render={({ field }) => (
+              <Field orientation="horizontal" className="w-auto">
+                <Checkbox
+                  id="remember"
+                  checked={field.value}
+                  onCheckedChange={(v) => field.onChange(v === true)}
+                />
+                <FieldLabel htmlFor="remember" className="font-normal">
+                  Remember me
+                </FieldLabel>
+              </Field>
+            )}
+          />
           <ComingSoon>
             <Button type="button" variant="link" disabled className="h-auto p-0">
               Forgot password?
             </Button>
           </ComingSoon>
         </div>
-        {submitError && (
-          <p role="alert" className="text-control text-destructive">
-            {submitError}
-          </p>
-        )}
-        <Button
-          type="submit"
-          size="lg"
-          className="w-full"
-          disabled={form.formState.isSubmitting}
-        >
-          {form.formState.isSubmitting ? "Signing in…" : "Sign In"}
+        <Button type="submit" size="lg" className="w-full">
+          Sign In
         </Button>
+        <FieldSeparator className="text-xs">or</FieldSeparator>
+        <SsoButtons />
       </FieldGroup>
       <p className="mt-6 text-center text-control text-muted-foreground">
         Don&apos;t have an account?{" "}
