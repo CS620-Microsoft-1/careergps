@@ -45,9 +45,13 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-008 | Authenticated user updates their own profile | Allowed fields are updated | NOT RUN |
 | DB-009 | Authenticated user updates another profile | Update is denied | NOT RUN |
 | DB-010 | Authenticated user deletes another profile | Delete is denied | NOT RUN |
-| DB-011 | Client changes a user ID in the request | Backend authorization rejects cross-user access | NOT RUN |
+| DB-011 | Client changes a user ID in the request | Backend authorization rejects cross-user access | PARTIAL — `/me` endpoints only use the user id from the verified token, never one from the request (`tests/test_me.py`); not yet run against the shared DB |
 | DB-012 | Limited application database role connects | Required operations work without administrator privileges | BLOCKED — role not created |
 | DB-013 | Secret scan and Git status | `.env` and credentials are absent from tracked files | PASS |
+| DB-014 | Apply migration `6786f26fc026` from `dev` | `alembic current` shows `6786f26fc026 (head)` | NOT RUN — waiting for merge to `dev` |
+| DB-015 | Inspect the RLS flag on `profiles` | RLS enabled | NOT RUN — needs DB-014 |
+| DB-016 | Inspect `users.id` foreign key | References `auth.users(id)` with `ON DELETE CASCADE` | NOT RUN — needs DB-014 |
+| DB-017 | Delete a test account in Supabase Auth | Its `users` and `profiles` rows are deleted by cascade | NOT RUN — needs DB-014 and Supabase Auth |
 
 ## Baseline automation
 
@@ -67,6 +71,11 @@ It performs seven checks without loading the real `.env` file or connecting to t
 7. A committed migration enables RLS on `users`.
 
 These checks validate repository configuration only. They do not prove that the remote database is reachable or that future user-level RLS policies correctly isolate data.
+
+The same workflow also runs the auth tests from `feat/supabase-auth`. None of them connect to the shared database; API tests use in-memory SQLite:
+
+- `test_security.py`: Supabase token verification (expired, wrong audience/issuer, wrong key, unsigned tokens are rejected).
+- `test_me.py`: sign-up (`POST /me`), `GET /me` and `PATCH /me/profile`, including missing or invalid tokens.
 
 ## Local verification steps
 
@@ -91,8 +100,8 @@ Never paste `DATABASE_URL` into this document, Git commits, pull requests, issue
 
 Before DB-005 through DB-011 can be completed, the project needs:
 
-1. A confirmed authentication provider and user identity model.
-2. A reliable relationship between `public.users.id` and the authenticated identity, such as Supabase Auth `auth.users.id`.
+1. A confirmed authentication provider and user identity model. **Done:** Supabase Auth (SPEC-001 §6).
+2. A reliable relationship between `public.users.id` and the authenticated identity, such as Supabase Auth `auth.users.id`. **Written, not applied:** migration `6786f26fc026` (DB-016).
 3. Explicit RLS policies for each required operation: `SELECT`, `INSERT`, `UPDATE`, and `DELETE`.
 4. At least two isolated test users with synthetic data.
 5. A non-administrator client or application role that does not bypass RLS.
@@ -144,3 +153,20 @@ When a database-related PR changes the schema or security model:
 - Updated the workflow badge to report the protected `dev` branch.
 - Ran all seven baseline configuration tests locally; all passed.
 - Did not connect to or modify the shared Supabase database.
+
+### 2026-10-11 — Auth schema written (not applied)
+
+- Branch `feat/supabase-auth` (then named `feat/login-resume-parsing`), after merging `dev` at `0e2baf5`.
+- Connected to the shared database with `check_connection`: PostgreSQL 17.11, role `postgres`. `alembic current`: `8cb9c0fe6e22 (head)`. No data was read or changed.
+- Added migration `6786f26fc026` (`profiles`; `users.id` → `auth.users`). `profiles` enables RLS. Reviewed with `alembic upgrade head --sql` only; **not applied**, per the rule to apply migrations from `main` after merge.
+- Added DB-014 to DB-017 to the matrix; all NOT RUN until the migration is applied.
+- Ran the backend test suite locally without `.env`; all tests passed.
+
+### 2026-10-11 — Migration rule changed to `dev`
+
+- Abanish agreed that migrations may be applied from `dev` instead of `main`: after the PR is merged into `dev`, by one person, announced in the team chat (backend README, shared database rules).
+- DB-014 now waits for the merge into `dev`.
+
+### 2026-10-14 — Branch narrowed to auth
+
+- Résumé parsing is now built in PR #11, so this branch (renamed `feat/supabase-auth`) keeps only auth. Migration `4d5da22c5814` (résumé tables, `profiles.phone`, `profiles.links`) was removed before it was ever applied; DB-014 to DB-017 now cover `6786f26fc026` only.
