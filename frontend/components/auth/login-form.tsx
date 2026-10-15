@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +10,10 @@ import { ComingSoon } from "@/components/common/coming-soon";
 import { TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
+import { errorMessage } from "@/lib/api/client";
+import { ensureAccount } from "@/lib/auth/account";
+import { authErrorMessage } from "@/lib/auth/errors";
+import { getSupabase } from "@/lib/supabase/client";
 import { loginSchema, type LoginValues } from "@/lib/validation/auth";
 
 export function LoginForm() {
@@ -18,8 +23,24 @@ export function LoginForm() {
     defaultValues: { email: "", password: "" },
   });
 
-  // No backend yet: a valid form simply continues into the app.
-  const onSubmit = () => router.push("/dashboard");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  async function onSubmit(values: LoginValues) {
+    setSubmitError(null);
+    const { data, error } = await getSupabase().auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    });
+    if (error) return setSubmitError(authErrorMessage(error));
+
+    try {
+      // First login after confirming by a link that didn't reach /auth/confirm: finish sign-up here.
+      const { created } = await ensureAccount(data.user);
+      router.replace(created ? "/onboarding" : "/dashboard");
+    } catch (accountError) {
+      setSubmitError(errorMessage(accountError));
+    }
+  }
 
   return (
     <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
@@ -47,8 +68,18 @@ export function LoginForm() {
             </Button>
           </ComingSoon>
         </div>
-        <Button type="submit" size="lg" className="w-full">
-          Sign In
+        {submitError && (
+          <p role="alert" className="text-control text-destructive">
+            {submitError}
+          </p>
+        )}
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? "Signing in…" : "Sign In"}
         </Button>
       </FieldGroup>
       <p className="mt-6 text-center text-control text-muted-foreground">

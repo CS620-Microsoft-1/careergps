@@ -27,28 +27,14 @@ const password = z
   .min(8, "Use at least 8 characters.")
   .max(128, "Use at most 128 characters.");
 
-const passwordPair = z.object({ password, confirmPassword: z.string() });
-
-export const signupSchema = z
-  .object({
-    fullName: z.string().trim().min(1, "Enter your full name.").max(100),
-    email,
-    password,
-    confirmPassword: z.string(),
-    targetRole,
-    graduationYear,
-    university: z.string().trim().min(1, "Enter your university.").max(150),
-    experienceLevel,
-    acceptTerms: z
-      .boolean()
-      .refine(Boolean, "Please accept the Terms of Service and Privacy Policy."),
-  })
-  .refine((v) => v.password === v.confirmPassword, {
-    path: ["confirmPassword"],
-    error: "Passwords don't match.",
-    // Check as soon as the password itself is valid, not only once every field is.
-    when: (payload) => passwordPair.safeParse(payload.value).success,
-  });
+// Sign-up asks only for email and password; the career goal is asked in onboarding.
+export const signupSchema = z.object({
+  email,
+  password,
+  acceptTerms: z
+    .boolean()
+    .refine(Boolean, "Please accept the Terms of Service and Privacy Policy."),
+});
 export type SignupValues = z.infer<typeof signupSchema>;
 
 export const onboardingSchema = z.object({
