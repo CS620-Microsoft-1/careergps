@@ -57,6 +57,9 @@ export function AuthShell({
             </ol>
           )}
         </div>
+        <p className="hidden text-xs text-[#86aaa2] lg:block">
+          Built for students at UW–Madison
+        </p>
       </aside>
       <main className="flex justify-center px-6 py-10 sm:px-10 lg:items-center lg:py-12">
         <div className={`w-full ${contentClassName}`}>{children}</div>

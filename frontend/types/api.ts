@@ -12,34 +12,6 @@ export type DatabaseHealthResponse = {
   database: "connected";
 };
 
-/** GET /me, POST /me (backend: app/schemas/me.py). user/profile are null until POST /me succeeds. */
-export type MeResponse = {
-  user: User | null;
-  profile: Profile | null;
-};
-
-export type User = {
-  id: string;
-  email: string;
-  full_name: string | null;
-  created_at: string;
-};
-
-/** Goal fields are null until onboarding fills them in. */
-export type Profile = {
-  target_role: string | null;
-  experience_level: string | null;
-  graduation_year: number | null;
-  university: string | null;
-  location: string | null;
-  onboarding_completed_at: string | null;
-};
-
-/** POST /me body. The email comes from the access token. */
-export type AccountCreateRequest = {
-  accept_terms: true;
-};
-
 export type ResumeFieldValue = string | null | string[];
 export type ResumeRecord = Record<string, ResumeFieldValue>;
 

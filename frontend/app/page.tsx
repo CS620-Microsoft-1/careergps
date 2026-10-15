@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-// proxy.ts sends / to /dashboard or /login first; this is only a fallback.
+// Without sessions yet, every visit starts at sign-in.
 export default function Home() {
   redirect("/login");
 }
