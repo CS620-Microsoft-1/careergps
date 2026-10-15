@@ -54,7 +54,7 @@ A new student can create an account with email and password, confirm their email
 
 | # | Task | Basis |
 |---|---|---|
-| P2-1 | SSO login via Supabase Auth OAuth providers (buttons exist as UI only) | Proposed |
+| P2-1 | SSO login via Supabase Auth OAuth providers. The buttons are removed from the P0 login page; `components/auth/sso-buttons.tsx` is kept for this | Proposed |
 
 ## 4. Flow
 
@@ -117,7 +117,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 **Frontend**
 - Uses `@supabase/supabase-js` with `@supabase/ssr`, so the Supabase session lives in cookies that Next.js can read (route guard, §7).
 - Sign-up: `supabase.auth.signUp({ email, password, options: { data: { accept_terms: true }, emailRedirectTo: <site>/auth/confirm } })`. No session is returned until the email is confirmed; the page says "Check your email".
-- `/auth/confirm` (new Next.js route) exchanges the link's token for a session, then calls `POST /me` with the terms consent from `user_metadata` and sends the user to `/onboarding`. The backend validates it like any other input. Login: `signInWithPassword`. Logout: `signOut`. "Remember me" has no direct Supabase equivalent; P0 drops the checkbox or keeps it as UI only.
+- `/auth/confirm` (new Next.js route) exchanges the link's token for a session, then calls `POST /me` with the terms consent from `user_metadata` and sends the user to `/onboarding`. The backend validates it like any other input. Login: `signInWithPassword`. Logout: `signOut`. **[DECIDED]** No "Remember me" checkbox: Supabase keeps users logged in until they log out, so the checkbox would do nothing.
 - Calls to FastAPI go through `frontend/lib/api/client.ts` (PR #9), which adds `Authorization: Bearer <access_token>` from the current session. No cross-site cookies are sent to FastAPI, so `credentials: "include"` is not needed.
 - New env vars: `NEXT_PUBLIC_SUPABASE_URL` and the project's publishable (anon) key. These are designed to be public; the service-role/secret key never goes to the frontend.
 

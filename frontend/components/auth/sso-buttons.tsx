@@ -2,7 +2,7 @@ import { ComingSoon } from "@/components/common/coming-soon";
 import { GoogleIcon, MicrosoftIcon, UwBadge } from "@/components/common/provider-icons";
 import { Button } from "@/components/ui/button";
 
-// Single sign-on is not implemented yet; buttons are shown disabled as "Coming soon".
+// Not shown in P0 (SPEC-001 P2-1). Kept for when single sign-on is built.
 export function SsoButtons() {
   return (
     <div className="grid grid-cols-1 gap-2 min-[22rem]:grid-cols-2">
