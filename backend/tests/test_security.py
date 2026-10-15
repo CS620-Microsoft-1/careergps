@@ -38,6 +38,20 @@ class SupabaseTokenVerifierTests(unittest.TestCase):
         self.assertEqual(user_id, user.id)
         self.assertEqual("student@example.com", user.email)
 
+    def test_small_clock_difference_is_accepted(self) -> None:
+        # Right after sign-up the token is brand new; Supabase's clock may be a little ahead.
+        token = make_token(self.key, issued_in=30)
+
+        self.assertEqual("student@example.com", self.verifier.verify(token).email)
+
+    def test_signing_keys_are_fetched_with_certifi_bundle(self) -> None:
+        # Works even where Python has no CA certificates of its own.
+        verifier = SupabaseTokenVerifier(SUPABASE_URL)
+        context = verifier._jwks_client.ssl_context
+
+        self.assertIsNotNone(context)
+        self.assertGreater(context.cert_store_stats()["x509_ca"], 0)
+
     def test_issuer_is_built_from_project_url(self) -> None:
         verifier = SupabaseTokenVerifier(SUPABASE_URL + "/", jwks_client=FakeJwks(self.key))
         self.assertEqual(ISSUER, verifier.issuer)
@@ -45,7 +59,8 @@ class SupabaseTokenVerifierTests(unittest.TestCase):
     def test_rejects_bad_tokens(self) -> None:
         other_key = new_signing_key()
         cases = {
-            "expired": make_token(self.key, expires_in=-60),
+            "expired": make_token(self.key, expires_in=-3600),
+            "issued far in the future": make_token(self.key, issued_in=300, expires_in=3900),
             "wrong audience": make_token(self.key, audience="anon"),
             "wrong issuer": make_token(self.key, issuer="https://other.supabase.co/auth/v1"),
             "signed by another key": make_token(other_key),

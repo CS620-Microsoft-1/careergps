@@ -67,8 +67,8 @@ def get_current_user(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Authentication unavailable"
         )
     except AuthError as error:
-        # The reason is logged, never the token itself.
-        logger.info("Rejected token: %s", error)
+        # The reason is logged, never the token itself. Warning, so it shows in uvicorn's console.
+        logger.warning("Rejected token: %s", error)
         raise unauthorized
 
 

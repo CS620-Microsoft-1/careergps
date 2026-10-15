@@ -34,13 +34,15 @@ def make_token(
     audience: str = "authenticated",
     issuer: str = ISSUER,
     expires_in: int = 3600,
+    issued_in: int = 0,
 ) -> str:
+    """issued_in shifts "iat", e.g. to mimic a Supabase clock that runs ahead of ours."""
     now = int(time.time())
     claims = {
         "sub": sub or str(uuid.uuid4()),
         "aud": audience,
         "iss": issuer,
-        "iat": now,
+        "iat": now + issued_in,
         "exp": now + expires_in,
         "role": "authenticated",
     }

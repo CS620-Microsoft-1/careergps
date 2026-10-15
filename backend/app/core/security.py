@@ -5,13 +5,18 @@ project's JWKS endpoint) or, on older projects, with one shared secret (HS256). 
 the key is chosen by the token's algorithm, so a token can never be checked against the wrong kind
 of key.
 """
+import ssl
 import uuid
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+import certifi
 import jwt
 
 AUDIENCE = "authenticated"
+# Allowed clock difference between Supabase and this server. Without it, a token issued a second
+# "in the future" by this machine's clock (a fresh token right after sign-up) would be rejected.
+CLOCK_SKEW_SECONDS = 60
 ASYMMETRIC_ALGORITHMS = {"ES256", "RS256"}
 
 
@@ -42,8 +47,14 @@ class SupabaseTokenVerifier:
     ) -> None:
         self.issuer = f"{supabase_url.rstrip('/')}/auth/v1"
         self._jwt_secret = jwt_secret
-        # PyJWKClient caches the keys and refetches when it sees an unknown key id.
-        self._jwks_client = jwks_client or jwt.PyJWKClient(f"{self.issuer}/.well-known/jwks.json")
+        # PyJWKClient caches the keys and refetches when it sees an unknown key id. certifi's CA
+        # bundle, because some Pythons (python.org's on macOS) ship without CA certificates and
+        # every key fetch would fail with 503.
+        self._jwks_client = jwks_client or jwt.PyJWKClient(
+            f"{self.issuer}/.well-known/jwks.json",
+            ssl_context=ssl.create_default_context(cafile=certifi.where()),
+            timeout=10,
+        )
 
     def verify(self, token: str) -> AuthenticatedUser:
         try:
@@ -61,6 +72,7 @@ class SupabaseTokenVerifier:
                 algorithms=[algorithm],
                 audience=AUDIENCE,
                 issuer=self.issuer,
+                leeway=CLOCK_SKEW_SECONDS,
                 options={"require": ["exp", "sub", "aud", "iss"]},
             )
         except jwt.PyJWKClientConnectionError as error:
