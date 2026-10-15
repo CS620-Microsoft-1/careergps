@@ -301,6 +301,19 @@ Sign-up, login and logout happen in the frontend with Supabase Auth; the API nev
 The frontend sends the Supabase access token as `Authorization: Bearer <token>`. The API checks its
 signature (Supabase's public signing keys, or `SUPABASE_JWT_SECRET` on legacy projects), expiry,
 audience and issuer. Missing or invalid token → **401**.
+The shared project uses JWT signing keys (ES256, checked 2026-10-14), so leave `SUPABASE_JWT_SECRET`
+unset.
+
+Supabase Auth settings (dashboard, not migrations; record any change here):
+
+| Setting | Value (checked 2026-10-14) |
+|---|---|
+| Email sign-up | On, **Confirm email** on |
+| Site URL | `http://localhost:3000` |
+| Sign-ups and sign-ins | 30 requests / 5 min per IP |
+| Token verifications | 30 requests / 5 min per IP |
+| Token refreshes | 150 requests / 5 min per IP |
+| Emails | 2 / hour for the whole project (built-in sender; only delivers to members of the Supabase organization). Create test users in Authentication → Users with auto-confirm instead of signing up |
 
 - `Depends(get_current_user)`: the Supabase account (id, email). Use for `/me` sign-up.
 - `Depends(get_current_db_user)`: also requires the `users` row; **403** if sign-up isn't finished.
