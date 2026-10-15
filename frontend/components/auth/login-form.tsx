@@ -50,7 +50,7 @@ export function LoginForm() {
           name="email"
           label="Email"
           type="email"
-          placeholder="student@wisc.edu"
+          placeholder="you@example.com"
           autoComplete="email"
         />
         <TextField

@@ -75,9 +75,9 @@ export function SignupForm() {
         <TextField
           control={form.control}
           name="email"
-          label="University Email"
+          label="Email"
           type="email"
-          placeholder="student@wisc.edu"
+          placeholder="you@example.com"
           autoComplete="email"
         />
         <TextField
