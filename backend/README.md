@@ -252,7 +252,8 @@ app/
 ├── models/
 │   ├── __init__.py          # import every model here so Alembic can see it
 │   ├── job_posting.py       # job_postings + ingest_runs
-│   └── user.py
+│   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
+│   └── user.py              # users (id = the Supabase Auth account id)
 ├── schemas/
 │   └── market.py            # NormalizedPosting, MarketProfile
 └── services/
@@ -333,6 +334,19 @@ To add companies, add them to `data/company_candidates.yaml` and run
 `python -m scripts.probe_boards`. It prints the boards it finds; `--write` replaces
 `data/companies.yaml`. Check each match before committing, since a slug can belong to a
 different company with the same name.
+
+## Users and résumé tables
+
+- `users.id` is the student's Supabase Auth id (`auth.users.id`). Supabase keeps the password; the
+  `users` row holds the onboarding answers and is created when onboarding is confirmed.
+- Only résumés the student confirmed ("Looks right") are stored. Unverified Agent output and the
+  extracted text are never saved.
+- `resumes.confirmed_data` keeps all 13 sections as confirmed and is the source of truth. The child
+  tables (`resume_experiences`, `resume_educations`, `resume_projects`, `resume_achievements`,
+  `resume_skills`) hold the parts the agents query and are rebuilt from it whenever a résumé is edited.
+- A student keeps every version; `users.active_resume_id` points to the one the agents use.
+- The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
+  autogenerate from proposing to drop it.
 
 ## Changing the schema
 
