@@ -85,18 +85,19 @@ export function ProfileView() {
 function IdentityCard({ state }: { state: ProfileState }) {
   const { me, saved, email } = state;
   const personal = saved?.classification.personal_information;
-  const profile = me?.profile;
 
   const resumeName = text(personal?.name);
+  const user = me?.user;
+  const accountName = user ? `${user.first_name} ${user.last_name}`.trim() : "";
   const name =
-    me?.user?.full_name?.trim() || resumeName || email?.split("@")[0] || (state.status === "loading" ? "" : "Student");
+    user?.full_name?.trim() || accountName || resumeName || email?.split("@")[0] || (state.status === "loading" ? "" : "Student");
   const initials = initialsOf(name || email || "S");
 
-  const targetRole = profile?.target_role ?? null;
-  const experienceLevel = profile?.experience_level ?? null;
-  const graduationYear = profile?.graduation_year?.toString() ?? null;
-  const location = profile?.location ?? text(personal?.location);
-  const university = profile?.university ?? null;
+  const targetRole = user?.target_role ?? null;
+  const experienceLevel = user?.experience_level ?? null;
+  const graduationYear = user?.graduation_year?.toString() ?? null;
+  const location = user?.preferred_location ?? text(personal?.location);
+  const university = user?.university ?? null;
 
   const contacts = [
     ...list(personal?.phones),
@@ -117,7 +118,7 @@ function IdentityCard({ state }: { state: ProfileState }) {
           {state.status === "ready" && (
             <p className="text-muted-foreground">
               {saved
-                ? `Résumé: ${saved.filename} · saved ${formatSavedAt(saved.updated_at)}`
+                ? `Résumé: ${saved.original_filename} · saved ${formatSavedAt(saved.created_at)}`
                 : "No résumé uploaded yet"}
             </p>
           )}

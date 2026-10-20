@@ -14,7 +14,9 @@ import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field
 import { EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
 import { analyzeResume } from "@/lib/api/resumes";
 import { ApiError, errorMessage } from "@/lib/api/client";
-import { saveResume, updateProfile } from "@/lib/api/me";
+import { addResume, createAccount, getMe, updateGoals } from "@/lib/api/me";
+import { acceptedTerms } from "@/lib/auth/account";
+import { getSupabase } from "@/lib/supabase/client";
 import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
 import type { ResumeAnalysis, ResumeClassification } from "@/types/api";
 
@@ -60,19 +62,32 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
         confirmError={confirmError}
         onConfirm={async () => {
           const { targetRole, experienceLevel, graduationYear, location } = form.getValues();
+          const goals = {
+            target_role: targetRole,
+            experience_level: experienceLevel,
+            graduation_year: Number(graduationYear),
+            preferred_location: location,
+          };
+          const resume = {
+            original_filename: analysis.filename,
+            parser: analysis.extraction.parser,
+            ocr_pages: analysis.extraction.ocr_pages,
+            agent_name: analysis.agent.name,
+            classification,
+          };
           setConfirming(true);
           setConfirmError(undefined);
           try {
-            await Promise.all([
-              updateProfile({
-                target_role: targetRole,
-                experience_level: experienceLevel,
-                graduation_year: Number(graduationYear),
-                location,
-                complete_onboarding: true,
-              }),
-              saveResume({ filename: analysis.filename, classification }),
-            ]);
+            const { user } = await getMe();
+            if (user) {
+              // Back from the profile page with a new résumé: update the goal, add a résumé version.
+              await Promise.all([updateGoals(goals), addResume(resume)]);
+            } else {
+              // First time: this creates the account, with the terms consent given at sign-up.
+              const { data } = await getSupabase().auth.getUser();
+              if (!data.user) throw new Error("Not logged in");
+              await createAccount({ ...goals, accept_terms: acceptedTerms(data.user), resume });
+            }
           } catch (error) {
             setConfirmError(errorMessage(error, "Couldn't save your profile. Try again."));
             setConfirming(false);

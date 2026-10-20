@@ -12,9 +12,8 @@ import { TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { errorMessage } from "@/lib/api/client";
 import { authErrorMessage } from "@/lib/auth/errors";
-import { ensureAccount, type SignupMetadata } from "@/lib/auth/account";
+import type { SignupMetadata } from "@/lib/auth/account";
 import { getSupabase } from "@/lib/supabase/client";
 import { signupSchema, type SignupValues } from "@/lib/validation/auth";
 
@@ -42,12 +41,8 @@ export function SignupForm() {
 
     // Only when email confirmation is turned off in Supabase: logged in right away.
     if (data.session && data.user) {
-      try {
-        await ensureAccount(data.user);
-        return router.push("/onboarding");
-      } catch (accountError) {
-        return setSubmitError(errorMessage(accountError));
-      }
+      // Email confirmation is off: logged in straight away. The account is created at the end of onboarding.
+      return router.push("/onboarding");
     }
     // Same message whether or not the email was already registered, so this form
     // can't be used to find out who has an account.

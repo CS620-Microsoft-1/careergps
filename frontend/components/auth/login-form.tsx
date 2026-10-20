@@ -11,7 +11,7 @@ import { TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { errorMessage } from "@/lib/api/client";
-import { ensureAccount } from "@/lib/auth/account";
+import { homeFor } from "@/lib/auth/account";
 import { authErrorMessage } from "@/lib/auth/errors";
 import { safeNextPath } from "@/lib/auth/next-path";
 import { getSupabase } from "@/lib/supabase/client";
@@ -28,20 +28,20 @@ export function LoginForm() {
 
   async function onSubmit(values: LoginValues) {
     setSubmitError(null);
-    const { data, error } = await getSupabase().auth.signInWithPassword({
+    const { error } = await getSupabase().auth.signInWithPassword({
       email: values.email,
       password: values.password,
     });
     if (error) return setSubmitError(authErrorMessage(error));
 
     try {
-      // First login after confirming by a link that didn't reach /auth/confirm: finish sign-up here.
-      const { created } = await ensureAccount(data.user);
       // Back to the page that sent them here (?next=, set by proxy.ts or a 401), except that
-      // new accounts go through onboarding first. Read at submit time so /login stays static.
+      // users who haven't finished onboarding go there first. Read at submit time so /login stays static.
       const next = safeNextPath(new URLSearchParams(window.location.search).get("next"));
-      router.replace(created ? "/onboarding" : (next ?? "/dashboard"));
+      router.replace(await homeFor(next));
     } catch (accountError) {
+      // Don't leave a session behind that the app can't use; the user can simply log in again.
+      await getSupabase().auth.signOut({ scope: "local" }).catch(() => {});
       setSubmitError(errorMessage(accountError));
     }
   }

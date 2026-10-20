@@ -12,51 +12,63 @@ export type DatabaseHealthResponse = {
   database: "connected";
 };
 
-/** GET /me, POST /me (backend: app/schemas/me.py). user/profile are null until POST /me succeeds. */
+/** GET /me, POST /me (backend: app/schemas/me.py). user is null until onboarding is finished. */
 export type MeResponse = {
   user: User | null;
-  profile: Profile | null;
 };
 
+/** The users row: created at the end of onboarding, together with the first résumé. */
 export type User = {
   id: string;
-  email: string;
+  primary_email: string;
+  first_name: string;
+  last_name: string;
   full_name: string | null;
+  target_role: string;
+  experience_level: string;
+  graduation_year: number;
+  university: string;
+  preferred_location: string;
+  resume_emails: string[];
+  phones: string[];
+  current_location: string | null;
+  linkedin_url: string | null;
+  github_url: string | null;
+  website_url: string | null;
+  active_resume_id: string | null;
   created_at: string;
 };
 
-/** Goal fields are null until onboarding fills them in. */
-export type Profile = {
-  target_role: string | null;
-  experience_level: string | null;
-  graduation_year: number | null;
-  university: string | null;
-  location: string | null;
-  onboarding_completed_at: string | null;
-};
-
-/** PATCH /me/profile body: only the fields sent change. */
-export type ProfileUpdateRequest = {
-  full_name?: string;
-  target_role?: string;
-  experience_level?: string;
-  graduation_year?: number;
-  university?: string;
-  location?: string;
-  /** Stamps onboarding_completed_at the first time it is sent. */
-  complete_onboarding?: true;
-};
-
-/** GET/PUT /me/resume: the reviewed résumé classification the backend keeps (latest only). */
-export type SavedResume = {
-  filename: string;
+/** A résumé confirmed on the review page, with how POST /resumes/analyze read it. */
+export type ResumeSubmitRequest = {
+  original_filename: string;
+  parser: string;
+  ocr_pages: number[];
+  agent_name: string;
   classification: ResumeClassification;
-  updated_at: string;
 };
 
-/** POST /me body. The email comes from the access token. */
-export type AccountCreateRequest = {
+/** The career goal asked in onboarding. */
+export type Goals = {
+  target_role: string;
+  experience_level: string;
+  graduation_year: number;
+  preferred_location: string;
+};
+
+/** POST /me body: finishes onboarding. The email comes from the access token. */
+export type AccountCreateRequest = Goals & {
   accept_terms: true;
+  resume: ResumeSubmitRequest;
+};
+
+/** GET /me/resume, POST /me/resumes: a confirmed résumé version. */
+export type SavedResume = {
+  id: string;
+  original_filename: string;
+  file_type: "pdf" | "docx";
+  classification: ResumeClassification;
+  created_at: string;
 };
 
 export type ResumeFieldValue = string | null | string[];
@@ -78,7 +90,7 @@ export type ResumeClassification = {
   other: ResumeRecord[];
 };
 
-/** POST /resumes/analyze: transient result; onboarding saves only the reviewed classification (PUT /me/resume). */
+/** POST /resumes/analyze: transient result; onboarding saves the reviewed classification (POST /me or POST /me/resumes). */
 export type ResumeAnalysis = {
   filename: string;
   extraction: {

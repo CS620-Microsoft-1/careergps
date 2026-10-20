@@ -1,34 +1,20 @@
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 
-import { ApiError } from "@/lib/api/client";
-import { createAccount, getMe } from "@/lib/api/me";
-import type { AccountCreateRequest, MeResponse } from "@/types/api";
+import { getMe } from "@/lib/api/me";
 
-/** What signUp() saves in Supabase user_metadata, read back after confirmation. */
-export type SignupMetadata = AccountCreateRequest;
+/** What signUp() saves in Supabase user_metadata, read back when onboarding finishes. */
+export type SignupMetadata = { accept_terms: true };
 
 /**
- * Makes sure the logged-in user has their users + profiles rows (POST /me), creating them the
- * first time with the terms consent given at sign-up. Called after email confirmation and after every login, so
- * it also works when the confirmation link didn't reach /auth/confirm.
- * `created` is true when this call finished sign-up.
+ * Where a logged-in user goes next: /onboarding until it is finished (the account row is created
+ * at its end), otherwise `next` or the dashboard.
  */
-export async function ensureAccount(user: SupabaseUser): Promise<{ me: MeResponse; created: boolean }> {
-  const me = await getMe();
-  if (me.user) return { me, created: false };
+export async function homeFor(next: string | null): Promise<string> {
+  const { user } = await getMe();
+  return user ? (next ?? "/dashboard") : "/onboarding";
+}
 
-  const data = user.user_metadata as Partial<SignupMetadata>;
-  try {
-    // Only what the user actually accepted at sign-up; the API rejects anything but true.
-    const created = await createAccount({ accept_terms: data.accept_terms as true });
-    return { me: created, created: true };
-  } catch (error) {
-    if (error instanceof ApiError && error.status === 409) {
-      // Another tab finished sign-up first. A 409 can also mean the email belongs to another
-      // users row; then there is still no account and the user must not continue as if there were.
-      const current = await getMe();
-      if (current.user) return { me: current, created: false };
-    }
-    throw error;
-  }
+/** The terms consent given at sign-up; the API rejects anything but true. */
+export function acceptedTerms(user: SupabaseUser): true {
+  return (user.user_metadata as Partial<SignupMetadata>).accept_terms as true;
 }

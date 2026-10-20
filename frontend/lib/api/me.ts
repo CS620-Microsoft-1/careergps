@@ -1,30 +1,36 @@
-import { ApiError, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api/client";
+import { ApiError, apiGet, apiPatch, apiPost } from "@/lib/api/client";
 import type {
   AccountCreateRequest,
+  Goals,
   MeResponse,
-  Profile,
-  ProfileUpdateRequest,
-  ResumeClassification,
+  ResumeSubmitRequest,
   SavedResume,
+  User,
 } from "@/types/api";
 
 // backend: app/api/routes/me.py
 
-/** The logged-in user's account and profile. */
+/** The logged-in student's account; user is null until onboarding is finished. */
 export function getMe() {
   return apiGet<MeResponse>("/me");
 }
 
-/** Finish sign-up after email confirmation. Throws ApiError 409 if already done. */
+/** Finish onboarding: creates the account and its first résumé. Throws ApiError 409 if already done. */
 export function createAccount(body: AccountCreateRequest) {
   return apiPost<MeResponse>("/me", { json: body });
 }
 
-export function updateProfile(body: ProfileUpdateRequest) {
-  return apiPatch<Profile>("/me/profile", { json: body });
+/** Change the career goal; only the fields sent change. */
+export function updateGoals(body: Partial<Goals>) {
+  return apiPatch<User>("/me", { json: body });
 }
 
-/** The résumé analysis saved in onboarding, or null if there is none yet. */
+/** Save a newer confirmed résumé; it becomes the active one. */
+export function addResume(body: ResumeSubmitRequest) {
+  return apiPost<SavedResume>("/me/resumes", { json: body });
+}
+
+/** The active résumé, or null if there is none yet. */
 export async function getSavedResume(): Promise<SavedResume | null> {
   try {
     return await apiGet<SavedResume>("/me/resume");
@@ -32,9 +38,4 @@ export async function getSavedResume(): Promise<SavedResume | null> {
     if (error instanceof ApiError && error.status === 404) return null;
     throw error;
   }
-}
-
-/** Save the reviewed classification, replacing any earlier one. */
-export function saveResume(body: { filename: string; classification: ResumeClassification }) {
-  return apiPut<SavedResume>("/me/resume", { json: body });
 }

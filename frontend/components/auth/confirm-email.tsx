@@ -8,13 +8,14 @@ import { AlertTriangle, Loader2 } from "lucide-react";
 import { EmptyState } from "@/components/common/empty-state";
 import { Button } from "@/components/ui/button";
 import { errorMessage } from "@/lib/api/client";
-import { ensureAccount } from "@/lib/auth/account";
+import { homeFor } from "@/lib/auth/account";
 import { authCodeMessage } from "@/lib/auth/errors";
 import { getSupabase } from "@/lib/supabase/client";
 
 /**
  * Where the email confirmation link lands. Supabase has already confirmed the email by now;
- * this turns the link's code into a session, finishes sign-up (POST /me) and moves on.
+ * this turns the link's code into a session and moves on to onboarding (or the dashboard, for an
+ * account that has already finished it).
  */
 export function ConfirmEmail() {
   const router = useRouter();
@@ -39,8 +40,8 @@ export function ConfirmEmail() {
       }
 
       try {
-        await ensureAccount(data.user);
-        if (!cancelled) router.replace("/onboarding");
+        const home = await homeFor(null);
+        if (!cancelled) router.replace(home);
       } catch (accountError) {
         if (!cancelled) setError(errorMessage(accountError));
       }
