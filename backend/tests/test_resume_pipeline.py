@@ -18,14 +18,17 @@ import pymupdf
 from docx import Document
 from fastapi.testclient import TestClient
 
-from app.api.deps import get_resume_pipeline
+from app.api.deps import get_current_db_user, get_resume_pipeline, get_token_verifier
+from app.core.security import SupabaseTokenVerifier
 from app.main import app
+from app.models import User
 from app.services.foundry_agent import (
     ClassificationValidationError,
     parse_json_response,
     validate_classification,
 )
 from app.services.resume_extraction import detect_file_type, extract_resume
+from tests.support import SUPABASE_URL, FakeJwks, new_signing_key
 
 
 def make_pdf(text: str) -> bytes:
@@ -206,6 +209,7 @@ class ResumeRouteTests(unittest.TestCase):
     def setUp(self) -> None:
         self.pipeline = FakePipeline()
         app.dependency_overrides[get_resume_pipeline] = lambda: self.pipeline
+        app.dependency_overrides[get_current_db_user] = lambda: User(email="ada@example.com")
         self.client = TestClient(app)
 
     def tearDown(self) -> None:
@@ -227,6 +231,19 @@ class ResumeRouteTests(unittest.TestCase):
             files={"file": ("resume.pdf", b"not really a pdf", "application/pdf")},
         )
         self.assertEqual(415, response.status_code)
+
+    def test_requires_login(self) -> None:
+        del app.dependency_overrides[get_current_db_user]
+        verifier = SupabaseTokenVerifier(SUPABASE_URL, jwks_client=FakeJwks(new_signing_key()))
+        app.dependency_overrides[get_token_verifier] = lambda: verifier
+
+        response = self.client.post(
+            "/resumes/analyze",
+            files={"file": ("resume.pdf", make_pdf("Ada Lovelace"), "application/pdf")},
+        )
+
+        self.assertEqual(401, response.status_code)
+        self.assertIsNone(self.pipeline.temporary_path)
 
 
 if __name__ == "__main__":
