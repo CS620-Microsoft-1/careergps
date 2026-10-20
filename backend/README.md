@@ -2,7 +2,8 @@
 
 Python 3.12+ · FastAPI · SQLAlchemy · Alembic · PostgreSQL (hosted on Supabase). See [ADR-002](../docs/decisions/ADR-002-CareerGPS-Backend.md).
 
-The whole team shares **one Supabase Postgres database**. There is no local database to set up.
+The whole team shares **one Supabase Postgres database** for application data.
+The current JD analysis queue and results are stored locally, as described below.
 
 ## Setup
 
@@ -333,6 +334,383 @@ To add companies, add them to `data/company_candidates.yaml` and run
 `python -m scripts.probe_boards`. It prints the boards it finds; `--write` replaces
 `data/companies.yaml`. Check each match before committing, since a slug can belong to a
 different company with the same name.
+
+## Job posting analysis
+
+### JD quick start on a new computer
+
+This sets up the local backend to call the **existing** Azure Agent named
+`job-analysis-agent`, fixed at **version `10`**. The extracted result keeps all **28 fields**
+from `app/schemas/job_posting_analysis_v10.json`. This repository contains the local output
+contract and client code; it does not create an Azure Agent or reproduce its full remote
+Instructions/model configuration in a new Azure project.
+
+Use a Git checkout containing this feature. Live testing requires access to the existing
+Foundry project and to an already-populated Supabase `job_postings` table. For JD setup,
+leave the deployed Agent unchanged and use the existing tables. The résumé Instructions
+synchronization, scraper and Alembic migration steps are separate workflows. JD analysis
+does not require Tesseract or Ghostscript system tools.
+
+#### 1. Install the local Python environment
+
+Run from `backend/` in the checkout. On macOS/Linux:
+
+```bash
+cd /path/to/careergps/backend
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+On Windows PowerShell:
+
+```powershell
+cd C:\path\to\careergps\backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+Python 3.12 or newer is required. An existing activated backend environment can also be
+used; its folder name does not have to be `.venv`. Keep subsequent commands in `backend/`.
+
+#### 2. Run offline tests first
+
+This command works in Bash/zsh and PowerShell. It supplies a dummy database URL and blank
+Azure endpoints only for this Python process, so it does not require Azure login, a real
+Supabase connection string, or a `.env` file. Tests use synthetic inputs, mocked Agents and
+temporary local databases; they neither call the remote Agent nor write to Supabase.
+
+```text
+python -c "import os, unittest; os.environ.update(DATABASE_URL='postgresql+psycopg://tester:not-a-real-password@127.0.0.1:1/test', JOB_ANALYSIS_PROJECT_ENDPOINT='', JOB_ANALYSIS_ADMIN_TOKEN='', FOUNDRY_PROJECT_ENDPOINT='', FOUNDRY_AGENT_NAME=''); unittest.main(module=None, argv=['unittest', 'discover', '-s', 'tests', '-t', '.', '-v'])"
+```
+
+Success ends with `OK`. The full suite includes the five JD test modules plus the existing
+backend tests; the latest local verification ran 215 tests. The count can grow as tests are
+added. Git metadata is needed for the repository configuration checks.
+
+#### 3. Configure access for a live test
+
+Copy `.env.example` to `.env` if `.env` does not already exist. Edit these JD settings locally:
+
+| Setting | What to provide |
+|---|---|
+| `DATABASE_URL` | Existing shared Supabase PostgreSQL connection string, obtained privately |
+| `JOB_ANALYSIS_PROJECT_ENDPOINT` | Project endpoint supplied by the owner of the existing version 10 Agent; replace all placeholders |
+| `JOB_ANALYSIS_TIMEOUT_SECONDS` | `600`, unless the owner specifies another timeout |
+| `JOB_ANALYSIS_LOCAL_DIR` | `local_exports/job_analyses` for normal use; the acceptance command overrides this with a fresh folder |
+| `JOB_ANALYSIS_ADMIN_TOKEN` | The one-off acceptance command generates its own temporary token; set a private token here when serving the API separately |
+
+The project endpoint has the form
+`https://<resource-name>.services.ai.azure.com/api/projects/<project-name>`.
+The Agent name/version are already fixed in the code. Résumé `FOUNDRY_*` settings are not
+needed for JD analysis. Do not print or share the database URL or management token.
+
+Install [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) if needed, then:
+
+```text
+az login
+az account show --query name -o tsv
+```
+
+Use an account with permission to invoke the existing Agent. Ask the project owner for
+access; login alone does not grant it. The shared [Azure authentication and RBAC notes](#3-install-azure-cli-and-authenticate)
+also apply to JD calls. Keep all commands on your own computer; no new Azure deployment,
+Agent update or database migration is part of this quick start.
+
+#### 4. Choose an existing JP ID with a read-only query
+
+The following command prints up to five current IDs and titles. It uses the protected
+read-only source, makes no Agent calls and does not enqueue jobs:
+
+```text
+python -c "from itertools import islice; from app.db.session import SessionLocal; from app.services.job_posting_analysis_pipeline import ReadOnlyJobPostingSource; source=ReadOnlyJobPostingSource(SessionLocal); [print(job_id, source.get_posting(job_id)['title']) for job_id in islice(source.iter_ids(batch_size=5), 5)]"
+```
+
+Copy an ID from the output, or use another ID known to exist in this same database. If the
+list is empty, ask the database owner about available postings before continuing.
+
+#### 5. Run one live acceptance request
+
+**This command sends one real analysis request to version 10 and consumes Azure model
+usage.** Supabase access stays read-only; analysis state and files are saved locally. Each
+run creates a fresh directory and therefore repeats the model request even for the same
+posting. It does not change the Agent definition or schema.
+
+Replace `PASTE_EXISTING_JOB_UUID_HERE` in the code below with the ID selected in step 4.
+For macOS/Linux, paste the complete command. For PowerShell, save just the Python content between `python - <<'PY'` and the final `PY`
+as `backend/local_tests/accept_jd_v10.py` (create `local_tests/` if needed), then run
+`python local_tests/accept_jd_v10.py` from `backend/`. That helper remains ignored by Git.
+
+```bash
+python - <<'PY'
+import json
+import os
+from pathlib import Path
+import secrets
+import sys
+from uuid import UUID, uuid4
+
+job_id = "PASTE_EXISTING_JOB_UUID_HERE"
+backend = Path.cwd()
+if not (backend / "app" / "main.py").is_file():
+    raise SystemExit("Run this command from backend/.")
+sys.path.insert(0, str(backend))
+
+folder = (backend / "local_exports" / f"acceptance_v10_{uuid4().hex[:8]}").resolve()
+folder.mkdir(parents=True)
+# Set overrides before the first app import/settings read. The .env file is unchanged.
+token = secrets.token_urlsafe(32)
+os.environ["JOB_ANALYSIS_LOCAL_DIR"] = str(folder)
+os.environ["JOB_ANALYSIS_ADMIN_TOKEN"] = token
+print("Directory:", folder, flush=True)
+
+try:
+    try:
+        job_id = str(UUID(job_id))
+    except ValueError:
+        raise SystemExit("Replace job_id with an existing UUID from step 4.")
+
+    from app.core.config import get_settings
+
+    endpoint = get_settings().job_analysis_project_endpoint or ""
+    if not endpoint.strip() or "<" in endpoint or ">" in endpoint:
+        raise SystemExit("Set JOB_ANALYSIS_PROJECT_ENDPOINT in .env first.")
+
+    from fastapi.testclient import TestClient
+    from app.api.deps import get_job_analysis_pipeline
+    from app.main import app
+    from app.services.job_posting_analysis_agent import AGENT_VERSION
+    from app.services.job_posting_analysis_pipeline import JobPostingNotFoundError
+
+    assert AGENT_VERSION == "10"
+    pipeline = get_job_analysis_pipeline()
+    try:
+        posting = pipeline.get_posting(job_id)
+    except JobPostingNotFoundError:
+        raise SystemExit("Job ID not found. No Agent request was sent; choose another ID.")
+
+    (folder / "input.json").write_text(
+        json.dumps(posting, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    print("Company:", posting["company_name"], flush=True)
+    print("Job:", posting["title"], flush=True)
+    print("Calling version 10; please wait...", flush=True)
+
+    # TestClient runs the real FastAPI route in-process; uvicorn is not needed.
+    with TestClient(app, raise_server_exceptions=False) as client:
+        response = client.post(
+            f"/job-postings/{job_id}/analyze",
+            headers={"X-Job-Analysis-Token": token},
+            json={"force": False},
+        )
+
+    response_file = folder / "response.txt"
+    response_file.write_text(response.text, encoding="utf-8")
+    print("HTTP:", response.status_code)
+    try:
+        result = response.json()
+    except ValueError:
+        raise SystemExit(f"Response is not JSON. Inspect {response_file}")
+
+    print("Status:", result.get("status"))
+    print("Error:", result.get("error_message") or result.get("detail") or "")
+    if response.status_code != 200 or result.get("status") != "succeeded":
+        raise SystemExit("Acceptance failed. Keep this directory for diagnosis.")
+
+    output = folder / "results" / f"{job_id}.json"
+    saved = json.loads(output.read_text(encoding="utf-8"))
+    assert len(saved) == 28, "Expected 28 output fields."
+    assert saved["id"]["value"] == job_id, "Posting ID mismatch."
+    assert saved == result["structured_data"], "File/API result mismatch."
+    print("Fields:", len(saved))
+    print("Result:", output)
+    print("Acceptance: PASSED")
+except Exception as error:
+    # Avoid exposing raw database/SDK exceptions or credentials.
+    print("Stopped:", type(error).__name__)
+    print("Inspect local files in:", folder)
+    raise SystemExit(1)
+PY
+```
+
+Expected success:
+
+```text
+HTTP: 200
+Status: succeeded
+Error:
+Fields: 28
+Result: .../results/<job-id>.json
+Acceptance: PASSED
+```
+
+Keep `input.json` (the preflight JP), `response.txt` (the API response), and
+`results/<job-id>.json` in the printed directory for content/evidence review. A local
+`queue.sqlite3` also records status and safe errors. `succeeded` confirms that the current
+local checks passed; useful-information coverage and requirement meaning still need sample
+review. This is an in-process API test; testing a separately hosted HTTP server is a
+separate step.
+
+For a persistent local HTTP server, configure `JOB_ANALYSIS_ADMIN_TOKEN` in `.env` with a
+private value (generate one locally with `python -c "import secrets; print(secrets.token_urlsafe(32))"`),
+then follow [Run the API](#run-the-api) and supply `X-Job-Analysis-Token` when calling the JD
+endpoint. These live commands do not run automatically during installation or offline tests.
+
+### JD implementation and behavior
+
+The JD implementation follows the résumé feature's route/schema/Agent/pipeline layout:
+
+| File | Responsibility |
+|---|---|
+| `app/api/routes/job_postings.py` | HTTP submission, authorization and error responses |
+| `app/schemas/job_posting_analysis.py` | Request/response models and strict JSON/schema validation |
+| `app/schemas/job_posting_analysis_v10.json` | Unchanged 28-field version 10 output contract |
+| `app/services/job_posting_analysis_agent.py` | Fixed Agent invocation and local evidence/compensation checks |
+| `app/services/job_posting_analysis_pipeline.py` | Read-only JP source, orchestration and disabled future-save boundary |
+| `app/services/local_job_analysis_store.py` | Local queue/results, heartbeats and interruption recovery |
+| `scripts/job_posting_analysis_worker.py` | Batch processing and queue-only submission |
+
+HTTP requests and the worker share the same pipeline and validation. The five JD test
+modules cover Agent/validation, pipeline/source, store/recovery, HTTP and worker/CLI.
+
+The JD pipeline reads all 25 fields from an existing `job_postings` row, calls
+`job-analysis-agent` version `10`, validates the response, and saves its unchanged 28-field
+JSON locally. Each posting uses an independent Azure conversation with a default 600-second
+request timeout and no SDK retries. The request does not override the deployed Agent's
+instructions, model, reasoning or response format.
+
+Source reads use short PostgreSQL transactions with `SET TRANSACTION READ ONLY` and a
+connection-scoped SELECT guard. Sessions close before Agent calls. This restriction applies
+to JD analysis; the existing scraper still has its own source-data writes. JD analysis does
+not query or write `job_postings_analyses`, `ingest_runs` or another cloud result/state table.
+
+Configure these independent JD settings using the placeholders in `.env.example`:
+
+| Setting | Purpose |
+|---|---|
+| `JOB_ANALYSIS_PROJECT_ENDPOINT` | Existing Foundry project hosting version 10 |
+| `JOB_ANALYSIS_TIMEOUT_SECONDS` | Agent request timeout, default 600 |
+| `JOB_ANALYSIS_ADMIN_TOKEN` | Private server-only HTTP management token; blank disables submission |
+| `JOB_ANALYSIS_LOCAL_DIR` | Local queue/export directory; relative paths resolve from `backend/` |
+
+Azure authentication uses the caller's identity. Never put the management token or database
+credentials in frontend code or `NEXT_PUBLIC_*` variables. Normal API requests and workers
+make real Azure calls and consume model usage; automated tests inject a fake Agent.
+
+### Local storage and future Supabase save interface
+
+The default directory is `backend/local_exports/job_analyses/`, ignored by Git:
+
+```text
+job_analyses/
+  queue.sqlite3             # local queue, ownership, last result and safe errors
+  results/<job-id>.json      # complete 28-field JSON with evidence
+```
+
+The queue survives restarts and permits one current attempt per posting. Failed refreshes
+retain the previous successful result. JSON writes use a temporary file and replacement;
+SQLite remains the committed source of truth during interruption recovery.
+
+`app/services/job_posting_analysis_pipeline.py` reserves the internal function
+`save_analysis_to_supabase(job_posting_id=..., structured_data=...)` for the future
+`job_postings_analyses` destination. It always raises `SupabaseAnalysisPersistenceNotEnabled`;
+the function neither opens connections nor reads configuration and is not called by the current
+pipeline or HTTP API.
+It is not a Supabase REST endpoint. Once the database owner prepares the table, this boundary
+can be implemented using the backend's existing SQLAlchemy connection pattern.
+
+This feature includes no active cloud analysis ORM model or Alembic migration. The future
+table design is deferred; it must be reviewed separately before any remote writes are enabled.
+
+### Analyze one posting through HTTP
+
+`POST /job-postings/{id}/analyze` requires `X-Job-Analysis-Token` matching the server token.
+It waits for analysis and returns `job_posting_id`, `status`, `structured_data`, `error_message`.
+The inner `structured_data` is the frozen contract in `app/schemas/job_posting_analysis_v10.json`.
+Use a client timeout that accommodates the Agent timeout.
+
+- No body or `{}` reuses existing local results. `{"force": true}` explicitly retries finished work.
+- Success or a saved analysis failure returns HTTP `200`; inspect `status`, not HTTP code alone.
+- A job already running returns `202` without another Agent call; force does not take it over.
+- Unknown source IDs return `404`, invalid requests `422`, lost ownership `409`, and source/local
+  storage failures safe `503` messages. A blank server token disables the endpoint.
+
+### First backfill and new-posting discovery
+
+From `backend/`, enqueue source IDs without making Agent calls:
+
+```bash
+python -m scripts.job_posting_analysis_worker --enqueue-only --limit 10
+```
+
+`--enqueue-only` does not require an Azure endpoint and never processes queued jobs.
+`--batch-size` (default 500) and `--limit` apply only to this mode; it cannot be combined
+with `--once`. The limit counts new queue entries. Discovery uses ID keyset pages and preserves every
+existing local state, including failed entries. It does not rely on ingestion timestamps.
+The default scope includes all stored postings; existing IDs whose content changes are not
+automatically reanalyzed.
+
+Run the worker to analyze queued postings and discover new IDs:
+
+```bash
+python -m scripts.job_posting_analysis_worker --once
+python -m scripts.job_posting_analysis_worker --scan-seconds 60
+```
+
+Startup recovers expired work and scans source IDs. `--once` still performs that scan, then
+processes at most one posting; it does not limit discovery to one source row. Continuous mode
+rescans between jobs every 60 seconds by default, so long model calls can delay scans. Ordinary
+failed analyses do not automatically retry or block other jobs. No scheduler or service is installed.
+
+### Interrupted task recovery
+
+Each running attempt has a unique token and a 120-second lease, renewed by a background
+heartbeat every 40 seconds. Ctrl+C/`SystemExit` requeues its owned attempt when cleanup can run.
+After an abrupt exit, the next worker startup/scan or POST for the same ID recovers an expired
+attempt. Valid live leases are preserved, and expired or superseded attempts cannot renew or
+save late results.
+
+Recovery restores the export from the last committed SQLite result, or removes an uncommitted
+first export, before requeuing. Filesystem errors leave recovery pending. A continuous worker
+that loses ownership waits and rescans; `--once` returns failure. Other storage errors stop it.
+A model response cannot be resumed midway: recovery repeats the whole JD analysis and may
+incur another Azure charge if the earlier request completed remotely.
+
+Use local storage on one machine with a correct clock. Before upgrading older local workers/API
+processes, stop them. Opening an old local queue adds only its lease column and gives legacy
+running rows a one-time 120-second grace period. This is local SQLite initialization, not a
+Supabase migration.
+
+### Output validation and evaluation limits
+
+Before a new result is saved, local checks enforce:
+
+- Strict JSON, the frozen schema, posting identity, nonblank values, required evidence and
+  correct null/evidence handling.
+- Exact contiguous evidence excerpts from actual decoded source fields; numeric/boolean
+  evidence must match its complete JSON scalar representation. No quote rewriting occurs.
+- Exact copies and full-field evidence for the 13 copied metadata fields; qualification
+  categories must be nonempty and unique.
+- Nonnegative monetary bounds in the correct order, nonblank optional compensation strings,
+  and consistency between populated salary summaries and reported base-pay arrangements.
+  Unknown summaries remain allowed; currency/period/amounts are not guessed or repaired.
+
+A rejected response becomes a local failed record with bounded rule codes and field paths.
+It is not exported as new structured data and cannot replace a previous successful result.
+Cached results and older exports are not retroactively revalidated. The Agent adapter receives
+a separate copy of the original source snapshot, so input mutation cannot bypass quote checks.
+
+These rules verify structure and provenance. They cannot prove that a paraphrase, requirement
+level, AND/OR logic, workplace classification, salary amount/period or completeness is correct.
+Separate sample review remains necessary. A single real Stripe posting passed the in-process
+API smoke test and core-content review; its qualification evidence omitted the headings that
+establish required/preferred levels. This does not validate salary/workplace branches or a
+separately deployed HTTP server. Real input/output files stay in ignored local exports.
+
+Formal tests under `tests/` use synthetic inputs, fake Agents and temporary local databases.
+Personal scripts, virtual environments, historical future-table drafts and acceptance artifacts
+remain ignored local files; the unrelated existing resume tests are unchanged.
 
 ## Changing the schema
 

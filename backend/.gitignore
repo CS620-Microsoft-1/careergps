@@ -2,7 +2,7 @@
 .env
 
 # Python
-.venv/
+.venv*/
 __pycache__/
 *.pyc
 
@@ -11,3 +11,11 @@ __pycache__/
 
 # Logs
 *.log
+
+# Local experiments and exported API results
+local_tests/
+local_exports/
+
+# Personal local scraping helpers
+fetch_jds_local.py
+view_jds_local.py
