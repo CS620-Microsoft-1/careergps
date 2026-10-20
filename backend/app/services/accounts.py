@@ -70,6 +70,15 @@ def fill_empty_contacts(user: User, classification: ResumeClassification) -> Non
             setattr(user, field, value)
 
 
+def university_from(classification: ResumeClassification) -> str:
+    """The first school listed in the résumé's education; DEFAULT_UNIVERSITY if there is none."""
+    for entry in classification.education:
+        name = (entry.institution or "").strip()
+        if name:
+            return name[:150]
+    return DEFAULT_UNIVERSITY
+
+
 def new_user(auth_user: AuthenticatedUser, data: AccountCreate) -> User:
     first_name, last_name = split_name(data.resume.classification.personal_information.name)
     user = User(
@@ -80,7 +89,7 @@ def new_user(auth_user: AuthenticatedUser, data: AccountCreate) -> User:
         target_role=data.target_role,
         experience_level=data.experience_level,
         graduation_year=data.graduation_year,
-        university=DEFAULT_UNIVERSITY,
+        university=university_from(data.resume.classification),
         preferred_location=data.preferred_location,
         terms_accepted_at=datetime.now(UTC),
         **{field: value for field, value in contact_details(data.resume.classification).items()},

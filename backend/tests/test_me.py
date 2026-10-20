@@ -125,7 +125,7 @@ class NameAndContactRulesTests(unittest.TestCase):
             with self.subTest(name=missing), self.assertRaises(accounts.MissingNameError):
                 accounts.split_name(missing)
 
-    def test_new_user_takes_names_contacts_and_the_default_university(self) -> None:
+    def test_new_user_takes_names_contacts_and_university_from_the_resume(self) -> None:
         auth_user = AuthenticatedUser(id=uuid.uuid4(), email="Ada@Example.com")
         data = AccountCreate.model_validate(
             onboarding_body(resume=resume_body(classification=classification(name="Ada Lovelace", phones=["1", "1"])))
@@ -135,8 +135,14 @@ class NameAndContactRulesTests(unittest.TestCase):
 
         self.assertEqual(("Ada", "Lovelace", "Ada Lovelace"), (user.first_name, user.last_name, user.full_name))
         self.assertEqual("ada@example.com", user.primary_email)
-        self.assertEqual(DEFAULT_UNIVERSITY, user.university)
+        self.assertEqual(EXAMPLE["education"][0]["institution"], user.university)
         self.assertEqual(["1"], user.phones)
+
+    def test_university_falls_back_to_the_default(self) -> None:
+        for education in ([], [{**EXAMPLE["education"][0], "institution": "  "}]):
+            with self.subTest(education=education):
+                data = ResumeClassification.model_validate({**classification(), "education": education})
+                self.assertEqual(DEFAULT_UNIVERSITY, accounts.university_from(data))
 
     def test_a_newer_resume_fills_only_empty_contacts(self) -> None:
         user = User(phones=["111"], linkedin_url=None, resume_emails=[], github_url="gh-old", website_url=None)

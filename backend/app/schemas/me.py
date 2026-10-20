@@ -35,8 +35,8 @@ class ResumeSubmit(BaseModel):
 class AccountCreate(BaseModel):
     """POST /me: the end of onboarding. Creates the users row and the first résumé together.
 
-    The email comes from the token. Names come from the résumé and the university is the default
-    (onboarding doesn't ask for either yet).
+    The email comes from the token. Names and the university come from the résumé (onboarding
+    doesn't ask for them).
     """
 
     model_config = REQUEST_CONFIG

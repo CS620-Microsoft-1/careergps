@@ -10,5 +10,5 @@ EXPERIENCE_LEVELS: tuple[str, ...] = get_args(ExperienceLevel)
 # Graduation year: this year plus the next four (frontend/lib/graduation-years.ts).
 GRADUATION_YEARS_AHEAD = 4
 
-# Onboarding doesn't ask for the university yet; users.university is required, so new users get this.
+# Onboarding doesn't ask for the university; it comes from the résumé's education, or this if none.
 DEFAULT_UNIVERSITY = "University of Wisconsin–Madison"

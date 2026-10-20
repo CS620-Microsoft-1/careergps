@@ -37,7 +37,7 @@ A new student can create an account with email and password, confirm their email
 |---|---|---|
 | P0-1 | Sign up with **email** + password, using **Supabase Auth**, with **email confirmation on** (§6) | Decided |
 | P0-2 | Log in, log out, session via Supabase Auth; FastAPI verifies the Supabase JWT (§6) | Decided |
-| P0-3 | Create the `users` row and the first `resumes` row when onboarding is confirmed (`POST /me`, records the terms consent). Names come from the résumé; the university is `DEFAULT_UNIVERSITY` until onboarding asks for it | Decided |
+| P0-3 | Create the `users` row and the first `resumes` row when onboarding is confirmed (`POST /me`, records the terms consent). Names and the university come from the résumé (the first school in its education, else `DEFAULT_UNIVERSITY`) | Decided |
 | P0-4 | Route guard: not logged in → `/login` | Decided |
 | P0-5 | Sign-up asks only for **email, password and the terms checkbox**. Name, university and the career goal (target role, graduation year, experience level) are not asked at sign-up; asking for and saving the goal is owned by onboarding | Decided |
 | P0-6 | Rate limit sign-up and login (Supabase Auth's built-in limits, configured in the dashboard) | Decided |
@@ -88,7 +88,7 @@ The tables are defined by PR #17 (migration `02a858fed0df`; see `backend/README.
 | `users.primary_email` | Copied (lower-cased) from the JWT `email` claim when the row is created, and synced on `GET /me`. |
 | `users.first_name`, `last_name`, `full_name` | From the confirmed résumé's name: first word, the rest, and the whole. A résumé without a name can't finish onboarding (`422`). |
 | `users.target_role`, `experience_level`, `graduation_year`, `preferred_location` | Asked in onboarding. `graduation_year` is 2000 … current year + 4. |
-| `users.university` | `DEFAULT_UNIVERSITY` (`backend/app/core/options.py`) until onboarding asks for it. |
+| `users.university` | The first school in the résumé's education; `DEFAULT_UNIVERSITY` (`backend/app/core/options.py`) if it lists none. Not changed by later résumés. |
 | `users.terms_accepted_at` | When onboarding is confirmed, from the consent saved in `user_metadata` at sign-up. |
 | `resumes` | One row per confirmed résumé (`confirmed_data` = the reviewed classification, `schema_version` `"1"`); `users.active_resume_id` is the newest. The child tables (`resume_experiences`, …) are not filled yet. |
 
