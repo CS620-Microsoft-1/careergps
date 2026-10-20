@@ -46,7 +46,8 @@ export function UserMenu() {
   }, []);
 
   async function signOut() {
-    await getSupabase().auth.signOut();
+    // Local scope: sign out this browser only, not the user's other devices.
+    await getSupabase().auth.signOut({ scope: "local" });
     router.replace("/login");
     router.refresh();
   }
