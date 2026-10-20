@@ -1,3 +1,5 @@
+import base64
+import json
 import sys
 import unittest
 import uuid
@@ -76,6 +78,18 @@ class SupabaseTokenVerifierTests(unittest.TestCase):
         for name, token in cases.items():
             with self.subTest(name), self.assertRaises(AuthError):
                 self.verifier.verify(token)
+
+    def test_header_algorithm_must_match_signing_key(self) -> None:
+        # An RS256 header pointing at the project's EC key used to crash PyJWT (TypeError → 500).
+        header, payload, signature = make_token(self.key).split(".")
+        forged_header = (
+            base64.urlsafe_b64encode(json.dumps({"alg": "RS256", "typ": "JWT"}).encode())
+            .rstrip(b"=")
+            .decode()
+        )
+
+        with self.assertRaises(AuthError):
+            self.verifier.verify(f"{forged_header}.{payload}.{signature}")
 
     def test_legacy_secret_token_accepted_only_when_secret_configured(self) -> None:
         token = make_token(LEGACY_SECRET, algorithm="HS256")

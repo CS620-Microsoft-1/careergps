@@ -8,7 +8,7 @@ of key.
 import ssl
 import uuid
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Protocol
 
 import certifi
 import jwt
@@ -35,7 +35,7 @@ class AuthenticatedUser:
 
 
 class SigningKeySource(Protocol):
-    def get_signing_key_from_jwt(self, token: str) -> Any: ...
+    def get_signing_key_from_jwt(self, token: str) -> jwt.PyJWK: ...
 
 
 class SupabaseTokenVerifier:
@@ -60,7 +60,12 @@ class SupabaseTokenVerifier:
         try:
             algorithm = jwt.get_unverified_header(token).get("alg")
             if algorithm in ASYMMETRIC_ALGORITHMS:
-                key = self._jwks_client.get_signing_key_from_jwt(token).key
+                signing_key = self._jwks_client.get_signing_key_from_jwt(token)
+                # The header's alg is attacker-chosen: an RS256 header naming an EC key's kid would
+                # otherwise crash PyJWT with a TypeError (500) instead of a 401.
+                if signing_key.algorithm_name != algorithm:
+                    raise AuthError(f"Token algorithm {algorithm} does not match its signing key")
+                key = signing_key.key
             elif algorithm == "HS256" and self._jwt_secret:
                 key = self._jwt_secret
             else:

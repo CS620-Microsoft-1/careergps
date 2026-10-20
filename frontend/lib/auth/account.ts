@@ -23,8 +23,12 @@ export async function ensureAccount(user: SupabaseUser): Promise<{ me: MeRespons
     const created = await createAccount({ accept_terms: data.accept_terms as true });
     return { me: created, created: true };
   } catch (error) {
-    // Another tab finished sign-up first.
-    if (error instanceof ApiError && error.status === 409) return { me: await getMe(), created: false };
+    if (error instanceof ApiError && error.status === 409) {
+      // Another tab finished sign-up first. A 409 can also mean the email belongs to another
+      // users row; then there is still no account and the user must not continue as if there were.
+      const current = await getMe();
+      if (current.user) return { me: current, created: false };
+    }
     throw error;
   }
 }

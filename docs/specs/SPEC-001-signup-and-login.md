@@ -123,7 +123,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 - New env vars: `NEXT_PUBLIC_SUPABASE_URL` and the project's publishable (anon) key. These are designed to be public; the service-role/secret key never goes to the frontend.
 
 **Backend**
-- A `get_current_user` dependency verifies the JWT on every request: signature (via the project's JWKS endpoint, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, if the project uses asymmetric signing keys; otherwise the legacy JWT secret from `.env`), `exp`, and `aud == "authenticated"`. Which of the two the project uses is still to be checked in the Supabase dashboard. Library: `PyJWT`.
+- A `get_current_user` dependency verifies the JWT on every request: signature (via the project's JWKS endpoint, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, if the project uses asymmetric signing keys; otherwise the legacy JWT secret from `.env`), `exp` (60 s clock leeway), `aud == "authenticated"`, `iss == <SUPABASE_URL>/auth/v1`, and that the header's `alg` matches the signing key. A missing or invalid token is `401`; signing keys that can't be fetched are `503`. The shared project uses asymmetric signing keys (ES256, checked 2026-10-14, see `backend/README.md`). Library: `PyJWT`.
 - It returns the user id (`sub`) and email. Endpoints other than `POST /me` return `403` if the `users` row doesn't exist yet.
 - New env var: `SUPABASE_URL` (plus `SUPABASE_JWT_SECRET` only if the project uses the legacy secret).
 
