@@ -14,6 +14,8 @@ import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field
 import { EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
 import { analyzeResume } from "@/lib/api/resumes";
 import { ApiError } from "@/lib/api/client";
+import { saveResumeProfile } from "@/lib/profile/resume-storage";
+import { getSupabase } from "@/lib/supabase/client";
 import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
 import type { ResumeAnalysis, ResumeClassification } from "@/types/api";
 
@@ -53,7 +55,21 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
           setClassification(undefined);
           form.resetField("resume");
         }}
-        onConfirm={() => {
+        onConfirm={async () => {
+          // The backend keeps no résumé data yet, so /profile reads this browser copy.
+          const { targetRole, experienceLevel, graduationYear, location } = form.getValues();
+          try {
+            const { data } = await getSupabase().auth.getUser();
+            if (data.user) {
+              saveResumeProfile(
+                data.user.id,
+                { ...analysis, classification },
+                { targetRole, experienceLevel, graduationYear, location },
+              );
+            }
+          } catch {
+            // Saving is best effort; the profile page shows its empty state instead.
+          }
           setAnalysis(undefined);
           setClassification(undefined);
           form.resetField("resume");

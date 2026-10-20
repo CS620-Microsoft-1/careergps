@@ -263,8 +263,8 @@ export function ResumeReview({
       <div>
         <h2 className="text-page-title tracking-[-0.02em]">Review the extracted résumé</h2>
         <p className="mt-1.5 text-muted-foreground">
-          Check and edit the Agent&apos;s classification. Empty categories are hidden below. This
-          test result is discarded when you continue to the dashboard.
+          Check and edit the Agent&apos;s classification. Empty categories are hidden below. When you
+          continue, the result is saved in this browser only and shown on your profile.
         </p>
       </div>
 
