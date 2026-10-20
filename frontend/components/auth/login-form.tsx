@@ -13,6 +13,7 @@ import { FieldGroup } from "@/components/ui/field";
 import { errorMessage } from "@/lib/api/client";
 import { ensureAccount } from "@/lib/auth/account";
 import { authErrorMessage } from "@/lib/auth/errors";
+import { safeNextPath } from "@/lib/auth/next-path";
 import { getSupabase } from "@/lib/supabase/client";
 import { loginSchema, type LoginValues } from "@/lib/validation/auth";
 
@@ -36,7 +37,10 @@ export function LoginForm() {
     try {
       // First login after confirming by a link that didn't reach /auth/confirm: finish sign-up here.
       const { created } = await ensureAccount(data.user);
-      router.replace(created ? "/onboarding" : "/dashboard");
+      // Back to the page that sent them here (?next=, set by proxy.ts or a 401), except that
+      // new accounts go through onboarding first. Read at submit time so /login stays static.
+      const next = safeNextPath(new URLSearchParams(window.location.search).get("next"));
+      router.replace(created ? "/onboarding" : (next ?? "/dashboard"));
     } catch (accountError) {
       setSubmitError(errorMessage(accountError));
     }

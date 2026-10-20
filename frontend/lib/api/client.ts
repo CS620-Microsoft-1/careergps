@@ -14,6 +14,7 @@ const DEFAULT_TIMEOUT_MS = 5000;
 type AccessTokenGetter = () => Promise<string | null>;
 
 let getAccessToken: AccessTokenGetter = async () => null;
+let onUnauthorized: () => void = () => {};
 
 /**
  * Where requests get the logged-in user's Supabase access token. The Supabase session code
@@ -21,6 +22,11 @@ let getAccessToken: AccessTokenGetter = async () => null;
  */
 export function setAccessTokenGetter(getter: AccessTokenGetter) {
   getAccessToken = getter;
+}
+
+/** What to do when the API answers 401 (no valid token). The Supabase session code sends the user to /login. */
+export function setUnauthorizedHandler(handler: () => void) {
+  onUnauthorized = handler;
 }
 
 type RequestOptions = {
@@ -90,6 +96,7 @@ async function apiRequest<T>(
 
   if (!response.ok) {
     const detail = await readDetail(response);
+    if (response.status === 401) onUnauthorized();
     throw new ApiError(response.status, `${method} ${path} failed with ${response.status}`, detail);
   }
 

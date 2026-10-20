@@ -127,6 +127,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 - It returns the user id (`sub`) and email. Endpoints other than `POST /me` return `403` if the `users` row doesn't exist yet.
 - `POST /me` also reads `auth.users.email_confirmed_at` and returns `403` until the email is confirmed, so an account can't claim an email it doesn't own even if **Confirm email** is turned off in the dashboard.
 - Logout signs out this browser only (`signOut({ scope: "local" })`), not the user's other devices.
+- Logged-out visits to a protected page go to `/login?next=<page>`; a `401` from the API signs this browser out and does the same. After login the user returns to `next` (same-site paths only, never an auth page); a newly created account goes to onboarding first.
 - New env var: `SUPABASE_URL` (plus `SUPABASE_JWT_SECRET` only if the project uses the legacy secret).
 
 **Rules**

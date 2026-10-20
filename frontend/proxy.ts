@@ -1,6 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+import { loginPath, safeNextPath } from "@/lib/auth/next-path";
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabase/config";
 
 // Pages that need a logged-in user. Everything else is public.
@@ -20,7 +21,8 @@ const startsWithAny = (path: string, prefixes: string[]) =>
 
 /**
  * Refreshes the Supabase session cookies on every page request and sends people to the
- * right place: logged out → /login, logged in → away from /login and /signup.
+ * right place: logged out → /login (remembering the page in ?next=), logged in → away from
+ * /login and /signup.
  * This only checks the session; the API checks the token again on every call.
  */
 export async function proxy(request: NextRequest) {
@@ -55,10 +57,9 @@ export async function proxy(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const loggedIn = Boolean(data?.claims);
 
+  // path may carry its own query, e.g. /login?next=%2Fprofile.
   const redirectTo = (path: string) => {
-    const url = request.nextUrl.clone();
-    url.pathname = path;
-    url.search = "";
+    const url = new URL(path, request.nextUrl);
     const redirect = NextResponse.redirect(url);
     // Keep any refreshed session cookies.
     response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
@@ -66,8 +67,12 @@ export async function proxy(request: NextRequest) {
   };
 
   if (pathname === "/") return redirectTo(loggedIn ? "/dashboard" : "/login");
-  if (!loggedIn && startsWithAny(pathname, PROTECTED_PREFIXES)) return redirectTo("/login");
-  if (loggedIn && startsWithAny(pathname, AUTH_PAGES)) return redirectTo("/dashboard");
+  if (!loggedIn && startsWithAny(pathname, PROTECTED_PREFIXES)) {
+    return redirectTo(loginPath(pathname + request.nextUrl.search));
+  }
+  if (loggedIn && startsWithAny(pathname, AUTH_PAGES)) {
+    return redirectTo(safeNextPath(searchParams.get("next")) ?? "/dashboard");
+  }
 
   return response;
 }
