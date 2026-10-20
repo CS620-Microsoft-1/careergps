@@ -39,7 +39,7 @@ A new student can create an account with email and password, confirm their email
 | P0-2 | Log in, log out, session via Supabase Auth; FastAPI verifies the Supabase JWT (§6) | Decided |
 | P0-3 | Create the `users` row and the first `resumes` row when onboarding is confirmed (`POST /me`, records the terms consent). Names and the university come from the résumé (the first school in its education, else `DEFAULT_UNIVERSITY`) | Decided |
 | P0-4 | Route guard: not logged in → `/login` | Decided |
-| P0-5 | Sign-up asks only for **email, password and the terms checkbox**. Name, university and the career goal (target role, graduation year, experience level) are not asked at sign-up; asking for and saving the goal is owned by onboarding | Decided |
+| P0-5 | Sign-up asks only for **email, password (typed twice) and the terms checkbox**. Name, university and the career goal (target role, graduation year, experience level) are not asked at sign-up; asking for and saving the goal is owned by onboarding | Decided |
 | P0-6 | Rate limit sign-up and login (Supabase Auth's built-in limits, configured in the dashboard) | Decided |
 | P0-7 | Security checklist (§8) and tests (§9) | Decided |
 
@@ -140,12 +140,12 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 
 ## 7. Frontend changes
 
-1. `signup-form.tsx`: email, password and the terms checkbox; `supabase.auth.signUp` with the terms consent as `user_metadata`, then a "Check your email" state. New `/auth/confirm` route (§6). `login-form.tsx`: `signInWithPassword`. Add a logout action to the user menu.
+1. `signup-form.tsx`: email, password, confirm password (must match) and the terms checkbox; `supabase.auth.signUp` with the terms consent as `user_metadata`, then a "Check your email" state. New `/auth/confirm` route (§6). `login-form.tsx`: `signInWithPassword`. Add a logout action to the user menu.
 2. Register the Supabase access token with `setAccessTokenGetter` in `lib/api/client.ts`, so every API call sends it.
 3. Route guard (`proxy.ts`): no Supabase session → `/login`. After login or confirmation, a user without a `users` row goes to `/onboarding`, which creates it (`POST /me`). The onboarding check is P2-2.
 4. API types come from FastAPI's `/openapi.json` (ADR-002), not written by hand.
 
-**[DECIDED] Sign-up asks only for email and password** (plus the terms checkbox; no password confirmation field). Target role, graduation year and experience level are asked in onboarding, which already has these fields on `dev` (PR #11); saving them (frontend and API) is owned by onboarding. `backend/app/core/options.py` keeps the allowed values for that.
+**[DECIDED] Sign-up asks only for email and password** (typed twice, checked in the browser, plus the terms checkbox; changed 2026-10-20, it had no confirmation field before). Target role, graduation year and experience level are asked in onboarding, which already has these fields on `dev` (PR #11); saving them (frontend and API) is owned by onboarding. `backend/app/core/options.py` keeps the allowed values for that.
 
 ## 8. Security and privacy checklist
 

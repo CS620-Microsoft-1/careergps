@@ -21,7 +21,7 @@ export function SignupForm() {
   const router = useRouter();
   const form = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { email: "", password: "", acceptTerms: false },
+    defaultValues: { email: "", password: "", confirmPassword: "", acceptTerms: false },
   });
 
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -81,6 +81,14 @@ export function SignupForm() {
           label="Password"
           type="password"
           placeholder="At least 8 characters"
+          autoComplete="new-password"
+        />
+        <TextField
+          control={form.control}
+          name="confirmPassword"
+          label="Confirm Password"
+          type="password"
+          placeholder="Type it again"
           autoComplete="new-password"
         />
         <Controller

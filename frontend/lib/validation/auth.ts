@@ -28,13 +28,19 @@ const password = z
   .max(128, "Use at most 128 characters.");
 
 // Sign-up asks only for email and password; the career goal is asked in onboarding.
-export const signupSchema = z.object({
-  email,
-  password,
-  acceptTerms: z
-    .boolean()
-    .refine(Boolean, "Please accept the Terms of Service and Privacy Policy."),
-});
+export const signupSchema = z
+  .object({
+    email,
+    password,
+    confirmPassword: z.string().min(1, "Confirm your password."),
+    acceptTerms: z
+      .boolean()
+      .refine(Boolean, "Please accept the Terms of Service and Privacy Policy."),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords don't match.",
+    path: ["confirmPassword"],
+  });
 export type SignupValues = z.infer<typeof signupSchema>;
 
 export const onboardingSchema = z.object({
