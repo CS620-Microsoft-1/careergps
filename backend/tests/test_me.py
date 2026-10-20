@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import unittest
@@ -207,6 +208,69 @@ class MeApiTests(unittest.TestCase):
             response = self.client.get("/me", headers=self.headers)
 
         self.assertEqual(503, response.status_code)
+
+
+class ResumeProfileApiTests(unittest.TestCase):
+    """PUT/GET /me/resume, with MeApiTests' setup (borrowed, so its tests don't run twice)."""
+
+    tearDown = MeApiTests.tearDown
+    auth_headers = MeApiTests.auth_headers
+
+    def setUp(self) -> None:
+        MeApiTests.setUp(self)
+        self.client.post("/me", json=valid_signup(), headers=self.headers)
+        example = BACKEND_ROOT.parent / "docs" / "resume-classification-example.json"
+        self.classification = json.loads(example.read_text(encoding="utf-8"))
+
+    def test_save_then_read(self) -> None:
+        saved = self.client.put(
+            "/me/resume",
+            json={"filename": "ada.pdf", "classification": self.classification},
+            headers=self.headers,
+        )
+
+        self.assertEqual(200, saved.status_code, saved.text)
+        read = self.client.get("/me/resume", headers=self.headers)
+        self.assertEqual(200, read.status_code)
+        self.assertEqual("ada.pdf", read.json()["filename"])
+        self.assertEqual(self.classification, read.json()["classification"])
+
+    def test_a_new_upload_replaces_the_old_one(self) -> None:
+        body = {"filename": "old.pdf", "classification": self.classification}
+        self.client.put("/me/resume", json=body, headers=self.headers)
+
+        self.client.put("/me/resume", json={**body, "filename": "new.pdf"}, headers=self.headers)
+
+        self.assertEqual("new.pdf", self.client.get("/me/resume", headers=self.headers).json()["filename"])
+
+    def test_nothing_saved_is_404(self) -> None:
+        self.assertEqual(404, self.client.get("/me/resume", headers=self.headers).status_code)
+
+    def test_only_the_owner_sees_it(self) -> None:
+        self.client.put(
+            "/me/resume", json={"filename": "ada.pdf", "classification": self.classification}, headers=self.headers
+        )
+        other = self.auth_headers(uuid.uuid4(), "grace@example.com")
+        self.client.post("/me", json=valid_signup(), headers=other)
+
+        self.assertEqual(404, self.client.get("/me/resume", headers=other).status_code)
+
+    def test_rejects_a_malformed_classification(self) -> None:
+        broken = {**self.classification, "unexpected": []}
+
+        response = self.client.put(
+            "/me/resume", json={"filename": "ada.pdf", "classification": broken}, headers=self.headers
+        )
+
+        self.assertEqual(422, response.status_code)
+
+    def test_requires_a_finished_sign_up(self) -> None:
+        stranger = self.auth_headers(uuid.uuid4(), "new@example.com")
+        for method in ("get", "put"):
+            with self.subTest(method=method):
+                body = {"filename": "x.pdf", "classification": self.classification}
+                response = self.client.request(method, "/me/resume", json=body, headers=stranger)
+                self.assertEqual(403, response.status_code)
 
 
 class ProfilesMigrationTests(unittest.TestCase):

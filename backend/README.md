@@ -248,7 +248,7 @@ app/
 │   ├── deps.py              # get_db, get_current_user (token), get_current_db_user (token + users row)
 │   └── routes/
 │       ├── health.py        # GET /health, GET /health/db
-│       ├── me.py            # POST /me, GET /me, PATCH /me/profile
+│       ├── me.py            # POST /me, GET /me, PATCH /me/profile, GET/PUT /me/resume
 │       └── resumes.py       # POST /resumes/analyze (no persistence)
 ├── db/
 │   ├── base.py              # SQLAlchemy Base; every model inherits from it
@@ -291,6 +291,8 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 | `POST /me` | Finish sign-up: creates the `users` and `profiles` rows for the logged-in account. **409** if they exist |
 | `GET /me` | `{user, profile}` for the logged-in account; both `null` until `POST /me` succeeds |
 | `PATCH /me/profile` | Onboarding saves the goal (`target_role`, `experience_level`, `graduation_year`), `location`, `university`, `full_name`, and `complete_onboarding: true` (stamps `onboarding_completed_at` once). Only the fields sent change. **403** until `POST /me` succeeds |
+| `GET /me/resume` | The latest résumé analysis confirmed in onboarding (`filename`, `classification`). **404** if none |
+| `PUT /me/resume` | Save the reviewed classification, replacing any earlier one. The file and its extracted text are not kept. **403** until `POST /me` succeeds |
 | `/docs` | Interactive API docs (Swagger UI), generated from the code |
 | `/openapi.json` | The API contract; the source of truth for frontend types (ADR-002) |
 | `POST /resumes/analyze` | Temporary PDF/DOCX extraction, OCR fallback and Foundry classification. **401** without a token, **403** until `POST /me` succeeds |

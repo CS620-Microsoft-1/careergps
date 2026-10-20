@@ -4,7 +4,14 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_current_db_user, get_current_user, get_db
 from app.core.security import AuthenticatedUser
 from app.models import User
-from app.schemas.me import AccountCreate, MeRead, ProfileRead, ProfileUpdate
+from app.schemas.me import (
+    AccountCreate,
+    MeRead,
+    ProfileRead,
+    ProfileUpdate,
+    ResumeProfileRead,
+    ResumeProfileWrite,
+)
 from app.services import accounts
 
 router = APIRouter(prefix="/me", tags=["me"])
@@ -48,3 +55,25 @@ def update_my_profile(
     if profile is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Finish sign-up first")
     return ProfileRead.model_validate(accounts.update_profile(db, user, profile, data))
+
+
+@router.get("/resume", response_model=ResumeProfileRead)
+def read_my_resume(
+    user: User = Depends(get_current_db_user),
+    db: Session = Depends(get_db),
+) -> ResumeProfileRead:
+    """The latest résumé analysis the user confirmed in onboarding. 404 if there is none yet."""
+    resume = accounts.get_resume_profile(db, user.id)
+    if resume is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No résumé saved yet")
+    return ResumeProfileRead.model_validate(resume)
+
+
+@router.put("/resume", response_model=ResumeProfileRead)
+def save_my_resume(
+    data: ResumeProfileWrite,
+    user: User = Depends(get_current_db_user),
+    db: Session = Depends(get_db),
+) -> ResumeProfileRead:
+    """Save the reviewed résumé analysis, replacing any earlier one."""
+    return ResumeProfileRead.model_validate(accounts.save_resume_profile(db, user, data))

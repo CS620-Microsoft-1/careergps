@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.core.options import GRADUATION_YEARS_AHEAD, ExperienceLevel, TargetRole
+from app.schemas.resume import ResumeClassification
 
 # Requests: strip whitespace, reject unknown fields. Mirrors frontend/lib/validation/auth.ts,
 # which only exists for user experience; these checks are the real ones.
@@ -45,6 +46,23 @@ class ProfileUpdate(BaseModel):
         if year is not None and not 1950 <= year <= latest:
             raise ValueError(f"graduation_year must be between 1950 and {latest}")
         return year
+
+
+class ResumeProfileWrite(BaseModel):
+    """PUT /me/resume: the classification as the user confirmed it on the review page."""
+
+    model_config = REQUEST_CONFIG
+
+    filename: str = Field(min_length=1, max_length=255)
+    classification: ResumeClassification
+
+
+class ResumeProfileRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    filename: str
+    classification: ResumeClassification
+    updated_at: datetime
 
 
 class UserRead(BaseModel):

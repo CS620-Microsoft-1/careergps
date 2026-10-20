@@ -67,6 +67,7 @@ confirmation link ──▶ /auth/confirm ──▶ session created
    │    ──POST /me (Bearer JWT)──▶ users + profiles rows created from user_metadata
    ▼
 /onboarding ──PATCH /me/profile──▶ goal, location saved; onboarding_completed_at set
+            ──PUT /me/resume──────▶ reviewed résumé classification saved
 ```
 
 ## 5. Data model
@@ -110,6 +111,8 @@ Sign-up, login and logout are not FastAPI endpoints: the frontend calls Supabase
 | `POST /me` | accept_terms (the email comes from the token) | `201` `{user, profile}`; creates the `users` and `profiles` rows | `401`, `409` already created, `422` |
 | `GET /me` | — | `{user, profile}`; both `null` until `POST /me` succeeds | `401` |
 | `PATCH /me/profile` | any of full_name, target_role, experience_level, graduation_year, university, location, complete_onboarding | `200` profile | `401`, `403` sign-up not finished, `422` |
+| `GET /me/resume` | — | `200` `{filename, classification, updated_at}` | `401`, `403`, `404` none saved |
+| `PUT /me/resume` | filename, classification (the reviewed one) | `200`; replaces any earlier one | `401`, `403`, `422` |
 
 Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend checks are only for user experience.
 

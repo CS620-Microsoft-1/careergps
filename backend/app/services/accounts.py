@@ -7,8 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.security import AuthenticatedUser
-from app.models import Profile, User
-from app.schemas.me import AccountCreate, ProfileUpdate
+from app.models import Profile, ResumeProfile, User
+from app.schemas.me import AccountCreate, ProfileUpdate, ResumeProfileWrite
 
 
 class AccountAlreadyExistsError(Exception):
@@ -68,3 +68,18 @@ def update_profile(db: Session, user: User, profile: Profile, data: ProfileUpdat
     db.commit()
     db.refresh(profile)
     return profile
+
+
+def get_resume_profile(db: Session, user_id: uuid.UUID) -> ResumeProfile | None:
+    return db.get(ResumeProfile, user_id)
+
+
+def save_resume_profile(db: Session, user: User, data: ResumeProfileWrite) -> ResumeProfile:
+    """Replace the user's saved résumé analysis with this one."""
+    resume = db.get(ResumeProfile, user.id) or ResumeProfile(user_id=user.id)
+    resume.filename = data.filename
+    resume.classification = data.classification.model_dump(mode="json")
+    db.add(resume)
+    db.commit()
+    db.refresh(resume)
+    return resume
