@@ -21,6 +21,10 @@ def create_me(
         user, profile = accounts.create_account(db, auth_user, data)
     except accounts.AccountAlreadyExistsError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
+    except accounts.EmailNotConfirmedError:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="Confirm your email, then log in again."
+        )
     return MeRead.model_validate({"user": user, "profile": profile}, from_attributes=True)
 
 

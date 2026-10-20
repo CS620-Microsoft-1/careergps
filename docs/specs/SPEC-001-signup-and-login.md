@@ -125,6 +125,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 **Backend**
 - A `get_current_user` dependency verifies the JWT on every request: signature (via the project's JWKS endpoint, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, if the project uses asymmetric signing keys; otherwise the legacy JWT secret from `.env`), `exp` (60 s clock leeway), `aud == "authenticated"`, `iss == <SUPABASE_URL>/auth/v1`, and that the header's `alg` matches the signing key. A missing or invalid token is `401`; signing keys that can't be fetched are `503`. The shared project uses asymmetric signing keys (ES256, checked 2026-10-14, see `backend/README.md`). Library: `PyJWT`.
 - It returns the user id (`sub`) and email. Endpoints other than `POST /me` return `403` if the `users` row doesn't exist yet.
+- `POST /me` also reads `auth.users.email_confirmed_at` and returns `403` until the email is confirmed, so an account can't claim an email it doesn't own even if **Confirm email** is turned off in the dashboard.
 - New env var: `SUPABASE_URL` (plus `SUPABASE_JWT_SECRET` only if the project uses the legacy secret).
 
 **Rules**

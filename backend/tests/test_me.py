@@ -21,6 +21,7 @@ from app.core.config import Settings
 from app.core.security import SupabaseTokenVerifier
 from app.db.base import Base
 from app.main import app
+from app.services import accounts
 from tests.support import SUPABASE_URL, FakeJwks, make_token, new_signing_key
 
 # The API tests run on in-memory SQLite so CI needs no database. The models use only
@@ -55,6 +56,10 @@ class MeApiTests(unittest.TestCase):
         app.dependency_overrides[deps.get_db] = override_get_db
         app.dependency_overrides[deps.get_token_verifier] = lambda: verifier
         self.client = TestClient(app)
+        # SQLite has no auth schema; every Supabase account counts as confirmed unless a test says otherwise.
+        confirmed = mock.patch.object(accounts, "email_is_confirmed", return_value=True)
+        self.email_is_confirmed = confirmed.start()
+        self.addCleanup(confirmed.stop)
 
         self.user_id = uuid.uuid4()
         self.headers = self.auth_headers(self.user_id, "ada@example.com")
@@ -101,6 +106,14 @@ class MeApiTests(unittest.TestCase):
         response = self.client.post("/me", json=valid_signup(), headers=other)
 
         self.assertEqual(409, response.status_code)
+
+    def test_unconfirmed_email_cannot_finish_sign_up(self) -> None:
+        self.email_is_confirmed.return_value = False
+
+        response = self.client.post("/me", json=valid_signup(), headers=self.headers)
+
+        self.assertEqual(403, response.status_code)
+        self.assertEqual({"user": None, "profile": None}, self.client.get("/me", headers=self.headers).json())
 
     def test_requires_a_valid_token(self) -> None:
         bad = {"Authorization": f"Bearer {make_token(new_signing_key())}"}

@@ -2,6 +2,7 @@
 import uuid
 from datetime import UTC, datetime
 
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -14,10 +15,25 @@ class AccountAlreadyExistsError(Exception):
     """This Supabase account (or its email) already has a users row."""
 
 
+class EmailNotConfirmedError(Exception):
+    """The Supabase account hasn't confirmed its email yet."""
+
+
+def email_is_confirmed(db: Session, user_id: uuid.UUID) -> bool:
+    """Read auth.users directly instead of trusting Supabase's Confirm email setting, so an
+    unconfirmed account can't claim an email it doesn't own."""
+    confirmed_at = db.execute(
+        text("SELECT email_confirmed_at FROM auth.users WHERE id = :id"), {"id": user_id}
+    ).scalar_one_or_none()
+    return confirmed_at is not None
+
+
 def create_account(db: Session, auth_user: AuthenticatedUser, data: AccountCreate) -> tuple[User, Profile]:
     """Create the users and profiles rows for a confirmed Supabase account, in one transaction."""
     if db.get(User, auth_user.id) is not None:
         raise AccountAlreadyExistsError
+    if not email_is_confirmed(db, auth_user.id):
+        raise EmailNotConfirmedError
 
     user = User(id=auth_user.id, email=auth_user.email)
     # data.accept_terms is always True here (the schema rejects anything else).
