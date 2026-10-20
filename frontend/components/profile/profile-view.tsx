@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMe } from "@/lib/api/me";
 import { loadResumeProfile, type StoredResumeProfile } from "@/lib/profile/resume-storage";
-import { rateSkills, type EvidenceLevel, type SkillEvidence } from "@/lib/profile/skill-evidence";
 import { getSupabase } from "@/lib/supabase/client";
 import type { MeResponse, ResumeClassification, ResumeRecord } from "@/types/api";
 
@@ -21,15 +20,11 @@ type ProfileState = {
   saved: StoredResumeProfile | null;
 };
 
-const SKILL_COLUMNS: { level: EvidenceLevel; title: string; dot: string; hint: string }[] = [
-  { level: "strong", title: "Strong", dot: "bg-success", hint: "Used in a job, research, or leadership role." },
-  { level: "some", title: "Some experience", dot: "bg-warning-fill", hint: "Used in a project." },
-  {
-    level: "none",
-    title: "Not yet demonstrated",
-    dot: "bg-danger",
-    hint: "Listed as a skill, but no entry shows it in use.",
-  },
+// Placeholder until skill ratings come from the gap analysis (ADR-001); the résumé alone has no evidence levels.
+const SKILL_COLUMNS = [
+  { title: "Strong", dot: "bg-success" },
+  { title: "Some experience", dot: "bg-warning-fill" },
+  { title: "Not yet demonstrated", dot: "bg-danger" },
 ];
 
 export function ProfileView() {
@@ -77,7 +72,7 @@ export function ProfileView() {
             Skills are rated by demonstrated evidence, not keywords.
           </p>
 
-          <SkillColumns skills={classification ? rateSkills(classification) : null} />
+          <SkillColumns />
 
           {classification && <ResumeSections classification={classification} />}
         </>
@@ -156,40 +151,23 @@ function IdentityCard({ state }: { state: ProfileState }) {
   );
 }
 
-function SkillColumns({ skills }: { skills: SkillEvidence[] | null }) {
+function SkillColumns() {
   return (
     <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {SKILL_COLUMNS.map(({ level, title, dot, hint }) => {
-        const items = skills?.filter((skill) => skill.level === level) ?? [];
-        return (
-          <Card key={level} size="sm">
-            <CardContent>
-              <h3 className="flex items-center gap-2 text-sm">
-                <span aria-hidden className={`size-2 rounded-full ${dot}`} />
-                {title}
-                <span className="ml-auto font-normal text-muted-foreground">{items.length}</span>
-              </h3>
-              <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>
-              {items.length > 0 ? (
-                <ul className="mt-3 grid gap-2.5 border-t border-line-soft pt-3">
-                  {items.map((item) => (
-                    <li key={item.skill}>
-                      <p className="text-control font-medium">{item.skill}</p>
-                      {item.sources.length > 0 && (
-                        <p className="text-xs text-muted-foreground">{item.sources.join(" · ")}</p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-3 border-t border-line-soft pt-3 text-control text-muted-foreground">
-                  {skills ? "None found in your résumé." : "Skills will appear here after your résumé is analyzed."}
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        );
-      })}
+      {SKILL_COLUMNS.map(({ title, dot }) => (
+        <Card key={title} size="sm">
+          <CardContent>
+            <h3 className="flex items-center gap-2 text-sm">
+              <span aria-hidden className={`size-2 rounded-full ${dot}`} />
+              {title}
+              <span className="ml-auto font-normal text-muted-foreground">0</span>
+            </h3>
+            <p className="mt-3 border-t border-line-soft pt-3 text-control text-muted-foreground">
+              Skill ratings will appear here once the gap analysis is ready.
+            </p>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 }
