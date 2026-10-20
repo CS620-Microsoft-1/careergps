@@ -1,0 +1,89 @@
+{
+  "data_source": "synthetic",
+  "postings": [
+    {
+      "company_name": "Example Northstar Labs",
+      "posting": {
+        "source": "greenhouse", "external_id": "demo-101",
+        "title": "Software Engineer, New Grad - Backend",
+        "location": "Madison, WI, United States", "country": "US", "workplace_type": "hybrid",
+        "department": "Engineering", "employment_type": "full_time",
+        "description_text": "About us\nExample Northstar Labs builds campus software. This is a synthetic job advertisement.\nResponsibilities\nBuild and maintain backend services with the team.\nRequired qualifications\nExperience building applications using Python.\nAbility to write queries and manage data using PostgreSQL.\nExperience collaborating with Git.\nPreferred qualifications\nExperience packaging an application with Docker.\nEligibility\nThis role is for new graduates and candidates with zero to two years of experience.",
+        "salary_min": null, "salary_max": null, "salary_currency": null, "salary_interval": null,
+        "url": "https://example.test/northstar/jobs/101", "published_at": "2026-10-01T12:00:00Z"
+      }
+    },
+    {
+      "company_name": "Example Beacon Systems",
+      "posting": {
+        "source": "ashby", "external_id": "demo-102",
+        "title": "Junior Software Engineer - Platform",
+        "location": "Chicago, IL, United States", "country": "US", "workplace_type": "onsite",
+        "department": "Engineering", "employment_type": "full_time",
+        "description_text": "About us\nExample Beacon Systems creates infrastructure tools. This is a synthetic job advertisement. Our marketing website uses JavaScript; this platform role does not require JavaScript.\nResponsibilities\nHelp the platform team build reliable services.\nRequired qualifications\nExperience programming in Python.\nExperience building and running Docker containers.\nFamiliarity with Git collaboration workflows.\nPreferred qualifications\nAbility to write SQL queries.\nEligibility\nJunior role for applicants with zero to two years of professional experience.",
+        "salary_min": null, "salary_max": null, "salary_currency": null, "salary_interval": null,
+        "url": "https://example.test/beacon/jobs/102", "published_at": "2026-10-03T12:00:00Z"
+      }
+    },
+    {
+      "company_name": "Example Harbor Apps",
+      "posting": {
+        "source": "lever", "external_id": "demo-103",
+        "title": "Entry-Level Software Engineer - Frontend",
+        "location": "Remote, United States", "country": "US", "workplace_type": "remote",
+        "department": "Product Engineering", "employment_type": "full_time",
+        "description_text": "About us\nExample Harbor Apps builds student tools. This is a synthetic job advertisement.\nRequired qualifications\nExperience building interfaces using JavaScript and React.\nExperience using Git to collaborate.\nPreferred qualifications\nPython scripting experience is a plus.\nDocker experience is not required for this role.\nEligibility\nEntry-level position; projects completed during university are welcome.",
+        "salary_min": null, "salary_max": null, "salary_currency": null, "salary_interval": null,
+        "url": "https://example.test/harbor/jobs/103", "published_at": "2026-10-05T12:00:00Z"
+      }
+    },
+    {
+      "company_name": "Example Northstar Labs",
+      "posting": {
+        "source": "greenhouse", "external_id": "demo-104",
+        "title": "Junior Backend Software Engineer",
+        "location": "Madison, WI, United States", "country": "US", "workplace_type": "hybrid",
+        "department": "Engineering", "employment_type": "full_time",
+        "description_text": "About us\nExample Northstar Labs is growing its backend team. This is a synthetic job advertisement.\nRequired qualifications\nExperience implementing services using Python.\nExperience storing and querying application data using PostgreSQL.\nExperience using Git for version control.\nPreferred qualifications\nExperience with Docker deployment workflows.\nJavaScript experience is a plus.\nEligibility\nJunior role for recent graduates.",
+        "salary_min": null, "salary_max": null, "salary_currency": null, "salary_interval": null,
+        "url": "https://example.test/northstar/jobs/104", "published_at": "2026-10-07T12:00:00Z"
+      }
+    },
+    {
+      "company_name": "Example Cedar Software",
+      "posting": {
+        "source": "ashby", "external_id": "demo-105",
+        "title": "Software Engineer, New Grad - Full Stack",
+        "location": "Boston, MA, United States", "country": "US", "workplace_type": "hybrid",
+        "department": "Engineering", "employment_type": "full_time",
+        "description_text": "About us\nExample Cedar Software builds career software. This is a synthetic job advertisement. Our infrastructure team maintains Kubernetes clusters; that background is not required for this role.\nRequired qualifications\nExperience building applications with Python and JavaScript.\nAbility to use SQL to read and update application data.\nPreferred qualifications\nExperience with Docker containers is a plus.\nExperience with Git collaboration is a plus.\nEligibility\nNew-graduate position; no prior full-time employment is required.",
+        "salary_min": null, "salary_max": null, "salary_currency": null, "salary_interval": null,
+        "url": "https://example.test/cedar/jobs/105", "published_at": "2026-10-09T12:00:00Z"
+      }
+    },
+    {
+      "company_name": "Example Beacon Systems",
+      "posting": {
+        "source": "ashby", "external_id": "demo-106",
+        "title": "Senior Software Engineer - Platform",
+        "location": "Chicago, IL, United States", "country": "US", "workplace_type": "onsite",
+        "department": "Engineering", "employment_type": "full_time",
+        "description_text": "Synthetic job advertisement. Required qualifications: seven years of engineering experience, Kubernetes, Docker and Python. Lead the platform architecture.",
+        "salary_min": null, "salary_max": null, "salary_currency": null, "salary_interval": null,
+        "url": "https://example.test/beacon/jobs/106", "published_at": "2026-10-10T12:00:00Z"
+      }
+    },
+    {
+      "company_name": "Example Northstar Labs",
+      "posting": {
+        "source": "greenhouse", "external_id": "demo-101",
+        "title": "Software Engineer, New Grad - Backend",
+        "location": "Madison, WI, United States", "country": "US", "workplace_type": "hybrid",
+        "department": "Engineering", "employment_type": "full_time",
+        "description_text": "About us\nExample Northstar Labs builds campus software. This is a synthetic job advertisement.\nResponsibilities\nBuild and maintain backend services with the team.\nRequired qualifications\nExperience building applications using Python.\nAbility to write queries and manage data using PostgreSQL.\nExperience collaborating with Git.\nPreferred qualifications\nExperience packaging an application with Docker.\nEligibility\nThis role is for new graduates and candidates with zero to two years of experience.",
+        "salary_min": null, "salary_max": null, "salary_currency": null, "salary_interval": null,
+        "url": "https://example.test/northstar/jobs/101", "published_at": "2026-10-01T12:00:00Z"
+      }
+    }
+  ]
+}

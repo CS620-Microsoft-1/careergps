@@ -1,0 +1,96 @@
+{
+  "confirmed": true,
+  "classification": {
+    "personal_information": {
+      "name": "Casey Example", "emails": ["casey@example.test"], "phones": [],
+      "location": "Boston, MA, United States", "linkedin": null, "github": null, "website": null
+    },
+    "research_interests": ["Systems performance", "Reproducible benchmarking", "Developer infrastructure"],
+    "education": [
+      {
+        "institution": "Example Harbor University", "degree": "Master of Science", "major": "Computer Engineering",
+        "start_date": "2024-09", "end_date": "2026-05", "gpa": "3.9/4.0",
+        "content": ["Coursework: operating systems, distributed systems, compilers, networks and performance analysis."]
+      },
+      {
+        "institution": "Example Coastal College", "degree": "Bachelor of Engineering", "major": "Computer Engineering",
+        "start_date": "2020-09", "end_date": "2024-05", "gpa": null,
+        "content": ["Completed a capstone on embedded telemetry and a sequence in database systems and SQL."]
+      }
+    ],
+    "work_experience": [
+      {
+        "company": "Example Atlas Infrastructure", "title": "Systems Engineering Intern",
+        "start_date": "2025-05", "end_date": "2025-08", "location": "Boston, MA",
+        "content": [
+          "Implemented C++ utilities to inspect service logs and summarize resource usage.",
+          "Used Linux process and filesystem tools to investigate slow local builds.",
+          "Packaged a reproducible development environment with Docker and documented its build and run commands.",
+          "Used Git feature branches, pull requests and code review to deliver small infrastructure changes."
+        ]
+      },
+      {
+        "company": "Example Coastal College Computing Centre", "title": "Student Systems Assistant",
+        "start_date": "2023-06", "end_date": "2024-04", "location": "Boston, MA",
+        "content": ["Implemented Bash scripts for rotating local experiment logs and checking available disk space.", "Documented Linux troubleshooting procedures for the student laboratory."]
+      }
+    ],
+    "research_experience": [
+      {
+        "organization": "Example Systems Measurement Lab", "title": "Graduate Research Assistant",
+        "start_date": "2024-10", "end_date": "2026-05", "location": "Boston, MA",
+        "content": [
+          "Built Python experiment runners that record throughput, latency and configuration metadata.",
+          "Wrote and ran Python regression tests verifying metric aggregation against reference experiment files.",
+          "Used SQL queries over SQLite experiment tables to compare runs and summarize outliers.",
+          "Reviewed measurement noise and documented limits on generalizing laboratory benchmarks."
+        ]
+      },
+      {
+        "organization": "Example Compiler Study Group", "title": "Student Research Contributor",
+        "start_date": "2023-10", "end_date": "2024-05", "location": "Boston, MA",
+        "content": ["Implemented Rust parsers for a small configuration language.", "Wrote and ran Rust parser tests checking malformed inputs, valid syntax trees and error spans."]
+      }
+    ],
+    "projects": [
+      {
+        "name": "Reproducible Benchmark Harness", "url": null,
+        "technologies": ["Python", "Bash", "Linux", "Docker", "Git"],
+        "content": [
+          "Built Python commands for running benchmark batches and exporting comparison tables.",
+          "Wrote and ran Python unit tests verifying percentile calculations and missing-sample handling.",
+          "Used Docker to package fixed tool versions for local benchmark execution.",
+          "Implemented Bash scripts to collect Linux process statistics during a run."
+        ]
+      },
+      {
+        "name": "Concurrent Log Indexer", "url": null,
+        "technologies": ["Rust", "Python", "Git"],
+        "content": [
+          "Implemented Rust worker queues and an index over local log records.",
+          "Wrote and ran Rust concurrency tests comparing indexed results with a serial reference implementation.",
+          "Used Python scripts to generate deterministic input files and summarize benchmark outputs.",
+          "Used Git pull requests to review changes with a project partner."
+        ]
+      },
+      {
+        "name": "Experiment Catalogue", "url": null,
+        "technologies": ["SQL", "SQLite", "Python"],
+        "content": ["Designed SQLite tables for benchmark configurations and results.", "Implemented SQL joins and aggregate queries to compare parameter sets.", "Exported query results with a Python command-line utility."]
+      }
+    ],
+    "technical_skills": ["Python", "Rust", "C++", "Linux", "Bash", "Docker", "Git", "SQL", "SQLite"],
+    "languages": [{"name": "English", "proficiency": "Professional working proficiency"}, {"name": "French", "proficiency": "Conversational"}],
+    "publications": [
+      {"title": "Noise-Aware Comparison of Local Build Benchmarks", "authors": "Casey Example and Example Systems Lab", "venue": "Fictional Graduate Systems Workshop", "date": "2026-02", "url": null, "content": ["Workshop report describing benchmark methodology and sources of measurement error."]},
+      {"title": "Readable Error Messages for Small Configuration Parsers", "authors": "Casey Example and Example Study Group", "venue": "Fictional Student Compiler Symposium", "date": "2024-05", "url": null, "content": ["Student poster describing parser error reporting examples."]}
+    ],
+    "awards_honors": [
+      {"name": "Systems Capstone Recognition", "issuer": "Example Coastal College", "date": "2024-05", "content": ["Fictional recognition for a documented capstone demonstration."]},
+      {"name": "Graduate Research Travel Grant", "issuer": "Example Harbor University", "date": "2026-01", "content": ["Fictional travel support for a student workshop presentation."]}
+    ],
+    "certifications": [{"name": "Container Orchestration Fundamentals", "issuer": "Example Training Academy", "date": "2025-11", "url": null, "content": ["Attended an introductory Kubernetes course; no Kubernetes project or production experience is claimed."]}],
+    "leadership_activities": [{"organization": "Example Systems Reading Group", "role": "Session Organizer", "start_date": "2025-01", "end_date": "2026-05", "location": "Boston, MA", "content": ["Coordinated paper discussions and helped students prepare reproducible benchmark demonstrations."]}],
+    "other": [{"content": "Entirely fictional candidate, organizations, accomplishments and publications for local Skill Gap evaluation. SQL work used SQLite; PostgreSQL experience is not claimed."}]
+  }
+}

@@ -1,0 +1,9 @@
+# Direct dependencies pinned to the successful local Python 3.12 test environment.
+# This does not install the API, OCR, SQLAlchemy or database driver dependencies.
+# Transitive dependencies are resolved by pip; this is not a complete lockfile.
+pydantic==2.14.1
+pydantic-settings==2.15.0
+python-dotenv==1.2.4
+azure-ai-projects==2.8.0
+azure-identity==1.26.0
+openai==3.29.0

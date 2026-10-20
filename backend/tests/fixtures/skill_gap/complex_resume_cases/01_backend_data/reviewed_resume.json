@@ -1,0 +1,97 @@
+{
+  "confirmed": true,
+  "classification": {
+    "personal_information": {
+      "name": "Avery Example",
+      "emails": ["avery@example.test"],
+      "phones": [],
+      "location": "Madison, WI, United States",
+      "linkedin": null,
+      "github": null,
+      "website": null
+    },
+    "research_interests": ["Reliable data services", "Reproducible analytical systems"],
+    "education": [
+      {
+        "institution": "Example Great Lakes University",
+        "degree": "Master of Science",
+        "major": "Computer Science",
+        "start_date": "2024-09", "end_date": "2026-05", "gpa": "3.8/4.0",
+        "content": ["Coursework: distributed systems, database implementation, data engineering and software testing.", "Completed a seminar on JavaScript visualization libraries."]
+      },
+      {
+        "institution": "Example River College",
+        "degree": "Bachelor of Science",
+        "major": "Applied Mathematics",
+        "start_date": "2020-09", "end_date": "2024-05", "gpa": null,
+        "content": ["Coursework: probability, algorithms, scientific programming and linear algebra."]
+      }
+    ],
+    "work_experience": [
+      {
+        "company": "Example Meridian Data",
+        "title": "Backend Engineering Intern",
+        "start_date": "2025-05", "end_date": "2025-08", "location": "Chicago, IL",
+        "content": [
+          "Implemented Python ingestion workers to validate partner files and expose status through internal APIs.",
+          "Wrote and ran Python integration tests for malformed records, retries and duplicate-file handling.",
+          "Used SQL joins and window functions to reconcile partner records with monthly reporting totals.",
+          "Wrote and ran SQL reconciliation tests comparing query outputs with hand-checked reference totals.",
+          "Used Git feature branches, pull requests and review discussions to deliver changes with two other interns."
+        ]
+      },
+      {
+        "company": "Example River College Library",
+        "title": "Student Data Assistant",
+        "start_date": "2023-09", "end_date": "2024-04", "location": "Madison, WI",
+        "content": ["Used pandas to clean circulation records and documented data-quality checks for staff.", "Prepared weekly summaries and explained missing-data limitations to nontechnical stakeholders."]
+      }
+    ],
+    "research_experience": [
+      {
+        "organization": "Example Reproducible Systems Lab",
+        "title": "Graduate Research Assistant",
+        "start_date": "2024-10", "end_date": "2026-05", "location": "Madison, WI",
+        "content": ["Built Python experiment runners for repeatable data-pipeline latency measurements.", "Wrote and ran Python regression tests against saved experiment fixtures and checked output hashes before publishing results.", "Used Linux shell tools to collect process statistics and archive experiment configurations."]
+      }
+    ],
+    "projects": [
+      {
+        "name": "Community Events API",
+        "url": null,
+        "technologies": ["Python", "FastAPI", "PostgreSQL", "SQL", "Docker"],
+        "content": [
+          "Built Python API endpoints using FastAPI for event registration, search and cancellation.",
+          "Designed PostgreSQL tables, foreign keys and indexes for events, registrations and audit records.",
+          "Wrote and ran PostgreSQL integration tests verifying rollback, unique constraints and concurrent registration limits.",
+          "Implemented SQL joins and aggregate queries for organizer reports.",
+          "Containerized the API using Docker and documented a reproducible local build and startup procedure.",
+          "Wrote and ran Docker smoke tests verifying container startup and the health endpoint."
+        ]
+      },
+      {
+        "name": "Transit Reporting Benchmark",
+        "url": null,
+        "technologies": ["SQL", "PostgreSQL", "Python", "pandas"],
+        "content": [
+          "Implemented SQL queries for route-level aggregates and compared alternative indexing plans.",
+          "Wrote and ran SQL query tests checking joins, null handling and aggregate totals against fixed expected results.",
+          "Used pandas to transform benchmark outputs into reproducible comparison tables."
+        ]
+      },
+      {
+        "name": "Dataset Provenance CLI",
+        "url": null,
+        "technologies": ["Python", "Git", "Linux"],
+        "content": ["Implemented Python commands that record input checksums and configuration metadata.", "Used Git branches and pull requests to review documentation updates with a project partner."]
+      }
+    ],
+    "technical_skills": ["Python", "Postgres", "SQL", "Docker", "Git", "JavaScript", "FastAPI", "pandas", "Linux"],
+    "languages": [{"name": "English", "proficiency": "Professional working proficiency"}, {"name": "Mandarin", "proficiency": "Native"}],
+    "publications": [{"title": "Reproducible Measurement of Small Data Pipelines", "authors": "Avery Example and Example Lab Team", "venue": "Fictional Student Systems Workshop", "date": "2026-03", "url": null, "content": ["Student workshop report describing the measurement protocol, datasets and limitations."]}],
+    "awards_honors": [{"name": "Graduate Project Demonstration Award", "issuer": "Example Great Lakes University", "date": "2026-04", "content": ["Fictional departmental award for reproducible project documentation."]}],
+    "certifications": [{"name": "Introductory Cloud Architecture Course Certificate", "issuer": "Example Training Academy", "date": "2025-01", "url": null, "content": ["Course completion only; not presented as professional production experience."]}],
+    "leadership_activities": [{"organization": "Example Data Engineering Club", "role": "Project Mentor", "start_date": "2025-09", "end_date": "2026-05", "location": "Madison, WI", "content": ["Led weekly project reviews and helped students document reproducible experiments."]}],
+    "other": [{"content": "Entirely fictional candidate, organizations, accomplishments and publication for local Skill Gap evaluation."}]
+  }
+}
