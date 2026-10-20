@@ -35,13 +35,14 @@ class ResumeSubmit(BaseModel):
 class AccountCreate(BaseModel):
     """POST /me: the end of onboarding. Creates the users row and the first résumé together.
 
-    The email comes from the token. Names and the university come from the résumé (onboarding
-    doesn't ask for them).
+    The email comes from the token; the university comes from the résumé (onboarding doesn't ask).
     """
 
     model_config = REQUEST_CONFIG
 
     accept_terms: Literal[True]
+    first_name: str = Field(min_length=1, max_length=100)
+    last_name: str = Field(min_length=1, max_length=100)
     target_role: TargetRole
     experience_level: ExperienceLevel
     graduation_year: int
@@ -54,10 +55,13 @@ class AccountCreate(BaseModel):
         return _check_graduation_year(year)
 
 
-class GoalsUpdate(BaseModel):
-    """PATCH /me: change the career goal. Only the fields sent change."""
+class AccountUpdate(BaseModel):
+    """PATCH /me: change the name or the career goal. Only the fields sent change."""
 
     model_config = REQUEST_CONFIG
+
+    first_name: str | None = Field(default=None, min_length=1, max_length=100)
+    last_name: str | None = Field(default=None, min_length=1, max_length=100)
 
     target_role: TargetRole | None = None
     experience_level: ExperienceLevel | None = None

@@ -3,12 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.api.deps import get_account_service, get_current_db_user, get_current_user
 from app.core.security import AuthenticatedUser
 from app.models import Resume, User
-from app.schemas.me import AccountCreate, GoalsUpdate, MeRead, ResumeRead, ResumeSubmit, UserRead
+from app.schemas.me import AccountCreate, AccountUpdate, MeRead, ResumeRead, ResumeSubmit, UserRead
 from app.services.accounts import (
     AccountAlreadyExistsError,
     AccountService,
     EmailNotConfirmedError,
-    MissingNameError,
 )
 
 router = APIRouter(prefix="/me", tags=["me"])
@@ -41,8 +40,6 @@ def create_me(
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Confirm your email, then log in again."
         )
-    except MissingNameError as error:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error))
     return MeRead(user=UserRead.model_validate(user))
 
 
@@ -61,11 +58,11 @@ def read_me(
 
 @router.patch("", response_model=UserRead)
 def update_me(
-    data: GoalsUpdate,
+    data: AccountUpdate,
     user: User = Depends(get_current_db_user),
     accounts: AccountService = Depends(get_account_service),
 ) -> UserRead:
-    return UserRead.model_validate(accounts.update_goals(user, data))
+    return UserRead.model_validate(accounts.update_account(user, data))
 
 
 @router.get("/resume", response_model=ResumeRead)

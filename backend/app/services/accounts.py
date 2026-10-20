@@ -1,6 +1,6 @@
 """Creating and updating a student's account (users row) and their confirmed résumés.
 
-The rules that don't need the database (names, contact details, file type) are plain functions so
+The rules that don't need the database (contact details, university, file type) are plain functions so
 they can be tested without one. AccountService holds the database part.
 """
 import logging
@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from app.core.options import DEFAULT_UNIVERSITY
 from app.core.security import AuthenticatedUser
 from app.models import Resume, User
-from app.schemas.me import AccountCreate, GoalsUpdate, ResumeSubmit
+from app.schemas.me import AccountCreate, AccountUpdate, ResumeSubmit
 from app.schemas.resume import ResumeClassification
 
 logger = logging.getLogger(__name__)
@@ -32,21 +32,6 @@ class AccountAlreadyExistsError(Exception):
 
 class EmailNotConfirmedError(Exception):
     """The Supabase account hasn't confirmed its email yet."""
-
-
-class MissingNameError(ValueError):
-    """The confirmed résumé has no name, and users.first_name is required."""
-
-
-def split_name(name: str | None) -> tuple[str, str]:
-    """First word is the first name, the rest the last name ("" for a one-word name)."""
-    words = (name or "").split()
-    if not words:
-        raise MissingNameError("Add your name to the résumé before continuing.")
-    first, last = words[0], " ".join(words[1:])
-    if len(first) > 100 or len(last) > 100:
-        raise MissingNameError("Your name is too long; shorten it to 100 characters per part.")
-    return first, last
 
 
 def contact_details(classification: ResumeClassification) -> dict:
@@ -80,12 +65,11 @@ def university_from(classification: ResumeClassification) -> str:
 
 
 def new_user(auth_user: AuthenticatedUser, data: AccountCreate) -> User:
-    first_name, last_name = split_name(data.resume.classification.personal_information.name)
     user = User(
         id=auth_user.id,
         primary_email=auth_user.email.lower(),
-        first_name=first_name,
-        last_name=last_name,
+        first_name=data.first_name,
+        last_name=data.last_name,
         target_role=data.target_role,
         experience_level=data.experience_level,
         graduation_year=data.graduation_year,
@@ -148,7 +132,7 @@ class AccountService:
         self.db.refresh(user)
         return user
 
-    def update_goals(self, user: User, data: GoalsUpdate) -> User:
+    def update_account(self, user: User, data: AccountUpdate) -> User:
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(user, field, value)
         self.db.commit()

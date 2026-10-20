@@ -56,8 +56,14 @@ export type Goals = {
   preferred_location: string;
 };
 
+/** The name typed in onboarding (the résumé's own name is kept separately as full_name). */
+export type Names = {
+  first_name: string;
+  last_name: string;
+};
+
 /** POST /me body: finishes onboarding. The email comes from the access token. */
-export type AccountCreateRequest = Goals & {
+export type AccountCreateRequest = Goals & Names & {
   accept_terms: true;
   resume: ResumeSubmitRequest;
 };

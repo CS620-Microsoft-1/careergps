@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronRight } from "lucide-react";
@@ -14,7 +14,7 @@ import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field
 import { EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
 import { analyzeResume } from "@/lib/api/resumes";
 import { ApiError, errorMessage } from "@/lib/api/client";
-import { addResume, createAccount, getMe, updateGoals } from "@/lib/api/me";
+import { addResume, createAccount, getMe, updateAccount } from "@/lib/api/me";
 import { acceptedTerms } from "@/lib/auth/account";
 import { getSupabase } from "@/lib/supabase/client";
 import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
@@ -29,8 +29,30 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
   const [confirmError, setConfirmError] = useState<string>();
   const form = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
-    defaultValues: { graduationYear: "", location: "" },
+    defaultValues: { firstName: "", lastName: "", graduationYear: "", location: "" },
   });
+
+  // Back from the profile page with a new résumé: start from what the account already has.
+  useEffect(() => {
+    let cancelled = false;
+    getMe()
+      .then(({ user }) => {
+        if (cancelled || !user || form.formState.isDirty) return;
+        const year = String(user.graduation_year);
+        form.reset({
+          firstName: user.first_name,
+          lastName: user.last_name,
+          targetRole: user.target_role as OnboardingValues["targetRole"],
+          experienceLevel: user.experience_level as OnboardingValues["experienceLevel"],
+          graduationYear: graduationYears.includes(year) ? year : "",
+          location: user.preferred_location,
+        });
+      })
+      .catch(() => {}); // A new user, or the API is down: the form simply starts empty.
+    return () => {
+      cancelled = true;
+    };
+  }, [form, graduationYears]);
 
   const onSubmit = async ({ resume }: OnboardingValues) => {
     setSubmitError(undefined);
@@ -61,7 +83,9 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
         confirming={confirming}
         confirmError={confirmError}
         onConfirm={async () => {
-          const { targetRole, experienceLevel, graduationYear, location } = form.getValues();
+          const { firstName, lastName, targetRole, experienceLevel, graduationYear, location } =
+            form.getValues();
+          const names = { first_name: firstName, last_name: lastName };
           const goals = {
             target_role: targetRole,
             experience_level: experienceLevel,
@@ -80,13 +104,13 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
           try {
             const { user } = await getMe();
             if (user) {
-              // Back from the profile page with a new résumé: update the goal, add a résumé version.
-              await Promise.all([updateGoals(goals), addResume(resume)]);
+              // Back from the profile page with a new résumé: update the account, add a résumé version.
+              await Promise.all([updateAccount({ ...names, ...goals }), addResume(resume)]);
             } else {
               // First time: this creates the account, with the terms consent given at sign-up.
               const { data } = await getSupabase().auth.getUser();
               if (!data.user) throw new Error("Not logged in");
-              await createAccount({ ...goals, accept_terms: acceptedTerms(data.user), resume });
+              await createAccount({ ...names, ...goals, accept_terms: acceptedTerms(data.user), resume });
             }
           } catch (error) {
             setConfirmError(errorMessage(error, "Couldn't save your profile. Try again."));
@@ -102,6 +126,22 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
   return (
     <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="mx-auto max-w-100">
       <FieldGroup>
+        <div className="grid gap-4 @sm/field-group:grid-cols-2">
+          <TextField
+            control={form.control}
+            name="firstName"
+            label="First Name"
+            placeholder="Ada"
+            autoComplete="given-name"
+          />
+          <TextField
+            control={form.control}
+            name="lastName"
+            label="Last Name"
+            placeholder="Lovelace"
+            autoComplete="family-name"
+          />
+        </div>
         <SelectField
           control={form.control}
           name="targetRole"

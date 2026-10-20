@@ -22,7 +22,7 @@ from app.core.options import DEFAULT_UNIVERSITY
 from app.core.security import AuthenticatedUser, SupabaseTokenVerifier
 from app.main import app
 from app.models import Resume, User
-from app.schemas.me import AccountCreate, GoalsUpdate, ResumeSubmit
+from app.schemas.me import AccountCreate, ResumeSubmit
 from app.schemas.resume import ResumeClassification
 from app.services import accounts
 from tests.support import SUPABASE_URL, FakeJwks, make_token, new_signing_key
@@ -51,6 +51,8 @@ def resume_body(**changes) -> dict:
 def onboarding_body(**changes) -> dict:
     body = {
         "accept_terms": True,
+        "first_name": "Ada",
+        "last_name": "Lovelace",
         "target_role": "Data Analyst",
         "experience_level": "Internship",
         "graduation_year": datetime.now().year + 1,
@@ -94,7 +96,7 @@ class FakeAccountService(accounts.AccountService):
         user.active_resume_id = resume.id
         return user
 
-    def update_goals(self, user, data):
+    def update_account(self, user, data):
         for field, value in data.model_dump(exclude_unset=True).items():
             setattr(user, field, value)
         return user
@@ -118,22 +120,20 @@ class FakeAccountService(accounts.AccountService):
 
 
 class NameAndContactRulesTests(unittest.TestCase):
-    def test_split_name(self) -> None:
-        self.assertEqual(("Ada", "King Lovelace"), accounts.split_name("  Ada  King Lovelace "))
-        self.assertEqual(("Cher", ""), accounts.split_name("Cher"))
-        for missing in (None, "", "   "):
-            with self.subTest(name=missing), self.assertRaises(accounts.MissingNameError):
-                accounts.split_name(missing)
-
-    def test_new_user_takes_names_contacts_and_university_from_the_resume(self) -> None:
+    def test_new_user_takes_typed_names_and_contacts_and_university_from_the_resume(self) -> None:
         auth_user = AuthenticatedUser(id=uuid.uuid4(), email="Ada@Example.com")
         data = AccountCreate.model_validate(
-            onboarding_body(resume=resume_body(classification=classification(name="Ada Lovelace", phones=["1", "1"])))
+            onboarding_body(
+                first_name=" Ada ",
+                last_name="King",
+                resume=resume_body(classification=classification(name="Ada Lovelace", phones=["1", "1"])),
+            )
         )
 
         user = accounts.new_user(auth_user, data)
 
-        self.assertEqual(("Ada", "Lovelace", "Ada Lovelace"), (user.first_name, user.last_name, user.full_name))
+        # Names as typed in onboarding; full_name is the résumé's, which may differ.
+        self.assertEqual(("Ada", "King", "Ada Lovelace"), (user.first_name, user.last_name, user.full_name))
         self.assertEqual("ada@example.com", user.primary_email)
         self.assertEqual(EXAMPLE["education"][0]["institution"], user.university)
         self.assertEqual(["1"], user.phones)
@@ -227,12 +227,6 @@ class MeApiTests(unittest.TestCase):
         self.assertEqual(403, self.onboard().status_code)
         self.assertEqual({"user": None}, self.client.get("/me", headers=self.headers).json())
 
-    def test_resume_without_a_name_is_rejected(self) -> None:
-        response = self.onboard(resume=resume_body(classification=classification(name=None)))
-
-        self.assertEqual(422, response.status_code)
-        self.assertIn("name", response.json()["detail"])
-
     def test_onboarding_validation(self) -> None:
         year = datetime.now().year
         cases = {
@@ -242,6 +236,9 @@ class MeApiTests(unittest.TestCase):
             "year too early": onboarding_body(graduation_year=1999),
             "year too late": onboarding_body(graduation_year=year + 5),
             "blank location": onboarding_body(preferred_location=" "),
+            "no first name": onboarding_body(first_name=" "),
+            "no last name": {k: v for k, v in onboarding_body().items() if k != "last_name"},
+            "first name too long": onboarding_body(first_name="A" * 101),
             "not a pdf or docx": onboarding_body(resume=resume_body(original_filename="ada.txt")),
             "malformed classification": onboarding_body(
                 resume=resume_body(classification={**EXAMPLE, "unexpected": []})
@@ -258,17 +255,20 @@ class MeApiTests(unittest.TestCase):
         self.onboard()
 
         response = self.client.patch(
-            "/me", json={"preferred_location": "  Seattle, WA ", "target_role": "AI Engineer"}, headers=self.headers
+            "/me",
+            json={"preferred_location": "  Seattle, WA ", "target_role": "AI Engineer", "last_name": "King"},
+            headers=self.headers,
         )
 
         self.assertEqual(200, response.status_code, response.text)
         self.assertEqual("Seattle, WA", response.json()["preferred_location"])
         self.assertEqual("AI Engineer", response.json()["target_role"])
         self.assertEqual("Internship", response.json()["experience_level"])
+        self.assertEqual(("Ada", "King"), (response.json()["first_name"], response.json()["last_name"]))
 
     def test_update_validation(self) -> None:
         self.onboard()
-        for body in ({"preferred_location": " "}, {"target_role": "Astronaut"}, {"first_name": "Ada"}):
+        for body in ({"preferred_location": " "}, {"target_role": "Astronaut"}, {"first_name": " "}, {"university": "MIT"}):
             with self.subTest(body=body):
                 self.assertEqual(422, self.client.patch("/me", json=body, headers=self.headers).status_code)
 

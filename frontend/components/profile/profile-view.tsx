@@ -90,7 +90,7 @@ function IdentityCard({ state }: { state: ProfileState }) {
   const user = me?.user;
   const accountName = user ? `${user.first_name} ${user.last_name}`.trim() : "";
   const name =
-    user?.full_name?.trim() || accountName || resumeName || email?.split("@")[0] || (state.status === "loading" ? "" : "Student");
+    accountName || user?.full_name?.trim() || resumeName || email?.split("@")[0] || (state.status === "loading" ? "" : "Student");
   const initials = initialsOf(name || email || "S");
 
   const targetRole = user?.target_role ?? null;

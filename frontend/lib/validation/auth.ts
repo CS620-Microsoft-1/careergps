@@ -27,7 +27,7 @@ const password = z
   .min(8, "Use at least 8 characters.")
   .max(128, "Use at most 128 characters.");
 
-// Sign-up asks only for email and password; the career goal is asked in onboarding.
+// Sign-up asks only for email and password; the name and career goal are asked in onboarding.
 export const signupSchema = z
   .object({
     email,
@@ -43,7 +43,12 @@ export const signupSchema = z
   });
 export type SignupValues = z.infer<typeof signupSchema>;
 
+const name = (label: string) =>
+  z.string().trim().min(1, `Enter your ${label}.`).max(100, `Use at most 100 characters.`);
+
 export const onboardingSchema = z.object({
+  firstName: name("first name"),
+  lastName: name("last name"),
   targetRole,
   graduationYear,
   location: z.string().trim().min(1, "Enter a preferred location.").max(100),
