@@ -234,10 +234,11 @@ function ResumeSections({ classification: c }: { classification: ResumeClassific
       entries: c.research_interests.filter(Boolean).map((item, i) => entry(`interest-${i}`, item, [], "", [])),
     },
     {
-      title: "Other",
+      // What the classifier couldn't place, e.g. a professional summary.
+      title: "More from your résumé",
       entries: c.other.map((r, i) => {
         const [first, ...rest] = text(r.content).split("\n");
-        return entry(`other-${i}`, first, [], "", rest);
+        return entry(`other-${i}`, sentenceCase(first), [], "", rest);
       }),
     },
   ].filter((section) => section.entries.length > 0);
@@ -310,6 +311,13 @@ function formatSavedAt(iso: string) {
   return Number.isNaN(date.getTime())
     ? "earlier"
     : date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+/** "PROFESSIONAL SUMMARY" → "Professional summary". Mixed-case text (e.g. "iOS apps") is left alone. */
+function sentenceCase(value: string) {
+  if (value !== value.toUpperCase() || value === value.toLowerCase()) return value;
+  const lower = value.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
 }
 
 function initialsOf(name: string) {
