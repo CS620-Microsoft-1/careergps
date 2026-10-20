@@ -1,7 +1,7 @@
 """Helpers for tests that need Supabase-style login tokens. Not a test module itself."""
+import json
 import time
 import uuid
-from types import SimpleNamespace
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -16,13 +16,14 @@ def new_signing_key() -> ec.EllipticCurvePrivateKey:
 
 
 class FakeJwks:
-    """Stands in for PyJWKClient: always returns the given key's public half."""
+    """Stands in for PyJWKClient: always returns the given key's public half, as an ES256 JWK."""
 
     def __init__(self, private_key: ec.EllipticCurvePrivateKey) -> None:
-        self.public_key = private_key.public_key()
+        jwk = json.loads(jwt.algorithms.ECAlgorithm.to_jwk(private_key.public_key()))
+        self.jwk = jwt.PyJWK({**jwk, "kid": "test-key", "alg": "ES256"})
 
-    def get_signing_key_from_jwt(self, token: str) -> SimpleNamespace:
-        return SimpleNamespace(key=self.public_key)
+    def get_signing_key_from_jwt(self, token: str) -> jwt.PyJWK:
+        return self.jwk
 
 
 def make_token(
