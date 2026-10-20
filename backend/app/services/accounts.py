@@ -57,8 +57,13 @@ def get_account(db: Session, user_id: uuid.UUID) -> tuple[User | None, Profile |
     return db.get(User, user_id), db.get(Profile, user_id)
 
 
-def update_profile(db: Session, profile: Profile, data: ProfileUpdate) -> Profile:
-    for field, value in data.model_dump(exclude_unset=True).items():
+def update_profile(db: Session, user: User, profile: Profile, data: ProfileUpdate) -> Profile:
+    changes = data.model_dump(exclude_unset=True)
+    if "full_name" in changes:
+        user.full_name = changes.pop("full_name")
+    if changes.pop("complete_onboarding", None) and profile.onboarding_completed_at is None:
+        profile.onboarding_completed_at = datetime.now(UTC)
+    for field, value in changes.items():
         setattr(profile, field, value)
     db.commit()
     db.refresh(profile)

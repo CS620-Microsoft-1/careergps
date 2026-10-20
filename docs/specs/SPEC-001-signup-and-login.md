@@ -37,7 +37,7 @@ A new student can create an account with email and password, confirm their email
 |---|---|---|
 | P0-1 | Sign up with **email** + password, using **Supabase Auth**, with **email confirmation on** (§6) | Decided |
 | P0-2 | Log in, log out, session via Supabase Auth; FastAPI verifies the Supabase JWT (§6) | Decided |
-| P0-3 | Create `users` + `profiles` rows on the first login after email confirmation (`POST /me`, records the terms consent); onboarding can add location (`PATCH /me/profile`) | Decided |
+| P0-3 | Create `users` + `profiles` rows on the first login after email confirmation (`POST /me`, records the terms consent); onboarding saves the goal, location, university and name (`PATCH /me/profile`) | Decided |
 | P0-4 | Route guard: not logged in → `/login` | Decided |
 | P0-5 | Sign-up asks only for **email, password and the terms checkbox**. Name, university and the career goal (target role, graduation year, experience level) are not asked at sign-up; asking for and saving the goal is owned by onboarding | Decided |
 | P0-6 | Rate limit sign-up and login (Supabase Auth's built-in limits, configured in the dashboard) | Decided |
@@ -66,7 +66,7 @@ A new student can create an account with email and password, confirm their email
 confirmation link ──▶ /auth/confirm ──▶ session created
    │    ──POST /me (Bearer JWT)──▶ users + profiles rows created from user_metadata
    ▼
-/onboarding ──PATCH /me/profile──▶ location saved
+/onboarding ──PATCH /me/profile──▶ goal, location saved; onboarding_completed_at set
 ```
 
 ## 5. Data model
@@ -109,7 +109,7 @@ Sign-up, login and logout are not FastAPI endpoints: the frontend calls Supabase
 |---|---|---|---|
 | `POST /me` | accept_terms (the email comes from the token) | `201` `{user, profile}`; creates the `users` and `profiles` rows | `401`, `409` already created, `422` |
 | `GET /me` | — | `{user, profile}`; both `null` until `POST /me` succeeds | `401` |
-| `PATCH /me/profile` | location (P0); saving goal fields is up to onboarding | `200` profile | `401`, `403` sign-up not finished, `422` |
+| `PATCH /me/profile` | any of full_name, target_role, experience_level, graduation_year, university, location, complete_onboarding | `200` profile | `401`, `403` sign-up not finished, `422` |
 
 Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend checks are only for user experience.
 

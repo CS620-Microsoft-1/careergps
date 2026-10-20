@@ -290,7 +290,7 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 | `/health/db` | `{"status": "ok", "database": "connected"}`, or **503** if the database is unreachable |
 | `POST /me` | Finish sign-up: creates the `users` and `profiles` rows for the logged-in account. **409** if they exist |
 | `GET /me` | `{user, profile}` for the logged-in account; both `null` until `POST /me` succeeds |
-| `PATCH /me/profile` | Update `location`. **403** until `POST /me` succeeds |
+| `PATCH /me/profile` | Onboarding saves the goal (`target_role`, `experience_level`, `graduation_year`), `location`, `university`, `full_name`, and `complete_onboarding: true` (stamps `onboarding_completed_at` once). Only the fields sent change. **403** until `POST /me` succeeds |
 | `/docs` | Interactive API docs (Swagger UI), generated from the code |
 | `/openapi.json` | The API contract; the source of truth for frontend types (ADR-002) |
 | `POST /resumes/analyze` | Temporary PDF/DOCX extraction, OCR fallback and Foundry classification. **401** without a token, **403** until `POST /me` succeeds |

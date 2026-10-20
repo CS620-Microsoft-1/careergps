@@ -144,9 +144,50 @@ class MeApiTests(unittest.TestCase):
         self.assertEqual(200, response.status_code, response.text)
         self.assertEqual("Seattle, WA", response.json()["location"])
 
-    def test_update_rejects_goal_fields_and_blank_location(self) -> None:
+    def test_onboarding_saves_goals_name_and_completion(self) -> None:
         self.client.post("/me", json=valid_signup(), headers=self.headers)
-        for body in ({"target_role": "Data Analyst"}, {"location": " "}):
+        body = {
+            "full_name": " Ada Lovelace ",
+            "target_role": "Data Analyst",
+            "experience_level": "Internship",
+            "graduation_year": 2027,
+            "university": "University of Wisconsin–Madison",
+            "location": "Madison, WI",
+            "complete_onboarding": True,
+        }
+
+        response = self.client.patch("/me/profile", json=body, headers=self.headers)
+
+        self.assertEqual(200, response.status_code, response.text)
+        profile = response.json()
+        self.assertEqual("Data Analyst", profile["target_role"])
+        self.assertEqual(2027, profile["graduation_year"])
+        self.assertIsNotNone(profile["onboarding_completed_at"])
+        self.assertEqual("Ada Lovelace", self.client.get("/me", headers=self.headers).json()["user"]["full_name"])
+
+    def test_completing_onboarding_again_keeps_the_first_time(self) -> None:
+        self.client.post("/me", json=valid_signup(), headers=self.headers)
+        first = self.client.patch("/me/profile", json={"complete_onboarding": True}, headers=self.headers)
+
+        again = self.client.patch(
+            "/me/profile", json={"complete_onboarding": True, "location": "Seattle, WA"}, headers=self.headers
+        )
+
+        self.assertEqual(first.json()["onboarding_completed_at"], again.json()["onboarding_completed_at"])
+        self.assertEqual("Seattle, WA", again.json()["location"])
+
+    def test_update_validation(self) -> None:
+        self.client.post("/me", json=valid_signup(), headers=self.headers)
+        cases = (
+            {"location": " "},
+            {"target_role": "Astronaut"},
+            {"experience_level": "Part-time"},
+            {"graduation_year": 1900},
+            {"graduation_year": 3000},
+            {"complete_onboarding": False},
+            {"terms_accepted_at": "2026-01-01T00:00:00Z"},
+        )
+        for body in cases:
             with self.subTest(body=body):
                 response = self.client.patch("/me/profile", json=body, headers=self.headers)
                 self.assertEqual(422, response.status_code)

@@ -47,4 +47,4 @@ def update_my_profile(
     _, profile = accounts.get_account(db, user.id)
     if profile is None:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Finish sign-up first")
-    return ProfileRead.model_validate(accounts.update_profile(db, profile, data))
+    return ProfileRead.model_validate(accounts.update_profile(db, user, profile, data))
