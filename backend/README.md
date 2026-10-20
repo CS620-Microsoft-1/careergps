@@ -358,14 +358,14 @@ different company with the same name.
 3. **Review the generated file.** Autogenerate treats a rename as drop + add (data loss) and ignores RLS, triggers and functions; add those by hand.
 4. Preview the SQL without touching the database: `alembic upgrade head --sql`
 5. Open a PR. The migration is reviewed like any other code.
-6. **After merge**, the migration owner runs `alembic upgrade head` from `main`.
+6. **After the PR is merged into `dev`**, the database owner (currently Abanish) runs `alembic upgrade head` from an up-to-date `dev`, then `alembic current` to confirm. Nobody else applies migrations to the shared database.
 
 ## Shared database rules
 
 1. **Schema changes only go through Alembic.** Never create or alter tables in the Supabase dashboard. Viewing and editing rows there is fine.
 2. **Never edit a migration that has been applied.** Write a new one.
-3. **Only apply migrations from `main`, after merge, by one person.** Announce it in the team chat.
-4. **No `alembic downgrade` on the shared database** without telling the team first. It can drop tables and their data.
+3. **Only the database owner (currently Abanish) applies migrations**, from `dev`, after the PR is merged. Never run `alembic upgrade head` on the shared database yourself, not even from a feature branch to test; ask the database owner instead. The owner announces it in the team chat when it's done.
+4. **No `alembic downgrade` on the shared database** except by the database owner, after telling the team. It can drop tables and their data.
 5. **No real personal data** until authentication is in place. Use fake test users.
 6. **Enable RLS on every new table** in its migration (`ALTER TABLE <name> ENABLE ROW LEVEL SECURITY`). The Supabase Data API is disabled; RLS is a second layer of protection.
 7. **If `.env` leaks**, reset the database password in Supabase (Project Settings → Database) and share the new URL privately.
