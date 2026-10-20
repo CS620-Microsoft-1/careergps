@@ -69,6 +69,10 @@ export function apiPatch<T>(path: string, options?: RequestOptions): Promise<T> 
   return apiRequest<T>("PATCH", path, options);
 }
 
+export function apiPut<T>(path: string, options?: RequestOptions): Promise<T> {
+  return apiRequest<T>("PUT", path, options);
+}
+
 async function apiRequest<T>(
   method: string,
   path: string,

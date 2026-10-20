@@ -13,9 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field";
 import { EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
 import { analyzeResume } from "@/lib/api/resumes";
-import { ApiError } from "@/lib/api/client";
-import { saveResumeProfile } from "@/lib/profile/resume-storage";
-import { getSupabase } from "@/lib/supabase/client";
+import { ApiError, errorMessage } from "@/lib/api/client";
+import { saveResume, updateProfile } from "@/lib/api/me";
 import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
 import type { ResumeAnalysis, ResumeClassification } from "@/types/api";
 
@@ -24,6 +23,8 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
   const [analysis, setAnalysis] = useState<ResumeAnalysis>();
   const [classification, setClassification] = useState<ResumeClassification>();
   const [submitError, setSubmitError] = useState<string>();
+  const [confirming, setConfirming] = useState(false);
+  const [confirmError, setConfirmError] = useState<string>();
   const form = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: { graduationYear: "", location: "" },
@@ -55,24 +56,28 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
           setClassification(undefined);
           form.resetField("resume");
         }}
+        confirming={confirming}
+        confirmError={confirmError}
         onConfirm={async () => {
-          // The backend keeps no résumé data yet, so /profile reads this browser copy.
           const { targetRole, experienceLevel, graduationYear, location } = form.getValues();
+          setConfirming(true);
+          setConfirmError(undefined);
           try {
-            const { data } = await getSupabase().auth.getUser();
-            if (data.user) {
-              saveResumeProfile(
-                data.user.id,
-                { ...analysis, classification },
-                { targetRole, experienceLevel, graduationYear, location },
-              );
-            }
-          } catch {
-            // Saving is best effort; the profile page shows its empty state instead.
+            await Promise.all([
+              updateProfile({
+                target_role: targetRole,
+                experience_level: experienceLevel,
+                graduation_year: Number(graduationYear),
+                location,
+                complete_onboarding: true,
+              }),
+              saveResume({ filename: analysis.filename, classification }),
+            ]);
+          } catch (error) {
+            setConfirmError(errorMessage(error, "Couldn't save your profile. Try again."));
+            setConfirming(false);
+            return;
           }
-          setAnalysis(undefined);
-          setClassification(undefined);
-          form.resetField("resume");
           router.push("/dashboard");
         }}
       />

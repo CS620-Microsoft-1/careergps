@@ -35,6 +35,25 @@ export type Profile = {
   onboarding_completed_at: string | null;
 };
 
+/** PATCH /me/profile body: only the fields sent change. */
+export type ProfileUpdateRequest = {
+  full_name?: string;
+  target_role?: string;
+  experience_level?: string;
+  graduation_year?: number;
+  university?: string;
+  location?: string;
+  /** Stamps onboarding_completed_at the first time it is sent. */
+  complete_onboarding?: true;
+};
+
+/** GET/PUT /me/resume: the reviewed résumé classification the backend keeps (latest only). */
+export type SavedResume = {
+  filename: string;
+  classification: ResumeClassification;
+  updated_at: string;
+};
+
 /** POST /me body. The email comes from the access token. */
 export type AccountCreateRequest = {
   accept_terms: true;
@@ -59,7 +78,7 @@ export type ResumeClassification = {
   other: ResumeRecord[];
 };
 
-/** POST /resumes/analyze: transient result; the backend stores none of these fields. */
+/** POST /resumes/analyze: transient result; onboarding saves only the reviewed classification (PUT /me/resume). */
 export type ResumeAnalysis = {
   filename: string;
   extraction: {

@@ -8,16 +8,15 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getMe } from "@/lib/api/me";
-import { loadResumeProfile, type StoredResumeProfile } from "@/lib/profile/resume-storage";
+import { getMe, getSavedResume } from "@/lib/api/me";
 import { getSupabase } from "@/lib/supabase/client";
-import type { MeResponse, ResumeClassification, ResumeRecord } from "@/types/api";
+import type { MeResponse, ResumeClassification, ResumeRecord, SavedResume } from "@/types/api";
 
 type ProfileState = {
   status: "loading" | "ready";
   email: string | null;
   me: MeResponse | null;
-  saved: StoredResumeProfile | null;
+  saved: SavedResume | null;
 };
 
 // Placeholder until skill ratings come from the gap analysis (ADR-001); the résumé alone has no evidence levels.
@@ -39,15 +38,17 @@ export function ProfileView() {
     let cancelled = false;
     (async () => {
       let email: string | null = null;
-      let saved: StoredResumeProfile | null = null;
+      let saved: SavedResume | null = null;
       let me: MeResponse | null = null;
       try {
         const { data } = await getSupabase().auth.getUser();
         if (data.user) {
           email = data.user.email ?? null;
-          saved = loadResumeProfile(data.user.id);
-          // Name and goal fields; the page still works from Supabase alone if the API is down.
-          me = await getMe().catch(() => null);
+          // The page still works from Supabase alone if the API is down.
+          [me, saved] = await Promise.all([
+            getMe().catch(() => null),
+            getSavedResume().catch(() => null),
+          ]);
         }
       } catch {
         // No Supabase session or config: show the empty state.
@@ -59,7 +60,7 @@ export function ProfileView() {
     };
   }, []);
 
-  const classification = state.saved?.analysis.classification;
+  const classification = state.saved?.classification;
 
   return (
     <>
@@ -83,8 +84,7 @@ export function ProfileView() {
 
 function IdentityCard({ state }: { state: ProfileState }) {
   const { me, saved, email } = state;
-  const personal = saved?.analysis.classification.personal_information;
-  const goals = saved?.goals;
+  const personal = saved?.classification.personal_information;
   const profile = me?.profile;
 
   const resumeName = text(personal?.name);
@@ -92,11 +92,10 @@ function IdentityCard({ state }: { state: ProfileState }) {
     me?.user?.full_name?.trim() || resumeName || email?.split("@")[0] || (state.status === "loading" ? "" : "Student");
   const initials = initialsOf(name || email || "S");
 
-  // Goal fields: the account's saved values first, then what onboarding collected in this browser.
-  const targetRole = profile?.target_role ?? goals?.targetRole ?? null;
-  const experienceLevel = profile?.experience_level ?? goals?.experienceLevel ?? null;
-  const graduationYear = profile?.graduation_year?.toString() ?? goals?.graduationYear ?? null;
-  const location = profile?.location ?? goals?.location ?? text(personal?.location);
+  const targetRole = profile?.target_role ?? null;
+  const experienceLevel = profile?.experience_level ?? null;
+  const graduationYear = profile?.graduation_year?.toString() ?? null;
+  const location = profile?.location ?? text(personal?.location);
   const university = profile?.university ?? null;
 
   const contacts = [
@@ -118,7 +117,7 @@ function IdentityCard({ state }: { state: ProfileState }) {
           {state.status === "ready" && (
             <p className="text-muted-foreground">
               {saved
-                ? `Résumé: ${saved.analysis.filename} · analyzed ${formatSavedAt(saved.savedAt)}`
+                ? `Résumé: ${saved.filename} · saved ${formatSavedAt(saved.updated_at)}`
                 : "No résumé uploaded yet"}
             </p>
           )}
