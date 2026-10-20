@@ -190,7 +190,11 @@ function formatUsPhone(value: string) {
 
 function blankRecord(section: ObjectListKey): ResumeRecord {
   return Object.fromEntries(
-    OBJECT_SECTIONS[section].fields.map((field) => [field.key, field.type === "lines" ? [] : null]),
+    // other.content is a required string in the contract (app/schemas/resume.py), not nullable.
+    OBJECT_SECTIONS[section].fields.map((field) => [
+      field.key,
+      field.type === "lines" ? [] : section === "other" ? "" : null,
+    ]),
   );
 }
 
