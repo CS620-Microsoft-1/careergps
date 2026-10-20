@@ -10,7 +10,16 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY_ROOT = BACKEND_ROOT.parent
 sys.path.insert(0, str(BACKEND_ROOT))
 
+from app.db.base import Base
+import app.models  # noqa: F401  (registers all models on Base.metadata)
 from app.models.user import User
+
+
+def migration_text() -> str:
+    return "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (BACKEND_ROOT / "migrations" / "versions").glob("*.py")
+    )
 
 
 def run_git(*args: str) -> subprocess.CompletedProcess[str]:
@@ -86,29 +95,71 @@ class BackendConfigurationTests(unittest.TestCase):
     def test_user_model_has_expected_table_and_columns(self) -> None:
         self.assertEqual("users", User.__tablename__)
         self.assertEqual(
-            {"id", "email", "full_name", "created_at", "updated_at"},
+            {
+                "id",
+                "primary_email",
+                "first_name",
+                "last_name",
+                "full_name",
+                "target_role",
+                "experience_level",
+                "graduation_year",
+                "university",
+                "preferred_location",
+                "resume_emails",
+                "phones",
+                "current_location",
+                "linkedin_url",
+                "github_url",
+                "website_url",
+                "active_resume_id",
+                "terms_accepted_at",
+                "created_at",
+                "updated_at",
+            },
             set(User.__table__.columns.keys()),
         )
-        self.assertTrue(User.__table__.columns.email.unique)
-        self.assertFalse(User.__table__.columns.email.nullable)
+        self.assertTrue(User.__table__.columns.primary_email.unique)
+        self.assertFalse(User.__table__.columns.primary_email.nullable)
+        # The id comes from Supabase Auth, never from Python.
+        self.assertIsNone(User.__table__.columns.id.default)
+
+    def test_resume_tables_are_registered_with_their_owner_columns(self) -> None:
+        self.assertIn("confirmed_data", Base.metadata.tables["resumes"].columns)
+        for table in (
+            "resume_experiences",
+            "resume_educations",
+            "resume_projects",
+            "resume_achievements",
+            "resume_skills",
+        ):
+            with self.subTest(table=table):
+                columns = Base.metadata.tables[table].columns
+                self.assertTrue({"id", "resume_id", "user_id", "created_at"} <= set(columns.keys()))
 
     def test_users_migration_enables_rls(self) -> None:
-        migration_text = "\n".join(
-            path.read_text(encoding="utf-8")
-            for path in (BACKEND_ROOT / "migrations" / "versions").glob("*.py")
-        )
+        self.assertIn("ALTER TABLE users ENABLE ROW LEVEL SECURITY", migration_text())
 
-        self.assertIn("ALTER TABLE users ENABLE ROW LEVEL SECURITY", migration_text)
+    def test_users_reference_supabase_auth_accounts(self) -> None:
+        # Written by hand in a migration; autogenerate can't create or see it.
+        self.assertIn("REFERENCES auth.users (id) ON DELETE CASCADE", migration_text())
 
     def test_job_posting_migration_enables_rls(self) -> None:
-        migration_text = "\n".join(
-            path.read_text(encoding="utf-8")
-            for path in (BACKEND_ROOT / "migrations" / "versions").glob("*.py")
-        )
-
         for table in ("job_postings", "ingest_runs"):
             with self.subTest(table=table):
-                self.assertIn(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY", migration_text)
+                self.assertIn(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY", migration_text())
+
+    def test_resume_migration_enables_rls(self) -> None:
+        for table in (
+            "resumes",
+            "resume_experiences",
+            "resume_educations",
+            "resume_projects",
+            "resume_achievements",
+            "resume_skills",
+        ):
+            with self.subTest(table=table):
+                self.assertIn(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY", migration_text())
 
 
 if __name__ == "__main__":

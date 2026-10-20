@@ -15,6 +15,7 @@ from app.core.security import (
 )
 from app.db.session import SessionLocal
 from app.models import User
+from app.services.accounts import AccountService
 from app.services.foundry_agent import FoundryResumeAgentService
 from app.services.resume_pipeline import ResumePipeline
 
@@ -72,14 +73,19 @@ def get_current_user(
         raise unauthorized
 
 
+def get_account_service(db: Session = Depends(get_db)) -> AccountService:
+    return AccountService(db)
+
+
 def get_current_db_user(
     auth_user: AuthenticatedUser = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    accounts: AccountService = Depends(get_account_service),
 ) -> User:
-    """Like get_current_user, but also requires the users row from POST /me. 403 if sign-up isn't finished."""
-    user = db.get(User, auth_user.id)
+    """Like get_current_user, but also requires the users row, which onboarding creates (POST /me).
+    403 until then."""
+    user = accounts.get_user(auth_user.id)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Finish sign-up first")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Finish onboarding first")
     return user
 
 

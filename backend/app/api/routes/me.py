@@ -1,79 +1,90 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_db_user, get_current_user, get_db
+from app.api.deps import get_account_service, get_current_db_user, get_current_user
 from app.core.security import AuthenticatedUser
-from app.models import User
-from app.schemas.me import (
-    AccountCreate,
-    MeRead,
-    ProfileRead,
-    ProfileUpdate,
-    ResumeProfileRead,
-    ResumeProfileWrite,
+from app.models import Resume, User
+from app.schemas.me import AccountCreate, GoalsUpdate, MeRead, ResumeRead, ResumeSubmit, UserRead
+from app.services.accounts import (
+    AccountAlreadyExistsError,
+    AccountService,
+    EmailNotConfirmedError,
+    MissingNameError,
 )
-from app.services import accounts
 
 router = APIRouter(prefix="/me", tags=["me"])
+
+
+def _resume_read(resume: Resume) -> ResumeRead:
+    return ResumeRead.model_validate(
+        {
+            "id": resume.id,
+            "original_filename": resume.original_filename,
+            "file_type": resume.file_type,
+            "classification": resume.confirmed_data,
+            "created_at": resume.created_at,
+        }
+    )
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=MeRead)
 def create_me(
     data: AccountCreate,
     auth_user: AuthenticatedUser = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    accounts: AccountService = Depends(get_account_service),
 ) -> MeRead:
-    """Finish sign-up: create the users and profiles rows for the logged-in Supabase account."""
+    """Finish onboarding: create the users row and the first confirmed résumé."""
     try:
-        user, profile = accounts.create_account(db, auth_user, data)
-    except accounts.AccountAlreadyExistsError:
+        user = accounts.create_account(auth_user, data)
+    except AccountAlreadyExistsError:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Account already exists")
-    except accounts.EmailNotConfirmedError:
+    except EmailNotConfirmedError:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Confirm your email, then log in again."
         )
-    return MeRead.model_validate({"user": user, "profile": profile}, from_attributes=True)
+    except MissingNameError as error:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(error))
+    return MeRead(user=UserRead.model_validate(user))
 
 
 @router.get("", response_model=MeRead)
 def read_me(
     auth_user: AuthenticatedUser = Depends(get_current_user),
-    db: Session = Depends(get_db),
+    accounts: AccountService = Depends(get_account_service),
 ) -> MeRead:
-    """The logged-in user's account and profile; both null if sign-up isn't finished yet."""
-    user, profile = accounts.get_account(db, auth_user.id)
-    return MeRead.model_validate({"user": user, "profile": profile}, from_attributes=True)
+    """The logged-in student's account; null until onboarding is finished."""
+    user = accounts.get_user(auth_user.id)
+    if user is None:
+        return MeRead(user=None)
+    accounts.sync_email(user, auth_user.email)
+    return MeRead(user=UserRead.model_validate(user))
 
 
-@router.patch("/profile", response_model=ProfileRead)
-def update_my_profile(
-    data: ProfileUpdate,
+@router.patch("", response_model=UserRead)
+def update_me(
+    data: GoalsUpdate,
     user: User = Depends(get_current_db_user),
-    db: Session = Depends(get_db),
-) -> ProfileRead:
-    _, profile = accounts.get_account(db, user.id)
-    if profile is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Finish sign-up first")
-    return ProfileRead.model_validate(accounts.update_profile(db, user, profile, data))
+    accounts: AccountService = Depends(get_account_service),
+) -> UserRead:
+    return UserRead.model_validate(accounts.update_goals(user, data))
 
 
-@router.get("/resume", response_model=ResumeProfileRead)
+@router.get("/resume", response_model=ResumeRead)
 def read_my_resume(
     user: User = Depends(get_current_db_user),
-    db: Session = Depends(get_db),
-) -> ResumeProfileRead:
-    """The latest résumé analysis the user confirmed in onboarding. 404 if there is none yet."""
-    resume = accounts.get_resume_profile(db, user.id)
+    accounts: AccountService = Depends(get_account_service),
+) -> ResumeRead:
+    """The active résumé (the newest confirmed one). 404 if there is none."""
+    resume = accounts.get_active_resume(user)
     if resume is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No résumé saved yet")
-    return ResumeProfileRead.model_validate(resume)
+    return _resume_read(resume)
 
 
-@router.put("/resume", response_model=ResumeProfileRead)
-def save_my_resume(
-    data: ResumeProfileWrite,
+@router.post("/resumes", status_code=status.HTTP_201_CREATED, response_model=ResumeRead)
+def add_my_resume(
+    data: ResumeSubmit,
     user: User = Depends(get_current_db_user),
-    db: Session = Depends(get_db),
-) -> ResumeProfileRead:
-    """Save the reviewed résumé analysis, replacing any earlier one."""
-    return ResumeProfileRead.model_validate(accounts.save_resume_profile(db, user, data))
+    accounts: AccountService = Depends(get_account_service),
+) -> ResumeRead:
+    """Save a newer confirmed résumé; it becomes the active one. Earlier versions are kept."""
+    return _resume_read(accounts.add_resume(user, data))

@@ -5,7 +5,7 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
-from app.api.deps import get_current_db_user, get_resume_pipeline
+from app.api.deps import get_current_user, get_resume_pipeline
 from app.schemas.resume import ResumeAnalysis
 from app.services.foundry_agent import ClassificationValidationError, FoundryAgentError
 from app.services.resume_extraction import (
@@ -25,10 +25,9 @@ def _display_name(filename: str | None, suffix: str) -> str:
     return (name or f"resume{suffix}")[:255]
 
 
-# Signed-in users who finished sign-up only (SPEC-001 §8): each call costs a Foundry Agent run.
-@router.post(
-    "/analyze", response_model=ResumeAnalysis, dependencies=[Depends(get_current_db_user)]
-)
+# Logged-in users only (SPEC-001 §8): each call costs a Foundry Agent run. Not get_current_db_user:
+# onboarding analyzes the résumé before the users row exists.
+@router.post("/analyze", response_model=ResumeAnalysis, dependencies=[Depends(get_current_user)])
 def analyze_resume(
     file: UploadFile = File(...),
     pipeline: ResumePipeline = Depends(get_resume_pipeline),

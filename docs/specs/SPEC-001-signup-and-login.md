@@ -2,7 +2,7 @@
 
 - **Status:** Draft
 - **Date:** 2026-10-10 (narrowed to auth on 2026-10-14)
-- **Scope:** Account creation with Supabase Auth, the `users` and `profiles` rows, verifying login tokens in FastAPI
+- **Scope:** Account creation with Supabase Auth, creating the `users` row at the end of onboarding, verifying login tokens in FastAPI
 - **Related:** [ADR-001](../decisions/ADR-001-CareerGPS-Frontend.md), [ADR-002](../decisions/ADR-002-CareerGPS-Backend.md), [Supabase test plan](../testing/SUPABASE_DATABASE_TEST_PLAN.md)
 
 Items marked **[DECIDED]** were settled by the team. Priorities (P0 / P1 / P2) are listed in §3.
@@ -13,7 +13,7 @@ Résumé upload and parsing are not part of this spec: they are built in PR #11 
 
 ## 1. Goal
 
-A new student can create an account with email and password, confirm their email, and log in. The backend knows who is calling every endpoint, and each account has a `users` row and a `profiles` row. Sign-up asks only for email and password; the career goal is asked in onboarding.
+A new student can create an account with email and password, confirm their email, and log in. The backend knows who is calling every endpoint. Sign-up asks only for email and password; the `users` row (career goal, name, first résumé) is created when onboarding is confirmed (schema: PR #17, `backend/app/models/user.py`).
 
 ## 2. Current state (as of `dev` @ `75ea4d2`)
 
@@ -37,7 +37,7 @@ A new student can create an account with email and password, confirm their email
 |---|---|---|
 | P0-1 | Sign up with **email** + password, using **Supabase Auth**, with **email confirmation on** (§6) | Decided |
 | P0-2 | Log in, log out, session via Supabase Auth; FastAPI verifies the Supabase JWT (§6) | Decided |
-| P0-3 | Create `users` + `profiles` rows on the first login after email confirmation (`POST /me`, records the terms consent); onboarding saves the goal, location, university and name (`PATCH /me/profile`) | Decided |
+| P0-3 | Create the `users` row and the first `resumes` row when onboarding is confirmed (`POST /me`, records the terms consent). Names come from the résumé; the university is `DEFAULT_UNIVERSITY` until onboarding asks for it | Decided |
 | P0-4 | Route guard: not logged in → `/login` | Decided |
 | P0-5 | Sign-up asks only for **email, password and the terms checkbox**. Name, university and the career goal (target role, graduation year, experience level) are not asked at sign-up; asking for and saving the goal is owned by onboarding | Decided |
 | P0-6 | Rate limit sign-up and login (Supabase Auth's built-in limits, configured in the dashboard) | Decided |
@@ -55,7 +55,7 @@ A new student can create an account with email and password, confirm their email
 | # | Task | Basis |
 |---|---|---|
 | P2-1 | SSO login via Supabase Auth OAuth providers. The buttons are removed from the P0 login page; `components/auth/sso-buttons.tsx` is kept for this | Proposed |
-| P2-2 | Route guard: onboarding not finished → `/onboarding`. Needs onboarding to set `profiles.onboarding_completed_at`, which nothing does yet | Decided |
+| P2-2 | Route guard: onboarding not finished (no `users` row) → `/onboarding`. Done in the app shell (`components/layout/onboarding-guard.tsx`) | Done |
 
 ## 4. Flow
 
@@ -64,10 +64,10 @@ A new student can create an account with email and password, confirm their email
    │                                  (terms consent saved in user_metadata)
    │
 confirmation link ──▶ /auth/confirm ──▶ session created
-   │    ──POST /me (Bearer JWT)──▶ users + profiles rows created from user_metadata
    ▼
-/onboarding ──PATCH /me/profile──▶ goal, location saved; onboarding_completed_at set
-            ──PUT /me/resume──────▶ reviewed résumé classification saved
+/onboarding ──POST /resumes/analyze──▶ classification to review
+            ──POST /me (Bearer JWT)──▶ users row + first résumé created (terms consent from user_metadata)
+later, from /profile: /onboarding ──PATCH /me + POST /me/resumes──▶ goal updated, new résumé version active
 ```
 
 ## 5. Data model
@@ -76,31 +76,23 @@ All tables get RLS enabled with no policies, as with `users` (the backend is the
 
 Migrations follow the shared database rules in `backend/README.md`: generated with Alembic and reviewed in the PR, never created in the Supabase dashboard, applied from `dev` after the PR is merged, by one person who announces it in the team chat, and `ENABLE ROW LEVEL SECURITY` in every new table's migration.
 
-### 5.1 `users` (change)
+### 5.1 `users` and résumé tables
 
 **[DECIDED] Users sign up and log in with email + password through Supabase Auth.** Supabase keeps accounts and password hashes in its own `auth.users` table; our database never stores passwords.
 
-| Change | Notes |
+The tables are defined by PR #17 (migration `02a858fed0df`; see `backend/README.md`, "Users and résumé tables"). What this spec relies on:
+
+| Column / table | Notes |
 |---|---|
-| `users.id` = `auth.users.id` | No default UUID for new rows; the id comes from the JWT `sub` claim. Add `FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE` **by hand** in the migration (autogenerate doesn't know the `auth` schema). |
-| `users.email` | Kept (unique, not null), copied from the JWT `email` claim when the row is created, so the baseline CI test stays as it is. `auth.users.email` is the source of truth; P1 email changes must update both. |
-| `users.full_name` | Now nullable: sign-up doesn't ask for a name. |
+| `users.id` = `auth.users.id` | From the JWT `sub` claim; `FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE`. |
+| `users.primary_email` | Copied (lower-cased) from the JWT `email` claim when the row is created, and synced on `GET /me`. |
+| `users.first_name`, `last_name`, `full_name` | From the confirmed résumé's name: first word, the rest, and the whole. A résumé without a name can't finish onboarding (`422`). |
+| `users.target_role`, `experience_level`, `graduation_year`, `preferred_location` | Asked in onboarding. `graduation_year` is 2000 … current year + 4. |
+| `users.university` | `DEFAULT_UNIVERSITY` (`backend/app/core/options.py`) until onboarding asks for it. |
+| `users.terms_accepted_at` | When onboarding is confirmed, from the consent saved in `user_metadata` at sign-up. |
+| `resumes` | One row per confirmed résumé (`confirmed_data` = the reviewed classification, `schema_version` `"1"`); `users.active_resume_id` is the newest. The child tables (`resume_experiences`, …) are not filled yet. |
 
 Password reset is P1, so in P0 a user who forgets their password cannot recover the account on their own.
-
-### 5.2 `profiles` (new, 1:1 with `users`)
-
-| Column | Type | Notes |
-|---|---|---|
-| `user_id` | `uuid PK, FK users.id ON DELETE CASCADE` | |
-| `target_role` | `text NULL` | Filled in by onboarding. One of `TARGET_ROLES` in `frontend/lib/options.ts`; not a DB enum, so the list can change without a migration. |
-| `experience_level` | `text NULL` | Filled in by onboarding. `Internship` or `Full-time` |
-| `graduation_year` | `smallint NULL` | Filled in by onboarding. Current year … current year + 4 |
-| `university` | `text NULL` | ≤ 150 chars; not asked at sign-up |
-| `location` | `text NULL` | ≤ 100 chars; filled in onboarding |
-| `terms_accepted_at` | `timestamptz NOT NULL` | when the user accepted the terms at sign-up (a record of consent) |
-| `onboarding_completed_at` | `timestamptz NULL` | set when onboarding is finished |
-| `created_at`, `updated_at` | `timestamptz` | same pattern as `users` |
 
 ## 6. API and sessions
 
@@ -108,11 +100,11 @@ Sign-up, login and logout are not FastAPI endpoints: the frontend calls Supabase
 
 | Method & path | Body | Success | Errors |
 |---|---|---|---|
-| `POST /me` | accept_terms (the email comes from the token) | `201` `{user, profile}`; creates the `users` and `profiles` rows | `401`, `409` already created, `422` |
-| `GET /me` | — | `{user, profile}`; both `null` until `POST /me` succeeds | `401` |
-| `PATCH /me/profile` | any of full_name, target_role, experience_level, graduation_year, university, location, complete_onboarding | `200` profile | `401`, `403` sign-up not finished, `422` |
-| `GET /me/resume` | — | `200` `{filename, classification, updated_at}` | `401`, `403`, `404` none saved |
-| `PUT /me/resume` | filename, classification (the reviewed one) | `200`; replaces any earlier one | `401`, `403`, `422` |
+| `POST /me` | accept_terms, target_role, experience_level, graduation_year, preferred_location, resume (original_filename, parser, ocr_pages, agent_name, classification). The email comes from the token | `201` `{user}`; creates the `users` row and its first, active résumé | `401`, `403` email not confirmed, `409` already created, `422` |
+| `GET /me` | — | `{user}`; `null` until onboarding is finished | `401` |
+| `PATCH /me` | any of target_role, experience_level, graduation_year, preferred_location | `200` user | `401`, `403` onboarding not finished, `422` |
+| `GET /me/resume` | — | `200` the active résumé `{id, original_filename, file_type, classification, created_at}` | `401`, `403`, `404` none |
+| `POST /me/resumes` | as `resume` above | `201`; becomes the active résumé; empty contact fields on `users` are filled from it | `401`, `403`, `422` |
 
 Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend checks are only for user experience.
 
@@ -127,8 +119,9 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 
 **Backend**
 - A `get_current_user` dependency verifies the JWT on every request: signature (via the project's JWKS endpoint, `<SUPABASE_URL>/auth/v1/.well-known/jwks.json`, if the project uses asymmetric signing keys; otherwise the legacy JWT secret from `.env`), `exp` (60 s clock leeway), `aud == "authenticated"`, `iss == <SUPABASE_URL>/auth/v1`, and that the header's `alg` matches the signing key. A missing or invalid token is `401`; signing keys that can't be fetched are `503`. The shared project uses asymmetric signing keys (ES256, checked 2026-10-14, see `backend/README.md`). Library: `PyJWT`.
-- It returns the user id (`sub`) and email. Endpoints other than `POST /me` return `403` if the `users` row doesn't exist yet.
+- It returns the user id (`sub`) and email. `GET /me`, `POST /me` and `POST /resumes/analyze` work before the `users` row exists; the other endpoints return `403` until onboarding is finished.
 - `POST /me` also reads `auth.users.email_confirmed_at` and returns `403` until the email is confirmed, so an account can't claim an email it doesn't own even if **Confirm email** is turned off in the dashboard.
+- If `GET /me` fails right after login, the browser is signed out again so no unusable session is left behind.
 - Logout signs out this browser only (`signOut({ scope: "local" })`), not the user's other devices.
 - Logged-out visits to a protected page go to `/login?next=<page>`; a `401` from the API signs this browser out and does the same. After login the user returns to `next` (same-site paths only, never an auth page); a newly created account goes to onboarding first.
 - New env var: `SUPABASE_URL` (plus `SUPABASE_JWT_SECRET` only if the project uses the legacy secret).
@@ -149,7 +142,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 
 1. `signup-form.tsx`: email, password and the terms checkbox; `supabase.auth.signUp` with the terms consent as `user_metadata`, then a "Check your email" state. New `/auth/confirm` route (§6). `login-form.tsx`: `signInWithPassword`. Add a logout action to the user menu.
 2. Register the Supabase access token with `setAccessTokenGetter` in `lib/api/client.ts`, so every API call sends it.
-3. Route guard (`proxy.ts`): no Supabase session → `/login`. If the `users` row is missing after login or confirmation, the frontend creates it (`POST /me`). The onboarding check is P2-2.
+3. Route guard (`proxy.ts`): no Supabase session → `/login`. After login or confirmation, a user without a `users` row goes to `/onboarding`, which creates it (`POST /me`). The onboarding check is P2-2.
 4. API types come from FastAPI's `/openapi.json` (ADR-002), not written by hand.
 
 **[DECIDED] Sign-up asks only for email and password** (plus the terms checkbox; no password confirmation field). Target role, graduation year and experience level are asked in onboarding, which already has these fields on `dev` (PR #11); saving them (frontend and API) is owned by onboarding. `backend/app/core/options.py` keeps the allowed values for that.
@@ -160,14 +153,15 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 - [ ] Only the publishable key in the frontend; secret keys only in backend `.env`
 - [ ] Every endpoint except `/health` requires a valid token; data is always looked up by the token's user id, never an id from the request
 - [ ] CORS stays limited to `CORS_ORIGINS` (already the case)
-- [ ] Deleting a Supabase account removes its `users` and `profiles` rows (cascade)
+- [ ] Deleting a Supabase account removes its `users` row and résumés (cascade)
 
 ## 9. Testing
 
 | Level | What |
 |---|---|
 | Unit | JWT verification (valid, expired, wrong `aud`, wrong issuer, bad signature, legacy HS256) with a locally generated key |
-| API (FastAPI `TestClient`; auth faked) | `POST /me` happy path; `401` without a token; `409` on a second `POST /me`; `422` on bad fields; `403` from `PATCH /me/profile` before sign-up is finished |
+| API (FastAPI `TestClient`; auth and the database layer faked) | `POST /me` happy path; `401` without a token; `403` unconfirmed email; `409` on a second `POST /me`; `422` on bad fields or a nameless résumé; `403` from `PATCH /me` and the résumé endpoints before onboarding is finished |
+| Database (`tests/test_accounts_postgres.py`, throwaway Postgres, skipped without `TEST_DATABASE_URL`) | Real migrations; account + first résumé, newer résumé becomes active, cascade from `auth.users`, email uniqueness, the `auth.users` foreign key |
 | Manual | full sign-up → confirm → login flow in the browser against the shared Supabase project before merging to `dev` |
 
 Existing CI (`unittest`, no DB) must keep passing; tests that need a DB are skipped when the env vars aren't set.

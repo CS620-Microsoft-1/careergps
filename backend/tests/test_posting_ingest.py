@@ -61,7 +61,8 @@ class FakeAdapter:
 class IngestTests(unittest.TestCase):
     def setUp(self) -> None:
         engine = create_engine("sqlite://")
-        Base.metadata.create_all(engine)
+        # Only the ingest tables: others use Postgres-only types (ARRAY, JSONB) that SQLite can't create.
+        Base.metadata.create_all(engine, tables=[JobPosting.__table__, IngestRun.__table__])
         self.session = Session(engine)
         self.adapter = FakeAdapter()
         self.day = 0
