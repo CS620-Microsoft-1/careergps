@@ -8,7 +8,7 @@ import { MailCheck } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
 import { EmptyState } from "@/components/common/empty-state";
-import { TextField } from "@/components/common/form-fields";
+import { PasswordField, TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -75,19 +75,17 @@ export function SignupForm() {
           placeholder="you@example.com"
           autoComplete="email"
         />
-        <TextField
+        <PasswordField
           control={form.control}
           name="password"
           label="Password"
-          type="password"
           placeholder="At least 8 characters"
           autoComplete="new-password"
         />
-        <TextField
+        <PasswordField
           control={form.control}
           name="confirmPassword"
           label="Confirm Password"
-          type="password"
           placeholder="Type it again"
           autoComplete="new-password"
         />

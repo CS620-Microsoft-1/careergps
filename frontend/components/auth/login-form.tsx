@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
 import { ComingSoon } from "@/components/common/coming-soon";
-import { TextField } from "@/components/common/form-fields";
+import { PasswordField, TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
 import { errorMessage } from "@/lib/api/client";
@@ -57,11 +57,10 @@ export function LoginForm() {
           placeholder="you@example.com"
           autoComplete="email"
         />
-        <TextField
+        <PasswordField
           control={form.control}
           name="password"
           label="Password"
-          type="password"
           placeholder="Enter your password"
           autoComplete="current-password"
         />
