@@ -43,7 +43,12 @@ class AccountServicePostgresTests(unittest.TestCase):
             connection.execute(text("DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public"))
             # Stand-in for Supabase's auth schema: only what the migrations and the service touch.
             connection.execute(text("DROP SCHEMA IF EXISTS auth CASCADE; CREATE SCHEMA auth"))
-            connection.execute(text("CREATE TABLE auth.users (id uuid PRIMARY KEY, email_confirmed_at timestamptz)"))
+            connection.execute(
+                text(
+                    "CREATE TABLE auth.users (id uuid PRIMARY KEY, created_at timestamptz NOT NULL DEFAULT now(),"
+                    " email_confirmed_at timestamptz)"
+                )
+            )
         subprocess.run(
             [sys.executable, "-m", "alembic", "upgrade", "head"],
             cwd=BACKEND_ROOT,
@@ -66,12 +71,14 @@ class AccountServicePostgresTests(unittest.TestCase):
     def tearDown(self) -> None:
         self.db.close()
 
+    SIGNED_UP_AT = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)
+
     def auth_user(self, email="ada@example.com", confirmed=True) -> AuthenticatedUser:
         user = AuthenticatedUser(id=uuid.uuid4(), email=email)
         with self.engine.begin() as connection:
             connection.execute(
-                text("INSERT INTO auth.users (id, email_confirmed_at) VALUES (:id, :at)"),
-                {"id": user.id, "at": datetime.now(UTC) if confirmed else None},
+                text("INSERT INTO auth.users (id, created_at, email_confirmed_at) VALUES (:id, :signed_up, :at)"),
+                {"id": user.id, "signed_up": self.SIGNED_UP_AT, "at": datetime.now(UTC) if confirmed else None},
             )
         return user
 
@@ -82,6 +89,7 @@ class AccountServicePostgresTests(unittest.TestCase):
         user = self.onboard(self.auth_user("Ada@Example.com"))
 
         self.assertEqual("ada@example.com", user.primary_email)
+        self.assertEqual(self.SIGNED_UP_AT, user.terms_accepted_at)  # from auth.users, not the request time
         resume = self.service.get_active_resume(user)
         self.assertEqual(user.id, resume.user_id)
         self.assertEqual("pdf", resume.file_type)
@@ -138,6 +146,7 @@ class AccountServicePostgresTests(unittest.TestCase):
         user = accounts.new_user(
             AuthenticatedUser(id=uuid.uuid4(), email="ghost@example.com"),
             AccountCreate.model_validate(onboarding_body()),
+            signed_up_at=datetime.now(UTC),
         )
         self.db.add(user)
 

@@ -90,7 +90,7 @@ The tables are defined by PR #17 (migration `02a858fed0df`; see `backend/README.
 | `users.full_name` | The name as written on the résumé, if any; may differ from first + last. |
 | `users.target_role`, `experience_level`, `graduation_year`, `preferred_location` | Asked in onboarding. `graduation_year` is 2000 … current year + 4. |
 | `users.university` | Confirmed on the review page: pre-filled with the first school in the résumé's education (else the account's current one, else University of Wisconsin–Madison). Changeable with `PATCH /me`. |
-| `users.terms_accepted_at` | When onboarding is confirmed, from the consent saved in `user_metadata` at sign-up. |
+| `users.terms_accepted_at` | The sign-up time, `auth.users.created_at`: sign-up can't be submitted without ticking the terms box, and Supabase writes this time, so the browser can't change it. The consent itself (`accept_terms: true`) is read from `user_metadata`. |
 | `resumes` | One row per confirmed résumé (`confirmed_data` = the reviewed classification, `schema_version` `"1"`); `users.active_resume_id` is the newest. The child tables (`resume_experiences`, …) are not filled yet. |
 
 Password reset is P1, so in P0 a user who forgets their password cannot recover the account on their own.

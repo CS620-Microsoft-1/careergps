@@ -75,21 +75,23 @@ class FakeAccountService(accounts.AccountService):
         self.users: dict[uuid.UUID, User] = {}
         self.resumes: dict[uuid.UUID, Resume] = {}
         self.confirmed = True
+        self.signed_up_at = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)
 
     def get_user(self, user_id):
         return self.users.get(user_id)
 
-    def email_is_confirmed(self, user_id):
-        return self.confirmed
+    def signup_record(self, user_id):
+        return accounts.SignupRecord(self.signed_up_at, self.signed_up_at if self.confirmed else None)
 
     def create_account(self, auth_user, data):
         if auth_user.id in self.users or any(
             user.primary_email == auth_user.email.lower() for user in self.users.values()
         ):
             raise accounts.AccountAlreadyExistsError
-        if not self.email_is_confirmed(auth_user.id):
+        signup = self.signup_record(auth_user.id)
+        if signup.email_confirmed_at is None:
             raise accounts.EmailNotConfirmedError
-        user = accounts.new_user(auth_user, data)
+        user = accounts.new_user(auth_user, data, signed_up_at=signup.created_at)
         user.created_at = datetime.now(UTC)
         self.users[user.id] = user
         resume = self._store(accounts.new_resume(user.id, data.resume))
@@ -131,12 +133,14 @@ class NameAndContactRulesTests(unittest.TestCase):
             )
         )
 
-        user = accounts.new_user(auth_user, data)
+        signed_up_at = datetime(2026, 10, 1, tzinfo=UTC)
+        user = accounts.new_user(auth_user, data, signed_up_at=signed_up_at)
 
         # Names as typed in onboarding; full_name is the résumé's, which may differ.
         self.assertEqual(("Ada", "King", "Ada Lovelace"), (user.first_name, user.last_name, user.full_name))
         self.assertEqual("ada@example.com", user.primary_email)
         self.assertEqual("Northlake University", user.university)
+        self.assertEqual(signed_up_at, user.terms_accepted_at)  # the sign-up time, not now
         self.assertEqual(["1"], user.phones)
 
     def test_a_newer_resume_fills_only_empty_contacts(self) -> None:

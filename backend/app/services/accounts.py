@@ -5,7 +5,8 @@ they can be tested without one. AccountService holds the database part.
 """
 import logging
 import uuid
-from datetime import UTC, datetime
+from dataclasses import dataclass
+from datetime import datetime
 
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
@@ -32,6 +33,13 @@ class AccountAlreadyExistsError(Exception):
 class EmailNotConfirmedError(Exception):
     """The Supabase account hasn't confirmed its email yet."""
 
+
+@dataclass(frozen=True)
+class SignupRecord:
+    """What Supabase recorded about the sign-up (auth.users)."""
+
+    created_at: datetime
+    email_confirmed_at: datetime | None
 
 
 def _column_length(column: str) -> int:
@@ -72,7 +80,7 @@ def fill_empty_contacts(user: User, classification: ResumeClassification) -> Non
             setattr(user, field, value)
 
 
-def new_user(auth_user: AuthenticatedUser, data: AccountCreate) -> User:
+def new_user(auth_user: AuthenticatedUser, data: AccountCreate, signed_up_at: datetime) -> User:
     user = User(
         id=auth_user.id,
         primary_email=auth_user.email.lower(),
@@ -83,7 +91,8 @@ def new_user(auth_user: AuthenticatedUser, data: AccountCreate) -> User:
         graduation_year=data.graduation_year,
         university=data.university,
         preferred_location=data.preferred_location,
-        terms_accepted_at=datetime.now(UTC),
+        # Sign-up can't be submitted without ticking the terms box, so its time is the consent time.
+        terms_accepted_at=signed_up_at,
         **{field: value for field, value in contact_details(data.resume.classification).items()},
     )
     return user
@@ -110,21 +119,22 @@ class AccountService:
     def get_user(self, user_id: uuid.UUID) -> User | None:
         return self.db.get(User, user_id)
 
-    def email_is_confirmed(self, user_id: uuid.UUID) -> bool:
-        """Read auth.users directly instead of trusting Supabase's Confirm email setting, so an
-        unconfirmed account can't claim an email it doesn't own."""
-        confirmed_at = self.db.execute(
-            text("SELECT email_confirmed_at FROM auth.users WHERE id = :id"), {"id": user_id}
-        ).scalar_one_or_none()
-        return confirmed_at is not None
+    def signup_record(self, user_id: uuid.UUID) -> SignupRecord | None:
+        """Read auth.users directly (the database role needs SELECT on it; see backend/README.md).
+        Supabase writes created_at, so the browser can't change it."""
+        row = self.db.execute(
+            text("SELECT created_at, email_confirmed_at FROM auth.users WHERE id = :id"), {"id": user_id}
+        ).one_or_none()
+        return SignupRecord(row.created_at, row.email_confirmed_at) if row else None
 
     def create_account(self, auth_user: AuthenticatedUser, data: AccountCreate) -> User:
         """Create the users row and its first résumé in one transaction; the résumé becomes active."""
         if self.get_user(auth_user.id) is not None:
             raise AccountAlreadyExistsError
-        if not self.email_is_confirmed(auth_user.id):
+        signup = self.signup_record(auth_user.id)
+        if signup is None or signup.email_confirmed_at is None:
             raise EmailNotConfirmedError
-        user = new_user(auth_user, data)
+        user = new_user(auth_user, data, signed_up_at=signup.created_at)
         resume = new_resume(user.id, data.resume)
         try:
             self.db.add(user)
