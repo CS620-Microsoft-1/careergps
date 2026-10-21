@@ -384,6 +384,9 @@ different company with the same name.
 - A student keeps every version; `users.active_resume_id` points to the one the agents use.
 - The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
   autogenerate from proposing to drop it.
+- `POST /me` reads `auth.users` (`email_confirmed_at` and `created_at`, the terms consent time)
+  directly. That works with the `postgres` role used now; a limited database role for the backend
+  will need `SELECT` on `auth.users`, or those two columns.
 
 ## Changing the schema
 
