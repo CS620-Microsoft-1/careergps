@@ -8,8 +8,8 @@ const MESSAGES: Partial<Record<string, string>> = {
   email_not_confirmed: "Confirm your email first. Check your inbox for the link we sent.",
   weak_password: "Choose a stronger password.",
   email_address_invalid: "Enter a valid email address.",
-  // The built-in Supabase mailer only sends to members of the project's organization.
-  email_address_not_authorized: "We can't send email to this address yet. Use a team member's email.",
+  // Supabase refused to email this address (e.g. its built-in mailer only reaches team members).
+  email_address_not_authorized: "We couldn't send a confirmation email to this address. Try a different email.",
   over_email_send_rate_limit: "Too many emails sent. Try again in an hour.",
   over_request_rate_limit: "Too many attempts. Wait a few minutes and try again.",
   signup_disabled: "Sign-up is closed right now.",
