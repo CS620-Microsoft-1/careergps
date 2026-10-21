@@ -11,7 +11,7 @@ from app.db.session import SessionLocal
 from app.core.config import BACKEND_ROOT, Settings, get_settings
 from app.services.foundry_agent import FoundryResumeAgentService
 from app.services.resume_pipeline import ResumePipeline
-from app.services.job_posting_analysis_agent import FoundryJobPostingAnalysisService
+from app.services.job_posting_analysis_agent import AGENT_VERSION, FoundryJobPostingAnalysisService
 from app.services.job_posting_analysis_pipeline import (
     JobPostingAnalysisPipeline,
     ReadOnlyJobPostingSource,
@@ -71,6 +71,9 @@ def get_job_analysis_pipeline() -> JobPostingAnalysisPipeline:
     directory = settings.job_analysis_local_dir
     if not directory.is_absolute():
         directory = BACKEND_ROOT / directory
+    # Always isolate output contracts, including when .env overrides the base path.
+    # Older queues/results remain untouched and are never served as v13 output.
+    directory = directory / f"v{AGENT_VERSION}"
     try:
         store = LocalJobAnalysisStore(directory)
     except (sqlite3.Error, OSError):

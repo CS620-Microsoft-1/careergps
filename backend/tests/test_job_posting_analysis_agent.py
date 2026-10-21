@@ -64,32 +64,13 @@ def posting_fixture() -> dict:
 
 def analysis_fixture() -> dict:
     source = posting_fixture()
-    scalar_fields = (
-        "id", "source", "external_id", "company_slug", "company_name", "company_tier",
-        "job_title", "job_family", "seniority", "department", "role_overview",
-        "salary_currency", "salary_interval", "url", "published_at", "first_seen_at",
-        "last_seen_at", "closed_at", "content_hash", "created_at", "updated_at",
-    )
-    array_fields = (
-        "locations", "responsibilities", "qualifications", "job_conditions",
-        "compensation", "benefits", "other_relevant_information",
-    )
-    payload = {field: {"value": None, "evidence": []} for field in scalar_fields}
-    payload.update({field: [] for field in array_fields})
-    for field in (
-        "id", "source", "external_id", "company_slug", "company_name", "company_tier",
-        "url", "published_at", "first_seen_at", "last_seen_at", "closed_at", "content_hash",
-        "created_at", "updated_at",
-    ):
-        if source[field] is not None:
-            payload[field] = {
-                "value": source[field],
-                "evidence": [{"source_field": field, "quote": source[field]}],
-            }
-    payload["job_title"] = {
-        "value": source["title"],
-        "evidence": [{"source_field": "title", "quote": source["title"]}],
-    }
+    payload = {field: None for field in SCALAR_FIELDS}
+    payload.update({field: [] for field in ARRAY_FIELDS})
+    payload["role_overview"] = {"value": None, "evidence": []}
+    payload["other_relevant_information"] = []
+    for field in (*COPIED_METADATA_FIELDS, "company_name"):
+        payload[field] = source.get(field)
+    payload["job_title"] = source["title"]
     payload["qualifications"] = [{
         "value": "Must have Python or Go.",
         "level": "required",
@@ -178,9 +159,97 @@ class AnalysisValidationTests(unittest.TestCase):
 
     def test_rejects_another_posting_id(self) -> None:
         payload = analysis_fixture()
-        payload["id"]["value"] = "10000000-0000-4000-8000-000000000002"
+        payload["id"] = "10000000-0000-4000-8000-000000000002"
         with self.assertRaises(JobPostingAnalysisValidationError):
             self.validate(json.dumps(payload))
+
+    def test_v13_has_only_the_six_agreed_evidence_structures(self) -> None:
+        payload = analysis_fixture()
+        payload["benefits"] = "Medical coverage.\n\nPaid leave (if eligible)."
+        payload["other_relevant_information"] = ["Multiple positions available."]
+        result = self.validate(json.dumps(payload))
+        self.assertIsInstance(result["id"], str)
+        self.assertEqual(payload["benefits"], result["benefits"])
+        self.assertEqual(payload["other_relevant_information"], result["other_relevant_information"])
+        complex_fields = {"locations", "role_overview", "responsibilities", "qualifications", "job_conditions", "compensation"}
+        for field, value in result.items():
+            if field not in complex_fields:
+                self.assertNotIsInstance(value, dict)
+                if isinstance(value, list):
+                    self.assertTrue(all(isinstance(item, str) for item in value))
+
+    def test_benefits_is_nullable_string_not_array_or_wrapper(self) -> None:
+        for value in (None, "Medical coverage.", "Medical coverage.\n\nPaid leave."):
+            payload = analysis_fixture()
+            payload["benefits"] = value
+            self.assertEqual(value, self.validate(json.dumps(payload))["benefits"])
+        for value in ([], ["Medical coverage."], {"value": "Medical coverage.", "evidence": []}):
+            payload = analysis_fixture()
+            payload["benefits"] = value
+            with self.subTest(value=value), self.assertRaises(JobPostingAnalysisValidationError):
+                self.validate(json.dumps(payload))
+
+    def test_other_relevant_information_only_accepts_strings(self) -> None:
+        payload = analysis_fixture()
+        payload["other_relevant_information"] = [{"value": "Multiple positions.", "evidence": []}]
+        with self.assertRaises(JobPostingAnalysisValidationError):
+            self.validate(json.dumps(payload))
+
+    def test_old_v10_scalar_wrapper_cannot_enter_v13_results(self) -> None:
+        payload = analysis_fixture()
+        for field in ("id", "company_name", "job_title", "salary_currency"):
+            old = deepcopy(payload)
+            old[field] = {"value": payload[field], "evidence": []}
+            with self.subTest(field=field), self.assertRaises(JobPostingAnalysisValidationError):
+                self.validate(json.dumps(old))
+
+    def test_v13_schema_keeps_28_keys_and_six_complex_definitions_from_v10(self) -> None:
+        schema_dir = BACKEND_ROOT / "app" / "schemas"
+        previous = json.loads((schema_dir / "job_posting_analysis_v10.json").read_text())["schema"]
+        wrapper = json.loads((schema_dir / "job_posting_analysis_v13.json").read_text())
+        schema = wrapper["schema"]
+        self.assertIs(wrapper["strict"], True)
+        self.assertEqual(28, len(schema["properties"]))
+        self.assertEqual(list(previous["properties"]), list(schema["properties"]))
+        self.assertEqual(previous["required"], schema["required"])
+        visited = set()
+
+        def compare(node):
+            if isinstance(node, dict):
+                if "$ref" in node:
+                    reference = node["$ref"]
+                    if reference not in visited:
+                        visited.add(reference)
+                        name = reference.rsplit("/", 1)[-1]
+                        self.assertEqual(previous["$defs"][name], schema["$defs"][name])
+                        compare(schema["$defs"][name])
+                for value in node.values():
+                    compare(value)
+            elif isinstance(node, list):
+                for value in node:
+                    compare(value)
+
+        for field in ("locations", "role_overview", "responsibilities", "qualifications", "job_conditions", "compensation"):
+            self.assertEqual(previous["properties"][field], schema["properties"][field])
+            compare(schema["properties"][field])
+
+    def test_v13_schema_has_no_ref_siblings_and_requires_all_object_properties(self) -> None:
+        wrapper = json.loads((BACKEND_ROOT / "app/schemas/job_posting_analysis_v13.json").read_text())
+
+        def check(node):
+            if isinstance(node, dict):
+                if "$ref" in node:
+                    self.assertEqual({"$ref"}, set(node))
+                if node.get("type") == "object":
+                    self.assertIs(node.get("additionalProperties"), False)
+                    self.assertEqual(set(node["properties"]), set(node["required"]))
+                for value in node.values():
+                    check(value)
+            elif isinstance(node, list):
+                for value in node:
+                    check(value)
+
+        check(wrapper["schema"])
 
     def test_rejects_non_object_roots(self) -> None:
         for text in ("[]", "null", '"text"', "42"):
@@ -221,7 +290,7 @@ class FoundryJobPostingAnalysisServiceTests(unittest.TestCase):
         self.addCleanup(self.module_patch.stop)
         self.service = FoundryJobPostingAnalysisService(ENDPOINT)
 
-    def test_sends_all_input_fields_and_uses_only_fixed_version_ten(self) -> None:
+    def test_sends_all_input_fields_and_uses_only_fixed_version_thirteen(self) -> None:
         posting = posting_fixture()
         before = deepcopy(posting)
         result = self.service.analyze(posting)
@@ -240,7 +309,7 @@ class FoundryJobPostingAnalysisServiceTests(unittest.TestCase):
         self.assertEqual({"conversation", "input", "extra_body"}, set(call.kwargs))
         self.assertEqual("conversation-1", call.kwargs["conversation"])
         self.assertEqual({"agent_reference": {
-            "type": "agent_reference", "name": "job-analysis-agent", "version": "10",
+            "type": "agent_reference", "name": "job-analysis-agent", "version": "13",
         }}, call.kwargs["extra_body"])
         messages = call.kwargs["input"]
         self.assertEqual(1, len(messages))
@@ -406,12 +475,13 @@ def content_posting_fixture() -> dict:
 
 def content_payload_fixture(posting: dict | None = None) -> dict:
     posting = content_posting_fixture() if posting is None else posting
-    result = {field: {"value": None, "evidence": []} for field in SCALAR_FIELDS}
+    result = {field: None for field in SCALAR_FIELDS}
     result.update({field: [] for field in ARRAY_FIELDS})
+    result["role_overview"] = {"value": None, "evidence": []}
+    result["other_relevant_information"] = []
     for field in COPIED_METADATA_FIELDS:
         value = posting.get(field)
-        if value is not None and value != "":
-            result[field] = {"value": value, "evidence": evidence(field, value)}
+        result[field] = value if value not in (None, "") else None
     return result
 
 
@@ -436,7 +506,7 @@ class JobPostingAnalysisContentValidationTests(unittest.TestCase):
         self.payload = content_payload_fixture(self.posting)
 
     def validate(self) -> None:
-        # Each fixture is also accepted by the unchanged strict v10 schema.
+        # Each fixture is also accepted by the strict v13 schema.
         parsed = validate_analysis_response(json.dumps(self.payload), job_posting_id=CONTENT_JOB_ID)
         validate_analysis_content(parsed, posting=self.posting)
 
@@ -454,23 +524,23 @@ class JobPostingAnalysisContentValidationTests(unittest.TestCase):
         self.assertEqual(self.payload, original_payload)
         self.assertEqual(len(self.payload), 28)
 
-    def test_non_null_scalar_needs_evidence(self) -> None:
-        self.payload["department"] = {"value": "Payments", "evidence": []}
-        self.assert_problem("missing_evidence", "/department/evidence")
+    def test_non_null_overview_needs_evidence(self) -> None:
+        self.payload["role_overview"] = {"value": "Payments", "evidence": []}
+        self.assert_problem("missing_evidence", "/role_overview/evidence")
 
     def test_empty_and_whitespace_scalar_values_are_rejected(self) -> None:
         for value in ("", " \t\n"):
             with self.subTest(value=repr(value)):
-                self.payload["department"] = {"value": value, "evidence": evidence("title", "Payments")}
-                self.assert_problem("empty_value", "/department/value")
+                self.payload["department"] = value
+                self.assert_problem("empty_value", "/department")
 
-    def test_null_scalar_must_have_empty_evidence(self) -> None:
-        self.payload["department"]["evidence"] = evidence("title", "Payments")
-        self.assert_problem("null_value_has_evidence", "/department/evidence")
+    def test_null_overview_must_have_empty_evidence(self) -> None:
+        self.payload["role_overview"]["evidence"] = evidence("title", "Payments")
+        self.assert_problem("null_value_has_evidence", "/role_overview/evidence")
 
     def test_every_array_item_requires_nonempty_value_and_evidence(self) -> None:
         factories = {
-            "locations": {}, "responsibilities": {}, "benefits": {}, "other_relevant_information": {},
+            "locations": {}, "responsibilities": {},
             "qualifications": {"level": "required", "categories": ["skill"]},
             "job_conditions": {"type": "other"},
             "compensation": {key: value for key, value in compensation().items() if key not in ("value", "evidence")},
@@ -484,12 +554,12 @@ class JobPostingAnalysisContentValidationTests(unittest.TestCase):
 
     def test_empty_or_whitespace_quote_rejected(self) -> None:
         for quote in ("", " \n"):
-            self.payload["job_title"] = {"value": "Engineer", "evidence": evidence("title", quote)}
-            self.assert_problem("empty_evidence_quote", "/job_title/evidence/0/quote")
+            self.payload["role_overview"] = {"value": "Engineer", "evidence": evidence("title", quote)}
+            self.assert_problem("empty_evidence_quote", "/role_overview/evidence/0/quote")
 
     def test_unknown_source_field_rejected_without_disclosing_its_name(self) -> None:
         private = "private_secret_field_123456"
-        self.payload["job_title"] = {"value": "Engineer", "evidence": evidence(private, "private_raw_quote_9876")}
+        self.payload["role_overview"] = {"value": "Engineer", "evidence": evidence(private, "private_raw_quote_9876")}
         error = self.assert_problem("unknown_evidence_source")
         self.assertNotIn(private, str(error))
         self.assertNotIn("private_raw_quote_9876", str(error))
@@ -499,7 +569,7 @@ class JobPostingAnalysisContentValidationTests(unittest.TestCase):
         for source in (None, ["Payments"], {"value": "Payments"}):
             with self.subTest(source=source):
                 self.posting["arbitrary_input"] = source
-                self.payload["department"] = {"value": "Payments", "evidence": evidence("arbitrary_input", "Payments")}
+                self.payload["role_overview"] = {"value": "Payments", "evidence": evidence("arbitrary_input", "Payments")}
                 self.assert_problem("unsupported_evidence_source")
 
     def test_exact_unicode_and_crlf_quote_after_json_decoding(self) -> None:
@@ -580,41 +650,40 @@ class JobPostingAnalysisContentValidationTests(unittest.TestCase):
         for field, replacement in (("external_id", "123"), ("published_at", "2026-10-20T10:01:02.1234Z"), ("url", "https://example.invalid/jobs")):
             with self.subTest(field=field):
                 self.payload = content_payload_fixture(self.posting)
-                self.payload[field]["value"] = replacement
-                self.assert_problem("metadata_not_exact_copy", f"/{field}/value")
+                self.payload[field] = replacement
+                self.assert_problem("metadata_not_exact_copy", f"/{field}")
 
-    def test_copied_metadata_needs_one_full_quote_from_same_input_field(self) -> None:
-        variants = (
-            [],
-            evidence("description_text", "100"),
-            evidence("url", "https://example.invalid"),
-            evidence("url", self.posting["url"]) * 2,
-        )
-        for entries in variants:
+    def test_copied_metadata_is_direct_and_rejects_old_evidence_wrappers(self) -> None:
+        self.validate()
+        self.assertIsInstance(self.payload["url"], str)
+        for entries in ([], evidence("url", self.posting["url"])):
             with self.subTest(entries=entries):
-                self.payload["url"]["evidence"] = entries
-                self.assert_problem("metadata_evidence_not_exact", "/url/evidence")
+                payload = deepcopy(self.payload)
+                payload["url"] = {"value": self.posting["url"], "evidence": entries}
+                with self.assertRaises(JobPostingAnalysisValidationError):
+                    validate_analysis_response(json.dumps(payload), job_posting_id=CONTENT_JOB_ID)
 
     def test_missing_null_and_empty_metadata_are_null_without_evidence(self) -> None:
         del self.posting["published_at"]
         self.posting["external_id"] = ""
         self.payload = content_payload_fixture(self.posting)
         self.validate()
-        self.payload["published_at"] = {"value": "2026-10-20", "evidence": []}
+        self.payload["published_at"] = "2026-10-20"
         self.assert_problem("metadata_absent_not_null", "/published_at")
 
     def test_null_metadata_with_attached_evidence_is_rejected(self) -> None:
-        self.payload["closed_at"]["evidence"] = evidence("title", "Engineer")
-        self.assert_problem("metadata_absent_not_null", "/closed_at")
+        self.payload["closed_at"] = {"value": None, "evidence": evidence("title", "Engineer")}
+        with self.assertRaises(JobPostingAnalysisValidationError):
+            validate_analysis_response(json.dumps(self.payload), job_posting_id=CONTENT_JOB_ID)
 
     def test_numeric_metadata_is_not_silently_stringified(self) -> None:
         self.posting["external_id"] = 123
-        self.payload["external_id"] = {"value": "123", "evidence": evidence("external_id", "123")}
+        self.payload["external_id"] = "123"
         self.assert_problem("metadata_source_not_string", "/external_id")
 
     def test_title_company_and_other_values_are_not_forced_to_equal_quotes(self) -> None:
-        self.payload["job_title"] = {"value": "Senior Engineer", "evidence": evidence("title", self.posting["title"])}
-        self.payload["company_name"] = {"value": "Example Company", "evidence": evidence("company_name", self.posting["company_name"])}
+        self.payload["job_title"] = "Senior Engineer"
+        self.payload["company_name"] = "Example Company"
         self.validate()
 
     def test_categories_require_one_or_more_unique_items(self) -> None:
@@ -647,29 +716,46 @@ class JobPostingAnalysisContentValidationTests(unittest.TestCase):
 
     def test_common_base_currency_and_interval_must_match_every_arrangement(self) -> None:
         self.payload["compensation"] = [compensation(), compensation(currency="EUR")]
-        self.payload["salary_currency"] = {"value": "USD", "evidence": evidence("salary_currency", "USD")}
-        self.assert_problem("base_summary_inconsistent", "/salary_currency/value")
-        self.payload["salary_currency"] = {"value": None, "evidence": []}
-        self.payload["salary_interval"] = {"value": "year", "evidence": evidence("salary_interval", "year")}
+        self.payload["salary_currency"] = "USD"
+        self.assert_problem("base_summary_inconsistent", "/salary_currency")
+        self.payload["salary_currency"] = None
+        self.payload["salary_interval"] = "year"
         self.validate()
         self.payload["compensation"][1]["interval"] = "month"
-        self.assert_problem("base_summary_inconsistent", "/salary_interval/value")
+        self.assert_problem("base_summary_inconsistent", "/salary_interval")
 
     def test_currency_summary_case_difference_is_equivalent_without_rewriting(self) -> None:
         self.payload["compensation"] = [compensation(currency="usd")]
-        self.payload["salary_currency"] = {"value": "USD", "evidence": evidence("salary_currency", "USD")}
+        self.payload["salary_currency"] = "USD"
         before = deepcopy(self.payload)
         self.validate()
         self.assertEqual(self.payload, before)
-        self.assertEqual(self.payload["salary_currency"]["value"], "USD")
+        self.assertEqual(self.payload["salary_currency"], "USD")
         self.assertEqual(self.payload["compensation"][0]["currency"], "usd")
 
     def test_unknown_item_attribute_prevents_nonnull_common_summary(self) -> None:
         self.payload["compensation"] = [compensation(currency=None, interval=None)]
-        self.payload["salary_currency"] = {"value": "USD", "evidence": evidence("salary_currency", "USD")}
-        self.payload["salary_interval"] = {"value": "year", "evidence": evidence("salary_interval", "year")}
-        self.assert_problem("base_summary_inconsistent", "/salary_currency/value")
-        self.assert_problem("base_summary_inconsistent", "/salary_interval/value")
+        self.payload["salary_currency"] = "USD"
+        self.payload["salary_interval"] = "year"
+        self.assert_problem("base_summary_inconsistent", "/salary_currency")
+        self.assert_problem("base_summary_inconsistent", "/salary_interval")
+
+    def test_benefits_and_other_plain_strings_need_no_evidence(self) -> None:
+        self.payload["benefits"] = "Medical coverage and paid leave."
+        self.payload["other_relevant_information"] = ["Hybrid team."]
+        before = deepcopy(self.payload)
+        self.validate()
+        self.assertEqual(before, self.payload)
+
+    def test_plain_benefits_and_information_cannot_be_blank(self) -> None:
+        for field, value, path in (
+            ("benefits", " \t", "/benefits"),
+            ("other_relevant_information", [" \n"], "/other_relevant_information/0"),
+        ):
+            with self.subTest(field=field):
+                self.payload = content_payload_fixture(self.posting)
+                self.payload[field] = value
+                self.assert_problem("empty_value", path)
 
     def test_null_summaries_are_not_forced_to_populate(self) -> None:
         self.payload["compensation"] = [compensation()]
@@ -680,25 +766,25 @@ class JobPostingAnalysisContentValidationTests(unittest.TestCase):
             compensation(type=kind, currency="EUR", interval="one_time")
             for kind in ("bonus", "equity", "commission", "ote", "stipend", "other")
         ]
-        self.payload["salary_currency"] = {"value": "USD", "evidence": evidence("salary_currency", "USD")}
-        self.payload["salary_interval"] = {"value": "year", "evidence": evidence("salary_interval", "year")}
+        self.payload["salary_currency"] = "USD"
+        self.payload["salary_interval"] = "year"
         self.validate()
 
     def test_hourly_pay_participates_in_common_summary_checks(self) -> None:
         self.payload["compensation"] = [compensation(type="hourly_rate", interval="hour")]
-        self.payload["salary_interval"] = {"value": "year", "evidence": evidence("salary_interval", "year")}
-        self.assert_problem("base_summary_inconsistent", "/salary_interval/value")
+        self.payload["salary_interval"] = "year"
+        self.assert_problem("base_summary_inconsistent", "/salary_interval")
 
     def test_metadata_only_summaries_can_be_known_without_compensation_amounts(self) -> None:
-        self.payload["salary_currency"] = {"value": "USD", "evidence": evidence("salary_currency", "USD")}
-        self.payload["salary_interval"] = {"value": "year", "evidence": evidence("salary_interval", "year")}
+        self.payload["salary_currency"] = "USD"
+        self.payload["salary_interval"] = "year"
         self.validate()
 
     def test_amount_currency_and_interval_are_independent(self) -> None:
         self.payload["compensation"] = [compensation(currency=None, interval=None)]
         self.validate()
         self.payload["compensation"] = [compensation(minimum=None, maximum=None)]
-        self.payload["salary_currency"] = {"value": "USD", "evidence": evidence("salary_currency", "USD")}
+        self.payload["salary_currency"] = "USD"
         self.validate()
 
     def test_semantic_truth_is_not_claimed_by_exact_quote_checks(self) -> None:

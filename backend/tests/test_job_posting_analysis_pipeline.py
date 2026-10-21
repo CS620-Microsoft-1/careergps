@@ -50,22 +50,8 @@ def analysis_fixture(
     posting: dict | None = None, include_overview: bool = False,
 ) -> dict:
     """Build a schema fixture; supplied source data makes metadata content-valid."""
-    scalar_fields = (
-        "id", "source", "external_id", "company_slug", "company_name", "company_tier",
-        "job_title", "job_family", "seniority", "department", "role_overview",
-        "salary_currency", "salary_interval", "url", "published_at", "first_seen_at",
-        "last_seen_at", "closed_at", "content_hash", "created_at", "updated_at",
-    )
-    array_fields = (
-        "locations", "responsibilities", "qualifications", "job_conditions",
-        "compensation", "benefits", "other_relevant_information",
-    )
-    result = {field: {"value": None, "evidence": []} for field in scalar_fields}
-    result.update({field: [] for field in array_fields})
-    result["id"] = {
-        "value": str(job_id),
-        "evidence": [{"source_field": "id", "quote": str(job_id)}],
-    }
+    result = agent_analysis_fixture()
+    result["id"] = str(job_id)
     if posting is not None:
         copied_fields = (
             "source", "external_id", "company_slug", "company_tier", "url",
@@ -74,11 +60,9 @@ def analysis_fixture(
         )
         for field in copied_fields:
             original = posting.get(field)
-            result[field] = {
-                "value": original if original not in (None, "") else None,
-                "evidence": [{"source_field": field, "quote": original}]
-                if original not in (None, "") else [],
-            }
+            result[field] = original if original not in (None, "") else None
+    result["company_name"] = posting.get("company_name") if posting else None
+    result["job_title"] = posting.get("title") if posting else None
     if include_overview:
         result["role_overview"] = {
             "value": ROLE_PURPOSE,
@@ -376,7 +360,7 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
                     elif rule == "evidence":
                         requirement["evidence"] = []
                     elif rule == "metadata":
-                        data["source"]["value"] = "private mutated source"
+                        data["source"] = "private mutated source"
                     else:
                         data["compensation"][0]["minimum"] = 120001
                     return data
@@ -459,7 +443,8 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
         expected["compensation"][0]["evidence"].append({
             "source_field": "salary_min", "quote": "100000",
         })
-        expected["other_relevant_information"] = [{
+        expected["job_conditions"] = [{
+            "type": "other",
             "value": "Relocation is supported.",
             "evidence": [{"source_field": "relocation_supported", "quote": "true"}],
         }]

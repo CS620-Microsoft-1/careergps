@@ -14,7 +14,7 @@ from app.schemas.job_posting_analysis import (
 )
 
 AGENT_NAME = "job-analysis-agent"
-AGENT_VERSION = "10"
+AGENT_VERSION = "13"
 
 
 class JobPostingAnalysisInputError(ValueError):
@@ -109,7 +109,7 @@ class FoundryJobPostingAnalysisService:
             if status in (401, 403) or "Authentication" in name or "Credential" in name:
                 message = "Azure authentication failed. Verify login and Foundry permissions."
             elif status == 404:
-                message = "The configured job analysis Agent version 10 was not found."
+                message = f"The configured job analysis Agent version {AGENT_VERSION} was not found."
             elif status == 429 or "RateLimit" in name:
                 message = "The job analysis Agent rate limit was reached."
             elif isinstance(error, TimeoutError) or "Timeout" in name:
@@ -125,13 +125,15 @@ COPIED_METADATA_FIELDS = (
     "published_at", "first_seen_at", "last_seen_at", "closed_at", "content_hash",
     "created_at", "updated_at",
 )
+# These fields are direct strings/null in v13, without value/evidence wrappers.
 SCALAR_FIELDS = COPIED_METADATA_FIELDS + (
     "company_name", "job_title", "job_family", "seniority", "department",
-    "role_overview", "salary_currency", "salary_interval",
+    "salary_currency", "salary_interval", "benefits",
 )
+# Together with role_overview, only these arrays retain evidence objects.
 ARRAY_FIELDS = (
     "locations", "responsibilities", "qualifications", "job_conditions",
-    "compensation", "benefits", "other_relevant_information",
+    "compensation",
 )
 BASE_PAY_TYPES = frozenset(("base_salary", "hourly_rate"))
 MAX_ISSUES = 100
@@ -209,26 +211,30 @@ def validate_analysis_content(payload: dict[str, Any], *, posting: dict[str, Any
         check_evidence(evidence, f"{path}/evidence")
 
     for field in SCALAR_FIELDS:
-        check_value(payload[field], f"/{field}", nullable=True)
+        value = payload[field]
+        if value is not None and (not isinstance(value, str) or not value.strip()):
+            reject("empty_value", f"/{field}")
+    check_value(payload["role_overview"], "/role_overview", nullable=True)
     for field in ARRAY_FIELDS:
         for index, item in enumerate(payload[field]):
             check_value(item, f"/{field}/{index}", nullable=False)
+    for index, value in enumerate(payload["other_relevant_information"]):
+        if not value.strip():
+            reject("empty_value", f"/other_relevant_information/{index}")
 
     for field in COPIED_METADATA_FIELDS:
-        item = payload[field]
+        value = payload[field]
         original = posting.get(field)
         path = f"/{field}"
         if original is None or original == "":
-            if item["value"] is not None or item["evidence"]:
+            if value is not None:
                 reject("metadata_absent_not_null", path)
             continue
         if not isinstance(original, str):
             reject("metadata_source_not_string", path)
             continue
-        if item["value"] != original:
-            reject("metadata_not_exact_copy", f"{path}/value")
-        if item["evidence"] != [{"source_field": field, "quote": original}]:
-            reject("metadata_evidence_not_exact", f"{path}/evidence")
+        if value != original:
+            reject("metadata_not_exact_copy", path)
 
     for index, item in enumerate(payload["qualifications"]):
         categories = item["categories"]
@@ -252,7 +258,7 @@ def validate_analysis_content(payload: dict[str, Any], *, posting: dict[str, Any
 
     base_pay = [item for item in payload["compensation"] if item["type"] in BASE_PAY_TYPES]
     for field, attribute in (("salary_currency", "currency"), ("salary_interval", "interval")):
-        value = payload[field]["value"]
+        value = payload[field]
         if value is None:
             continue
         def equivalent(item_value: Any) -> bool:
@@ -261,7 +267,7 @@ def validate_analysis_content(payload: dict[str, Any], *, posting: dict[str, Any
             return item_value == value
 
         if base_pay and any(not equivalent(item[attribute]) for item in base_pay):
-            reject("base_summary_inconsistent", f"/{field}/value")
+            reject("base_summary_inconsistent", f"/{field}")
 
     if issues:
         raise JobPostingAnalysisContentValidationError(tuple(issues))

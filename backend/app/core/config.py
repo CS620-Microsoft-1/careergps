@@ -19,9 +19,10 @@ class Settings(BaseSettings):
     # DefaultAzureCredential (Azure CLI locally; managed identity when deployed).
     foundry_project_endpoint: str | None = None
     foundry_agent_name: str | None = None
-    # Independent endpoint for the existing job-analysis-agent, pinned to version 10.
+    # Independent endpoint for the existing job-analysis-agent, pinned to version 13.
     job_analysis_project_endpoint: str | None = None
-    # Analysis queues and exported JSON stay local; source database access is read-only.
+    # Local storage base; the JD factory appends v13 to isolate older output formats.
+    # Source database access stays read-only.
     job_analysis_local_dir: Path = BACKEND_ROOT / "local_exports" / "job_analyses"
     # Server-side management token for the analysis submission endpoint only.
     job_analysis_admin_token: SecretStr | None = None

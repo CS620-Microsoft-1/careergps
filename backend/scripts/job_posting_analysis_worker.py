@@ -111,7 +111,7 @@ def _build_pipeline() -> AnalysisQueue:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Process queued version 10 job analyses.")
+    parser = argparse.ArgumentParser(description="Process queued version 13 job analyses.")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--once", action="store_true", help="Process at most one queued request.")
     mode.add_argument(

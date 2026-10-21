@@ -1,4 +1,4 @@
-"""HTTP models and validation for the frozen version 10 JD output contract."""
+"""HTTP models and validation for the version 13 JD output contract."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ class JobPostingAnalysisValidationError(ValueError):
 
 @lru_cache(maxsize=1)
 def _validator() -> Draft202012Validator:
-    path = Path(__file__).with_name("job_posting_analysis_v10.json")
+    path = Path(__file__).with_name("job_posting_analysis_v13.json")
     response_format = json.loads(path.read_text(encoding="utf-8"))
     return Draft202012Validator(response_format["schema"])
 
@@ -66,9 +66,9 @@ def validate_analysis_response(
     except (ValidationError, RecursionError):
         # jsonschema's exception text can contain the full JD or generated result.
         raise JobPostingAnalysisValidationError(
-            "The job analysis Agent response does not match the version 10 schema."
+            "The job analysis Agent response does not match the version 13 schema."
         ) from None
-    if payload["id"]["value"] != job_posting_id:
+    if payload["id"] != job_posting_id:
         raise JobPostingAnalysisValidationError(
             "The job analysis Agent response belongs to a different posting."
         )

@@ -340,10 +340,13 @@ different company with the same name.
 ### JD quick start on a new computer
 
 This sets up the local backend to call the **existing** Azure Agent named
-`job-analysis-agent`, fixed at **version `10`**. The extracted result keeps all **28 fields**
-from `app/schemas/job_posting_analysis_v10.json`. This repository contains the local output
-contract and client code; it does not create an Azure Agent or reproduce its full remote
-Instructions/model configuration in a new Azure project.
+`job-analysis-agent`, fixed at **version `13`**. The extracted result keeps all **28 fields**
+from `app/schemas/job_posting_analysis_v13.json`. Only `locations`, `role_overview`,
+`responsibilities`, `qualifications`, `job_conditions` and `compensation` retain nested
+structures and evidence. Other scalar fields are direct strings or `null`; `benefits` is a
+string or `null`, and `other_relevant_information` is a string array. This repository contains
+the local output contract and client code; it does not create an Azure Agent or reproduce
+its full remote Instructions/model configuration in a new Azure project.
 
 Use a Git checkout containing this feature. Live testing requires access to the existing
 Foundry project and to an already-populated Supabase `job_postings` table. For JD setup,
@@ -386,8 +389,8 @@ python -c "import os, unittest; os.environ.update(DATABASE_URL='postgresql+psyco
 ```
 
 Success ends with `OK`. The full suite includes the five JD test modules plus the existing
-backend tests; the latest local verification ran 215 tests. The count can grow as tests are
-added. Git metadata is needed for the repository configuration checks.
+backend tests. The reported test count can change as scenarios are added; use the command
+result for the current total. Git metadata is needed for repository configuration checks.
 
 #### 3. Configure access for a live test
 
@@ -396,9 +399,9 @@ Copy `.env.example` to `.env` if `.env` does not already exist. Edit these JD se
 | Setting | What to provide |
 |---|---|
 | `DATABASE_URL` | Existing shared Supabase PostgreSQL connection string, obtained privately |
-| `JOB_ANALYSIS_PROJECT_ENDPOINT` | Project endpoint supplied by the owner of the existing version 10 Agent; replace all placeholders |
+| `JOB_ANALYSIS_PROJECT_ENDPOINT` | Project endpoint supplied by the owner of the existing version 13 Agent; replace all placeholders |
 | `JOB_ANALYSIS_TIMEOUT_SECONDS` | `600`, unless the owner specifies another timeout |
-| `JOB_ANALYSIS_LOCAL_DIR` | `local_exports/job_analyses` for normal use; the acceptance command overrides this with a fresh folder |
+| `JOB_ANALYSIS_LOCAL_DIR` | Base directory, normally `local_exports/job_analyses`; the pipeline always adds `/v13` for its queue and results |
 | `JOB_ANALYSIS_ADMIN_TOKEN` | The one-off acceptance command generates its own temporary token; set a private token here when serving the API separately |
 
 The project endpoint has the form
@@ -432,15 +435,15 @@ list is empty, ask the database owner about available postings before continuing
 
 #### 5. Run one live acceptance request
 
-**This command sends one real analysis request to version 10 and consumes Azure model
+**This command sends one real analysis request to version 13 and consumes Azure model
 usage.** Supabase access stays read-only; analysis state and files are saved locally. Each
 run creates a fresh directory and therefore repeats the model request even for the same
 posting. It does not change the Agent definition or schema.
 
 Replace `PASTE_EXISTING_JOB_UUID_HERE` in the code below with the ID selected in step 4.
 For macOS/Linux, paste the complete command. For PowerShell, save just the Python content between `python - <<'PY'` and the final `PY`
-as `backend/local_tests/accept_jd_v10.py` (create `local_tests/` if needed), then run
-`python local_tests/accept_jd_v10.py` from `backend/`. That helper remains ignored by Git.
+as `backend/local_tests/accept_jd_v13.py` (create `local_tests/` if needed), then run
+`python local_tests/accept_jd_v13.py` from `backend/`. That helper remains ignored by Git.
 
 ```bash
 python - <<'PY'
@@ -457,7 +460,7 @@ if not (backend / "app" / "main.py").is_file():
     raise SystemExit("Run this command from backend/.")
 sys.path.insert(0, str(backend))
 
-folder = (backend / "local_exports" / f"acceptance_v10_{uuid4().hex[:8]}").resolve()
+folder = (backend / "local_exports" / f"acceptance_v13_{uuid4().hex[:8]}").resolve()
 folder.mkdir(parents=True)
 # Set overrides before the first app import/settings read. The .env file is unchanged.
 token = secrets.token_urlsafe(32)
@@ -483,7 +486,7 @@ try:
     from app.services.job_posting_analysis_agent import AGENT_VERSION
     from app.services.job_posting_analysis_pipeline import JobPostingNotFoundError
 
-    assert AGENT_VERSION == "10"
+    assert AGENT_VERSION == "13"
     pipeline = get_job_analysis_pipeline()
     try:
         posting = pipeline.get_posting(job_id)
@@ -495,7 +498,7 @@ try:
     )
     print("Company:", posting["company_name"], flush=True)
     print("Job:", posting["title"], flush=True)
-    print("Calling version 10; please wait...", flush=True)
+    print("Calling version 13; please wait...", flush=True)
 
     # TestClient runs the real FastAPI route in-process; uvicorn is not needed.
     with TestClient(app, raise_server_exceptions=False) as client:
@@ -518,10 +521,13 @@ try:
     if response.status_code != 200 or result.get("status") != "succeeded":
         raise SystemExit("Acceptance failed. Keep this directory for diagnosis.")
 
-    output = folder / "results" / f"{job_id}.json"
+    output = folder / "v13" / "results" / f"{job_id}.json"
     saved = json.loads(output.read_text(encoding="utf-8"))
     assert len(saved) == 28, "Expected 28 output fields."
-    assert saved["id"]["value"] == job_id, "Posting ID mismatch."
+    assert saved["id"] == job_id, "Posting ID mismatch."
+    assert saved["benefits"] is None or isinstance(saved["benefits"], str), (
+        "Expected benefits string or null."
+    )
     assert saved == result["structured_data"], "File/API result mismatch."
     print("Fields:", len(saved))
     print("Result:", output)
@@ -541,13 +547,13 @@ HTTP: 200
 Status: succeeded
 Error:
 Fields: 28
-Result: .../results/<job-id>.json
+Result: .../v13/results/<job-id>.json
 Acceptance: PASSED
 ```
 
 Keep `input.json` (the preflight JP), `response.txt` (the API response), and
-`results/<job-id>.json` in the printed directory for content/evidence review. A local
-`queue.sqlite3` also records status and safe errors. `succeeded` confirms that the current
+`v13/results/<job-id>.json` in the printed directory for content/evidence review. A local
+`v13/queue.sqlite3` also records status and safe errors. `succeeded` confirms that the current
 local checks passed; useful-information coverage and requirement meaning still need sample
 review. This is an in-process API test; testing a separately hosted HTTP server is a
 separate step.
@@ -565,7 +571,7 @@ The JD implementation follows the résumé feature's route/schema/Agent/pipeline
 |---|---|
 | `app/api/routes/job_postings.py` | HTTP submission, authorization and error responses |
 | `app/schemas/job_posting_analysis.py` | Request/response models and strict JSON/schema validation |
-| `app/schemas/job_posting_analysis_v10.json` | Unchanged 28-field version 10 output contract |
+| `app/schemas/job_posting_analysis_v13.json` | Active 28-field version 13 output contract; the v10 schema remains as a historical reference |
 | `app/services/job_posting_analysis_agent.py` | Fixed Agent invocation and local evidence/compensation checks |
 | `app/services/job_posting_analysis_pipeline.py` | Read-only JP source, orchestration and disabled future-save boundary |
 | `app/services/local_job_analysis_store.py` | Local queue/results, heartbeats and interruption recovery |
@@ -575,7 +581,7 @@ HTTP requests and the worker share the same pipeline and validation. The five JD
 modules cover Agent/validation, pipeline/source, store/recovery, HTTP and worker/CLI.
 
 The JD pipeline reads all 25 fields from an existing `job_postings` row, calls
-`job-analysis-agent` version `10`, validates the response, and saves its unchanged 28-field
+`job-analysis-agent` version `13`, validates the response, and saves its unchanged 28-field
 JSON locally. Each posting uses an independent Azure conversation with a default 600-second
 request timeout and no SDK retries. The request does not override the deployed Agent's
 instructions, model, reasoning or response format.
@@ -589,10 +595,10 @@ Configure these independent JD settings using the placeholders in `.env.example`
 
 | Setting | Purpose |
 |---|---|
-| `JOB_ANALYSIS_PROJECT_ENDPOINT` | Existing Foundry project hosting version 10 |
+| `JOB_ANALYSIS_PROJECT_ENDPOINT` | Existing Foundry project hosting version 13 |
 | `JOB_ANALYSIS_TIMEOUT_SECONDS` | Agent request timeout, default 600 |
 | `JOB_ANALYSIS_ADMIN_TOKEN` | Private server-only HTTP management token; blank disables submission |
-| `JOB_ANALYSIS_LOCAL_DIR` | Local queue/export directory; relative paths resolve from `backend/` |
+| `JOB_ANALYSIS_LOCAL_DIR` | Base directory; relative paths resolve from `backend/`, and the pipeline always adds `/v13` |
 
 Azure authentication uses the caller's identity. Never put the management token or database
 credentials in frontend code or `NEXT_PUBLIC_*` variables. Normal API requests and workers
@@ -600,13 +606,22 @@ make real Azure calls and consume model usage; automated tests inject a fake Age
 
 ### Local storage and future Supabase save interface
 
-The default directory is `backend/local_exports/job_analyses/`, ignored by Git:
+The default base directory is `backend/local_exports/job_analyses/`, ignored by Git.
+The pipeline always adds the version subdirectory, including when `JOB_ANALYSIS_LOCAL_DIR`
+points to an explicitly configured older directory:
 
 ```text
 job_analyses/
-  queue.sqlite3             # local queue, ownership, last result and safe errors
-  results/<job-id>.json      # complete 28-field JSON with evidence
+  v13/
+    queue.sqlite3           # v13 local queue, ownership, last result and safe errors
+    results/<job-id>.json    # complete 28-field JSON; evidence in six complex fields
 ```
+
+Existing v10 files and queues are retained without conversion or automatic reanalysis.
+Do not add `/v13` to the configured base yourself. A new v13 queue does not reuse earlier
+results or states, so starting a worker will discover all source jobs missing from this new
+queue and can trigger a full backfill. Stop older workers/API processes before switching;
+run offline tests first and start live processing only when ready.
 
 The queue survives restarts and permits one current attempt per posting. Failed refreshes
 retain the previous successful result. JSON writes use a temporary file and replacement;
@@ -627,7 +642,7 @@ table design is deferred; it must be reviewed separately before any remote write
 
 `POST /job-postings/{id}/analyze` requires `X-Job-Analysis-Token` matching the server token.
 It waits for analysis and returns `job_posting_id`, `status`, `structured_data`, `error_message`.
-The inner `structured_data` is the frozen contract in `app/schemas/job_posting_analysis_v10.json`.
+The inner `structured_data` is the frozen contract in `app/schemas/job_posting_analysis_v13.json`.
 Use a client timeout that accommodates the Agent timeout.
 
 - No body or `{}` reuses existing local results. `{"force": true}` explicitly retries finished work.
@@ -677,20 +692,20 @@ that loses ownership waits and rescans; `--once` returns failure. Other storage 
 A model response cannot be resumed midway: recovery repeats the whole JD analysis and may
 incur another Azure charge if the earlier request completed remotely.
 
-Use local storage on one machine with a correct clock. Before upgrading older local workers/API
-processes, stop them. Opening an old local queue adds only its lease column and gives legacy
-running rows a one-time 120-second grace period. This is local SQLite initialization, not a
+Use local storage on one machine with a correct clock. Stop older local workers/API processes
+before switching versions. Normal v13 configuration opens its own queue under `/v13`; it does
+not open or migrate the old v10 queue. SQLite queue initialization is local and is not a
 Supabase migration.
 
 ### Output validation and evaluation limits
 
 Before a new result is saved, local checks enforce:
 
-- Strict JSON, the frozen schema, posting identity, nonblank values, required evidence and
-  correct null/evidence handling.
+- Strict JSON, the v13 schema, direct posting identity, nonblank values and correct null
+  handling. Only the six complex fields require evidence; `benefits` must be a string or `null`.
 - Exact contiguous evidence excerpts from actual decoded source fields; numeric/boolean
   evidence must match its complete JSON scalar representation. No quote rewriting occurs.
-- Exact copies and full-field evidence for the 13 copied metadata fields; qualification
+- Exact direct copies for the 13 copied metadata fields, without evidence wrappers; qualification
   categories must be nonempty and unique.
 - Nonnegative monetary bounds in the correct order, nonblank optional compensation strings,
   and consistency between populated salary summaries and reported base-pay arrangements.
@@ -703,10 +718,11 @@ a separate copy of the original source snapshot, so input mutation cannot bypass
 
 These rules verify structure and provenance. They cannot prove that a paraphrase, requirement
 level, AND/OR logic, workplace classification, salary amount/period or completeness is correct.
-Separate sample review remains necessary. A single real Stripe posting passed the in-process
-API smoke test and core-content review; its qualification evidence omitted the headings that
-establish required/preferred levels. This does not validate salary/workplace branches or a
-separately deployed HTTP server. Real input/output files stay in ignored local exports.
+Direct fields without evidence are still required to be input-supported by the Agent contract;
+local validation does not prove their semantic support.
+Separate sample review remains necessary. Earlier v10 live acceptance results do not validate
+the new v13 format. The offline suite uses simulated Agent responses; any real v13 acceptance
+request is a separate, explicit step. Real input/output files stay in ignored local exports.
 
 Formal tests under `tests/` use synthetic inputs, fake Agents and temporary local databases.
 Personal scripts, virtual environments, historical future-table drafts and acceptance artifacts

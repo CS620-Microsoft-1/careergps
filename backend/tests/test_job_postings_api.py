@@ -106,6 +106,82 @@ class JobPostingsApiTests(unittest.TestCase):
         self.assertTrue(all(sql.lstrip().upper().startswith("SELECT") for sql in statements))
         self.assertTrue(all("job_postings_analyses" not in sql for sql in statements))
 
+    def test_http_returns_flat_v13_scalars_and_nullable_benefits_string(self) -> None:
+        def v13_result(posting):
+            data = analysis_fixture(posting["id"], posting=posting)
+            data["benefits"] = "Medical coverage.\n\nPaid leave if eligible."
+            return data
+
+        self.agent.behavior = v13_result
+        response = self.client.post(self.path, headers=ADMIN_HEADERS)
+        self.assertEqual(200, response.status_code)
+        data = response.json()["structured_data"]
+        self.assertEqual(str(self.job_id), data["id"])
+        self.assertEqual("Example", data["company_name"])
+        self.assertEqual("Medical coverage.\n\nPaid leave if eligible.", data["benefits"])
+        self.assertEqual(data, json.loads(self.exported().read_text()))
+        self.assertEqual(28, len(data))
+
+    def test_http_rejects_old_benefits_array_without_export(self) -> None:
+        def old_result(posting):
+            data = analysis_fixture(posting["id"], posting=posting)
+            data["benefits"] = []
+            return data
+
+        self.agent.behavior = old_result
+        response = self.client.post(self.path, headers=ADMIN_HEADERS)
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("failed", response.json()["status"])
+        self.assertIsNone(response.json()["structured_data"])
+        self.assertFalse(self.exported().exists())
+
+    def test_factory_isolates_v13_from_old_cache_for_absolute_and_relative_roots(self) -> None:
+        # Old cache layouts are deliberately populated with incompatible v10 data.
+        # The runtime factory must append the version even when .env sets a root.
+        for relative in (False, True):
+            with self.subTest(relative=relative):
+                sandbox = Path(self.temporary.name) / ("relative" if relative else "absolute")
+                configured_root = Path("legacy_results") if relative else sandbox / "legacy_results"
+                actual_root = sandbox / configured_root if relative else configured_root
+                legacy_stores = [LocalJobAnalysisStore(actual_root), LocalJobAnalysisStore(actual_root / "v10")]
+                legacy_payload = {"id": {"value": str(self.job_id), "evidence": []}, "benefits": []}
+                old_bytes = {}
+                for legacy in legacy_stores:
+                    legacy.enqueue(str(self.job_id))
+                    attempt = legacy.claim(str(self.job_id))
+                    legacy.finish(str(self.job_id), attempt, data=legacy_payload)
+                    # A second old queue row must not be picked up by v13 either.
+                    legacy.enqueue(str(uuid.uuid4()))
+                    for path in (legacy.database_path, legacy.results_directory / f"{self.job_id}.json"):
+                        old_bytes[path] = path.read_bytes()
+                settings = SimpleNamespace(
+                    job_analysis_project_endpoint="https://example.test/project",
+                    job_analysis_timeout_seconds=600.0,
+                    job_analysis_local_dir=configured_root,
+                )
+                fake = FakeAgent()
+                with (
+                    patch("app.api.deps.get_settings", return_value=settings),
+                    patch("app.api.deps.BACKEND_ROOT", sandbox),
+                    patch("app.api.deps.SessionLocal", self.session_factory),
+                    patch("app.api.deps.FoundryJobPostingAnalysisService", return_value=fake),
+                ):
+                    pipeline = get_job_analysis_pipeline()
+                    self.assertEqual(actual_root / "v13", pipeline.store.directory)
+                    self.assertIsNone(pipeline.get_analysis(self.job_id))
+                    self.assertEqual(1, pipeline.enqueue_missing())
+                    result = pipeline.process_next()
+                    self.assertEqual("succeeded", result["status"])
+                    self.assertEqual(str(self.job_id), result["structured_data"]["id"])
+                    self.assertEqual(28, len(result["structured_data"]))
+                    self.assertIsNone(result["structured_data"]["benefits"])
+                    self.assertIsNone(pipeline.process_next())
+                    restarted = get_job_analysis_pipeline()
+                    self.assertEqual(result, restarted.analyze(self.job_id))
+                    self.assertEqual(1, len(fake.calls))
+                    self.assertEqual(0, restarted.enqueue_missing())
+                self.assertTrue(all(path.read_bytes() == content for path, content in old_bytes.items()))
+
     def test_router_exposes_only_one_post_and_no_previous_get_endpoints(self) -> None:
         routes = [route for route in router.routes if getattr(route, "path", "").startswith("/job-postings/")]
         self.assertEqual(1, len(routes))
