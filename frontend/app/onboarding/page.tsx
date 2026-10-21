@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
 import { OnboardingForm } from "@/components/auth/onboarding-form";
+import { SignOutLink } from "@/components/auth/sign-out-link";
 import { getGraduationYears } from "@/lib/graduation-years";
 
 export const metadata: Metadata = { title: "Your career goal" };
@@ -15,6 +16,7 @@ export default async function OnboardingPage() {
     >
       <AuthHeading title="Your career goal" subtitle="You can change this anytime." />
       <OnboardingForm graduationYears={await getGraduationYears()} />
+      <SignOutLink />
     </AuthShell>
   );
 }
