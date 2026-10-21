@@ -48,6 +48,15 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-011 | Client changes a user ID in the request | Backend authorization rejects cross-user access | NOT RUN |
 | DB-012 | Limited application database role connects | Required operations work without administrator privileges | BLOCKED — role not created |
 | DB-013 | Secret scan and Git status | `.env` and credentials are absent from tracked files | PASS |
+| DB-014 | Alembic after applying `02a858fed0df` (users + résumé tables) | `alembic current` shows `02a858fed0df (head)`; `alembic check` reports no new operations | NOT RUN — not applied yet |
+| DB-015 | Inspect RLS on `resumes`, `resume_experiences`, `resume_educations`, `resume_projects`, `resume_achievements`, `resume_skills` | RLS is enabled on all six | NOT RUN |
+| DB-016 | Insert a `users` row whose `id` is not in `auth.users` | Rejected by `users_id_fkey` | NOT RUN |
+| DB-017 | Delete a test user that has résumés | Their résumés and all child rows are deleted (cascade) | NOT RUN |
+| DB-018 | Delete a user's active résumé | `users.active_resume_id` becomes NULL; the user row remains | NOT RUN |
+| DB-019 | Set `users.active_resume_id` to another user's résumé | Rejected by `fk_users_active_resume` | NOT RUN |
+| DB-020 | Insert a child row whose `user_id` differs from its résumé's owner | Rejected by the `(resume_id, user_id)` foreign key | NOT RUN |
+| DB-021 | Insert the same skill twice from the same source (e.g. listed) | Second insert rejected by `uq_resume_skills_evidence` (NULLs count as equal) | NOT RUN |
+| DB-022 | Insert a skill whose source link doesn't match `source` (e.g. `project` without `source_project_id`) | Rejected by `ck_resume_skills_source_link` | NOT RUN |
 
 ## Baseline automation
 
@@ -56,15 +65,17 @@ The workflow at `.github/workflows/backend-baseline-tests.yml` runs on:
 - Pushes to `test/database-rls` that change backend, test-document, or workflow files.
 - Every pull request targeting `dev`, including frontend-only pull requests, so the required `baseline` status check is always created.
 
-It performs seven checks without loading the real `.env` file or connecting to the shared database:
+The configuration tests in `tests/test_baseline_configuration.py` check, without loading the real `.env` file or connecting to the shared database:
 
 1. `.env` and `.venv` paths are ignored by Git.
 2. Sensitive environment files and virtual environments are not tracked.
 3. `.env.example` contains placeholders rather than real credentials.
 4. Required backend dependencies are declared.
 5. Alembic has exactly one migration head.
-6. The `User` model has the expected table, columns, and email constraints.
-7. A committed migration enables RLS on `users`.
+6. The `User` model has the expected table, columns, and `primary_email` constraints, and no Python-generated id.
+7. The six résumé tables are registered and carry their owner columns.
+8. Committed migrations enable RLS on `users`, `job_postings`, `ingest_runs`, and the six résumé tables.
+9. A committed migration links `users.id` to Supabase Auth (`auth.users`).
 
 These checks validate repository configuration only. They do not prove that the remote database is reachable or that future user-level RLS policies correctly isolate data.
 
@@ -92,7 +103,7 @@ Never paste `DATABASE_URL` into this document, Git commits, pull requests, issue
 Before DB-005 through DB-011 can be completed, the project needs:
 
 1. A confirmed authentication provider and user identity model.
-2. A reliable relationship between `public.users.id` and the authenticated identity, such as Supabase Auth `auth.users.id`.
+2. A reliable relationship between `public.users.id` and the authenticated identity, such as Supabase Auth `auth.users.id`. Migration `02a858fed0df` adds this foreign key.
 3. Explicit RLS policies for each required operation: `SELECT`, `INSERT`, `UPDATE`, and `DELETE`.
 4. At least two isolated test users with synthetic data.
 5. A non-administrator client or application role that does not bypass RLS.
@@ -144,3 +155,11 @@ When a database-related PR changes the schema or security model:
 - Updated the workflow badge to report the protected `dev` branch.
 - Ran all seven baseline configuration tests locally; all passed.
 - Did not connect to or modify the shared Supabase database.
+
+### 2026-10-20 — Users and résumé tables migration prepared
+
+- Branch `feat/resume-storage-schema` from `dev` (`b4cf5e8`).
+- Added migration `02a858fed0df`: extends `users` (rename `email` → `primary_email`, onboarding and résumé contact columns, `active_resume_id`, foreign key to `auth.users`) and creates six résumé tables with RLS enabled.
+- Confirmed `public.users` contains 0 rows before writing NOT NULL columns without defaults.
+- Reviewed the upgrade and downgrade SQL with `alembic upgrade --sql` / `alembic downgrade --sql`. The migration was not applied; the shared database stays at `6ef2e4581bd9` until the PR is merged.
+- Added DB-014 to DB-022 (NOT RUN) and updated the baseline tests; all 46 backend tests pass locally.

@@ -253,7 +253,8 @@ app/
 ├── models/
 │   ├── __init__.py          # import every model here so Alembic can see it
 │   ├── job_posting.py       # job_postings + ingest_runs
-│   └── user.py
+│   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
+│   └── user.py              # users (id = the Supabase Auth account id)
 ├── schemas/
 │   └── market.py            # NormalizedPosting, MarketProfile
 └── services/
@@ -728,6 +729,19 @@ Formal tests under `tests/` use synthetic inputs, fake Agents and temporary loca
 Personal scripts, virtual environments, historical future-table drafts and acceptance artifacts
 remain ignored local files; the unrelated existing resume tests are unchanged.
 
+## Users and résumé tables
+
+- `users.id` is the student's Supabase Auth id (`auth.users.id`). Supabase keeps the password; the
+  `users` row holds the onboarding answers and is created when onboarding is confirmed.
+- Only résumés the student confirmed ("Looks right") are stored. Unverified Agent output and the
+  extracted text are never saved.
+- `resumes.confirmed_data` keeps all 13 sections as confirmed and is the source of truth. The child
+  tables (`resume_experiences`, `resume_educations`, `resume_projects`, `resume_achievements`,
+  `resume_skills`) hold the parts the agents query and are rebuilt from it whenever a résumé is edited.
+- A student keeps every version; `users.active_resume_id` points to the one the agents use.
+- The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
+  autogenerate from proposing to drop it.
+
 ## Changing the schema
 
 1. Edit or add a model in `app/models/` (and import new models in `app/models/__init__.py`).
@@ -738,14 +752,14 @@ remain ignored local files; the unrelated existing resume tests are unchanged.
 3. **Review the generated file.** Autogenerate treats a rename as drop + add (data loss) and ignores RLS, triggers and functions; add those by hand.
 4. Preview the SQL without touching the database: `alembic upgrade head --sql`
 5. Open a PR. The migration is reviewed like any other code.
-6. **After merge**, the migration owner runs `alembic upgrade head` from `main`.
+6. **After the PR is merged into `dev`**, the database owner (currently Abanish) runs `alembic upgrade head` from an up-to-date `dev`, then `alembic current` to confirm. Nobody else applies migrations to the shared database.
 
 ## Shared database rules
 
 1. **Schema changes only go through Alembic.** Never create or alter tables in the Supabase dashboard. Viewing and editing rows there is fine.
 2. **Never edit a migration that has been applied.** Write a new one.
-3. **Only apply migrations from `main`, after merge, by one person.** Announce it in the team chat.
-4. **No `alembic downgrade` on the shared database** without telling the team first. It can drop tables and their data.
+3. **Only the database owner (currently Abanish) applies migrations**, from `dev`, after the PR is merged. Never run `alembic upgrade head` on the shared database yourself, not even from a feature branch to test; ask the database owner instead. The owner announces it in the team chat when it's done.
+4. **No `alembic downgrade` on the shared database** except by the database owner, after telling the team. It can drop tables and their data.
 5. **No real personal data** until authentication is in place. Use fake test users.
 6. **Enable RLS on every new table** in its migration (`ALTER TABLE <name> ENABLE ROW LEVEL SECURITY`). The Supabase Data API is disabled; RLS is a second layer of protection.
 7. **If `.env` leaks**, reset the database password in Supabase (Project Settings → Database) and share the new URL privately.
