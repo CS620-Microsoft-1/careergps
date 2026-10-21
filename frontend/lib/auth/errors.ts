@@ -13,8 +13,9 @@ const MESSAGES: Partial<Record<string, string>> = {
   over_email_send_rate_limit: "Too many emails sent. Try again in an hour.",
   over_request_rate_limit: "Too many attempts. Wait a few minutes and try again.",
   signup_disabled: "Sign-up is closed right now.",
-  flow_state_expired: "This link has expired or was already used. Try signing in.",
-  otp_expired: "This link has expired or was already used. Try signing in.",
+  // University mail scanners often open the link first and confirm the email, so signing in usually works.
+  flow_state_expired: "This link was already used. Your email may already be confirmed. Try signing in.",
+  otp_expired: "This link was already used or has expired. Your email may already be confirmed. Try signing in.",
 };
 
 /** A message for a Supabase error code, e.g. the error_code a confirmation link comes back with. */
