@@ -1,67 +1,78 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle, Loader2, MailCheck } from "lucide-react";
 
 import { EmptyState } from "@/components/common/empty-state";
 import { Button } from "@/components/ui/button";
 import { errorMessage } from "@/lib/api/client";
 import { homeFor } from "@/lib/auth/account";
-import { authCodeMessage } from "@/lib/auth/errors";
+import { readConfirmLink, type TokenType } from "@/lib/auth/confirm-link";
+import { authCodeMessage, authErrorMessage } from "@/lib/auth/errors";
 import { getSupabase } from "@/lib/supabase/client";
 
+type Progress = { step: "confirming" } | { step: "failed"; message: string } | null;
+
+// The link never changes while the page is open, so there is nothing to subscribe to. On the server
+// (prerender) there is no URL yet: null shows the spinner until the browser reads it.
+const subscribe = () => () => {};
+const readUrl = () => window.location.search + window.location.hash;
+const noUrl = () => null;
+
 /**
- * Where the email confirmation link lands. Supabase has already confirmed the email by now;
- * this turns the link's code into a session and moves on to onboarding (or the dashboard, for an
- * account that has already finished it).
+ * Where the email confirmation link lands (?token_hash=, from docs/supabase/confirm-signup.html).
+ * The email is confirmed only when the student presses the button: mail scanners (such as
+ * Microsoft 365 Safe Links on wisc.edu) open every link to check it, and the token is single-use,
+ * so confirming on page load would let the scanner use it up first. Then on to onboarding.
  */
 export function ConfirmEmail() {
   const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
+  const url = useSyncExternalStore(subscribe, readUrl, noUrl);
+  const [progress, setProgress] = useState<Progress>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function confirm() {
-      // Supabase reports a bad or expired link in the URL instead of a code.
-      const params = new URLSearchParams(window.location.search + window.location.hash.replace("#", "&"));
-      if (params.has("error_code")) return setError(authCodeMessage(params.get("error_code")));
-
-      // The client exchanges ?code= for a session while it initializes. That needs the
-      // browser the user signed up in; anywhere else there is no session, only a confirmed email.
-      const supabase = getSupabase();
-      await supabase.auth.initialize();
-      const { data } = await supabase.auth.getUser();
-      if (cancelled) return;
-      if (!data.user) {
-        return setError("Your email is confirmed. Sign in to continue.");
-      }
-
-      try {
-        const home = await homeFor(null);
-        if (!cancelled) router.replace(home);
-      } catch (accountError) {
-        if (!cancelled) setError(errorMessage(accountError));
-      }
+  async function confirm(tokenHash: string, type: TokenType) {
+    setProgress({ step: "confirming" });
+    const { error } = await getSupabase().auth.verifyOtp({ token_hash: tokenHash, type });
+    if (error) return setProgress({ step: "failed", message: authErrorMessage(error) });
+    try {
+      router.replace(await homeFor(null));
+    } catch (accountError) {
+      setProgress({ step: "failed", message: errorMessage(accountError) });
     }
+  }
 
-    confirm();
-    return () => {
-      cancelled = true;
-    };
-  }, [router]);
+  const hashAt = url?.indexOf("#") ?? -1;
+  const link =
+    url === null ? null : hashAt < 0 ? readConfirmLink(url, "") : readConfirmLink(url.slice(0, hashAt), url.slice(hashAt));
+  const failure =
+    progress?.step === "failed" ? progress.message : link?.kind === "error" ? authCodeMessage(link.code) : null;
 
-  if (error) {
+  if (failure) {
     return (
       <EmptyState
         icon={AlertTriangle}
         title="We couldn't finish signing you in"
-        description={error}
+        description={failure}
         action={
           <Button asChild>
             <Link href="/login">Go to Sign In</Link>
+          </Button>
+        }
+      />
+    );
+  }
+
+  if (link?.kind === "token" && progress === null) {
+    return (
+      <EmptyState
+        icon={MailCheck}
+        title="Confirm your email"
+        description="Press the button to confirm your email and continue to CareerGPS."
+        action={
+          <Button size="lg" onClick={() => confirm(link.tokenHash, link.type)}>
+            Confirm my email
           </Button>
         }
       />

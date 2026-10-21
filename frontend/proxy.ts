@@ -28,9 +28,9 @@ const startsWithAny = (path: string, prefixes: string[]) =>
 export async function proxy(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
 
-  // The email confirmation link lands on the Site URL (/) when /auth/confirm isn't an
-  // allowed redirect URL in Supabase. Pass its code on to /auth/confirm.
-  if (pathname === "/" && searchParams.has("code")) {
+  // A confirmation link that lands on / (e.g. a template without the /auth/confirm path):
+  // pass its token_hash on to /auth/confirm.
+  if (pathname === "/" && searchParams.has("token_hash")) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/confirm";
     return NextResponse.redirect(url);

@@ -63,7 +63,7 @@ A new student can create an account with email and password, confirm their email
 /signup ──supabase.auth.signUp()──▶ Supabase Auth creates the account and emails a confirmation link
    │                                  (terms consent saved in user_metadata)
    │
-confirmation link ──▶ /auth/confirm ──▶ session created
+confirmation link ──▶ /auth/confirm ──"Confirm my email"──▶ verifyOtp: email confirmed, session created
    ▼
 /onboarding ──POST /resumes/analyze──▶ classification to review
             ──POST /me (Bearer JWT)──▶ users row + first résumé created (terms consent from user_metadata)
@@ -114,7 +114,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 **Frontend**
 - Uses `@supabase/supabase-js` with `@supabase/ssr`, so the Supabase session lives in cookies that Next.js can read (route guard, §7).
 - Sign-up: `supabase.auth.signUp({ email, password, options: { data: { accept_terms: true }, emailRedirectTo: <site>/auth/confirm } })`. No session is returned until the email is confirmed; the page says "Check your email".
-- `/auth/confirm` (new Next.js route) exchanges the link's token for a session, then calls `POST /me` with the terms consent from `user_metadata` and sends the user to `/onboarding`. The backend validates it like any other input. Login: `signInWithPassword`. Logout: `signOut`. **[DECIDED]** No "Remember me" checkbox: Supabase keeps users logged in until they log out, so the checkbox would do nothing.
+- `/auth/confirm` (Next.js route): the confirmation email (`docs/supabase/confirm-signup.html`) links here with `?token_hash=`, and the page confirms only when the student presses **Confirm my email** (`supabase.auth.verifyOtp`), which also creates the session. University mail scanners (Microsoft 365 Safe Links on wisc.edu) open every link to check it, and the token is single-use, so confirming on page load would let the scanner use it up first. Links without a token (e.g. Supabase's default template, which must not be used) and used or expired links say the email may already be confirmed and offer sign-in. Then the user goes to `/onboarding`, which creates the account (`POST /me`). Login: `signInWithPassword`. Logout: `signOut`. **[DECIDED]** No "Remember me" checkbox: Supabase keeps users logged in until they log out, so the checkbox would do nothing.
 - Calls to FastAPI go through `frontend/lib/api/client.ts` (PR #9), which adds `Authorization: Bearer <access_token>` from the current session. No cross-site cookies are sent to FastAPI, so `credentials: "include"` is not needed.
 - New env vars: `NEXT_PUBLIC_SUPABASE_URL` and the project's publishable (anon) key. These are designed to be public; the service-role/secret key never goes to the frontend.
 
@@ -136,7 +136,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 
 **[DECIDED] Email confirmation is on in P0.** P0 is used for testing only, so Supabase's built-in email sender is enough. Limits to know:
 - The built-in sender is meant for testing: it has a low hourly limit, and may only deliver to the project's team members' addresses. Testers sign up with their own (team) emails; to check the current limits, see Supabase's Auth → Emails docs.
-- The confirmation link needs the right Site URL and redirect URL (`http://localhost:3000/auth/confirm` for local work) in Supabase Auth → URL Configuration.
+- The confirmation link needs the right Site URL (`http://localhost:3000` for local work) and redirect URL (`http://localhost:3000/auth/confirm`) in Supabase Auth → URL Configuration, and the "Confirm signup" template from `docs/supabase/confirm-signup.html`.
 - Real users (P1) need custom SMTP (P1-2).
 
 ## 7. Frontend changes

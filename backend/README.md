@@ -316,6 +316,7 @@ Supabase Auth settings (dashboard, not migrations; record any change here):
 | Token verifications | 30 requests / 5 min per IP |
 | Token refreshes | 150 requests / 5 min per IP |
 | Emails | 2 / hour for the whole project (built-in sender; only delivers to members of the Supabase organization). Create test users in Authentication → Users with auto-confirm instead of signing up |
+| "Confirm signup" template | Should be `docs/supabase/confirm-signup.html` (a button page, so mail scanners can't use up the link). Required: with the default template, the confirmation link only shows "Try signing in" |
 
 - `Depends(get_current_user)`: the Supabase account (id, email). Use for endpoints onboarding calls before the `users` row exists (`POST /me`, `GET /me`, `POST /resumes/analyze`).
 - `Depends(get_current_db_user)`: also requires the `users` row; **403** until onboarding is finished.
