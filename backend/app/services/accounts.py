@@ -55,7 +55,8 @@ def contact_details(classification: ResumeClassification) -> dict:
     personal = classification.personal_information
     return {
         "full_name": _fit_text(personal.name, "full_name"),
-        "resume_emails": list(dict.fromkeys(personal.emails)),
+        # Emails are case-insensitive: A@x.com and a@x.com are the same address.
+        "resume_emails": list(dict.fromkeys(e.strip().lower() for e in personal.emails if e.strip())),
         "phones": list(dict.fromkeys(p.strip() for p in personal.phones if p.strip())),
         "current_location": _fit_text(personal.location, "current_location"),
         "linkedin_url": _fit_url(personal.linkedin, "linkedin_url"),

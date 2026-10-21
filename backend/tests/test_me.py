@@ -172,6 +172,13 @@ class NameAndContactRulesTests(unittest.TestCase):
         self.assertIsNone(contacts["linkedin_url"])  # a cut URL wouldn't work, so it's dropped
         self.assertEqual("https://github.com/ada", contacts["github_url"])
 
+    def test_resume_emails_are_lowercased_and_deduplicated(self) -> None:
+        data = ResumeClassification.model_validate(
+            classification(emails=["Ada@Example.com", "ada@example.com ", "", "grace@example.com"])
+        )
+
+        self.assertEqual(["ada@example.com", "grace@example.com"], accounts.contact_details(data)["resume_emails"])
+
     def test_new_resume_records_how_it_was_read(self) -> None:
         resume = accounts.new_resume(uuid.uuid4(), ResumeSubmit.model_validate(resume_body(original_filename="CV.DOCX")))
 
