@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getMe } from "@/lib/api/me";
 import { PLACEHOLDER_USER } from "@/lib/placeholder-user";
 import { getSupabase } from "@/lib/supabase/client";
 
@@ -29,16 +30,25 @@ export function UserMenu() {
     let cancelled = false;
     getSupabase()
       .auth.getUser()
-      .then(({ data }) => {
+      .then(async ({ data }) => {
         if (cancelled || !data.user) return;
         const address = data.user.email ?? "";
-        // Sign-up asks only for email and password, so the email stands in for a name.
+        // Until onboarding saves a name (or if the API is down), the email stands in for it.
         setUser({
           name: address.split("@")[0] || PLACEHOLDER_USER.name,
           initials: address[0]?.toUpperCase() || PLACEHOLDER_USER.initials,
           detail: address.split("@")[1] ?? "",
         });
         setEmail(address || null);
+
+        const me = await getMe().catch(() => null);
+        if (cancelled || !me?.user) return;
+        const { first_name, last_name } = me.user;
+        setUser((current) => ({
+          ...current,
+          name: first_name,
+          initials: `${first_name[0] ?? ""}${last_name[0] ?? ""}`.toUpperCase() || current.initials,
+        }));
       });
     return () => {
       cancelled = true;
