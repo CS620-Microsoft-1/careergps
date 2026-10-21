@@ -290,7 +290,7 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 | `/health/db` | `{"status": "ok", "database": "connected"}`, or **503** if the database is unreachable |
 | `POST /me` | Finish onboarding: creates the `users` row and the first confirmed résumé (made active). **403** until the email is confirmed, **409** if it exists |
 | `GET /me` | `{user}` for the logged-in account; `null` until onboarding is finished. Syncs `primary_email` with the token |
-| `PATCH /me` | Change the name (`first_name`, `last_name`) or goal (`target_role`, `experience_level`, `graduation_year`, `preferred_location`). **403** until onboarding is finished |
+| `PATCH /me` | Change the name (`first_name`, `last_name`), `university` or goal (`target_role`, `experience_level`, `graduation_year`, `preferred_location`). **403** until onboarding is finished |
 | `GET /me/resume` | The active résumé (`original_filename`, `file_type`, `classification`). **404** if none |
 | `POST /me/resumes` | Save a newer confirmed résumé; it becomes active and fills empty contact fields on `users`. Earlier versions are kept
 | `/docs` | Interactive API docs (Swagger UI), generated from the code |

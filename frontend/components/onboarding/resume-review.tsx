@@ -28,6 +28,9 @@ type ResumeReviewProps = {
   confirming?: boolean;
   /** Why saving failed, shown above the buttons. */
   confirmError?: string;
+  /** The student's university, pre-filled from the résumé; they confirm or change it here. */
+  university: string;
+  onUniversityChange: (university: string) => void;
 };
 
 type StringListKey = "research_interests" | "technical_skills";
@@ -214,6 +217,8 @@ export function ResumeReview({
   onConfirm,
   confirming = false,
   confirmError,
+  university,
+  onUniversityChange,
 }: ResumeReviewProps) {
   const updatePersonal = (field: string, value: string | string[]) => {
     onChange({
@@ -277,6 +282,21 @@ export function ResumeReview({
           continue, the result is saved to your account and shown on your profile.
         </p>
       </div>
+
+      <Field className="max-w-100">
+        <FieldLabel htmlFor="university">University</FieldLabel>
+        <Input
+          id="university"
+          value={university}
+          onChange={(event) => onUniversityChange(event.target.value)}
+          maxLength={150}
+          autoComplete="organization"
+          aria-describedby="university-hint"
+        />
+        <p id="university-hint" className="text-xs text-muted-foreground">
+          From your résumé. Change it if this isn&apos;t the school you attend now.
+        </p>
+      </Field>
 
       <Card size="sm">
         <CardHeader>

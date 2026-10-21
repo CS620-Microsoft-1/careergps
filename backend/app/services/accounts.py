@@ -1,6 +1,6 @@
 """Creating and updating a student's account (users row) and their confirmed résumés.
 
-The rules that don't need the database (contact details, university, file type) are plain functions so
+The rules that don't need the database (contact details, file type) are plain functions so
 they can be tested without one. AccountService holds the database part.
 """
 import logging
@@ -11,7 +11,6 @@ from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.core.options import DEFAULT_UNIVERSITY
 from app.core.security import AuthenticatedUser
 from app.models import Resume, User
 from app.schemas.me import AccountCreate, AccountUpdate, ResumeSubmit
@@ -32,6 +31,7 @@ class AccountAlreadyExistsError(Exception):
 
 class EmailNotConfirmedError(Exception):
     """The Supabase account hasn't confirmed its email yet."""
+
 
 
 def _column_length(column: str) -> int:
@@ -72,15 +72,6 @@ def fill_empty_contacts(user: User, classification: ResumeClassification) -> Non
             setattr(user, field, value)
 
 
-def university_from(classification: ResumeClassification) -> str:
-    """The first school listed in the résumé's education; DEFAULT_UNIVERSITY if there is none."""
-    for entry in classification.education:
-        name = (entry.institution or "").strip()
-        if name:
-            return name[:150]
-    return DEFAULT_UNIVERSITY
-
-
 def new_user(auth_user: AuthenticatedUser, data: AccountCreate) -> User:
     user = User(
         id=auth_user.id,
@@ -90,7 +81,7 @@ def new_user(auth_user: AuthenticatedUser, data: AccountCreate) -> User:
         target_role=data.target_role,
         experience_level=data.experience_level,
         graduation_year=data.graduation_year,
-        university=university_from(data.resume.classification),
+        university=data.university,
         preferred_location=data.preferred_location,
         terms_accepted_at=datetime.now(UTC),
         **{field: value for field, value in contact_details(data.resume.classification).items()},

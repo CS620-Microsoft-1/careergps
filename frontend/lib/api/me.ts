@@ -3,7 +3,7 @@ import type {
   AccountCreateRequest,
   Goals,
   MeResponse,
-  Names,
+  PersonalDetails,
   ResumeSubmitRequest,
   SavedResume,
   User,
@@ -21,8 +21,8 @@ export function createAccount(body: AccountCreateRequest) {
   return apiPost<MeResponse>("/me", { json: body });
 }
 
-/** Change the name or career goal; only the fields sent change. */
-export function updateAccount(body: Partial<Goals & Names>) {
+/** Change the name, university or career goal; only the fields sent change. */
+export function updateAccount(body: Partial<Goals & PersonalDetails>) {
   return apiPatch<User>("/me", { json: body });
 }
 

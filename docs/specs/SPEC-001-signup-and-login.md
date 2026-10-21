@@ -37,9 +37,9 @@ A new student can create an account with email and password, confirm their email
 |---|---|---|
 | P0-1 | Sign up with **email** + password, using **Supabase Auth**, with **email confirmation on** (§6) | Decided |
 | P0-2 | Log in, log out, session via Supabase Auth; FastAPI verifies the Supabase JWT (§6) | Decided |
-| P0-3 | Create the `users` row and the first `resumes` row when onboarding is confirmed (`POST /me`, records the terms consent). Names and the university come from the résumé (the first school in its education, else `DEFAULT_UNIVERSITY`) | Decided |
+| P0-3 | Create the `users` row and the first `resumes` row when onboarding is confirmed (`POST /me`, records the terms consent). Name and university are confirmed in onboarding (the university is pre-filled from the résumé) | Decided |
 | P0-4 | Route guard: not logged in → `/login` | Decided |
-| P0-5 | Sign-up asks only for **email, password (typed twice) and the terms checkbox**. Name and career goal (target role, graduation year, experience level) are asked in onboarding; the university comes from the résumé | Decided |
+| P0-5 | Sign-up asks only for **email, password (typed twice) and the terms checkbox**. Name and career goal (target role, graduation year, experience level) are asked in onboarding; the university is pre-filled from the résumé on the review page | Decided |
 | P0-6 | Rate limit sign-up and login (Supabase Auth's built-in limits, configured in the dashboard) | Decided |
 | P0-7 | Security checklist (§8) and tests (§9) | Decided |
 
@@ -89,7 +89,7 @@ The tables are defined by PR #17 (migration `02a858fed0df`; see `backend/README.
 | `users.first_name`, `last_name` | Typed in onboarding (both required, ≤ 100 chars); changeable with `PATCH /me`. |
 | `users.full_name` | The name as written on the résumé, if any; may differ from first + last. |
 | `users.target_role`, `experience_level`, `graduation_year`, `preferred_location` | Asked in onboarding. `graduation_year` is 2000 … current year + 4. |
-| `users.university` | The first school in the résumé's education; `DEFAULT_UNIVERSITY` (`backend/app/core/options.py`) if it lists none. Not changed by later résumés. |
+| `users.university` | Confirmed on the review page: pre-filled with the first school in the résumé's education (else the account's current one, else University of Wisconsin–Madison). Changeable with `PATCH /me`. |
 | `users.terms_accepted_at` | When onboarding is confirmed, from the consent saved in `user_metadata` at sign-up. |
 | `resumes` | One row per confirmed résumé (`confirmed_data` = the reviewed classification, `schema_version` `"1"`); `users.active_resume_id` is the newest. The child tables (`resume_experiences`, …) are not filled yet. |
 
@@ -101,9 +101,9 @@ Sign-up, login and logout are not FastAPI endpoints: the frontend calls Supabase
 
 | Method & path | Body | Success | Errors |
 |---|---|---|---|
-| `POST /me` | accept_terms, first_name, last_name, target_role, experience_level, graduation_year, preferred_location, resume (original_filename, parser, ocr_pages, agent_name, classification). The email comes from the token | `201` `{user}`; creates the `users` row and its first, active résumé | `401`, `403` email not confirmed, `409` already created, `422` |
+| `POST /me` | accept_terms, first_name, last_name, university, target_role, experience_level, graduation_year, preferred_location, resume (original_filename, parser, ocr_pages, agent_name, classification). The email comes from the token | `201` `{user}`; creates the `users` row and its first, active résumé | `401`, `403` email not confirmed, `409` already created, `422` |
 | `GET /me` | — | `{user}`; `null` until onboarding is finished | `401` |
-| `PATCH /me` | any of first_name, last_name, target_role, experience_level, graduation_year, preferred_location | `200` user | `401`, `403` onboarding not finished, `422` |
+| `PATCH /me` | any of first_name, last_name, university, target_role, experience_level, graduation_year, preferred_location | `200` user | `401`, `403` onboarding not finished, `422` |
 | `GET /me/resume` | — | `200` the active résumé `{id, original_filename, file_type, classification, created_at}` | `401`, `403`, `404` none |
 | `POST /me/resumes` | as `resume` above | `201`; becomes the active résumé; empty contact fields on `users` are filled from it | `401`, `403`, `422` |
 
@@ -146,7 +146,7 @@ Backend validation mirrors `frontend/lib/validation/auth.ts`; the frontend check
 3. Route guard (`proxy.ts`): no Supabase session → `/login`. After login or confirmation, a user without a `users` row goes to `/onboarding`, which creates it (`POST /me`). The onboarding check is P2-2.
 4. API types come from FastAPI's `/openapi.json` (ADR-002), not written by hand.
 
-**[DECIDED] Sign-up asks only for email and password** (typed twice, checked in the browser, plus the terms checkbox; changed 2026-10-20, it had no confirmation field before). First and last name, target role, graduation year and experience level are asked in onboarding, which already has these fields on `dev` (PR #11); saving them (frontend and API) is owned by onboarding. `backend/app/core/options.py` keeps the allowed values for that.
+**[DECIDED] Sign-up asks only for email and password** (typed twice, checked in the browser, plus the terms checkbox; changed 2026-10-20, it had no confirmation field before). First and last name, university, target role, graduation year and experience level are asked in onboarding, which already has these fields on `dev` (PR #11); saving them (frontend and API) is owned by onboarding. `backend/app/core/options.py` keeps the allowed values for that.
 
 ## 8. Security and privacy checklist
 

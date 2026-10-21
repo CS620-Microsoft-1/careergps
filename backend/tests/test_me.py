@@ -18,7 +18,6 @@ from fastapi.testclient import TestClient
 
 from app.api import deps
 from app.core.config import Settings
-from app.core.options import DEFAULT_UNIVERSITY
 from app.core.security import AuthenticatedUser, SupabaseTokenVerifier
 from app.main import app
 from app.models import Resume, User
@@ -53,6 +52,7 @@ def onboarding_body(**changes) -> dict:
         "accept_terms": True,
         "first_name": "Ada",
         "last_name": "Lovelace",
+        "university": "University of Wisconsin–Madison",
         "target_role": "Data Analyst",
         "experience_level": "Internship",
         "graduation_year": datetime.now().year + 1,
@@ -120,12 +120,13 @@ class FakeAccountService(accounts.AccountService):
 
 
 class NameAndContactRulesTests(unittest.TestCase):
-    def test_new_user_takes_typed_names_and_contacts_and_university_from_the_resume(self) -> None:
+    def test_new_user_takes_typed_details_and_contacts_from_the_resume(self) -> None:
         auth_user = AuthenticatedUser(id=uuid.uuid4(), email="Ada@Example.com")
         data = AccountCreate.model_validate(
             onboarding_body(
                 first_name=" Ada ",
                 last_name="King",
+                university=" Northlake University ",
                 resume=resume_body(classification=classification(name="Ada Lovelace", phones=["1", "1"])),
             )
         )
@@ -135,14 +136,8 @@ class NameAndContactRulesTests(unittest.TestCase):
         # Names as typed in onboarding; full_name is the résumé's, which may differ.
         self.assertEqual(("Ada", "King", "Ada Lovelace"), (user.first_name, user.last_name, user.full_name))
         self.assertEqual("ada@example.com", user.primary_email)
-        self.assertEqual(EXAMPLE["education"][0]["institution"], user.university)
+        self.assertEqual("Northlake University", user.university)
         self.assertEqual(["1"], user.phones)
-
-    def test_university_falls_back_to_the_default(self) -> None:
-        for education in ([], [{**EXAMPLE["education"][0], "institution": "  "}]):
-            with self.subTest(education=education):
-                data = ResumeClassification.model_validate({**classification(), "education": education})
-                self.assertEqual(DEFAULT_UNIVERSITY, accounts.university_from(data))
 
     def test_a_newer_resume_fills_only_empty_contacts(self) -> None:
         user = User(phones=["111"], linkedin_url=None, resume_emails=[], github_url="gh-old", website_url=None)
@@ -258,13 +253,15 @@ class MeApiTests(unittest.TestCase):
             "blank location": onboarding_body(preferred_location=" "),
             "no first name": onboarding_body(first_name=" "),
             "no last name": {k: v for k, v in onboarding_body().items() if k != "last_name"},
+            "no university": {k: v for k, v in onboarding_body().items() if k != "university"},
+            "blank university": onboarding_body(university=" "),
+            "university too long": onboarding_body(university="U" * 151),
             "first name too long": onboarding_body(first_name="A" * 101),
             "not a pdf or docx": onboarding_body(resume=resume_body(original_filename="ada.txt")),
             "malformed classification": onboarding_body(
                 resume=resume_body(classification={**EXAMPLE, "unexpected": []})
             ),
             "email is taken from the token": onboarding_body(email="someone@else.com"),
-            "university isn't asked yet": onboarding_body(university="MIT"),
         }
         for name, body in cases.items():
             with self.subTest(name):
@@ -276,7 +273,7 @@ class MeApiTests(unittest.TestCase):
 
         response = self.client.patch(
             "/me",
-            json={"preferred_location": "  Seattle, WA ", "target_role": "AI Engineer", "last_name": "King"},
+            json={"preferred_location": "  Seattle, WA ", "target_role": "AI Engineer", "last_name": "King", "university": "MIT"},
             headers=self.headers,
         )
 
@@ -285,16 +282,17 @@ class MeApiTests(unittest.TestCase):
         self.assertEqual("AI Engineer", response.json()["target_role"])
         self.assertEqual("Internship", response.json()["experience_level"])
         self.assertEqual(("Ada", "King"), (response.json()["first_name"], response.json()["last_name"]))
+        self.assertEqual("MIT", response.json()["university"])
 
     def test_update_validation(self) -> None:
         self.onboard()
-        for body in ({"preferred_location": " "}, {"target_role": "Astronaut"}, {"first_name": " "}, {"university": "MIT"}):
+        for body in ({"preferred_location": " "}, {"target_role": "Astronaut"}, {"first_name": " "}, {"university": " "}, {"primary_email": "x@y.com"}):
             with self.subTest(body=body):
                 self.assertEqual(422, self.client.patch("/me", json=body, headers=self.headers).status_code)
 
     def test_update_rejects_explicit_nulls(self) -> None:
         self.onboard()
-        for field in ("first_name", "last_name", "target_role", "experience_level", "graduation_year", "preferred_location"):
+        for field in ("first_name", "last_name", "university", "target_role", "experience_level", "graduation_year", "preferred_location"):
             with self.subTest(field=field):
                 response = self.client.patch("/me", json={field: None}, headers=self.headers)
                 self.assertEqual(422, response.status_code, response.text)

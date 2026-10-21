@@ -11,7 +11,7 @@ import { ResumeReview } from "@/components/onboarding/resume-review";
 import { SegmentedField, SelectField, TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field";
-import { EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
+import { DEFAULT_UNIVERSITY, EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
 import { analyzeResume } from "@/lib/api/resumes";
 import { ApiError, errorMessage } from "@/lib/api/client";
 import { addResume, createAccount, getMe, updateAccount } from "@/lib/api/me";
@@ -27,6 +27,9 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
   const [submitError, setSubmitError] = useState<string>();
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState<string>();
+  const [university, setUniversity] = useState("");
+  // A returning student's saved university, used when the new résumé lists no school.
+  const [savedUniversity, setSavedUniversity] = useState<string>();
   const form = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: { firstName: "", lastName: "", graduationYear: "", location: "" },
@@ -37,7 +40,9 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
     let cancelled = false;
     getMe()
       .then(({ user }) => {
-        if (cancelled || !user || form.formState.isDirty) return;
+        if (cancelled || !user) return;
+        setSavedUniversity(user.university);
+        if (form.formState.isDirty) return;
         const year = String(user.graduation_year);
         form.reset({
           firstName: user.first_name,
@@ -60,6 +65,7 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
       const result = await analyzeResume(resume);
       setAnalysis(result);
       setClassification(result.classification);
+      setUniversity(firstSchool(result.classification) ?? savedUniversity ?? DEFAULT_UNIVERSITY);
     } catch (error) {
       if (error instanceof ApiError) {
         setSubmitError(error.detail ?? error.message);
@@ -82,10 +88,16 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
         }}
         confirming={confirming}
         confirmError={confirmError}
+        university={university}
+        onUniversityChange={setUniversity}
         onConfirm={async () => {
           const { firstName, lastName, targetRole, experienceLevel, graduationYear, location } =
             form.getValues();
-          const names = { first_name: firstName, last_name: lastName };
+          if (!university.trim()) {
+            setConfirmError("Enter your university.");
+            return;
+          }
+          const details = { first_name: firstName, last_name: lastName, university: university.trim() };
           const goals = {
             target_role: targetRole,
             experience_level: experienceLevel,
@@ -105,12 +117,12 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
             const { user } = await getMe();
             if (user) {
               // Back from the profile page with a new résumé: update the account, add a résumé version.
-              await Promise.all([updateAccount({ ...names, ...goals }), addResume(resume)]);
+              await Promise.all([updateAccount({ ...details, ...goals }), addResume(resume)]);
             } else {
               // First time: this creates the account, with the terms consent given at sign-up.
               const { data } = await getSupabase().auth.getUser();
               if (!data.user) throw new Error("Not logged in");
-              await createAccount({ ...names, ...goals, accept_terms: acceptedTerms(data.user), resume });
+              await createAccount({ ...details, ...goals, accept_terms: acceptedTerms(data.user), resume });
             }
           } catch (error) {
             setConfirmError(errorMessage(error, "Couldn't save your profile. Try again."));
@@ -205,4 +217,13 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
       </FieldGroup>
     </form>
   );
+}
+
+/** The first school listed in the résumé's education, to pre-fill the University field. */
+function firstSchool(classification: ResumeClassification): string | undefined {
+  for (const entry of classification.education) {
+    const name = typeof entry.institution === "string" ? entry.institution.trim() : "";
+    if (name) return name.slice(0, 150);
+  }
+  return undefined;
 }

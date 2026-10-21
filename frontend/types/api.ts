@@ -56,14 +56,16 @@ export type Goals = {
   preferred_location: string;
 };
 
-/** The name typed in onboarding (the résumé's own name is kept separately as full_name). */
-export type Names = {
+/** Asked in onboarding: the name (the résumé's own is kept as full_name) and the university,
+ * which the review page pre-fills from the résumé. */
+export type PersonalDetails = {
   first_name: string;
   last_name: string;
+  university: string;
 };
 
 /** POST /me body: finishes onboarding. The email comes from the access token. */
-export type AccountCreateRequest = Goals & Names & {
+export type AccountCreateRequest = Goals & PersonalDetails & {
   accept_terms: true;
   resume: ResumeSubmitRequest;
 };
