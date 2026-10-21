@@ -95,13 +95,15 @@ class BackendConfigurationTests(unittest.TestCase):
 
         self.assertEqual(1, len(script.get_heads()), script.get_heads())
 
-    def test_cloud_analysis_table_is_not_part_of_active_schema(self) -> None:
-        from app.db.base import Base
-
-        self.assertNotIn("job_postings_analyses", Base.metadata.tables)
-        for path in (BACKEND_ROOT / "migrations" / "versions").glob("*.py"):
-            with self.subTest(migration=path.name):
-                self.assertNotIn("job_postings_analyses", path.read_text(encoding="utf-8"))
+    def test_job_analysis_tables_are_registered_for_future_persistence(self) -> None:
+        for table in (
+            "job_postings_analyses", "job_analysis_locations",
+            "job_analysis_responsibilities", "job_analysis_qualifications",
+            "job_analysis_conditions", "job_analysis_compensation",
+        ):
+            with self.subTest(table=table):
+                self.assertIn(table, Base.metadata.tables)
+                self.assertIn("job_posting_id", Base.metadata.tables[table].columns)
 
     def test_user_model_has_expected_table_and_columns(self) -> None:
         self.assertEqual("users", User.__tablename__)

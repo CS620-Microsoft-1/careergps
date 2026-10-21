@@ -636,8 +636,15 @@ pipeline or HTTP API.
 It is not a Supabase REST endpoint. Once the database owner prepares the table, this boundary
 can be implemented using the backend's existing SQLAlchemy connection pattern.
 
-This feature includes no active cloud analysis ORM model or Alembic migration. The future
-table design is deferred; it must be reviewed separately before any remote writes are enabled.
+The repository now includes schema-only PostgreSQL models and migration `7d2c91a4e8b6`
+(after the résumé migration `02a858fed0df`): one `job_postings_analyses` parent and five
+ordered detail tables. The parent has 25 columns, including backend-only `is_open`
+(default `true`, temporarily treating all jobs as open); the Agent still returns exactly
+28 fields. Seven analysis-management columns are intentionally omitted. See [JPA storage schema](../docs/decisions/JPA-STORAGE-SCHEMA.md)
+for field mapping, constraints, query examples and offline verification. This does **not**
+activate PostgreSQL result saving: the API/worker still uses local SQLite and JSON, and the
+reserved save function still refuses remote writes. Only the database owner applies the
+migration after review and merge; no migration or backfill runs at application startup.
 
 ### Analyze one posting through HTTP
 
