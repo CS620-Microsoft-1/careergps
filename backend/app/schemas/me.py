@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.core.options import GRADUATION_YEARS_AHEAD, ExperienceLevel, TargetRole
 from app.schemas.resume import ResumeClassification
@@ -72,6 +72,14 @@ class AccountUpdate(BaseModel):
     @classmethod
     def _plausible_year(cls, year: int | None) -> int | None:
         return _check_graduation_year(year)
+
+    @model_validator(mode="after")
+    def _no_nulls(self) -> "AccountUpdate":
+        # None only means "not sent". An explicit null would write NULL into a NOT NULL column.
+        for field in self.model_fields_set:
+            if getattr(self, field) is None:
+                raise ValueError(f"{field} can't be null; leave it out to keep the current value")
+        return self
 
 
 class UserRead(BaseModel):

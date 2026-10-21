@@ -272,6 +272,14 @@ class MeApiTests(unittest.TestCase):
             with self.subTest(body=body):
                 self.assertEqual(422, self.client.patch("/me", json=body, headers=self.headers).status_code)
 
+    def test_update_rejects_explicit_nulls(self) -> None:
+        self.onboard()
+        for field in ("first_name", "last_name", "target_role", "experience_level", "graduation_year", "preferred_location"):
+            with self.subTest(field=field):
+                response = self.client.patch("/me", json={field: None}, headers=self.headers)
+                self.assertEqual(422, response.status_code, response.text)
+        self.assertEqual("Ada", self.client.get("/me", headers=self.headers).json()["user"]["first_name"])
+
     def test_a_new_resume_becomes_active(self) -> None:
         self.onboard()
 
