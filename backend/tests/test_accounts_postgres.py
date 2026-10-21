@@ -107,6 +107,14 @@ class AccountServicePostgresTests(unittest.TestCase):
         self.assertEqual(2, self.db.query(Resume).filter_by(user_id=user.id).count())
         self.assertEqual("li", self.service.get_user(user.id).linkedin_url)
 
+    def test_long_resume_values_are_saved_without_errors(self) -> None:
+        long = classification(location="x" * 300, website="https://example.com/" + "a" * 2100, name="n" * 300)
+
+        user = self.onboard(self.auth_user(), resume=resume_body(classification=long))
+
+        self.assertEqual(255, len(self.service.get_user(user.id).current_location))
+        self.assertIsNone(self.service.get_user(user.id).website_url)
+
     def test_deleting_the_supabase_account_deletes_everything(self) -> None:
         auth_user = self.auth_user()
         self.onboard(auth_user)

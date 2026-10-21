@@ -34,17 +34,33 @@ class EmailNotConfirmedError(Exception):
     """The Supabase account hasn't confirmed its email yet."""
 
 
+def _column_length(column: str) -> int:
+    return User.__table__.c[column].type.length
+
+
+def _fit_text(value: str | None, column: str) -> str | None:
+    """Trimmed and cut to the column's length; the résumé contract has no length limits."""
+    value = (value or "").strip()
+    return value[: _column_length(column)] or None
+
+
+def _fit_url(value: str | None, column: str) -> str | None:
+    """A URL longer than its column is dropped rather than cut, since a cut URL doesn't work."""
+    value = (value or "").strip()
+    return value if value and len(value) <= _column_length(column) else None
+
+
 def contact_details(classification: ResumeClassification) -> dict:
     """The users columns that come from the résumé, as found in this one."""
     personal = classification.personal_information
     return {
-        "full_name": (personal.name or "").strip()[:255] or None,
+        "full_name": _fit_text(personal.name, "full_name"),
         "resume_emails": list(dict.fromkeys(personal.emails)),
-        "phones": list(dict.fromkeys(personal.phones)),
-        "current_location": personal.location,
-        "linkedin_url": personal.linkedin,
-        "github_url": personal.github,
-        "website_url": personal.website,
+        "phones": list(dict.fromkeys(p.strip() for p in personal.phones if p.strip())),
+        "current_location": _fit_text(personal.location, "current_location"),
+        "linkedin_url": _fit_url(personal.linkedin, "linkedin_url"),
+        "github_url": _fit_url(personal.github, "github_url"),
+        "website_url": _fit_url(personal.website, "website_url"),
     }
 
 

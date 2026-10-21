@@ -159,6 +159,19 @@ class NameAndContactRulesTests(unittest.TestCase):
         self.assertEqual("li-new", user.linkedin_url)
         self.assertEqual(["new@example.com"], user.resume_emails)
 
+    def test_contacts_fit_their_columns(self) -> None:
+        long_url = "https://example.com/" + "a" * 2100
+        data = ResumeClassification.model_validate(
+            classification(location="x" * 300, linkedin=long_url, github=" https://github.com/ada ", name="n" * 300)
+        )
+
+        contacts = accounts.contact_details(data)
+
+        self.assertEqual(255, len(contacts["current_location"]))
+        self.assertEqual(255, len(contacts["full_name"]))
+        self.assertIsNone(contacts["linkedin_url"])  # a cut URL wouldn't work, so it's dropped
+        self.assertEqual("https://github.com/ada", contacts["github_url"])
+
     def test_new_resume_records_how_it_was_read(self) -> None:
         resume = accounts.new_resume(uuid.uuid4(), ResumeSubmit.model_validate(resume_body(original_filename="CV.DOCX")))
 
