@@ -9,10 +9,10 @@ postings through the protected read-only source and save analyses locally. The r
 
 These are shared facts about a job, never a user's résumé, application or skill-gap result.
 The storage shape follows the résumé schema's UUIDs, PostgreSQL JSONB/arrays, ordered child
-rows, constraints and RLS. Unlike `resumes.confirmed_data`, no duplicate full output JSON
-is stored: the six tables are the future canonical result. The parent has exactly **25
-columns**: 28 output fields minus five child collections, plus one extra overview evidence
-column, plus the backend-only `is_open` flag (28 - 5 + 1 + 1 = 25).
+rows, constraints and RLS. The Agent v13 output remains exactly **28 fields**; its schema,
+validation, API response and complete local JSON exports are unchanged. Relational storage
+is a selected projection, not a lossless copy of that JSON. It uses exactly **10 parent
+columns** and five child tables; source metadata is read by joining `job_postings`.
 
 | Table | One row represents | Link |
 | --- | --- | --- |
@@ -28,64 +28,107 @@ Each child has an independent UUID `id`, `job_posting_id`, zero-based `position`
 table; its index also serves ordered per-job reads. Five requirements for one job share
 the same `job_posting_id` but have distinct child IDs. No parent column stores lists of
 child IDs. Foreign keys cascade physical deletion from source to analysis to details.
-Closing a posting only sets the source's `closed_at`; it does not delete an analysis
-or synchronize the temporary `is_open` flag yet.
+Closing a posting only sets the source's `closed_at`; it does not delete an analysis.
+There is no `is_open` column or availability synchronization job. Queries use the current
+source's `closed_at IS NULL` (the ingestion system's recorded state, not a fresh live-site check).
 
-## Complete mapping from the current 28-field output
+## Parent columns
 
-| Agent field(s) | Destination |
+| Column | PostgreSQL type | Meaning |
+| --- | --- | --- |
+| `job_posting_id` | `UUID PRIMARY KEY` | Also FK to `job_postings.id`; never generate a second job identity |
+| `job_family` | nullable `TEXT` | Agent-derived occupational family |
+| `seniority` | nullable `TEXT` | Agent-derived seniority |
+| `role_overview` | nullable `TEXT` | Agent-derived overview value |
+| `role_overview_evidence` | `JSONB NOT NULL`, default `[]` | Overview evidence; empty only when overview is null |
+| `benefits` | nullable `TEXT` | Agent-derived benefits string |
+| `other_relevant_information` | `TEXT[] NOT NULL`, default empty array | Supplemental facts |
+| `source_content_hash` | nullable `TEXT` | Hash copied from the input used for this analysis |
+| `agent_version` | `TEXT NOT NULL` | Actual Agent version used, e.g. `13`, supplied by backend |
+| `analyzed_at` | `TIMESTAMPTZ NOT NULL` | Time this successful analysis completed, supplied by backend |
+
+`agent_version` and `analyzed_at` have no insert defaults. A future writer must provide
+provenance from the successful run, not the current application version or import time.
+They do not belong in the Agent's 28-field output. The current local queue/exports have
+no per-result analysis timestamp, so historical files cannot be silently backfilled using
+an invented `analyzed_at`. Add trusted local run metadata or perform a fresh analysis when
+implementing persistence. This schema change does not migrate or enrich local exports.
+
+Keep `source_content_hash` as the analyzed input's hash, even if the source changes later.
+Compare it with the current `job_postings.content_hash` to detect stale results. A null hash
+means freshness cannot be established. The hash is not a historical source snapshot.
+
+## Mapping from the unchanged 28-field output
+
+| Agent field(s) | Relational destination / read policy |
 | --- | --- |
-| `id` | `job_postings_analyses.job_posting_id` (UUID; no new ID generated) |
-| `source`, `external_id`, `company_slug`, `company_name`, `company_tier`, `job_title`, `job_family`, `seniority`, `department`, `benefits`, `salary_currency`, `salary_interval`, `url` | Same-named nullable `TEXT` columns on the parent |
-| `published_at`, `first_seen_at`, `last_seen_at`, `closed_at` | Same-named nullable `TIMESTAMPTZ` columns on the parent |
-| `content_hash` | Parent `source_content_hash` |
-| `created_at`, `updated_at` | Parent `source_created_at`, `source_updated_at` |
-| `role_overview.value`, `role_overview.evidence` | Parent `role_overview TEXT`, `role_overview_evidence JSONB` |
+| `id` | Parent `job_posting_id` |
+| `source`, `external_id`, `company_slug`, `company_tier`, `url` | Not copied; read current same-named columns from `job_postings` |
+| `published_at`, `first_seen_at`, `last_seen_at`, `closed_at`, `created_at`, `updated_at` | Not copied; read current source timestamps |
+| `content_hash` | Parent `source_content_hash`, preserving which input was analyzed |
+| `company_name`, `job_title`, `department` | Not persisted from Agent; read source `company_name`, `title`, `department` |
+| `salary_currency`, `salary_interval` | No parent summary columns; use analysis compensation rows for extracted pay facts, or source columns explicitly for source-reported summaries |
+| `job_family`, `seniority`, `benefits` | Same-named nullable parent columns |
+| `role_overview.value`, `role_overview.evidence` | Parent `role_overview`, `role_overview_evidence` |
 | `other_relevant_information` | Parent `TEXT[]`; `[]` means no supplemental facts |
-| `locations[]` | Location rows with `value`, `evidence`, and array `position` |
-| `responsibilities[]` | Responsibility rows with `value`, `evidence`, and array `position` |
-| `qualifications[]` | Qualification rows with `value`, `level`, `categories TEXT[]`, `evidence`, `position` |
-| `job_conditions[]` | Condition rows with `type`, `value`, `evidence`, `position` |
-| `compensation[]` | Compensation rows with `type`, `value`, `minimum NUMERIC`, `maximum NUMERIC`, `currency`, `interval`, `applies_to`, `evidence`, `position` |
+| `locations[]` | `job_analysis_locations`: `id`, `job_posting_id`, `position`, `value`, `evidence` |
+| `responsibilities[]` | `job_analysis_responsibilities`: `id`, `job_posting_id`, `position`, `value`, `evidence` |
+| `qualifications[]` | `job_analysis_qualifications`: common five columns plus `level TEXT`, `categories TEXT[]` |
+| `job_conditions[]` | `job_analysis_conditions`: common five columns plus `type TEXT` |
+| `compensation[]` | `job_analysis_compensation`: common five columns plus `type TEXT`, `minimum NUMERIC`, `maximum NUMERIC`, `currency TEXT`, `interval TEXT`, `applies_to TEXT` |
+
+All common child columns are non-null: `id UUID` is the PK, `job_posting_id UUID` the FK,
+`position INTEGER` the zero-based array order, `value TEXT` the complete item, and
+`evidence JSONB` its supporting quotes. Qualification `level`/`categories` and condition/
+compensation `type` are required. Compensation bounds, currency, interval and applies_to
+are nullable. The five child tables have 5, 5, 7, 6 and 11 columns respectively.
 
 Empty arrays create zero detail rows. Unknown scalar values stay SQL NULL; a null role
-overview has empty evidence. Evidence remains a JSON array of `{source_field, quote}`
-objects. No evidence table is needed. Do not flatten an AND/OR requirement into several
-mandatory rows or convert team technologies into candidate requirements. Category tags
-may overlap; they do not create duplicate requirement rows. `benefits` is a string/null,
-and other relevant information is a string array, matching the active output format.
+overview has empty evidence. Evidence remains an array of `{source_field, quote}` objects.
+Do not flatten an AND/OR requirement into several mandatory rows or convert team technologies
+into candidate requirements. Category tags may overlap without creating duplicate rows.
 
-No invented country/city columns, skill-normalization layer, or per-user fields are added.
-Locations such as `SF` remain source-supported text. Classifying an item as a sponsorship
-condition does not by itself mean that the employer offers sponsorship.
+### Decision on the five potentially overlapping fields
 
-The only additional parent field is `is_open BOOLEAN NOT NULL`, with Python and database
-insert defaults of `true`. It is a temporary backend placeholder: all newly stored analyses
-are treated as open, even when the copied `closed_at` is non-null. It is not an Agent output
-field, verified availability, or an analysis-success status. There is no constraint coupling
-it to `closed_at` yet. Future backend synchronization should derive it from the current
-`job_postings.closed_at` without calling the Agent again. Explicit false values remain
-representable for that future work; no availability synchronization is activated now.
+These five fields are **not** in `COPIED_METADATA_FIELDS`; do not claim the validator proves
+them identical to the source. Their v13 definitions were reviewed individually:
 
-The seven management columns (`source_snapshot`, `agent_name`, `agent_version`,
-`schema_version`, `analyzed_at`, `created_at`, `updated_at`) are intentionally omitted.
-The original posting times are still stored as `source_created_at` / `source_updated_at`;
-they do not represent analysis or storage times. TIMESTAMPTZ preserves their instant,
-not the original string formatting. Source metadata describes the input at analysis time,
-not necessarily the current source record. Evidence quotes and `source_content_hash` remain,
-but the complete historical input, analysis versions, and analysis timestamps cannot be
-recovered from these six tables. This is the accepted minimal-storage tradeoff.
+| Field | Agent semantics | Storage decision and cost |
+| --- | --- | --- |
+| `company_name` | Explicit input company, potentially supplemented from description; no invented conflict resolution | Use source identity. The current source column is required. Agent-only supplementation or conflict-related nulls remain in local JSON, not this projection. |
+| `job_title` | Normally input `title`, preserving wording and specialization; not a normalized occupational label | Use source `title`; `job_family` is the separate normalized filter. Any Agent-selected alternative title remains only in local JSON. |
+| `department` | Explicit department or team, potentially extracted from description even when source department is null | Use source `department`. This deliberately forgoes Agent-only department enrichment in relational storage; no current analysis filter requires it. |
+| `salary_currency` | Common explicitly supported currency across all relevant base salary/hourly arrangements | Keep each compensation item's currency and scope; omit the redundant summary column. Do not substitute source salary currency and call it Agent-derived. |
+| `salary_interval` | Common normalized period across all relevant base salary/hourly arrangements | Keep each compensation item's period and scope; omit the summary column. No annualization or inferred period. |
+
+A consumer needing a pay summary should consider **all** relevant `base_salary`/`hourly_rate`
+rows and return unknown if no relevant rows exist, any value is unknown, values differ, or
+applicability is unresolved. Selecting the first row is incorrect. Such a derived summary
+is not guaranteed to reproduce the Agent's original null/non-null decision. Exact output
+replay uses the unchanged local JSON; these six tables do not provide that guarantee.
+
+No `source_created_at`, `source_updated_at`, analysis `created_at`/`updated_at`,
+`source_snapshot`, `agent_name` or `schema_version` is stored. Provenance is the actual
+Agent version, analysis completion time and analyzed content hash. A join returns **current**
+source data, not the historical input. Old source text, original source metadata and prior
+analysis versions cannot be reconstructed from this schema. If historical evidence must
+remain independently verifiable after source edits, a future snapshot/history design is needed.
+
+No invented country/city columns, skill-normalization layer or per-user fields are added.
+Locations such as `SF` remain source-supported text. A sponsorship condition does not by
+itself mean that the employer offers sponsorship.
 
 ## Queries and constraints
 
 The parent has a B-tree index on `(job_family, seniority)`. These are direct scalar columns,
 not generated JSON projections. Unknown levels remain NULL; `multiple_levels` is not
-expanded into guesses. To find AI internship analyses under the temporary open-state assumption:
+expanded into guesses. To find AI internship analyses for postings currently recorded as open:
 
 ```sql
-SELECT a.job_posting_id, a.job_title, a.company_name
+SELECT a.job_posting_id, p.title, p.company_name, a.agent_version, a.analyzed_at
 FROM job_postings_analyses AS a
-WHERE a.is_open IS TRUE
+JOIN job_postings AS p ON p.id = a.job_posting_id
+WHERE p.closed_at IS NULL
   AND a.job_family = 'ai_engineer'
   AND a.seniority = 'intern';
 ```
@@ -144,7 +187,9 @@ ordinary clients receive no direct access from this migration. Shared authentica
 and restricted writes must be enforced by the future backend endpoints/DB roles.
 
 As with résumé #17, only the database owner applies the migration to the shared database
-after review and merge. No application import or startup runs migrations. Downgrade drops
+after review and merge. Revision `7d2c91a4e8b6` is amended in place because it has not been
+applied to the shared database; an already-applied database would require a new migration.
+No application import or startup runs migrations. Downgrade drops
 the five children before the parent and destroys these analysis results; it does not drop
 source postings or résumé tables.
 
@@ -157,7 +202,22 @@ python -c "import os, unittest; os.environ.update(DATABASE_URL='postgresql+psyco
 `test_job_posting_analysis_schema.py` compares the active output contract with model fields,
 checks enum alignment and identity, and renders PostgreSQL upgrade/downgrade SQL in memory.
 It compares migration columns, constraints, defaults, indexes and FKs against ORM metadata,
-checks RLS statements, the exact 25-column parent and true open-state defaults, and never
-connects to PostgreSQL. Existing pipeline tests continue
+checks RLS statements, the exact 10-column parent, required provenance, source joins and absence
+of copied metadata/`is_open`, and never connects to PostgreSQL. Existing pipeline tests continue
 to verify that the reserved cloud writer is disabled. Offline DDL compilation does not
 replace executing integrity/RLS tests against a disposable PostgreSQL database before rollout.
+
+An optional embedded PostgreSQL check is also available. From the repository root, with
+Node.js, a Python environment containing the backend requirements, and an externally
+installed `@electric-sql/pglite` package:
+
+```text
+node backend/tests/check_job_posting_analysis_postgres.mjs /path/to/python /path/to/node_modules/@electric-sql/pglite
+```
+
+The script renders the current migration chain offline, bypasses application configuration,
+and executes it in an in-memory PGlite engine with synthetic source data. It verifies required
+provenance, constraints, all five cascades, source JOIN/closure/hash behavior, RLS with a
+non-superuser role, downgrade and re-upgrade. It does not load `.env`, connect to Supabase,
+or validate hosted Supabase roles/configuration. The script does not install dependencies;
+PGlite is optional and is not needed for the Python offline suite.

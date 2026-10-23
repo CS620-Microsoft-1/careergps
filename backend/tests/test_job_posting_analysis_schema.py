@@ -1,7 +1,7 @@
 """Offline JPA contract/DDL tests; never connect to PostgreSQL, Supabase or Azure.
 
 Compile the migration with the PostgreSQL dialect, compare it with ORM metadata,
-and verify that every field in the live output contract has a lossless destination.
+and verify the selected relational projection of the unchanged live output contract.
 PostgreSQL CHECK enforcement and live RLS behavior require a separate local DB test.
 """
 
@@ -17,13 +17,14 @@ from alembic.config import Config
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alembic.script import ScriptDirectory
-from sqlalchemy import Boolean, CheckConstraint, ForeignKeyConstraint, Numeric, Text, UniqueConstraint, select
+from sqlalchemy import CheckConstraint, DateTime, ForeignKeyConstraint, Numeric, Text, UniqueConstraint, select
 from sqlalchemy.dialects import postgresql
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
 from app.db.base import Base
+from app.models.job_posting import JobPosting
 from app.models.job_posting_analysis import (
     COMPENSATION_TYPES,
     CONDITION_TYPES,
@@ -87,28 +88,47 @@ def table_signature(table) -> dict:
 
 
 class JobAnalysisModelTests(unittest.TestCase):
-    def test_every_active_output_field_and_nested_attribute_has_a_destination(self) -> None:
+    def test_unchanged_contract_has_an_explicit_storage_projection(self) -> None:
         schema = _validator().schema
         main = JobPostingAnalysis.__table__
-        renamed = {
+        retained = {
             "id": "job_posting_id", "content_hash": "source_content_hash",
-            "created_at": "source_created_at", "updated_at": "source_updated_at",
+            "job_family": "job_family", "seniority": "seniority",
+            "role_overview": "role_overview", "benefits": "benefits",
+            "other_relevant_information": "other_relevant_information",
         }
-        for field in schema["properties"]:
-            with self.subTest(field=field):
-                if field in CHILDREN:
-                    table = CHILDREN[field].__table__
-                    item = schema["properties"][field]["items"]
-                    definition = schema["$defs"][item["$ref"].rsplit("/", 1)[-1]]
-                    self.assertEqual(set(definition["properties"]), set(table.columns.keys()) - {
-                        "id", "job_posting_id", "position",
-                    })
-                elif field == "role_overview":
-                    self.assertIsInstance(main.c.role_overview.type, Text)
-                    self.assertIsInstance(main.c.role_overview_evidence.type, postgresql.JSONB)
-                else:
-                    self.assertIn(renamed.get(field, field), main.columns)
+        source_metadata = {
+            "source", "external_id", "company_slug", "company_tier", "url",
+            "published_at", "first_seen_at", "last_seen_at", "closed_at",
+            "created_at", "updated_at",
+        }
+        # These five are not exact copies by contract. We deliberately prefer
+        # source identity fields and per-arrangement compensation over storing
+        # Agent enrichment/summary scalars. Only the local JSON keeps them all.
+        omitted_agent_fields = {
+            "company_name": "company_name", "job_title": "title",
+            "department": "department", "salary_currency": "salary_currency",
+            "salary_interval": "salary_interval",
+        }
         self.assertEqual(28, len(schema["properties"]))
+        self.assertEqual(
+            set(schema["properties"]),
+            set(retained) | source_metadata | set(omitted_agent_fields) | set(CHILDREN),
+        )
+        for column in retained.values():
+            self.assertIn(column, main.columns)
+        for field in source_metadata | set(omitted_agent_fields):
+            self.assertNotIn(field, main.columns)
+            self.assertIn(omitted_agent_fields.get(field, field), JobPosting.__table__.columns)
+        self.assertIsInstance(main.c.role_overview.type, Text)
+        self.assertIsInstance(main.c.role_overview_evidence.type, postgresql.JSONB)
+        for field, model in CHILDREN.items():
+            with self.subTest(field=field):
+                item = schema["properties"][field]["items"]
+                definition = schema["$defs"][item["$ref"].rsplit("/", 1)[-1]]
+                self.assertEqual(set(definition["properties"]), set(model.__table__.columns.keys()) - {
+                    "id", "job_posting_id", "position",
+                })
         self.assertNotIn("structured_data", main.columns)
         self.assertNotIn("qualifications", main.columns)
 
@@ -160,7 +180,7 @@ class JobAnalysisModelTests(unittest.TestCase):
                 self.assertFalse(table.c.evidence.nullable)
 
     def test_unknown_scalars_and_partial_compensation_can_be_stored(self) -> None:
-        for field in ("job_family", "seniority", "salary_currency", "salary_interval", "role_overview"):
+        for field in ("job_family", "seniority", "source_content_hash", "role_overview"):
             self.assertTrue(JobPostingAnalysis.__table__.c[field].nullable)
         for field in ("minimum", "maximum", "currency", "interval", "applies_to"):
             self.assertTrue(JobAnalysisCompensation.__table__.c[field].nullable)
@@ -171,39 +191,45 @@ class JobAnalysisModelTests(unittest.TestCase):
         self.assertIsInstance(JobPostingAnalysis.__table__.c.benefits.type, Text)
         self.assertIsInstance(JobPostingAnalysis.__table__.c.other_relevant_information.type, postgresql.ARRAY)
 
-    def test_parent_has_exactly_25_columns_with_no_management_fields(self) -> None:
+    def test_parent_has_exactly_ten_columns_including_analysis_provenance(self) -> None:
         main = JobPostingAnalysis.__table__
-        renamed = {
-            "id": "job_posting_id", "content_hash": "source_content_hash",
-            "created_at": "source_created_at", "updated_at": "source_updated_at",
-        }
         expected = {
-            renamed.get(field, field) for field in _validator().schema["properties"]
-            if field not in CHILDREN
-        } | {"role_overview_evidence", "is_open"}
-        self.assertEqual(25, len(main.columns))
+            "job_posting_id", "job_family", "seniority", "role_overview",
+            "role_overview_evidence", "benefits", "other_relevant_information",
+            "source_content_hash", "agent_version", "analyzed_at",
+        }
+        self.assertEqual(10, len(main.columns))
         self.assertEqual(expected, set(main.columns.keys()))
         self.assertTrue({
-            "source_snapshot", "agent_name", "agent_version", "schema_version",
-            "analyzed_at", "created_at", "updated_at",
+            "source_snapshot", "agent_name", "schema_version", "is_open",
+            "created_at", "updated_at", "source_created_at", "source_updated_at",
         }.isdisjoint(main.columns.keys()))
-        for field in ("published_at", "first_seen_at", "last_seen_at", "closed_at",
-                      "source_created_at", "source_updated_at"):
-            self.assertTrue(main.c[field].type.timezone)
 
-    def test_is_open_is_backend_only_with_true_insert_defaults(self) -> None:
-        column = JobPostingAnalysis.__table__.c.is_open
-        self.assertIsInstance(column.type, Boolean)
-        self.assertFalse(column.nullable)
-        self.assertIs(column.default.arg, True)
-        self.assertEqual("true", str(column.server_default.arg.compile(dialect=DIALECT)))
-        self.assertNotIn("is_open", _validator().schema["properties"])
-        # Keep the strict 28-field Agent contract: this flag belongs to storage only.
-        payload = analysis_fixture()
-        payload["is_open"] = True
+    def test_provenance_is_required_without_insert_time_or_version_defaults(self) -> None:
+        main = JobPostingAnalysis.__table__
+        self.assertIsInstance(main.c.agent_version.type, Text)
+        self.assertIsInstance(main.c.analyzed_at.type, DateTime)
+        self.assertTrue(main.c.analyzed_at.type.timezone)
+        for name in ("agent_version", "analyzed_at"):
+            with self.subTest(field=name):
+                column = main.c[name]
+                self.assertFalse(column.nullable)
+                self.assertIsNone(column.default)
+                self.assertIsNone(column.server_default)
+                self.assertIsNone(column.onupdate)
+
+    def test_provenance_and_availability_do_not_change_agent_contract(self) -> None:
         from app.schemas.job_posting_analysis import JobPostingAnalysisValidationError
-        with self.assertRaises(JobPostingAnalysisValidationError):
-            validate_analysis_response(json.dumps(payload), job_posting_id=JOB_ID)
+
+        for name, value in (("agent_version", "13"),
+                            ("analyzed_at", "2026-10-22T12:00:00+00:00"),
+                            ("is_open", True)):
+            with self.subTest(field=name):
+                self.assertNotIn(name, _validator().schema["properties"])
+                payload = analysis_fixture()
+                payload[name] = value
+                with self.assertRaises(JobPostingAnalysisValidationError):
+                    validate_analysis_response(json.dumps(payload), job_posting_id=JOB_ID)
 
     def test_alternatives_and_multi_category_evidence_remain_one_requirement(self) -> None:
         # Synthetic fixture already used by the offline Agent contract tests.
@@ -220,12 +246,17 @@ class JobAnalysisModelTests(unittest.TestCase):
 
     def test_supported_filter_and_single_requirement_queries_compile(self) -> None:
         statement = (
-            select(JobPostingAnalysis.job_posting_id)
-            .where(JobPostingAnalysis.is_open.is_(True), JobPostingAnalysis.job_family == "ai_engineer",
+            select(JobPostingAnalysis.job_posting_id, JobPosting.title, JobPosting.company_name)
+            .join(JobPosting, JobPosting.id == JobPostingAnalysis.job_posting_id)
+            .where(JobPosting.closed_at.is_(None), JobPostingAnalysis.job_family == "ai_engineer",
                    JobPostingAnalysis.seniority == "intern")
         )
         sql = str(statement.compile(dialect=DIALECT, compile_kwargs={"literal_binds": True}))
-        self.assertIn("job_postings_analyses.is_open IS true", sql)
+        self.assertIn("JOIN job_postings ON job_postings.id = job_postings_analyses.job_posting_id", sql)
+        self.assertIn("job_postings.closed_at IS NULL", sql)
+        self.assertIn("job_postings.title", sql)
+        self.assertIn("job_postings.company_name", sql)
+        self.assertNotIn("is_open", sql)
         self.assertIn("job_postings_analyses.job_family = 'ai_engineer'", sql)
         detail = select(JobAnalysisQualification).where(JobAnalysisQualification.id == UUID(JOB_ID))
         self.assertIn("job_analysis_qualifications.id =", str(detail.compile(dialect=DIALECT)))
@@ -295,7 +326,8 @@ class JobAnalysisMigrationTests(unittest.TestCase):
     def test_postgres_ddl_contains_identity_evidence_and_monetary_guards(self) -> None:
         sql, _, _ = self.render("upgrade")
         for rule in (
-            "is_open BOOLEAN DEFAULT true NOT NULL",
+            "agent_version TEXT NOT NULL",
+            "analyzed_at TIMESTAMP WITH TIME ZONE NOT NULL",
             "jsonb_array_length(evidence) > 0",
             "jsonb_array_length(role_overview_evidence) = 0",
             "minimum <= maximum", "minimum >= 0", "maximum >= 0",

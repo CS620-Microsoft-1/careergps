@@ -389,7 +389,7 @@ temporary local databases; they neither call the remote Agent nor write to Supab
 python -c "import os, unittest; os.environ.update(DATABASE_URL='postgresql+psycopg://tester:not-a-real-password@127.0.0.1:1/test', JOB_ANALYSIS_PROJECT_ENDPOINT='', JOB_ANALYSIS_ADMIN_TOKEN='', FOUNDRY_PROJECT_ENDPOINT='', FOUNDRY_AGENT_NAME=''); unittest.main(module=None, argv=['unittest', 'discover', '-s', 'tests', '-t', '.', '-v'])"
 ```
 
-Success ends with `OK`. The full suite includes the five JD test modules plus the existing
+Success ends with `OK`. The full suite includes the six JD test modules plus the existing
 backend tests. The reported test count can change as scenarios are added; use the command
 result for the current total. Git metadata is needed for repository configuration checks.
 
@@ -578,8 +578,8 @@ The JD implementation follows the résumé feature's route/schema/Agent/pipeline
 | `app/services/local_job_analysis_store.py` | Local queue/results, heartbeats and interruption recovery |
 | `scripts/job_posting_analysis_worker.py` | Batch processing and queue-only submission |
 
-HTTP requests and the worker share the same pipeline and validation. The five JD test
-modules cover Agent/validation, pipeline/source, store/recovery, HTTP and worker/CLI.
+HTTP requests and the worker share the same pipeline and validation. The six JD test
+modules cover Agent/validation, pipeline/source, store/recovery, HTTP, worker/CLI and storage schema.
 
 The JD pipeline reads all 25 fields from an existing `job_postings` row, calls
 `job-analysis-agent` version `13`, validates the response, and saves its unchanged 28-field
@@ -620,9 +620,10 @@ job_analyses/
 
 Existing v10 files and queues are retained without conversion or automatic reanalysis.
 Do not add `/v13` to the configured base yourself. A new v13 queue does not reuse earlier
-results or states, so starting a worker will discover all source jobs missing from this new
-queue and can trigger a full backfill. Stop older workers/API processes before switching;
-run offline tests first and start live processing only when ready.
+results or states. The worker now discovers only the three focused title families and defaults
+to at most three new queue entries and three processing attempts per invocation. A new version
+cache can still cause fresh model calls for eligible jobs. Stop older workers/API processes
+before switching; run offline tests first and start live processing only when ready.
 
 The queue survives restarts and permits one current attempt per posting. Failed refreshes
 retain the previous successful result. JSON writes use a temporary file and replacement;
@@ -638,9 +639,13 @@ can be implemented using the backend's existing SQLAlchemy connection pattern.
 
 The repository now includes schema-only PostgreSQL models and migration `7d2c91a4e8b6`
 (after the résumé migration `02a858fed0df`): one `job_postings_analyses` parent and five
-ordered detail tables. The parent has 25 columns, including backend-only `is_open`
-(default `true`, temporarily treating all jobs as open); the Agent still returns exactly
-28 fields. Seven analysis-management columns are intentionally omitted. See [JPA storage schema](../docs/decisions/JPA-STORAGE-SCHEMA.md)
+ordered detail tables. The parent has exactly **10 columns**, including required backend-supplied
+`agent_version` and `analyzed_at`. Copied source metadata and `is_open` are removed; reads join
+`job_postings` and use its `closed_at IS NULL`. `source_content_hash` retains the analyzed input
+version. Company/title/department use source values, while per-item compensation stores extracted
+currency and period; the five corresponding Agent scalar fields are omitted from the relational
+projection. Agent-only enrichment and exact salary summaries remain in the complete local JSON.
+The Agent still returns exactly 28 fields. See [JPA storage schema](../docs/decisions/JPA-STORAGE-SCHEMA.md)
 for field mapping, constraints, query examples and offline verification. This does **not**
 activate PostgreSQL result saving: the API/worker still uses local SQLite and JSON, and the
 reserved save function still refuses remote writes. Only the database owner applies the
@@ -659,32 +664,60 @@ Use a client timeout that accommodates the Agent timeout.
 - Unknown source IDs return `404`, invalid requests `422`, lost ownership `409`, and source/local
   storage failures safe `503` messages. A blank server token disables the endpoint.
 
-### First backfill and new-posting discovery
+### Bounded discovery and worker processing
 
-From `backend/`, enqueue source IDs without making Agent calls:
+From `backend/`, enqueue eligible source IDs without making Agent calls:
 
 ```bash
+python -m scripts.job_posting_analysis_worker --enqueue-only
 python -m scripts.job_posting_analysis_worker --enqueue-only --limit 10
 ```
 
-`--enqueue-only` does not require an Azure endpoint and never processes queued jobs.
-`--batch-size` (default 500) and `--limit` apply only to this mode; it cannot be combined
-with `--once`. The limit counts new queue entries. Discovery uses ID keyset pages and preserves every
-existing local state, including failed entries. It does not rely on ingestion timestamps.
-The default scope includes all stored postings; existing IDs whose content changes are not
-automatically reanalyzed.
+`--enqueue-only` defaults to at most **3 new queue entries**, does not require an Azure
+endpoint and never processes jobs. `--batch-size` (default 500) and `--limit` apply only
+to this mode; it cannot be combined with `--once`. The limit counts newly inserted entries,
+not source rows read. Repeated explicit invocations can add more entries.
 
-Run the worker to analyze queued postings and discover new IDs:
+Automatic discovery and worker consumption are limited to titles containing a whole-word,
+case-insensitive **Software Engineer**, **Data Analyst** or **AI Engineer** phrase.
+Whitespace/hyphens between the words and surrounding qualifiers (e.g. Senior or Intern)
+are accepted. This is a pre-Agent title heuristic, not the Agent's `job_family` classifier;
+related titles such as Machine Learning Engineer or SDE may be excluded. It does not impose
+an internship-only or open-posting-only filter. A single posting outside this scope can
+still be analyzed through the explicit, token-protected HTTP endpoint.
+
+Discovery uses ID keyset pages, closes source sessions between pages, and preserves every
+existing local state, including failed entries. It does not rely on ingestion timestamps.
+Existing IDs whose contents change are not automatically reanalyzed.
+
+Run the worker with a finite per-invocation budget:
 
 ```bash
 python -m scripts.job_posting_analysis_worker --once
-python -m scripts.job_posting_analysis_worker --scan-seconds 60
+python -m scripts.job_posting_analysis_worker
+python -m scripts.job_posting_analysis_worker --max-jobs 10 --scan-seconds 60
 ```
 
-Startup recovers expired work and scans source IDs. `--once` still performs that scan, then
-processes at most one posting; it does not limit discovery to one source row. Continuous mode
-rescans between jobs every 60 seconds by default, so long model calls can delay scans. Ordinary
-failed analyses do not automatically retry or block other jobs. No scheduler or service is installed.
+`--once` permits at most one processing attempt and one new queue entry. Otherwise the
+default is **3 processing attempts and 3 new queue entries over the entire invocation**;
+`--max-jobs N` explicitly changes that budget. These are separate budgets: a large existing
+queue cannot bypass the processing cap, and periodic scans cannot reset either cap.
+Failures, lease losses and raced attempts conservatively consume processing budget even
+when no Azure request ultimately occurs. Increasing the cap or restarting the worker can
+consume additional quota; it is not a daily or team-wide spending limit.
+
+Startup recovers expired work and scans eligible IDs. The worker rechecks title eligibility
+before the Agent call, including for previously queued jobs. Out-of-scope entries remain
+queued and are skipped without an Agent call. Between jobs, periodic mode rescans every
+60 seconds by default, so long model calls can delay scans. Legacy queued titles are checked
+in batches, and excluded IDs are cached until the next scan so idle polls do not repeatedly
+read every unrelated posting. The next scan reevaluates changed titles. It exits when its processing
+budget is exhausted; when no eligible work is available it waits and polls (use `--once`
+for a non-waiting check). Ordinary failed analyses do not automatically retry or block
+other jobs. No scheduler or service is installed.
+
+The worker exits with status 1 if its completed budget included a failed analysis or a lost
+lease; otherwise budget completion returns 0. `--once` with no eligible work also returns 0.
 
 ### Interrupted task recovery
 
@@ -695,8 +728,9 @@ attempt. Valid live leases are preserved, and expired or superseded attempts can
 save late results.
 
 Recovery restores the export from the last committed SQLite result, or removes an uncommitted
-first export, before requeuing. Filesystem errors leave recovery pending. A continuous worker
-that loses ownership waits and rescans; `--once` returns failure. Other storage errors stop it.
+first export, before requeuing. Filesystem errors leave recovery pending. A worker
+that loses ownership consumes one attempt from its budget and, if budget remains, waits
+and rescans; `--once` returns failure. Other storage errors stop it.
 A model response cannot be resumed midway: recovery repeats the whole JD analysis and may
 incur another Azure charge if the earlier request completed remotely.
 
@@ -733,8 +767,18 @@ the new v13 format. The offline suite uses simulated Agent responses; any real v
 request is a separate, explicit step. Real input/output files stay in ignored local exports.
 
 Formal tests under `tests/` use synthetic inputs, fake Agents and temporary local databases.
-Personal scripts, virtual environments, historical future-table drafts and acceptance artifacts
-remain ignored local files; the unrelated existing resume tests are unchanged.
+Project-wide ignore rules cover `local_tests/`, `local_exports/` and `.venv*/`. Personal
+helpers `backend/fetch_jds_local.py` and `backend/view_jds_local.py` belong in your own
+`.git/info/exclude` (or the path returned by `git rev-parse --git-path info/exclude`), not
+the shared `.gitignore`. Add these local rules if you keep those helpers:
+
+```text
+/backend/fetch_jds_local.py
+/backend/view_jds_local.py
+```
+
+This exclude file is local Git configuration and is not committed or distributed.
+The unrelated existing résumé tests are unchanged.
 
 ## Users and résumé tables
 

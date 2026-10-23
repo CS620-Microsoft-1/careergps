@@ -11,7 +11,6 @@ from datetime import datetime
 from decimal import Decimal
 
 from sqlalchemy import (
-    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -60,16 +59,23 @@ def _enum_check(column: str, values: tuple[str, ...], name: str) -> CheckConstra
 class JobPostingAnalysis(Base):
     """One successfully validated analysis per existing source posting.
 
-No duplicate structured_data JSON: scalar columns and child tables store the
-output in a 25-column parent and five child tables. Source timestamps are copied
-from the posting. is_open temporarily defaults to true, without verifying availability.
-"""
+    This 10-column projection stores derived requirements, not a duplicate of the
+    full 28-field Agent response. Join job_postings for source metadata and use
+    its closed_at to determine availability. source_content_hash records the
+    version actually analyzed, even when the current source has since changed.
+
+    Company, title and department use source values: v13 preserves explicit names
+    rather than canonicalizing them, but can supplement missing metadata from the
+    description. Such Agent-only enrichment remains in the local JSON, not here.
+    Salary currency/interval summaries are omitted: compensation rows retain the
+    individual arrangements. Neither a JOIN nor this projection promises an exact
+    reconstruction of the original Agent response.
+    """
 
     __tablename__ = "job_postings_analyses"
     __table_args__ = (
         _enum_check("job_family", JOB_FAMILIES, "ck_jpa_job_family"),
         _enum_check("seniority", SENIORITIES, "ck_jpa_seniority"),
-        _enum_check("salary_interval", PAY_INTERVALS, "ck_jpa_salary_interval"),
         CheckConstraint(
             "CASE WHEN jsonb_typeof(role_overview_evidence) = 'array' THEN "
             "CASE WHEN role_overview IS NULL THEN jsonb_array_length(role_overview_evidence) = 0 "
@@ -89,15 +95,8 @@ from the posting. is_open temporarily defaults to true, without verifying availa
     job_posting_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("job_postings.id", ondelete="CASCADE"), primary_key=True
     )
-    source: Mapped[str | None] = mapped_column(Text)
-    external_id: Mapped[str | None] = mapped_column(Text)
-    company_slug: Mapped[str | None] = mapped_column(Text)
-    company_name: Mapped[str | None] = mapped_column(Text)
-    company_tier: Mapped[str | None] = mapped_column(Text)
-    job_title: Mapped[str | None] = mapped_column(Text)
     job_family: Mapped[str | None] = mapped_column(Text)
     seniority: Mapped[str | None] = mapped_column(Text)
-    department: Mapped[str | None] = mapped_column(Text)
     role_overview: Mapped[str | None] = mapped_column(Text)
     role_overview_evidence: Mapped[list[dict[str, str]]] = mapped_column(
         JSONB(none_as_null=True), default=list, server_default=text("'[]'::jsonb"), nullable=False
@@ -106,22 +105,11 @@ from the posting. is_open temporarily defaults to true, without verifying availa
     other_relevant_information: Mapped[list[str]] = mapped_column(
         ARRAY(Text), default=list, server_default=text("'{}'"), nullable=False
     )
-    salary_currency: Mapped[str | None] = mapped_column(Text)
-    salary_interval: Mapped[str | None] = mapped_column(Text)
-    url: Mapped[str | None] = mapped_column(Text)
-    published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    first_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     source_content_hash: Mapped[str | None] = mapped_column(Text)
-    source_created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    source_updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
-    # Temporary backend placeholder: all newly stored analyses start as open.
-    # TODO: synchronize from job_postings.closed_at without rerunning the Agent.
-    # The copied closed_at may disagree until that synchronization is implemented.
-    is_open: Mapped[bool] = mapped_column(
-        Boolean, default=True, server_default=text("true"), nullable=False
-    )
+    # Supplied by the backend from the successful analysis, not by the Agent or
+    # INSERT defaults. Importing a local result must preserve its analysis time.
+    agent_version: Mapped[str] = mapped_column(Text, nullable=False)
+    analyzed_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
 
 
 class _AnalysisChild:

@@ -178,6 +178,20 @@ class LocalJobAnalysisStore:
         finally:
             connection.close()
 
+    def queued_ids(self) -> list[str]:
+        """Snapshot queued IDs in order, closing SQLite before source reads.
+
+        A snapshot also prevents concurrent enqueues from extending this scan.
+        """
+        connection = self._connect()
+        try:
+            return [row["job_posting_id"] for row in connection.execute(
+                "SELECT job_posting_id FROM local_job_analyses "
+                "WHERE status = 'queued' ORDER BY rowid"
+            ).fetchall()]
+        finally:
+            connection.close()
+
     def claim(self, id: str, force: bool = False) -> str | None:
         attempt = str(uuid.uuid4())
         with self._transaction() as connection:

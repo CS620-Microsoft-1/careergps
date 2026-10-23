@@ -15,9 +15,12 @@ from app.services.local_job_analysis_store import LocalAnalysisStateError
 class AnalysisQueue(Protocol):
     def recover_interrupted(self) -> int: ...
 
-    def enqueue_missing(self, *, batch_size: int = 500, limit: int | None = None) -> int: ...
+    def enqueue_missing(
+        self, *, batch_size: int = 500, limit: int | None = None,
+        focused_only: bool = False,
+    ) -> int: ...
 
-    def process_next(self) -> dict[str, Any] | None: ...
+    def process_next(self, *, focused_only: bool = False) -> dict[str, Any] | None: ...
 
 
 def _positive_int(value: str) -> int:
@@ -44,32 +47,50 @@ def run_worker(
     pipeline: AnalysisQueue,
     *,
     once: bool = False,
+    max_jobs: int = 3,
     poll_seconds: float = 2.0,
     scan_seconds: float = 60.0,
     monotonic: Callable[[], float] = time.monotonic,
     sleep: Callable[[float], None] = time.sleep,
 ) -> int:
-    """Recover expired work and discover IDs on each scan, then process local work."""
+    """Process only focus titles, with per-invocation enqueue and attempt budgets.
+
+    Empty queues wait for new eligible work. Both budgets survive periodic scans;
+    failures and lost leases consume attempts even if no result was committed.
+    Concurrent workers and repeated invocations each have their own budget.
+    """
+    if isinstance(max_jobs, bool) or not isinstance(max_jobs, int) or max_jobs < 1:
+        raise ValueError("max_jobs must be a positive integer.")
     if not math.isfinite(poll_seconds) or poll_seconds <= 0:
         raise ValueError("poll_seconds must be finite and greater than zero.")
 
     if not math.isfinite(scan_seconds) or scan_seconds <= 0:
         raise ValueError("scan_seconds must be finite and greater than zero.")
+    budget = 1 if once else max_jobs
+    attempts = 0
+    enqueued = 0
+    any_failed = False
     next_scan = float("-inf")
     try:
-        while True:
+        while attempts < budget:
             if monotonic() >= next_scan:
                 pipeline.recover_interrupted()
-                pipeline.enqueue_missing()
+                enqueue_capacity = min(budget - enqueued, budget - attempts)
+                if enqueue_capacity > 0:
+                    enqueued += pipeline.enqueue_missing(
+                        limit=enqueue_capacity, focused_only=True,
+                    )
                 next_scan = monotonic() + scan_seconds
             try:
-                result = pipeline.process_next()
+                result = pipeline.process_next(focused_only=True)
             except LocalAnalysisStateError:
+                attempts += 1
+                any_failed = True
                 print(
-                    "A job analysis lost its local lease; the queue will be checked again.",
+                    "A job analysis lost its local lease; this attempt counts toward the run limit.",
                     file=sys.stderr,
                 )
-                if once:
+                if attempts >= budget:
                     return 1
                 sleep(poll_seconds)
                 next_scan = float("-inf")
@@ -80,14 +101,17 @@ def run_worker(
                 sleep(poll_seconds)
                 continue
 
+            # A claim race or a changed title can return queued/running instead
+            # of calling Azure. Count it anyway: spending must never be undercounted.
+            attempts += 1
             failed = result.get("status") == "failed"
+            any_failed = any_failed or failed
             if failed:
                 print(
                     "A job analysis failed; its status is saved in the local analysis queue.",
                     file=sys.stderr,
                 )
-            if once:
-                return 1 if failed else 0
+        return 1 if any_failed else 0
     except KeyboardInterrupt:
         return 0
     except Exception:
@@ -111,12 +135,14 @@ def _build_pipeline() -> AnalysisQueue:
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Process queued version 13 job analyses.")
+    parser = argparse.ArgumentParser(
+        description="Process version 13 analyses for Software Engineer, Data Analyst and AI Engineer titles."
+    )
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--once", action="store_true", help="Process at most one queued request.")
     mode.add_argument(
         "--enqueue-only", action="store_true",
-        help="Read source JP IDs and enqueue missing jobs locally without calling the Agent.",
+        help="Enqueue missing focus-title jobs locally without calling the Agent.",
     )
     parser.add_argument(
         "--batch-size", type=_positive_int,
@@ -124,7 +150,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument(
         "--limit", type=_positive_int,
-        help="Maximum number of new local jobs for --enqueue-only.",
+        help="Maximum new focus-title jobs for --enqueue-only (default: 3).",
+    )
+    parser.add_argument(
+        "--max-jobs", type=_positive_int,
+        help="Maximum processing attempts per invocation, including failures (default: 3; --once: 1).",
     )
     parser.add_argument(
         "--poll-seconds",
@@ -140,11 +170,15 @@ def main(argv: Sequence[str] | None = None) -> int:
     if not args.enqueue_only and (args.batch_size is not None or args.limit is not None):
         parser.error("--batch-size and --limit require --enqueue-only")
 
+    if args.enqueue_only and args.max_jobs is not None:
+        parser.error("--max-jobs cannot be used with --enqueue-only; use --limit")
+
     if args.enqueue_only:
         try:
             added = _build_pipeline().enqueue_missing(
                 batch_size=args.batch_size if args.batch_size is not None else 500,
-                limit=args.limit,
+                limit=args.limit if args.limit is not None else 3,
+                focused_only=True,
             )
         except Exception:
             print("Could not read source postings or update the local queue.", file=sys.stderr)
@@ -164,7 +198,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 1
 
     return run_worker(
-        pipeline, once=args.once, poll_seconds=args.poll_seconds, scan_seconds=args.scan_seconds
+        pipeline, once=args.once, max_jobs=args.max_jobs if args.max_jobs is not None else 3,
+        poll_seconds=args.poll_seconds, scan_seconds=args.scan_seconds,
     )
 
 

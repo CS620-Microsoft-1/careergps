@@ -19,25 +19,28 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
         for result, expected in ((None, 0), ({"status": "succeeded"}, 0), ({"status": "failed"}, 1)):
             with self.subTest(result=result), redirect_stderr(io.StringIO()):
                 pipeline = Mock()
+                pipeline.enqueue_missing.return_value = 0
                 pipeline.process_next.return_value = result
                 sleep = Mock()
                 self.assertEqual(worker.run_worker(pipeline, once=True, sleep=sleep), expected)
-                pipeline.process_next.assert_called_once_with()
+                pipeline.process_next.assert_called_once_with(focused_only=True)
                 self.assertEqual(pipeline.mock_calls, [
-                    call.recover_interrupted(), call.enqueue_missing(), call.process_next(),
+                    call.recover_interrupted(), call.enqueue_missing(limit=1, focused_only=True), call.process_next(focused_only=True),
                 ])
                 sleep.assert_not_called()
 
     def test_continuous_empty_queue_sleeps_and_interrupt_stops_cleanly(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.process_next.return_value = None
         sleep = Mock(side_effect=KeyboardInterrupt)
         self.assertEqual(worker.run_worker(pipeline, poll_seconds=0.25, sleep=sleep), 0)
-        pipeline.process_next.assert_called_once_with()
+        pipeline.process_next.assert_called_once_with(focused_only=True)
         sleep.assert_called_once_with(0.25)
 
     def test_continuous_failure_does_not_block_the_next_job(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.process_next.side_effect = [{"status": "failed"}, {"status": "succeeded"}, None]
         sleep = Mock(side_effect=KeyboardInterrupt)
         with redirect_stderr(io.StringIO()):
@@ -47,6 +50,7 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
 
     def test_queue_error_stops_without_disclosing_exception(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.process_next.side_effect = RuntimeError("secret database connection string")
         output = io.StringIO()
         with redirect_stderr(output):
@@ -61,6 +65,7 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
 
     def test_worker_scans_on_start_and_after_interval_without_resetting_per_job(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.process_next.side_effect = [{"status": "succeeded"}, None, KeyboardInterrupt]
         times = iter((0.0, 0.0, 1.0, 61.0, 61.0))
         sleep = Mock()
@@ -68,9 +73,9 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
             pipeline, monotonic=lambda: next(times), sleep=sleep,
         ), 0)
         self.assertEqual(pipeline.mock_calls, [
-            call.recover_interrupted(), call.enqueue_missing(), call.process_next(),
-            call.process_next(),
-            call.recover_interrupted(), call.enqueue_missing(), call.process_next(),
+            call.recover_interrupted(), call.enqueue_missing(limit=3, focused_only=True), call.process_next(focused_only=True),
+            call.process_next(focused_only=True),
+            call.recover_interrupted(), call.enqueue_missing(limit=2, focused_only=True), call.process_next(focused_only=True),
         ])
         self.assertEqual(2, pipeline.enqueue_missing.call_count)
         self.assertEqual(3, pipeline.process_next.call_count)
@@ -78,6 +83,7 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
 
     def test_recovery_error_stops_before_enqueue_or_processing_and_hides_details(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.recover_interrupted.side_effect = RuntimeError("private local database path")
         output = io.StringIO()
         with redirect_stderr(output):
@@ -90,6 +96,7 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
 
     def test_periodic_recovery_error_stops_before_more_enqueue_or_processing(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.recover_interrupted.side_effect = [1, RuntimeError("private state error")]
         pipeline.process_next.return_value = {"status": "succeeded"}
         times = iter((0.0, 0.0, 61.0))
@@ -99,13 +106,14 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
                 pipeline, monotonic=lambda: next(times), sleep=sleep,
             ), 1)
         self.assertEqual(pipeline.mock_calls, [
-            call.recover_interrupted(), call.enqueue_missing(), call.process_next(),
+            call.recover_interrupted(), call.enqueue_missing(limit=3, focused_only=True), call.process_next(focused_only=True),
             call.recover_interrupted(),
         ])
         sleep.assert_not_called()
 
     def test_lost_lease_waits_then_recovers_and_continues_processing(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.process_next.side_effect = [
             worker.LocalAnalysisStateError("private prior attempt"),
             {"status": "succeeded"},
@@ -119,9 +127,9 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
                 pipeline, poll_seconds=0.25, monotonic=lambda: next(times), sleep=sleep,
             ), 0)
         self.assertEqual(pipeline.mock_calls, [
-            call.recover_interrupted(), call.enqueue_missing(), call.process_next(),
-            call.recover_interrupted(), call.enqueue_missing(), call.process_next(),
-            call.process_next(),
+            call.recover_interrupted(), call.enqueue_missing(limit=3, focused_only=True), call.process_next(focused_only=True),
+            call.recover_interrupted(), call.enqueue_missing(limit=2, focused_only=True), call.process_next(focused_only=True),
+            call.process_next(focused_only=True),
         ])
         self.assertEqual(sleep.mock_calls, [call(0.25), call(0.25)])
         self.assertIn("lost its local lease", output.getvalue())
@@ -129,12 +137,13 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
 
     def test_once_lost_lease_returns_failure_without_retry_or_sleep(self) -> None:
         pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
         pipeline.process_next.side_effect = worker.LocalAnalysisStateError("old attempt")
         sleep = Mock()
         with redirect_stderr(io.StringIO()):
             self.assertEqual(worker.run_worker(pipeline, once=True, sleep=sleep), 1)
         self.assertEqual(pipeline.mock_calls, [
-            call.recover_interrupted(), call.enqueue_missing(), call.process_next(),
+            call.recover_interrupted(), call.enqueue_missing(limit=1, focused_only=True), call.process_next(focused_only=True),
         ])
         sleep.assert_not_called()
 
@@ -158,7 +167,7 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
         ):
             self.assertEqual(worker.main(["--once", "--poll-seconds", "0.5"]), 0)
         build.assert_called_once_with()
-        run.assert_called_once_with(pipeline, once=True, poll_seconds=0.5, scan_seconds=60.0)
+        run.assert_called_once_with(pipeline, once=True, max_jobs=3, poll_seconds=0.5, scan_seconds=60.0)
 
     def test_main_rejects_invalid_poll_interval_before_loading_settings(self) -> None:
         for value in ("0", "-1", "nan", "inf", "not-a-number"):
@@ -173,6 +182,75 @@ class JobPostingAnalysisWorkerTests(unittest.TestCase):
             load.assert_not_called()
 
 
+    def test_budget_stops_with_preexisting_queue_and_counts_failures(self) -> None:
+        pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 0
+        pipeline.process_next.side_effect = [
+            {"status": "succeeded"}, {"status": "failed"}, {"status": "succeeded"},
+            AssertionError("fourth attempt exceeds budget"),
+        ]
+        with redirect_stderr(io.StringIO()):
+            self.assertEqual(worker.run_worker(pipeline), 1)
+        self.assertEqual(pipeline.process_next.call_count, 3)
+
+    def test_lost_leases_and_rescans_do_not_reset_either_budget(self) -> None:
+        pipeline = Mock()
+        pipeline.enqueue_missing.return_value = 3
+        pipeline.process_next.side_effect = worker.LocalAnalysisStateError("lost")
+        sleep = Mock()
+        with redirect_stderr(io.StringIO()):
+            self.assertEqual(worker.run_worker(pipeline, sleep=sleep), 1)
+        self.assertEqual(pipeline.process_next.call_count, 3)
+        pipeline.enqueue_missing.assert_called_once_with(limit=3, focused_only=True)
+        self.assertEqual(sleep.call_count, 2)
+        self.assertEqual(pipeline.recover_interrupted.call_count, 3)
+
+    def test_new_enqueue_budget_survives_empty_rescans(self) -> None:
+        pipeline = Mock()
+        pipeline.enqueue_missing.side_effect = [2, 1, AssertionError("enqueue budget exceeded")]
+        pipeline.process_next.side_effect = [None, None, {"status": "succeeded"}, KeyboardInterrupt]
+        times = iter((0, 0, 61, 61, 122, 122, 183, 183))
+        self.assertEqual(worker.run_worker(pipeline, monotonic=lambda: next(times), sleep=Mock()), 0)
+        self.assertEqual(pipeline.enqueue_missing.call_args_list, [
+            call(limit=3, focused_only=True), call(limit=1, focused_only=True),
+        ])
+
+    def test_explicit_budget_and_once_cap(self) -> None:
+        for once, maximum, expected in ((False, 5, 5), (True, 10, 1)):
+            with self.subTest(once=once):
+                pipeline = Mock()
+                pipeline.enqueue_missing.return_value = 0
+                pipeline.process_next.return_value = {"status": "succeeded"}
+                self.assertEqual(worker.run_worker(pipeline, once=once, max_jobs=maximum), 0)
+                self.assertEqual(pipeline.process_next.call_count, expected)
+
+    def test_invalid_budget_is_rejected_before_access(self) -> None:
+        for value in (0, -1, True, None, 1.5, "3"):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                worker.run_worker(Mock(), max_jobs=value)
+
+    def test_main_passes_explicit_budget(self) -> None:
+        pipeline = Mock()
+        with (
+            patch.object(worker, "_load_settings", return_value=SimpleNamespace(job_analysis_project_endpoint="https://example.invalid/project")),
+            patch.object(worker, "_build_pipeline", return_value=pipeline),
+            patch.object(worker, "run_worker", return_value=0) as run,
+        ):
+            self.assertEqual(worker.main(["--max-jobs", "5"]), 0)
+        run.assert_called_once_with(pipeline, once=False, max_jobs=5, poll_seconds=2.0, scan_seconds=60.0)
+
+    def test_main_rejects_invalid_or_conflicting_budget_before_access(self) -> None:
+        for args in (["--max-jobs", "0"], ["--max-jobs", "-1"], ["--max-jobs", "all"],
+                     ["--enqueue-only", "--max-jobs", "5"]):
+            with (
+                self.subTest(args=args), patch.object(worker, "_build_pipeline") as build,
+                patch.object(worker, "_load_settings") as load,
+                redirect_stderr(io.StringIO()), self.assertRaises(SystemExit),
+            ):
+                worker.main(args)
+            build.assert_not_called()
+            load.assert_not_called()
+
 # Both CLI modes share the worker entry point.
 command = worker
 
@@ -180,7 +258,7 @@ command = worker
 class EnqueueCommandTests(unittest.TestCase):
     def test_backfill_defaults_only_enqueue_and_do_not_analyze(self):
         pipeline = Mock()
-        pipeline.enqueue_missing.return_value = 17
+        pipeline.enqueue_missing.return_value = 3
         output = io.StringIO()
         with (
             patch.object(command, "_build_pipeline", return_value=pipeline),
@@ -189,17 +267,17 @@ class EnqueueCommandTests(unittest.TestCase):
         ):
             self.assertEqual(0, command.main(["--enqueue-only"]))
         load.assert_not_called()
-        pipeline.enqueue_missing.assert_called_once_with(batch_size=500, limit=None)
+        pipeline.enqueue_missing.assert_called_once_with(batch_size=500, limit=3, focused_only=True)
         pipeline.analyze.assert_not_called()
         pipeline.process_next.assert_not_called()
-        self.assertIn("17 new local", output.getvalue())
+        self.assertIn("3 new local", output.getvalue())
 
     def test_limit_and_batch_size_are_forwarded(self):
         pipeline = Mock()
         pipeline.enqueue_missing.return_value = 2
         with patch.object(command, "_build_pipeline", return_value=pipeline), redirect_stdout(io.StringIO()):
             self.assertEqual(0, command.main(["--enqueue-only", "--batch-size", "1", "--limit", "2"]))
-        pipeline.enqueue_missing.assert_called_once_with(batch_size=1, limit=2)
+        pipeline.enqueue_missing.assert_called_once_with(batch_size=1, limit=2, focused_only=True)
 
     def test_invalid_options_do_not_construct_resources(self):
         for option in ("--batch-size", "--limit"):

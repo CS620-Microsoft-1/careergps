@@ -34,6 +34,7 @@ from app.services.job_posting_analysis_pipeline import (
     ReadOnlyJobPostingSource,
     SupabaseAnalysisPersistenceNotEnabled,
     save_analysis_to_supabase,
+    is_focus_job_title,
 )
 
 from tests.test_job_posting_analysis_agent import (
@@ -127,13 +128,13 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
         self.engine.dispose()
         self.temporary.cleanup()
 
-    def add_posting(self, external_id: str) -> uuid.UUID:
+    def add_posting(self, external_id: str, *, title: str = "Software Engineer") -> uuid.UUID:
         now = datetime(2026, 10, 20, 10, 15, 30, 123456, tzinfo=UTC)
         with self.session_factory() as session, session.begin():
             posting = JobPosting(
                 id=uuid.uuid4(), source="greenhouse", external_id=external_id,
                 company_slug="example", company_name="Example", company_tier="other",
-                title="Software Engineer", location="Example City", country=None,
+                title=title, location="Example City", country=None,
                 workplace_type=None, department="Engineering", employment_type=None,
                 description_text=DESCRIPTION, salary_min=None, salary_max=None,
                 salary_currency=None, salary_interval=None,
@@ -147,6 +148,112 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
 
     def exported(self, job_id=None) -> Path:
         return self.directory / "results" / f"{job_id or self.job_id}.json"
+
+    def test_focus_title_match_is_conservative_and_case_insensitive(self) -> None:
+        for title in ("Software Engineer", "Senior Software Engineer, Backend", "DATA ANALYST Intern",
+                      "AI-Engineer", "Software  Engineer II", "AI–Engineer (New Grad)"):
+            with self.subTest(title=title):
+                self.assertTrue(is_focus_job_title(title))
+        for title in (None, "", 42, "Retail Engineer", "Software Engineering Manager",
+                      "Metadata Analyst", "Sustaining AI Engineering", "Artificial Intelligence Engineer"):
+            with self.subTest(title=title):
+                self.assertFalse(is_focus_job_title(title))
+
+    def test_focused_discovery_filters_before_enqueuing_and_preserves_states(self) -> None:
+        selected = [self.job_id, self.add_posting("data", title="Data Analyst"),
+                    self.add_posting("ai", title="AI Engineer Intern")]
+        excluded = [self.add_posting("retail", title="Retail Engineer"),
+                    self.add_posting("engineering", title="Software Engineering Manager")]
+        self.record_sql = True
+        self.assertEqual(self.pipeline.enqueue_missing(batch_size=1, focused_only=True, limit=3), 3)
+        self.assertEqual(self.pipeline.enqueue_missing(batch_size=1, focused_only=True, limit=3), 0)
+        for job_id in selected:
+            self.assertEqual(self.store.get(str(job_id))["status"], "queued")
+        for job_id in excluded:
+            self.assertIsNone(self.store.get(str(job_id)))
+        self.assertEqual(self.agent.calls, [])
+        self.assertTrue(all("description_text" not in sql for sql in self.source_sql))
+        self.assertTrue(all(sql.lstrip().upper().startswith("SELECT") for sql in self.source_sql))
+
+    def test_worker_budget_limits_real_queue_and_skips_preexisting_unrelated_job(self) -> None:
+        from scripts.job_posting_analysis_worker import run_worker
+
+        with self.session_factory() as session, session.begin():
+            session.get(JobPosting, self.job_id).title = "Retail Engineer"
+        ids = [self.add_posting(f"budget-{n}", title="Senior Software Engineer") for n in range(6)]
+        self.store.enqueue_many([str(self.job_id), *(str(job_id) for job_id in ids)])
+        self.assertEqual(run_worker(self.pipeline), 0)
+        self.assertEqual(len(self.agent.calls), 3)
+        self.assertTrue(all(is_focus_job_title(posting["title"]) for posting in self.agent.calls))
+        self.assertEqual(self.store.get(str(self.job_id))["status"], "queued")
+        self.assertEqual(sum(self.store.get(str(job_id))["status"] == "queued" for job_id in ids), 3)
+
+    def test_worker_discovers_at_most_three_from_large_unqueued_source(self) -> None:
+        from scripts.job_posting_analysis_worker import run_worker
+
+        ids = [self.job_id, *(self.add_posting(f"discover-{n}") for n in range(8))]
+        self.assertEqual(run_worker(self.pipeline), 0)
+        self.assertEqual(len(self.agent.calls), 3)
+        self.assertEqual(sum(self.store.get(str(job_id)) is not None for job_id in ids), 3)
+
+    def test_unrelated_only_queue_is_idle_but_manual_single_id_can_analyze(self) -> None:
+        with self.session_factory() as session, session.begin():
+            session.get(JobPosting, self.job_id).title = "Retail Engineer"
+        self.pipeline.enqueue(self.job_id)
+        self.assertIsNone(self.pipeline.process_next(focused_only=True))
+        self.assertEqual(self.agent.calls, [])
+        self.assertEqual(self.store.get(str(self.job_id))["status"], "queued")
+        self.assertEqual(self.pipeline.analyze(self.job_id)["status"], "succeeded")
+        self.assertEqual(len(self.agent.calls), 1)
+
+    def test_worker_rechecks_changed_title_after_claim_without_calling_agent(self) -> None:
+        self.pipeline.enqueue(self.job_id)
+        original = self.source.get_posting(self.job_id)
+        changed = {**original, "title": "Retail Engineer"}
+        with patch.object(self.source, "get_posting", return_value=changed):
+            result = self.pipeline.process_next(focused_only=True)
+        self.assertEqual(result["status"], "queued")
+        self.assertEqual(self.agent.calls, [])
+        self.assertIsNone(self.store.get(str(self.job_id))["structured_data"])
+
+    def test_idle_focus_skip_cache_refreshes_on_worker_scan(self) -> None:
+        self.pipeline.enqueue(self.job_id)
+        with self.session_factory() as session, session.begin():
+            session.get(JobPosting, self.job_id).title = "Retail Engineer"
+        self.source_sql.clear()
+        self.record_sql = True
+        self.assertIsNone(self.pipeline.process_next(focused_only=True))
+        self.assertEqual(len(self.source_sql), 1)
+        self.assertNotIn("description_text", self.source_sql[0])
+        self.source_sql.clear()
+        self.assertIsNone(self.pipeline.process_next(focused_only=True))
+        self.assertEqual(self.source_sql, [])
+        self.record_sql = False
+        with self.session_factory() as session, session.begin():
+            session.get(JobPosting, self.job_id).title = "AI Engineer"
+        self.assertIsNone(self.pipeline.process_next(focused_only=True))
+        self.assertEqual(self.agent.calls, [])
+        self.pipeline.recover_interrupted()
+        self.assertEqual(self.pipeline.process_next(focused_only=True)["status"], "succeeded")
+        self.assertEqual(len(self.agent.calls), 1)
+
+    def test_title_lookup_batches_large_legacy_queue(self) -> None:
+        # Absent IDs need no full posting reads to discover their absence. The
+        # same bounded lookup applies to hundreds of unrelated legacy entries.
+        ids = [str(self.job_id), *(str(uuid.uuid4()) for _ in range(500))]
+        self.source_sql.clear()
+        self.record_sql = True
+        self.assertEqual(self.source.get_titles(ids), {str(self.job_id): "Software Engineer"})
+        self.assertEqual(len(self.source_sql), 2)
+        self.assertTrue(all("description_text" not in sql for sql in self.source_sql))
+        self.assertTrue(all(sql.lstrip().upper().startswith("SELECT") for sql in self.source_sql))
+
+    def test_focused_queue_records_deleted_source_without_calling_agent(self) -> None:
+        self.pipeline.enqueue(self.job_id)
+        with self.session_factory() as session, session.begin():
+            session.delete(session.get(JobPosting, self.job_id))
+        self.assertEqual(self.pipeline.process_next(focused_only=True)["status"], "failed")
+        self.assertEqual(self.agent.calls, [])
 
     def test_get_posting_preserves_all_25_fields_and_nulls(self) -> None:
         with self.session_factory() as session:
@@ -722,6 +829,18 @@ class ReadOnlyJobPostingSourceTests(unittest.TestCase):
         self.assertEqual(len(self.statements), 1)
         self.assertNotIn("description_text", self.statements[0])
         self.assertIn("job_postings.id", self.statements[0])
+
+    def test_title_lookup_closes_sessions_and_rejects_invalid_ids_before_read(self):
+        self.assertEqual(self.source.get_titles([str(self.job_id)]), {
+            str(self.job_id): "Software Engineer",
+        })
+        self.assertTrue(all(session.was_closed for session in self.sessions))
+        self.sessions.clear()
+        with self.assertRaises(JobPostingAnalysisInputError):
+            self.source.get_titles([str(self.job_id), "invalid"])
+        self.assertEqual(self.sessions, [])
+        self.assertEqual(self.source.get_titles([]), {})
+        self.assertEqual(self.sessions, [])
 
     def test_empty_source_yields_no_ids(self):
         with Session(self.engine) as session:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from copy import deepcopy
@@ -30,6 +31,19 @@ from app.services.local_job_analysis_store import (
     LocalJobAnalysisStore,
     maintain_analysis_lease,
 )
+
+
+# This is a conservative pre-Agent spending guard, not job_family classification.
+# Qualifiers before/after the phrase are allowed; synonyms are not inferred.
+_FOCUS_TITLE = re.compile(
+    r"\b(?:software[\s\-\u2010-\u2015]+engineer|"
+    r"data[\s\-\u2010-\u2015]+analyst|ai[\s\-\u2010-\u2015]+engineer)\b",
+    re.IGNORECASE,
+)
+
+
+def is_focus_job_title(title: Any) -> bool:
+    return isinstance(title, str) and _FOCUS_TITLE.search(title) is not None
 
 
 class JobPostingNotFoundError(LookupError):
@@ -107,7 +121,20 @@ class ReadOnlyJobPostingSource:
                 raise JobPostingNotFoundError("The source job posting was not found.")
             return serialize_posting(posting)
 
-    def iter_ids(self, batch_size: int = 500) -> Iterator[str]:
+    def get_titles(self, job_ids: list[str]) -> dict[str, str | None]:
+        """Read only titles for a local queue snapshot, in bounded SELECT batches."""
+        ids = [posting_id(job_id) for job_id in job_ids]
+        titles: dict[str, str | None] = {}
+        for start in range(0, len(ids), 500):
+            query = select(JobPosting.id, JobPosting.title).where(
+                JobPosting.id.in_(ids[start:start + 500])
+            )
+            with self._session() as session:
+                rows = list(session.execute(query))
+            titles.update((str(row.id), row.title) for row in rows)
+        return titles
+
+    def iter_ids(self, batch_size: int = 500, *, focused_only: bool = False) -> Iterator[str]:
         """Page through source IDs, closing each session before yielding its IDs.
 
         A later scan discovers any newly inserted IDs, including ones ordered
@@ -117,15 +144,23 @@ class ReadOnlyJobPostingSource:
             raise JobPostingAnalysisInputError("batch_size must be a positive integer.")
         previous: UUID | None = None
         while True:
-            query = select(JobPosting.id).order_by(JobPosting.id).limit(batch_size)
+            columns = (JobPosting.id, JobPosting.title) if focused_only else (JobPosting.id,)
+            query = select(*columns).order_by(JobPosting.id).limit(batch_size)
             if previous is not None:
                 query = query.where(JobPosting.id > previous)
             with self._session() as session:
-                ids = list(session.scalars(query))
+                if focused_only:
+                    rows = list(session.execute(query))
+                    ids = [row.id for row in rows]
+                    eligible = {row.id for row in rows if is_focus_job_title(row.title)}
+                else:
+                    ids = list(session.scalars(query))
+                    eligible = None
             if not ids:
                 return
             for job_id in ids:
-                yield str(job_id)
+                if eligible is None or job_id in eligible:
+                    yield str(job_id)
             if len(ids) < batch_size:
                 return
             previous = ids[-1]
@@ -166,6 +201,7 @@ class JobPostingAnalysisPipeline:
         self.source = source
         self.store = store
         self.agent = agent
+        self._skipped_focus_ids: set[str] = set()
 
     def get_posting(self, job_posting_id: UUID | str) -> dict[str, Any]:
         return self.source.get_posting(job_posting_id)
@@ -180,7 +216,10 @@ class JobPostingAnalysisPipeline:
             self.source.get_posting(job_id)
         return self.store.enqueue(job_id, force=force)
 
-    def enqueue_missing(self, *, batch_size: int = 500, limit: int | None = None) -> int:
+    def enqueue_missing(
+        self, *, batch_size: int = 500, limit: int | None = None,
+        focused_only: bool = False,
+    ) -> int:
         """First scan backfills; later scans add only IDs absent from the local queue.
 
         No timestamp watermark is used. Repeated scans also discover late-arriving
@@ -193,7 +232,7 @@ class JobPostingAnalysisPipeline:
                 raise JobPostingAnalysisInputError(f"{name} must be a positive integer.")
         added = 0
         batch: list[str] = []
-        for job_id in self.source.iter_ids(batch_size=batch_size):
+        for job_id in self.source.iter_ids(batch_size=batch_size, focused_only=focused_only):
             batch.append(job_id)
             capacity = min(batch_size, limit - added) if limit is not None else batch_size
             if len(batch) >= capacity:
@@ -206,14 +245,38 @@ class JobPostingAnalysisPipeline:
         return added
 
     def recover_interrupted(self) -> int:
-        """Recover expired local attempts without reading or writing the source."""
+        """Start a new worker scan and recover expired attempts locally.
+
+        Reevaluating skipped titles once per scan permits source title changes
+        without rereading an unrelated legacy queue on every short idle poll.
+        """
+        self._skipped_focus_ids.clear()
         return self.store.recover_interrupted()
 
-    def process_next(self) -> dict[str, Any] | None:
-        job_id = self.store.next_queued_id()
-        return self.analyze(job_id) if job_id is not None else None
+    def process_next(self, *, focused_only: bool = False) -> dict[str, Any] | None:
+        if not focused_only:
+            job_id = self.store.next_queued_id()
+            return self.analyze(job_id) if job_id is not None else None
+        # Existing queues may predate the spending guard or contain manual API
+        # requests. Leave unrelated rows queued, without blocking eligible rows.
+        candidates = [
+            job_id for job_id in self.store.queued_ids()
+            if job_id not in self._skipped_focus_ids
+        ]
+        titles = self.source.get_titles(candidates)
+        self._skipped_focus_ids.update(
+            job_id for job_id, title in titles.items() if not is_focus_job_title(title)
+        )
+        for job_id in candidates:
+            if job_id not in self._skipped_focus_ids:
+                # Missing source IDs follow the normal terminal failure path.
+                return self.analyze(job_id, focused_only=True)
+        return None
 
-    def analyze(self, job_posting_id: UUID | str, *, force: bool = False) -> dict[str, Any]:
+    def analyze(
+        self, job_posting_id: UUID | str, *, force: bool = False,
+        focused_only: bool = False,
+    ) -> dict[str, Any]:
         job_id = str(posting_id(job_posting_id))
         self.store.recover_interrupted(job_posting_id=job_id)
         self.enqueue(job_id)
@@ -226,7 +289,7 @@ class JobPostingAnalysisPipeline:
 
         try:
             with maintain_analysis_lease(self.store, job_id, attempt) as ensure_owned:
-                return self._analyze_claimed(job_id, attempt, ensure_owned)
+                return self._analyze_claimed(job_id, attempt, ensure_owned, focused_only=focused_only)
         except BaseException as error:
             # A graceful interrupt releases only this attempt. Abrupt exits are
             # recovered after lease expiry by a later worker scan or API request.
@@ -238,7 +301,10 @@ class JobPostingAnalysisPipeline:
                     pass
             raise
 
-    def _analyze_claimed(self, job_id: str, attempt: str, ensure_owned: Callable[[], None]) -> dict[str, Any]:
+    def _analyze_claimed(
+        self, job_id: str, attempt: str, ensure_owned: Callable[[], None],
+        *, focused_only: bool = False,
+    ) -> dict[str, Any]:
         try:
             posting = self.source.get_posting(job_id)
         except JobPostingNotFoundError:
@@ -256,6 +322,15 @@ class JobPostingAnalysisPipeline:
 
         # The source session has closed; only local state changes from this point.
         ensure_owned()
+        if focused_only and not is_focus_job_title(posting.get("title")):
+            # The title may have changed after discovery/selection. Never spend
+            # an Agent run on an out-of-scope snapshot; preserve the queued row.
+            self.store.release(job_id, attempt)
+            self._skipped_focus_ids.add(job_id)
+            result = self.store.get(job_id)
+            if result is None:
+                raise LocalAnalysisStateError("The local analysis record is unavailable.")
+            return result
         try:
             # Validate against the original snapshot even if an Agent adapter mutates its input.
             result = self.agent.analyze(deepcopy(posting))
