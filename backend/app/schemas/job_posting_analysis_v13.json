@@ -1,0 +1,536 @@
+{
+  "name": "job_posting_analysis",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "source": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "external_id": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "company_slug": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "company_name": {
+        "$ref": "#/$defs/company_name"
+      },
+      "company_tier": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "job_title": {
+        "$ref": "#/$defs/job_title"
+      },
+      "job_family": {
+        "$ref": "#/$defs/job_family"
+      },
+      "seniority": {
+        "$ref": "#/$defs/seniority"
+      },
+      "department": {
+        "$ref": "#/$defs/department"
+      },
+      "locations": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/evidenced_item"
+        },
+        "description": "Explicit work-location entities only. Put workplace arrangements, residence restrictions and location eligibility in job_conditions. Return [] if none."
+      },
+      "role_overview": {
+        "$ref": "#/$defs/role_overview"
+      },
+      "responsibilities": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/evidenced_item"
+        },
+        "description": "Specific work, ownership, deliverables and collaboration duties anywhere in the input, including prose. Preserve logical relationships, meaningful technologies, application areas, integration targets and scale. Do not convert team capabilities or candidate experience into personal obligations. Return [] if none."
+      },
+      "qualifications": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/qualification"
+        },
+        "description": "Candidate requirements throughout the input, including prose outside qualification sections. Preserve core requirements here even when mentioned in an overview or cited elsewhere. Keep logically connected requirements together; retain supported requirements when level is unspecified. Team technologies alone are not candidate requirements."
+      },
+      "job_conditions": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/job_condition"
+        },
+        "description": "Employment arrangements, restrictions and eligibility applicable to this position. Workplace arrangements require support about employee work location or attendance policy, not team composition or technical architecture alone. Keep conditions with their exceptions and alternative employing-entity or geographic branches. Do not duplicate qualifications."
+      },
+      "compensation": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/compensation_item"
+        },
+        "description": "Monetary remuneration and equity, with separate items for different types or applicable scopes. Extract explicit text amounts despite null salary metadata. Exclude non-compensation benefits."
+      },
+      "benefits": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "Concrete non-compensation benefits as one string without evidence, preserving useful details and conditional eligibility. Separate distinct benefits with \\n\\n. Exclude unspecified benefits claims. Do not duplicate compensation items. Return null if none."
+      },
+      "other_relevant_information": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Useful job-specific facts that fit no other field, or unresolved conflicts preserving the conflicting source statements and their applicable scope as strings. Do not use this field instead of role_overview, responsibilities, qualifications or job_conditions. Exclude repetition, generic marketing and generic compensation or career-level disclaimers. Return [] if none."
+      },
+      "salary_currency": {
+        "$ref": "#/$defs/base_pay_currency"
+      },
+      "salary_interval": {
+        "$ref": "#/$defs/base_pay_interval"
+      },
+      "url": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "published_at": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "first_seen_at": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "last_seen_at": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "closed_at": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "content_hash": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "created_at": {
+        "$ref": "#/$defs/copied_metadata"
+      },
+      "updated_at": {
+        "$ref": "#/$defs/copied_metadata"
+      }
+    },
+    "required": [
+      "id",
+      "source",
+      "external_id",
+      "company_slug",
+      "company_name",
+      "company_tier",
+      "job_title",
+      "job_family",
+      "seniority",
+      "department",
+      "locations",
+      "role_overview",
+      "responsibilities",
+      "qualifications",
+      "job_conditions",
+      "compensation",
+      "benefits",
+      "other_relevant_information",
+      "salary_currency",
+      "salary_interval",
+      "url",
+      "published_at",
+      "first_seen_at",
+      "last_seen_at",
+      "closed_at",
+      "content_hash",
+      "created_at",
+      "updated_at"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "evidence": {
+        "type": "object",
+        "properties": {
+          "source_field": {
+            "type": "string",
+            "description": "Actual original input field name. Never use a generated output field as a source."
+          },
+          "quote": {
+            "type": "string",
+            "description": "Exact nonempty contiguous excerpt from the decoded source string, preserving case, punctuation and whitespace. Do not rewrite, translate, splice or insert ellipses. For numeric or boolean sources, use their JSON scalar representation as a string; never cite null. Use standard JSON escaping: do not add a backslash before $. Preserve any literal source backslash using valid JSON escaping."
+          }
+        },
+        "required": [
+          "source_field",
+          "quote"
+        ],
+        "additionalProperties": false,
+        "description": "Original input evidence. Excerpts collectively support the entire associated value and populated attributes, including classification, requirement level, quantities, conditions and scope. Include contextual support where needed; use separate excerpts for noncontiguous support."
+      },
+      "job_family": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "software_engineer",
+              "data_analyst",
+              "ai_engineer"
+            ]
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "software_engineer: primarily designs or builds software systems; data_analyst: primarily analyzes and interprets data for insights; ai_engineer: primarily builds, trains, optimizes or deploys AI/ML models or systems. Use role context; return null if unsupported or ambiguous. Classify the role's actual work into a permitted family. Use null when unsupported, ambiguous or outside these families; do not force a match."
+      },
+      "seniority": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "intern",
+              "new_grad",
+              "entry_level",
+              "mid_level",
+              "senior",
+              "staff",
+              "senior_staff",
+              "principal",
+              "manager",
+              "multiple_levels"
+            ]
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "Normalize an explicitly supported role level. multiple_levels requires this posting explicitly covering multiple levels. Years of experience alone or a company-wide career-level disclaimer do not establish seniority. Use null if unresolved. Explicit level of this role, supported by its title or applicable text. Do not infer from years of experience or generic company title disclaimers."
+      },
+      "evidenced_item": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "Nonempty content preserving useful specifics, technologies, application areas, integration targets, scale, examples and quantities. Preserve AND/OR relationships, negation, uncertainty, conditions, exceptions and scope. Conditional benefits remain conditional. Important details must not appear only in evidence."
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidence"
+            },
+            "description": "One or more exact source excerpts that collectively support the entire fact, including conditions and scope. Use separate excerpts for noncontiguous support."
+          }
+        },
+        "required": [
+          "value",
+          "evidence"
+        ],
+        "additionalProperties": false,
+        "description": "One useful fact assigned to the containing field, with its complete applicable meaning and supporting evidence. Omit unsupported items."
+      },
+      "qualification": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "string",
+            "description": "The complete requirement with its original strength and logical relationships. Preserve named skills, quantities, examples, AND/OR grouping, degree-and-experience combinations, conditions, negation and limits. Do not turn examples into mandatory checklists or alternatives into separate mandatory items. Keep any branch-specific levels or conditions explicit."
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "required",
+              "preferred",
+              "unspecified"
+            ],
+            "description": "required when wording or applicable context clearly establishes necessity; preferred when it clearly establishes an advantage or optional qualification; otherwise unspecified. No particular keyword is required. A broad suitable-candidate heading alone establishes neither required nor preferred. Specific qualifiers take precedence over general headings for the same requirement and scope. A mandatory alternative group is required as a group. Use unspecified if linked branches cannot share one accurate level, preserving their individual levels in value."
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "skill",
+                "experience",
+                "education",
+                "certification",
+                "domain_knowledge",
+                "language",
+                "competency",
+                "other"
+              ]
+            },
+            "description": "One or more applicable categories, without duplicates. Classify the stated requirement; use other when none of the specific categories fits."
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidence"
+            },
+            "description": "One or more exact excerpts collectively supporting the full requirement, level and categories. Include an applicable heading or surrounding context when it establishes the level, plus every linked alternative or qualifier needed to support value."
+          }
+        },
+        "required": [
+          "value",
+          "level",
+          "categories",
+          "evidence"
+        ],
+        "additionalProperties": false,
+        "description": "One logically complete candidate requirement. Clearly linked alternatives belong in one item even across source bullets. Keep independent requirements separate."
+      },
+      "job_condition": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "employment_type",
+              "workplace_arrangement",
+              "geographic_restriction",
+              "schedule",
+              "travel",
+              "visa_sponsorship",
+              "work_authorization",
+              "citizenship_requirement",
+              "security_clearance",
+              "export_control",
+              "other"
+            ],
+            "description": "Classify the actual employment condition in context. workplace_arrangement requires evidence about where or how the employee may or must work; team composition, collaboration style and technical architecture alone are insufficient. Do not infer authorization, sponsorship or clearance from isolated keywords."
+          },
+          "value": {
+            "type": "string",
+            "description": "Complete stated condition, preserving positive or negative meaning, uncertainty, frequency, applicable scope and exceptions. Keep a restriction together with qualifying location or employing-entity branches."
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidence"
+            },
+            "description": "One or more exact excerpts supporting this condition as applicable to the position, including every stated qualifier, exception and branch. Cite applicable policy context when it establishes the employment condition."
+          }
+        },
+        "required": [
+          "type",
+          "value",
+          "evidence"
+        ],
+        "additionalProperties": false
+      },
+      "compensation_item": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "base_salary",
+              "hourly_rate",
+              "ote",
+              "bonus",
+              "commission",
+              "equity",
+              "stipend",
+              "other"
+            ],
+            "description": "Compensation type supported by context. Do not classify unspecified total compensation as base salary or put non-compensation benefits here."
+          },
+          "value": {
+            "type": "string",
+            "description": "Supported compensation statement retaining amounts, units, formulas, conditional eligibility, exclusions and scope. Must agree with the numeric attributes. Keep percentages and equity-unit counts in this text, not monetary amount fields."
+          },
+          "minimum": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Populate the unambiguous monetary lower bound, or stated fixed amount, from applicable metadata or text even when input salary_min is null. Unknown currency or period does not erase a known amount. Use null for upper-bound-only, absent or unresolved monetary bounds. Do not estimate, annualize, convert currencies, or store percentages or equity-unit counts."
+          },
+          "maximum": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Populate the unambiguous monetary upper bound, or stated fixed amount, from applicable metadata or text even when input salary_max is null. Unknown currency or period does not erase a known amount. Use null for lower-bound-only, absent or unresolved monetary bounds. A fixed amount fills both bounds equally; do not estimate or convert amounts, or store percentages or equity-unit counts."
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Currency unambiguously supported by applicable input fields or text, normalized to a code; otherwise null. Do not infer from company, location, amount size or ambiguous symbols. Determine independently of amounts and payment period."
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "hour",
+                  "day",
+                  "week",
+                  "month",
+                  "year",
+                  "one_time"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Payment period unambiguously supported by applicable input fields or text, normalized to a permitted value; otherwise null. Calling an amount salary does not establish year. Do not infer from amount size, company, location or employment type. Preserve explicitly stated periods outside the enum in value."
+          },
+          "applies_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Explicit applicable location, zone, level, arrangement or group; otherwise null. Preserve unexplained zone labels without inventing their geographic meaning."
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidence"
+            },
+            "description": "One or more original input excerpts jointly supporting type, amount, currency, period, scope and conditions. Include contextual base-pay wording when it establishes type; an isolated amount alone may not establish compensation type."
+          }
+        },
+        "required": [
+          "type",
+          "value",
+          "minimum",
+          "maximum",
+          "currency",
+          "interval",
+          "applies_to",
+          "evidence"
+        ],
+        "additionalProperties": false,
+        "description": "One compensation type and applicable scope. Populate unambiguous monetary bounds from metadata or description_text even when salary metadata is null; determine amounts, currency and period independently. Keep distinct types and applicable location, zone, level or arrangement ranges separate. Preserve non-monetary formulas and conditions in value."
+      },
+      "copied_metadata": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "Copy the entire nonempty string from the same-named input field exactly, preserving URL query parameters, identifiers, timestamp precision and timezone offsets. Missing, null or empty input means null. Do not generate dates, recompute hashes or reassess company_tier. These are source-posting metadata, not analysis metadata."
+      },
+      "base_pay_currency": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "One explicitly supported unambiguous currency code common to every relevant base-pay arrangement. Use null if values differ, any applicable value is unknown, or applicability is unresolved. Do not infer from ambiguous symbols, company or location. Posting-wide currency for base_salary and hourly_rate only. Exclude all other compensation types and benefits; determine independently of salary_interval."
+      },
+      "base_pay_interval": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "hour",
+              "day",
+              "week",
+              "month",
+              "year",
+              "one_time"
+            ]
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "One explicitly supported normalized period common to every relevant base_salary or hourly_rate arrangement. Use null if periods differ, any applicable period is unknown or outside the enum, or applicability is unresolved. Do not infer year merely because the amount is called salary, or infer a period from amount size, company, location or employment type. Posting-wide payment period for base_salary and hourly_rate only. Exclude all other compensation types and benefits; determine independently of salary_currency."
+      },
+      "company_name": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "Explicit company name from the input; supplement missing metadata from description_text. Do not invent or silently resolve conflicting identities. Unknown or unresolved means null; never use an empty string."
+      },
+      "job_title": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "Explicit job title, normally from input title. Preserve its wording and specialization; do not replace it with a generic occupational label. Unknown or unresolved means null; never use an empty string."
+      },
+      "department": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "null"
+          }
+        ],
+        "description": "Explicit department or team name. Do not infer a department from the occupation or technical domain. Unknown or unresolved means null; never use an empty string."
+      },
+      "role_overview": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Concise supported content retaining useful specifics, examples, conditions, alternatives, negation and scope. Important details must not be left only in evidence."
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/$defs/evidence"
+            },
+            "description": "One or more source excerpts supporting a non-null value; [] when value is null. Include relevant context where needed."
+          }
+        },
+        "required": [
+          "value",
+          "evidence"
+        ],
+        "additionalProperties": false,
+        "description": "Role purpose and useful team or product context, including supported technical scope, application areas, integration targets and scale in value, not only in evidence. Exclude generic marketing and detailed-duty repetition. Unknown or unresolved means value:null and evidence:[]. A non-null value needs excerpts jointly supporting its entire content; never use an empty string."
+      }
+    },
+    "description": "Useful input-supported information from exactly one job posting. Preserve source logic, requirement strength, quantities, conditions and scope. Keep evidence only in locations, role_overview, responsibilities, qualifications, job_conditions and compensation; use direct values or string arrays for all other fields. Include all 28 fields; no candidate evaluation."
+  },
+  "strict": true
+}

@@ -34,16 +34,17 @@ def run_git(*args: str) -> subprocess.CompletedProcess[str]:
 
 class RepositorySafetyTests(unittest.TestCase):
     def test_local_environment_paths_are_ignored(self) -> None:
-        result = run_git(
-            "check-ignore",
+        paths = (
             "backend/.env",
             "backend/.venv/pyvenv.cfg",
+            "backend/.venv-jd-test/pyvenv.cfg",
+            "backend/local_tests/scratch.py",
+            "backend/local_exports/api_tests/output.txt",
         )
+        result = run_git("check-ignore", *paths)
 
         self.assertEqual(result.returncode, 0, result.stderr)
-        ignored = set(result.stdout.splitlines())
-        self.assertIn("backend/.env", ignored)
-        self.assertIn("backend/.venv/pyvenv.cfg", ignored)
+        self.assertEqual(set(paths), set(result.stdout.splitlines()))
 
     def test_sensitive_environment_files_are_not_tracked(self) -> None:
         result = run_git("ls-files")
@@ -52,7 +53,9 @@ class RepositorySafetyTests(unittest.TestCase):
         unsafe_paths = []
         for raw_path in result.stdout.splitlines():
             path = Path(raw_path)
-            if ".venv" in path.parts:
+            if any(part.startswith(".venv") for part in path.parts) or raw_path.startswith(
+                ("backend/local_tests/", "backend/local_exports/")
+            ):
                 unsafe_paths.append(raw_path)
             if path.name == ".env" or (
                 path.name.startswith(".env.") and path.name != ".env.example"
@@ -91,6 +94,16 @@ class BackendConfigurationTests(unittest.TestCase):
         script = ScriptDirectory.from_config(config)
 
         self.assertEqual(1, len(script.get_heads()), script.get_heads())
+
+    def test_job_analysis_tables_are_registered_for_future_persistence(self) -> None:
+        for table in (
+            "job_postings_analyses", "job_analysis_locations",
+            "job_analysis_responsibilities", "job_analysis_qualifications",
+            "job_analysis_conditions", "job_analysis_compensation",
+        ):
+            with self.subTest(table=table):
+                self.assertIn(table, Base.metadata.tables)
+                self.assertIn("job_posting_id", Base.metadata.tables[table].columns)
 
     def test_user_model_has_expected_table_and_columns(self) -> None:
         self.assertEqual("users", User.__tablename__)
