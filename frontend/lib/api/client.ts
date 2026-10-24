@@ -9,7 +9,34 @@ export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhos
   "",
 );
 
-const TIMEOUT_MS = 5000;
+const DEFAULT_TIMEOUT_MS = 5000;
+
+type AccessTokenGetter = () => Promise<string | null>;
+
+let getAccessToken: AccessTokenGetter = async () => null;
+let onUnauthorized: () => void = () => {};
+
+/**
+ * Where requests get the logged-in user's Supabase access token. The Supabase session code
+ * registers this once; every request then sends it as "Authorization: Bearer <token>".
+ */
+export function setAccessTokenGetter(getter: AccessTokenGetter) {
+  getAccessToken = getter;
+}
+
+/** What to do when the API answers 401 (no valid token). The Supabase session code sends the user to /login. */
+export function setUnauthorizedHandler(handler: () => void) {
+  onUnauthorized = handler;
+}
+
+type RequestOptions = {
+  /** JSON request body. */
+  json?: unknown;
+  /** Multipart body, e.g. a file upload. */
+  form?: FormData;
+  /** Defaults to 5 s; uploads need longer. */
+  timeoutMs?: number;
+};
 
 /** Thrown for any failed API call. */
 export class ApiError extends Error {
@@ -30,40 +57,41 @@ export class ApiError extends Error {
 }
 
 /** GET a JSON endpoint, e.g. apiGet<DatabaseHealthResponse>("/health/db"). */
-export async function apiGet<T>(path: string): Promise<T> {
-  const url = `${API_BASE_URL}${path}`;
-
-  let response: Response;
-  try {
-    response = await fetch(url, {
-      cache: "no-store",
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    });
-  } catch {
-    throw new ApiError(0, `Couldn't reach the API at ${API_BASE_URL}`);
-  }
-
-  if (!response.ok) {
-    const detail = await readDetail(response);
-    throw new ApiError(response.status, `GET ${path} failed with ${response.status}`, detail);
-  }
-
-  return (await response.json()) as T;
+export function apiGet<T>(path: string, options?: RequestOptions): Promise<T> {
+  return apiRequest<T>("GET", path, options);
 }
 
-/** POST multipart form data. The browser supplies the boundary in Content-Type. */
-export async function apiPostForm<T>(
+export function apiPost<T>(path: string, options?: RequestOptions): Promise<T> {
+  return apiRequest<T>("POST", path, options);
+}
+
+export function apiPatch<T>(path: string, options?: RequestOptions): Promise<T> {
+  return apiRequest<T>("PATCH", path, options);
+}
+
+export function apiPut<T>(path: string, options?: RequestOptions): Promise<T> {
+  return apiRequest<T>("PUT", path, options);
+}
+
+async function apiRequest<T>(
+  method: string,
   path: string,
-  form: FormData,
-  timeoutMs = TIMEOUT_MS,
+  { json, form, timeoutMs = DEFAULT_TIMEOUT_MS }: RequestOptions = {},
 ): Promise<T> {
   const url = `${API_BASE_URL}${path}`;
+  const headers = new Headers();
+  const token = await getAccessToken();
+  if (token) headers.set("Authorization", `Bearer ${token}`);
+  if (json !== undefined) headers.set("Content-Type", "application/json");
 
   let response: Response;
   try {
     response = await fetch(url, {
-      method: "POST",
-      body: form,
+      method,
+      headers,
+      // FormData sets its own multipart Content-Type with the boundary.
+      body: form ?? (json !== undefined ? JSON.stringify(json) : undefined),
+      cache: "no-store",
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch {
@@ -72,10 +100,20 @@ export async function apiPostForm<T>(
 
   if (!response.ok) {
     const detail = await readDetail(response);
-    throw new ApiError(response.status, `POST ${path} failed with ${response.status}`, detail);
+    if (response.status === 401) onUnauthorized();
+    throw new ApiError(response.status, `${method} ${path} failed with ${response.status}`, detail);
   }
 
   return (await response.json()) as T;
+}
+
+/** POST multipart form data. The browser supplies the boundary in Content-Type. */
+export function apiPostForm<T>(
+  path: string,
+  form: FormData,
+  timeoutMs = DEFAULT_TIMEOUT_MS,
+): Promise<T> {
+  return apiRequest<T>("POST", path, { form, timeoutMs });
 }
 
 async function readDetail(response: Response): Promise<string | undefined> {
@@ -88,4 +126,13 @@ async function readDetail(response: Response): Promise<string | undefined> {
     // Not JSON; there's no detail to show.
   }
   return undefined;
+}
+
+/** A message for the user: the API's own explanation for 4xx errors, otherwise a generic one. */
+export function errorMessage(error: unknown, fallback = "Something went wrong. Try again.") {
+  if (!(error instanceof ApiError)) return fallback;
+  if (error.status === 0) return "Can't reach CareerGPS right now. Check your connection and try again.";
+  if (error.status === 401) return "Your session has expired. Log in again.";
+  if (error.status >= 400 && error.status < 500 && error.detail) return error.detail;
+  return fallback;
 }

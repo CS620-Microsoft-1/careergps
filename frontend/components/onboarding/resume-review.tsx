@@ -24,6 +24,13 @@ type ResumeReviewProps = {
   onChange: (classification: ResumeClassification) => void;
   onStartOver: () => void;
   onConfirm: () => void;
+  /** True while the confirmed result is being saved. */
+  confirming?: boolean;
+  /** Why saving failed, shown above the buttons. */
+  confirmError?: string;
+  /** The student's university, pre-filled from the résumé; they confirm or change it here. */
+  university: string;
+  onUniversityChange: (university: string) => void;
 };
 
 type StringListKey = "research_interests" | "technical_skills";
@@ -190,7 +197,11 @@ function formatUsPhone(value: string) {
 
 function blankRecord(section: ObjectListKey): ResumeRecord {
   return Object.fromEntries(
-    OBJECT_SECTIONS[section].fields.map((field) => [field.key, field.type === "lines" ? [] : null]),
+    // other.content is a required string in the contract (app/schemas/resume.py), not nullable.
+    OBJECT_SECTIONS[section].fields.map((field) => [
+      field.key,
+      field.type === "lines" ? [] : section === "other" ? "" : null,
+    ]),
   );
 }
 
@@ -204,6 +215,10 @@ export function ResumeReview({
   onChange,
   onStartOver,
   onConfirm,
+  confirming = false,
+  confirmError,
+  university,
+  onUniversityChange,
 }: ResumeReviewProps) {
   const updatePersonal = (field: string, value: string | string[]) => {
     onChange({
@@ -263,10 +278,25 @@ export function ResumeReview({
       <div>
         <h2 className="text-page-title tracking-[-0.02em]">Review the extracted résumé</h2>
         <p className="mt-1.5 text-muted-foreground">
-          Check and edit the Agent&apos;s classification. Empty categories are hidden below. This
-          test result is discarded when you continue to the dashboard.
+          Check and edit the Agent&apos;s classification. Empty categories are hidden below. When you
+          continue, the result is saved to your account and shown on your profile.
         </p>
       </div>
+
+      <Field className="max-w-100">
+        <FieldLabel htmlFor="university">University</FieldLabel>
+        <Input
+          id="university"
+          value={university}
+          onChange={(event) => onUniversityChange(event.target.value)}
+          maxLength={150}
+          autoComplete="organization"
+          aria-describedby="university-hint"
+        />
+        <p id="university-hint" className="text-xs text-muted-foreground">
+          From your résumé. Change it if this isn&apos;t the school you attend now.
+        </p>
+      </Field>
 
       <Card size="sm">
         <CardHeader>
@@ -373,12 +403,17 @@ export function ResumeReview({
         </details>
       )}
 
+      {confirmError && (
+        <p role="alert" className="text-control text-destructive">
+          {confirmError}
+        </p>
+      )}
       <div className="grid gap-3 border-t border-border pt-5 sm:grid-cols-[auto_1fr]">
         <Button type="button" variant="outline" size="lg" onClick={onStartOver}>
           <RotateCcw data-icon="inline-start" /> Choose another résumé
         </Button>
-        <Button type="button" size="lg" onClick={onConfirm}>
-          Looks right, continue
+        <Button type="button" size="lg" onClick={onConfirm} disabled={confirming}>
+          {confirming ? "Saving…" : "Looks right, continue"}
         </Button>
       </div>
     </div>

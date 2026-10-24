@@ -19,7 +19,6 @@ const experienceLevel = z.enum(EXPERIENCE_LEVELS, {
 export const loginSchema = z.object({
   email,
   password: z.string().min(1, "Enter your password."),
-  remember: z.boolean(),
 });
 export type LoginValues = z.infer<typeof loginSchema>;
 
@@ -28,31 +27,28 @@ const password = z
   .min(8, "Use at least 8 characters.")
   .max(128, "Use at most 128 characters.");
 
-const passwordPair = z.object({ password, confirmPassword: z.string() });
-
+// Sign-up asks only for email and password; the name and career goal are asked in onboarding.
 export const signupSchema = z
   .object({
-    fullName: z.string().trim().min(1, "Enter your full name.").max(100),
     email,
     password,
-    confirmPassword: z.string(),
-    targetRole,
-    graduationYear,
-    university: z.string().trim().min(1, "Enter your university.").max(150),
-    experienceLevel,
+    confirmPassword: z.string().min(1, "Confirm your password."),
     acceptTerms: z
       .boolean()
       .refine(Boolean, "Please accept the Terms of Service and Privacy Policy."),
   })
-  .refine((v) => v.password === v.confirmPassword, {
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "Passwords don't match.",
     path: ["confirmPassword"],
-    error: "Passwords don't match.",
-    // Check as soon as the password itself is valid, not only once every field is.
-    when: (payload) => passwordPair.safeParse(payload.value).success,
   });
 export type SignupValues = z.infer<typeof signupSchema>;
 
+const name = (label: string) =>
+  z.string().trim().min(1, `Enter your ${label}.`).max(100, `Use at most 100 characters.`);
+
 export const onboardingSchema = z.object({
+  firstName: name("first name"),
+  lastName: name("last name"),
   targetRole,
   graduationYear,
   location: z.string().trim().min(1, "Enter a preferred location.").max(100),

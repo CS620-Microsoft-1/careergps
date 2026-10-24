@@ -82,6 +82,23 @@ The app calls the FastAPI backend at `NEXT_PUBLIC_API_URL`, set in `.env.local` 
   `backend/.env` (default `http://localhost:3000`). Running the frontend on another port means
   adding it there.
 
+## Sign-up and login
+
+Accounts live in Supabase Auth (SPEC-001). Set `NEXT_PUBLIC_SUPABASE_URL` and
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in `.env.local` (ask the team for the publishable key).
+
+- `/signup` asks only for email, password and the terms checkbox, calls `supabase.auth.signUp`
+  (the terms consent goes in user metadata), then shows
+  "Check your email". The link in that email lands on `/auth/confirm` (or on `/`, which passes the
+  code on), which creates the session and calls `POST /me`.
+- `/login` calls `signInWithPassword`, then `POST /me` too if sign-up wasn't finished yet.
+- `proxy.ts` refreshes the session cookies and redirects: logged out → `/login` for app pages,
+  logged in → `/dashboard` from `/login` and `/signup`. The API checks the token again on every call.
+- `lib/supabase/client.ts` registers the access token with `lib/api/client.ts`, so every API call
+  sends `Authorization: Bearer <token>`.
+- Supabase's built-in mailer sends 2 emails an hour, only to members of the Supabase organization.
+  For testing, create confirmed users in Supabase → Authentication → Users instead.
+
 The **backend status badge** (bottom of the sidebar, and in the account menu on small screens)
 shows whether the app can reach the API and database. Hover it for details.
 
