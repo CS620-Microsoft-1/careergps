@@ -1,0 +1,146 @@
+# CareerGPS
+
+[![Backend baseline checks](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml/badge.svg?branch=dev)](https://github.com/CS620-Microsoft-1/careergps/actions/workflows/backend-baseline-tests.yml)
+
+An agentic career-intelligence platform that helps students see how competitive they are for a target role and
+what to do next. CareerGPS reads a student's résumé, compares it with real job-market data, ranks the skill gaps,
+and turns them into an action plan.
+
+## Features
+
+| Area | Status |
+| --- | --- |
+| Résumé parsing: PDF/DOCX extraction, OCR fallback for scanned pages, classification by a Microsoft Foundry Agent, editable review | Working (results are not saved yet) |
+| Job-market data: daily ingest of public Greenhouse, Ashby and Lever job postings | Working |
+| Database schema for users and confirmed résumés | Migrated, not yet used by the API |
+| Market statistics, skill-gap analysis, action roadmap, Ask CareerGPS Copilot | Planned (UI placeholders) |
+| Sign-up / login | Planned |
+
+The analysis runs as four agents in order: **Student Profile → Market Intelligence → Gap Analysis → Action**.
+
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Zod, React Hook Form |
+| Backend | Python 3.12+, FastAPI, Pydantic, SQLAlchemy 2, Alembic |
+| Database | PostgreSQL on Supabase (one shared team database) |
+| AI | Microsoft Foundry Agent via `azure-ai-projects` and `azure-identity` |
+| Document processing | PyMuPDF, python-docx, OCRmyPDF + Tesseract, Ghostscript |
+| CI | GitHub Actions (backend unit tests on PRs to `dev`) |
+
+Each choice is explained in the [architecture decision records](docs/decisions/).
+
+## Architecture
+
+```text
+Next.js frontend ──HTTP/JSON──▶ FastAPI backend ──▶ Supabase PostgreSQL
+  (localhost:3000)               (localhost:8000)  ├─▶ Microsoft Foundry Agent (résumé classification)
+                                                   └─▶ Greenhouse / Ashby / Lever public job-board APIs
+```
+
+- The frontend calls the API only through `frontend/lib/api/`, with one file per backend router.
+- Market statistics are computed with SQL over stored postings. LLMs only extract fields or explain results that
+  were already computed ([ADR-003](docs/decisions/ADR-003-Career-Market-Data-Sources.md)).
+
+## Project structure
+
+```text
+careergps/
+├── backend/               FastAPI service
+│   ├── app/               api/routes, core config, db, models, schemas, services
+│   ├── data/              curated company job-board lists
+│   ├── migrations/        Alembic migrations
+│   ├── scripts/           job-posting ingest and board probe
+│   └── tests/             unittest suite (no DB or network needed)
+├── frontend/              Next.js app
+│   ├── app/               routes: auth, onboarding, dashboard, market, gaps, opportunities, roadmap, profile
+│   ├── components/        UI primitives, layout, auth, onboarding, Copilot panel
+│   ├── lib/               API client, navigation, validation, utilities
+│   └── types/             shared TypeScript types
+├── docs/
+│   ├── decisions/         ADR-001 frontend, ADR-002 backend, ADR-003 market data sources
+│   ├── testing/           Supabase database test plan
+│   └── resume-classifier-agent-prompt.md   Foundry Agent instructions and JSON contract
+└── .github/workflows/     CI
+```
+
+## Getting started
+
+### Prerequisites
+
+- Python 3.12+ and Node.js 20.9+
+- Tesseract OCR (with English data) and Ghostscript, for scanned résumés
+- Azure CLI, signed in with an account that has a Microsoft Foundry RBAC role
+- The shared `DATABASE_URL`, from the database owner (share it privately)
+
+### Backend
+
+```bash
+cd backend
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env              # fill in DATABASE_URL and FOUNDRY_* values
+az login
+python -m app.db.check_connection # should print "Connected ✅"
+uvicorn app.main:app --reload     # http://localhost:8000 (API docs at /docs)
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm ci
+cp .env.example .env.local        # NEXT_PUBLIC_API_URL, defaults to http://localhost:8000
+npm run dev                       # http://localhost:3000
+```
+
+The **backend status badge** in the sidebar shows whether the app can reach the API and the database.
+
+Windows setup, Foundry access, and troubleshooting are covered in the [backend README](backend/README.md) and the
+[frontend README](frontend/README.md).
+
+## Configuration
+
+| File | Variable | Purpose |
+| --- | --- | --- |
+| `backend/.env` | `DATABASE_URL` | Supabase PostgreSQL connection (session pooler) |
+| | `CORS_ORIGINS` | Frontend origins allowed to call the API (never `*`) |
+| | `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME` | Résumé classification Agent |
+| `frontend/.env.local` | `NEXT_PUBLIC_API_URL` | Backend URL (public: never put secrets here) |
+
+Never commit `.env` or `.env.local`.
+
+## Testing
+
+```bash
+cd backend && python -m unittest discover -s tests -v   # also runs in CI
+cd frontend && npm run lint && npm run typecheck && npm run build
+```
+
+`backend/tests/manual_resume_smoke.py` runs a live test against the Foundry Agent. It is not part of CI.
+
+## Data collection
+
+```bash
+cd backend
+python -m scripts.ingest_postings          # all boards in data/companies.yaml; run once a day
+python -m scripts.probe_boards             # find job boards for companies in data/company_candidates.yaml
+```
+
+## Contributing
+
+- Branch off `dev` and open pull requests into `dev`. `main` is the release branch.
+- Use Conventional Commits with a scope, for example `feat(backend): ...`, `fix(frontend): ...`, `docs: ...`.
+- **Database changes only go through Alembic migrations.** Never edit an applied migration. Enable row-level
+  security on every new table. Only the database owner applies migrations to the shared database, after merge.
+- Frontend screens must work from 320px to 2560px wide and with a larger browser font. See the responsive rules in
+  the [frontend README](frontend/README.md#responsive-rules).
+
+## Documentation
+
+- [Backend README](backend/README.md): setup, résumé pipeline, schema workflow, database rules
+- [Frontend README](frontend/README.md): setup, API client, responsive rules, Copilot
+- [Architecture decision records](docs/decisions/)
+- [Supabase database test plan](docs/testing/SUPABASE_DATABASE_TEST_PLAN.md)
+- [Résumé classifier prompt](docs/resume-classifier-agent-prompt.md)

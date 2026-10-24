@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health, me, resumes
+from app.api.routes import health, job_postings, me, resumes
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -21,3 +21,4 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(me.router)
 app.include_router(resumes.router)
+app.include_router(job_postings.router)
