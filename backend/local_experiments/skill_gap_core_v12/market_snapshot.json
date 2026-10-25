@@ -1,0 +1,528 @@
+{
+  "source_analysis_version": "careergps-compact-core-v3.0",
+  "source_fingerprint": "8766af4a81703dc686566d8a316e18f9e184c704a73e7da3d732b57a76eadf44",
+  "source_status": "computed_with_review_queue",
+  "source_sha256": "d47b1bafc91c7f0ae98ff5cf0c5f3f2f85f1c848ab03455de56b4bc34e7546ab",
+  "counts_recomputed": false,
+  "families": {
+    "software_engineer": {
+      "total_job_count": 2858,
+      "skills": {
+        "programming": {
+          "required_job_count": 1239,
+          "preferred_only_job_count": 227,
+          "unspecified_job_count": 220,
+          "required_ratio": 0.43352,
+          "preferred_only_ratio": 0.079426,
+          "unspecified_ratio": 0.076977
+        },
+        "algorithms": {
+          "required_job_count": 52,
+          "preferred_only_job_count": 1,
+          "unspecified_job_count": 16,
+          "required_ratio": 0.018195,
+          "preferred_only_ratio": 0.00035,
+          "unspecified_ratio": 0.005598
+        },
+        "object_oriented_design": {
+          "required_job_count": 61,
+          "preferred_only_job_count": 17,
+          "unspecified_job_count": 7,
+          "required_ratio": 0.021344,
+          "preferred_only_ratio": 0.005948,
+          "unspecified_ratio": 0.002449
+        },
+        "ai_assisted_development": {
+          "required_job_count": 194,
+          "preferred_only_job_count": 19,
+          "unspecified_job_count": 15,
+          "required_ratio": 0.06788,
+          "preferred_only_ratio": 0.006648,
+          "unspecified_ratio": 0.005248
+        },
+        "system_design": {
+          "required_job_count": 174,
+          "preferred_only_job_count": 116,
+          "unspecified_job_count": 46,
+          "required_ratio": 0.060882,
+          "preferred_only_ratio": 0.040588,
+          "unspecified_ratio": 0.016095
+        },
+        "backend_apis": {
+          "required_job_count": 333,
+          "preferred_only_job_count": 85,
+          "unspecified_job_count": 64,
+          "required_ratio": 0.116515,
+          "preferred_only_ratio": 0.029741,
+          "unspecified_ratio": 0.022393
+        },
+        "frontend": {
+          "required_job_count": 141,
+          "preferred_only_job_count": 119,
+          "unspecified_job_count": 75,
+          "required_ratio": 0.049335,
+          "preferred_only_ratio": 0.041638,
+          "unspecified_ratio": 0.026242
+        },
+        "distributed_systems": {
+          "required_job_count": 570,
+          "preferred_only_job_count": 158,
+          "unspecified_job_count": 184,
+          "required_ratio": 0.19944,
+          "preferred_only_ratio": 0.055283,
+          "unspecified_ratio": 0.064381
+        },
+        "relational_sql": {
+          "required_job_count": 198,
+          "preferred_only_job_count": 209,
+          "unspecified_job_count": 62,
+          "required_ratio": 0.069279,
+          "preferred_only_ratio": 0.073128,
+          "unspecified_ratio": 0.021693
+        },
+        "nosql_search": {
+          "required_job_count": 102,
+          "preferred_only_job_count": 58,
+          "unspecified_job_count": 9,
+          "required_ratio": 0.035689,
+          "preferred_only_ratio": 0.020294,
+          "unspecified_ratio": 0.003149
+        },
+        "code_quality": {
+          "required_job_count": 188,
+          "preferred_only_job_count": 8,
+          "unspecified_job_count": 20,
+          "required_ratio": 0.06578,
+          "preferred_only_ratio": 0.002799,
+          "unspecified_ratio": 0.006998
+        },
+        "testing": {
+          "required_job_count": 55,
+          "preferred_only_job_count": 85,
+          "unspecified_job_count": 11,
+          "required_ratio": 0.019244,
+          "preferred_only_ratio": 0.029741,
+          "unspecified_ratio": 0.003849
+        },
+        "debugging": {
+          "required_job_count": 332,
+          "preferred_only_job_count": 152,
+          "unspecified_job_count": 68,
+          "required_ratio": 0.116165,
+          "preferred_only_ratio": 0.053184,
+          "unspecified_ratio": 0.023793
+        },
+        "code_review": {
+          "required_job_count": 68,
+          "preferred_only_job_count": 7,
+          "unspecified_job_count": 9,
+          "required_ratio": 0.023793,
+          "preferred_only_ratio": 0.002449,
+          "unspecified_ratio": 0.003149
+        },
+        "version_control": {
+          "required_job_count": 48,
+          "preferred_only_job_count": 202,
+          "unspecified_job_count": 8,
+          "required_ratio": 0.016795,
+          "preferred_only_ratio": 0.070679,
+          "unspecified_ratio": 0.002799
+        },
+        "cloud": {
+          "required_job_count": 236,
+          "preferred_only_job_count": 154,
+          "unspecified_job_count": 93,
+          "required_ratio": 0.082575,
+          "preferred_only_ratio": 0.053884,
+          "unspecified_ratio": 0.03254
+        },
+        "containers": {
+          "required_job_count": 187,
+          "preferred_only_job_count": 240,
+          "unspecified_job_count": 49,
+          "required_ratio": 0.06543,
+          "preferred_only_ratio": 0.083975,
+          "unspecified_ratio": 0.017145
+        },
+        "delivery_automation": {
+          "required_job_count": 260,
+          "preferred_only_job_count": 340,
+          "unspecified_job_count": 111,
+          "required_ratio": 0.090973,
+          "preferred_only_ratio": 0.118964,
+          "unspecified_ratio": 0.038838
+        },
+        "performance": {
+          "required_job_count": 49,
+          "preferred_only_job_count": 163,
+          "unspecified_job_count": 16,
+          "required_ratio": 0.017145,
+          "preferred_only_ratio": 0.057033,
+          "unspecified_ratio": 0.005598
+        },
+        "observability_operations": {
+          "required_job_count": 156,
+          "preferred_only_job_count": 133,
+          "unspecified_job_count": 42,
+          "required_ratio": 0.054584,
+          "preferred_only_ratio": 0.046536,
+          "unspecified_ratio": 0.014696
+        },
+        "reliability": {
+          "required_job_count": 27,
+          "preferred_only_job_count": 2,
+          "unspecified_job_count": 2,
+          "required_ratio": 0.009447,
+          "preferred_only_ratio": 0.0007,
+          "unspecified_ratio": 0.0007
+        },
+        "security": {
+          "required_job_count": 99,
+          "preferred_only_job_count": 107,
+          "unspecified_job_count": 30,
+          "required_ratio": 0.03464,
+          "preferred_only_ratio": 0.037439,
+          "unspecified_ratio": 0.010497
+        }
+      }
+    },
+    "data_analyst": {
+      "total_job_count": 174,
+      "skills": {
+        "sql": {
+          "required_job_count": 110,
+          "preferred_only_job_count": 3,
+          "unspecified_job_count": 15,
+          "required_ratio": 0.632184,
+          "preferred_only_ratio": 0.017241,
+          "unspecified_ratio": 0.086207
+        },
+        "analytical_scripting": {
+          "required_job_count": 65,
+          "preferred_only_job_count": 11,
+          "unspecified_job_count": 15,
+          "required_ratio": 0.373563,
+          "preferred_only_ratio": 0.063218,
+          "unspecified_ratio": 0.086207
+        },
+        "spreadsheets": {
+          "required_job_count": 7,
+          "preferred_only_job_count": 0,
+          "unspecified_job_count": 3,
+          "required_ratio": 0.04023,
+          "preferred_only_ratio": 0.0,
+          "unspecified_ratio": 0.017241
+        },
+        "data_analysis": {
+          "required_job_count": 16,
+          "preferred_only_job_count": 4,
+          "unspecified_job_count": 3,
+          "required_ratio": 0.091954,
+          "preferred_only_ratio": 0.022989,
+          "unspecified_ratio": 0.017241
+        },
+        "business_analytics": {
+          "required_job_count": 16,
+          "preferred_only_job_count": 1,
+          "unspecified_job_count": 1,
+          "required_ratio": 0.091954,
+          "preferred_only_ratio": 0.005747,
+          "unspecified_ratio": 0.005747
+        },
+        "requirements_analysis": {
+          "required_job_count": 4,
+          "preferred_only_job_count": 0,
+          "unspecified_job_count": 1,
+          "required_ratio": 0.022989,
+          "preferred_only_ratio": 0.0,
+          "unspecified_ratio": 0.005747
+        },
+        "statistics": {
+          "required_job_count": 41,
+          "preferred_only_job_count": 6,
+          "unspecified_job_count": 12,
+          "required_ratio": 0.235632,
+          "preferred_only_ratio": 0.034483,
+          "unspecified_ratio": 0.068966
+        },
+        "experimentation": {
+          "required_job_count": 12,
+          "preferred_only_job_count": 3,
+          "unspecified_job_count": 2,
+          "required_ratio": 0.068966,
+          "preferred_only_ratio": 0.017241,
+          "unspecified_ratio": 0.011494
+        },
+        "causal_inference": {
+          "required_job_count": 20,
+          "preferred_only_job_count": 7,
+          "unspecified_job_count": 7,
+          "required_ratio": 0.114943,
+          "preferred_only_ratio": 0.04023,
+          "unspecified_ratio": 0.04023
+        },
+        "data_pipelines": {
+          "required_job_count": 22,
+          "preferred_only_job_count": 9,
+          "unspecified_job_count": 3,
+          "required_ratio": 0.126437,
+          "preferred_only_ratio": 0.051724,
+          "unspecified_ratio": 0.017241
+        },
+        "data_modeling": {
+          "required_job_count": 4,
+          "preferred_only_job_count": 6,
+          "unspecified_job_count": 0,
+          "required_ratio": 0.022989,
+          "preferred_only_ratio": 0.034483,
+          "unspecified_ratio": 0.0
+        },
+        "data_quality": {
+          "required_job_count": 1,
+          "preferred_only_job_count": 0,
+          "unspecified_job_count": 1,
+          "required_ratio": 0.005747,
+          "preferred_only_ratio": 0.0,
+          "unspecified_ratio": 0.005747
+        },
+        "dashboarding": {
+          "required_job_count": 18,
+          "preferred_only_job_count": 2,
+          "unspecified_job_count": 1,
+          "required_ratio": 0.103448,
+          "preferred_only_ratio": 0.011494,
+          "unspecified_ratio": 0.005747
+        },
+        "data_visualization": {
+          "required_job_count": 13,
+          "preferred_only_job_count": 0,
+          "unspecified_job_count": 3,
+          "required_ratio": 0.074713,
+          "preferred_only_ratio": 0.0,
+          "unspecified_ratio": 0.017241
+        },
+        "bi_tools": {
+          "required_job_count": 9,
+          "preferred_only_job_count": 4,
+          "unspecified_job_count": 3,
+          "required_ratio": 0.051724,
+          "preferred_only_ratio": 0.022989,
+          "unspecified_ratio": 0.017241
+        },
+        "warehousing": {
+          "required_job_count": 8,
+          "preferred_only_job_count": 6,
+          "unspecified_job_count": 4,
+          "required_ratio": 0.045977,
+          "preferred_only_ratio": 0.034483,
+          "unspecified_ratio": 0.022989
+        },
+        "large_scale_processing": {
+          "required_job_count": 18,
+          "preferred_only_job_count": 3,
+          "unspecified_job_count": 2,
+          "required_ratio": 0.103448,
+          "preferred_only_ratio": 0.017241,
+          "unspecified_ratio": 0.011494
+        },
+        "workflow_automation": {
+          "required_job_count": 7,
+          "preferred_only_job_count": 2,
+          "unspecified_job_count": 1,
+          "required_ratio": 0.04023,
+          "preferred_only_ratio": 0.011494,
+          "unspecified_ratio": 0.005747
+        }
+      }
+    },
+    "ai_engineer": {
+      "total_job_count": 566,
+      "skills": {
+        "general_programming": {
+          "required_job_count": 56,
+          "preferred_only_job_count": 39,
+          "unspecified_job_count": 13,
+          "required_ratio": 0.09894,
+          "preferred_only_ratio": 0.068905,
+          "unspecified_ratio": 0.022968
+        },
+        "python": {
+          "required_job_count": 158,
+          "preferred_only_job_count": 23,
+          "unspecified_job_count": 40,
+          "required_ratio": 0.279152,
+          "preferred_only_ratio": 0.040636,
+          "unspecified_ratio": 0.070671
+        },
+        "software_engineering": {
+          "required_job_count": 85,
+          "preferred_only_job_count": 56,
+          "unspecified_job_count": 38,
+          "required_ratio": 0.150177,
+          "preferred_only_ratio": 0.09894,
+          "unspecified_ratio": 0.067138
+        },
+        "sql": {
+          "required_job_count": 53,
+          "preferred_only_job_count": 20,
+          "unspecified_job_count": 5,
+          "required_ratio": 0.09364,
+          "preferred_only_ratio": 0.035336,
+          "unspecified_ratio": 0.008834
+        },
+        "machine_learning": {
+          "required_job_count": 202,
+          "preferred_only_job_count": 54,
+          "unspecified_job_count": 48,
+          "required_ratio": 0.35689,
+          "preferred_only_ratio": 0.095406,
+          "unspecified_ratio": 0.084806
+        },
+        "deep_learning": {
+          "required_job_count": 48,
+          "preferred_only_job_count": 15,
+          "unspecified_job_count": 3,
+          "required_ratio": 0.084806,
+          "preferred_only_ratio": 0.026502,
+          "unspecified_ratio": 0.0053
+        },
+        "math_statistics": {
+          "required_job_count": 45,
+          "preferred_only_job_count": 7,
+          "unspecified_job_count": 4,
+          "required_ratio": 0.079505,
+          "preferred_only_ratio": 0.012367,
+          "unspecified_ratio": 0.007067
+        },
+        "data_preparation": {
+          "required_job_count": 15,
+          "preferred_only_job_count": 6,
+          "unspecified_job_count": 0,
+          "required_ratio": 0.026502,
+          "preferred_only_ratio": 0.010601,
+          "unspecified_ratio": 0.0
+        },
+        "data_pipelines": {
+          "required_job_count": 45,
+          "preferred_only_job_count": 47,
+          "unspecified_job_count": 5,
+          "required_ratio": 0.079505,
+          "preferred_only_ratio": 0.083039,
+          "unspecified_ratio": 0.008834
+        },
+        "feature_engineering": {
+          "required_job_count": 8,
+          "preferred_only_job_count": 4,
+          "unspecified_job_count": 2,
+          "required_ratio": 0.014134,
+          "preferred_only_ratio": 0.007067,
+          "unspecified_ratio": 0.003534
+        },
+        "model_training": {
+          "required_job_count": 16,
+          "preferred_only_job_count": 6,
+          "unspecified_job_count": 3,
+          "required_ratio": 0.028269,
+          "preferred_only_ratio": 0.010601,
+          "unspecified_ratio": 0.0053
+        },
+        "fine_tuning": {
+          "required_job_count": 23,
+          "preferred_only_job_count": 12,
+          "unspecified_job_count": 8,
+          "required_ratio": 0.040636,
+          "preferred_only_ratio": 0.021201,
+          "unspecified_ratio": 0.014134
+        },
+        "model_evaluation": {
+          "required_job_count": 16,
+          "preferred_only_job_count": 12,
+          "unspecified_job_count": 8,
+          "required_ratio": 0.028269,
+          "preferred_only_ratio": 0.021201,
+          "unspecified_ratio": 0.014134
+        },
+        "experimentation": {
+          "required_job_count": 25,
+          "preferred_only_job_count": 7,
+          "unspecified_job_count": 9,
+          "required_ratio": 0.04417,
+          "preferred_only_ratio": 0.012367,
+          "unspecified_ratio": 0.015901
+        },
+        "model_deployment": {
+          "required_job_count": 9,
+          "preferred_only_job_count": 10,
+          "unspecified_job_count": 0,
+          "required_ratio": 0.015901,
+          "preferred_only_ratio": 0.017668,
+          "unspecified_ratio": 0.0
+        },
+        "mlops": {
+          "required_job_count": 3,
+          "preferred_only_job_count": 8,
+          "unspecified_job_count": 0,
+          "required_ratio": 0.0053,
+          "preferred_only_ratio": 0.014134,
+          "unspecified_ratio": 0.0
+        },
+        "ai_infrastructure": {
+          "required_job_count": 71,
+          "preferred_only_job_count": 64,
+          "unspecified_job_count": 10,
+          "required_ratio": 0.125442,
+          "preferred_only_ratio": 0.113074,
+          "unspecified_ratio": 0.017668
+        },
+        "generative_ai": {
+          "required_job_count": 34,
+          "preferred_only_job_count": 16,
+          "unspecified_job_count": 11,
+          "required_ratio": 0.060071,
+          "preferred_only_ratio": 0.028269,
+          "unspecified_ratio": 0.019435
+        },
+        "llm": {
+          "required_job_count": 92,
+          "preferred_only_job_count": 90,
+          "unspecified_job_count": 29,
+          "required_ratio": 0.162544,
+          "preferred_only_ratio": 0.159011,
+          "unspecified_ratio": 0.051237
+        },
+        "rag": {
+          "required_job_count": 9,
+          "preferred_only_job_count": 3,
+          "unspecified_job_count": 8,
+          "required_ratio": 0.015901,
+          "preferred_only_ratio": 0.0053,
+          "unspecified_ratio": 0.014134
+        },
+        "ai_agents": {
+          "required_job_count": 31,
+          "preferred_only_job_count": 36,
+          "unspecified_job_count": 12,
+          "required_ratio": 0.05477,
+          "preferred_only_ratio": 0.063604,
+          "unspecified_ratio": 0.021201
+        },
+        "prompt_engineering": {
+          "required_job_count": 16,
+          "preferred_only_job_count": 3,
+          "unspecified_job_count": 1,
+          "required_ratio": 0.028269,
+          "preferred_only_ratio": 0.0053,
+          "unspecified_ratio": 0.001767
+        },
+        "vector_retrieval": {
+          "required_job_count": 15,
+          "preferred_only_job_count": 6,
+          "unspecified_job_count": 4,
+          "required_ratio": 0.026502,
+          "preferred_only_ratio": 0.010601,
+          "unspecified_ratio": 0.007067
+        }
+      }
+    }
+  }
+}

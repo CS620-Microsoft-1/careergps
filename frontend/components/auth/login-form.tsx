@@ -51,7 +51,7 @@ export function LoginForm() {
                 <Checkbox
                   id="remember"
                   checked={field.value}
-                  onCheckedChange={(v) => field.onChange(v === true)}
+                  onCheckedChange={(v: boolean | "indeterminate") => field.onChange(v === true)}
                 />
                 <FieldLabel htmlFor="remember" className="font-normal">
                   Remember me

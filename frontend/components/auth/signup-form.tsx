@@ -110,7 +110,7 @@ export function SignupForm({ graduationYears }: { graduationYears: string[] }) {
               <Checkbox
                 id="acceptTerms"
                 checked={field.value}
-                onCheckedChange={(v) => field.onChange(v === true)}
+                onCheckedChange={(v: boolean | "indeterminate") => field.onChange(v === true)}
                 aria-invalid={fieldState.invalid}
               />
               <FieldContent>

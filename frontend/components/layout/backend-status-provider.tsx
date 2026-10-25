@@ -2,8 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
-import { API_BASE_URL, ApiError } from "@/lib/api/client";
-import { getDatabaseHealth } from "@/lib/api/health";
+import { API_BASE_URL, ApiError, IS_LOCAL_MODE } from "@/lib/api/client";
+import { getApiHealth, getDatabaseHealth } from "@/lib/api/health";
 
 export type BackendStatus = "checking" | "connected" | "database-down" | "unreachable";
 
@@ -18,7 +18,7 @@ type BackendStatusContextValue = {
 const BackendStatusContext = createContext<BackendStatusContextValue | null>(null);
 
 function toStatus(error: unknown): BackendStatus {
-  return error instanceof ApiError && error.status === 503 ? "database-down" : "unreachable";
+  return !IS_LOCAL_MODE && error instanceof ApiError && error.status === 503 ? "database-down" : "unreachable";
 }
 
 /**
@@ -34,7 +34,8 @@ export function BackendStatusProvider({ children }: { children: React.ReactNode 
     const checkId = ++latestCheckRef.current;
     let next: BackendStatus;
     try {
-      await getDatabaseHealth();
+      if (IS_LOCAL_MODE) await getApiHealth();
+      else await getDatabaseHealth();
       next = "connected";
     } catch (error) {
       next = toStatus(error);

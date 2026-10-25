@@ -9,6 +9,8 @@ export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhos
   "",
 );
 
+export const IS_LOCAL_MODE = process.env.NEXT_PUBLIC_LOCAL_MODE === "true";
+
 const TIMEOUT_MS = 5000;
 
 /** Thrown for any failed API call. */
@@ -88,4 +90,24 @@ async function readDetail(response: Response): Promise<string | undefined> {
     // Not JSON; there's no detail to show.
   }
   return undefined;
+}
+
+/** Submit JSON; long work is queued by the API and then polled separately. */
+export async function apiPostJson<T>(path: string, body: unknown): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch {
+    throw new ApiError(0, "The request could not be confirmed. Try again; an existing matching analysis will be reused.");
+  }
+  if (!response.ok) {
+    const detail = await readDetail(response);
+    throw new ApiError(response.status, `POST ${path} failed with ${response.status}`, detail);
+  }
+  return (await response.json()) as T;
 }

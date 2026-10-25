@@ -3,6 +3,7 @@
 import { type BackendStatus as Status, useBackendStatus } from "@/components/layout/backend-status-provider";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { IS_LOCAL_MODE } from "@/lib/api/client";
 
 const DISPLAY: Record<Status, { label: string; dot: string; hint: (apiUrl: string) => string }> = {
   checking: {
@@ -11,9 +12,11 @@ const DISPLAY: Record<Status, { label: string; dot: string; hint: (apiUrl: strin
     hint: (apiUrl) => `Contacting the API at ${apiUrl}.`,
   },
   connected: {
-    label: "Backend connected",
+    label: IS_LOCAL_MODE ? "Local API connected" : "Backend connected",
     dot: "bg-success",
-    hint: (apiUrl) => `The API at ${apiUrl} can reach the database.`,
+    hint: (apiUrl) => IS_LOCAL_MODE
+      ? `The local API at ${apiUrl} is running. No database is used in this preview.`
+      : `The API at ${apiUrl} can reach the database.`,
   },
   "database-down": {
     label: "Database unreachable",
@@ -25,7 +28,9 @@ const DISPLAY: Record<Status, { label: string; dot: string; hint: (apiUrl: strin
     label: "Backend unreachable",
     dot: "bg-danger",
     hint: (apiUrl) =>
-      `Couldn't reach the API at ${apiUrl}. Start it with "uvicorn app.main:app --reload", then check NEXT_PUBLIC_API_URL and CORS_ORIGINS.`,
+      IS_LOCAL_MODE
+        ? `Couldn't reach the local API at ${apiUrl}. Start the local preview backend.`
+        : `Couldn't reach the API at ${apiUrl}. Start it with "uvicorn app.main:app --reload", then check NEXT_PUBLIC_API_URL and CORS_ORIGINS.`,
   },
 };
 

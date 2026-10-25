@@ -815,6 +815,13 @@ The unrelated existing résumé tests are unchanged.
 6. **Enable RLS on every new table** in its migration (`ALTER TABLE <name> ENABLE ROW LEVEL SECURITY`). The Supabase Data API is disabled; RLS is a second layer of protection.
 7. **If `.env` leaks**, reset the database password in Supabase (Project Settings → Database) and share the new URL privately.
 
+## Local Skill Gap web preview
+
+Review confirmation opens Dashboard and starts Skill Gap analysis. The existing
+Dashboard, Career Analysis, Skill Gaps and Profile pages use the confirmed resume
+and backend local demand JSON without a database connection. See the
+[local setup and usage guide](../docs/testing/SKILL_GAP_WEB_LOCAL.md).
+
 ## Troubleshooting
 
 | Error                                                | Likely cause                                                            |

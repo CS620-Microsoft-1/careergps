@@ -9,8 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app.core.config import BACKEND_ROOT, Settings, get_settings
-from app.services.foundry_agent import FoundryResumeAgentService
-from app.services.resume_pipeline import ResumePipeline
+from app.api.resume_deps import get_resume_pipeline
 from app.services.job_posting_analysis_agent import AGENT_VERSION, FoundryJobPostingAnalysisService
 from app.services.job_posting_analysis_pipeline import (
     JobPostingAnalysisPipeline,
@@ -26,16 +25,6 @@ def get_db() -> Iterator[Session]:
         yield db
     finally:
         db.close()
-
-
-def get_resume_pipeline() -> ResumePipeline:
-    """Build the stateless pipeline; no uploaded file or result is persisted."""
-    settings = get_settings()
-    agent = FoundryResumeAgentService(
-        endpoint=settings.foundry_project_endpoint,
-        agent_name=settings.foundry_agent_name,
-    )
-    return ResumePipeline(agent)
 
 
 _job_analysis_token_header = APIKeyHeader(

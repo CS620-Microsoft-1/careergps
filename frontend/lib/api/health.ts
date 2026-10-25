@@ -1,5 +1,10 @@
 import { apiGet } from "@/lib/api/client";
-import type { DatabaseHealthResponse } from "@/types/api";
+import type { DatabaseHealthResponse, HealthResponse } from "@/types/api";
+
+/** API-only health check. This endpoint does not query the database. */
+export function getApiHealth() {
+  return apiGet<HealthResponse>("/health");
+}
 
 /**
  * Checks the API and the database in one request (backend: app/api/routes/health.py).

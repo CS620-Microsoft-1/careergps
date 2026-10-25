@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronRight } from "lucide-react";
@@ -16,16 +16,38 @@ import { analyzeResume } from "@/lib/api/resumes";
 import { ApiError } from "@/lib/api/client";
 import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
 import type { ResumeAnalysis, ResumeClassification } from "@/types/api";
+import { clearConfirmedResume, loadConfirmedResume, queueSkillGapAnalysis, saveConfirmedResume } from "@/lib/confirmed-resume";
 
 export function OnboardingForm({ graduationYears }: { graduationYears: string[] }) {
   const router = useRouter();
   const [analysis, setAnalysis] = useState<ResumeAnalysis>();
   const [classification, setClassification] = useState<ResumeClassification>();
   const [submitError, setSubmitError] = useState<string>();
+  const [confirming, setConfirming] = useState(false);
   const form = useForm<OnboardingValues>({
     resolver: zodResolver(onboardingSchema),
     defaultValues: { graduationYear: "", location: "" },
   });
+  const { setValue } = form;
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      if (new URLSearchParams(window.location.search).get("edit") !== "1") return;
+      try {
+        const snapshot = loadConfirmedResume();
+        if (!snapshot) return;
+        setAnalysis(snapshot.analysis);
+        setClassification(snapshot.reviewed_resume);
+        setValue("targetRole", snapshot.onboarding.targetRole);
+        setValue("graduationYear", snapshot.onboarding.graduationYear);
+        setValue("location", snapshot.onboarding.location);
+        setValue("experienceLevel", snapshot.onboarding.experienceLevel);
+      } catch {
+        setSubmitError("This browser could not restore the local résumé. Upload it again.");
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [setValue]);
 
   const onSubmit = async ({ resume }: OnboardingValues) => {
     setSubmitError(undefined);
@@ -49,15 +71,33 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
         classification={classification}
         onChange={setClassification}
         onStartOver={() => {
+          clearConfirmedResume();
           setAnalysis(undefined);
           setClassification(undefined);
+          setSubmitError(undefined);
           form.resetField("resume");
         }}
-        onConfirm={() => {
-          setAnalysis(undefined);
-          setClassification(undefined);
-          form.resetField("resume");
-          router.push("/dashboard");
+        confirming={confirming}
+        confirmError={submitError}
+        onConfirm={async () => {
+          if (confirming) return;
+          setConfirming(true);
+          setSubmitError(undefined);
+          try {
+            const values = form.getValues();
+            const snapshot = await saveConfirmedResume(analysis, classification, {
+              targetRole: values.targetRole,
+              graduationYear: values.graduationYear,
+              location: values.location,
+              experienceLevel: values.experienceLevel,
+            });
+            queueSkillGapAnalysis(snapshot);
+            router.push("/dashboard");
+          } catch {
+            setSubmitError("Your résumé could not be kept in this browser tab. Allow local browser storage and try again.");
+          } finally {
+            setConfirming(false);
+          }
         }}
       />
     );

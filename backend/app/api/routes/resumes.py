@@ -5,7 +5,7 @@ from pathlib import Path, PurePosixPath, PureWindowsPath
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
-from app.api.deps import get_resume_pipeline
+from app.api.resume_deps import get_resume_pipeline
 from app.schemas.resume import ResumeAnalysis
 from app.services.foundry_agent import ClassificationValidationError, FoundryAgentError
 from app.services.resume_extraction import (

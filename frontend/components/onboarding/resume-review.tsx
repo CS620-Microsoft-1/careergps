@@ -23,7 +23,9 @@ type ResumeReviewProps = {
   classification: ResumeClassification;
   onChange: (classification: ResumeClassification) => void;
   onStartOver: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
+  confirming?: boolean;
+  confirmError?: string;
 };
 
 type StringListKey = "research_interests" | "technical_skills";
@@ -204,6 +206,8 @@ export function ResumeReview({
   onChange,
   onStartOver,
   onConfirm,
+  confirming = false,
+  confirmError,
 }: ResumeReviewProps) {
   const updatePersonal = (field: string, value: string | string[]) => {
     onChange({
@@ -263,8 +267,8 @@ export function ResumeReview({
       <div>
         <h2 className="text-page-title tracking-[-0.02em]">Review the extracted résumé</h2>
         <p className="mt-1.5 text-muted-foreground">
-          Check and edit the Agent&apos;s classification. Empty categories are hidden below. This
-          test result is discarded when you continue to the dashboard.
+          Check and edit the extracted information. When you confirm, your dashboard opens and
+          skill gap analysis starts in the background using these reviewed details.
         </p>
       </div>
 
@@ -373,12 +377,13 @@ export function ResumeReview({
         </details>
       )}
 
+      {confirmError && <p role="alert" className="text-sm text-destructive">{confirmError}</p>}
       <div className="grid gap-3 border-t border-border pt-5 sm:grid-cols-[auto_1fr]">
-        <Button type="button" variant="outline" size="lg" onClick={onStartOver}>
+        <Button type="button" variant="outline" size="lg" onClick={onStartOver} disabled={confirming}>
           <RotateCcw data-icon="inline-start" /> Choose another résumé
         </Button>
-        <Button type="button" size="lg" onClick={onConfirm}>
-          Looks right, continue
+        <Button type="button" size="lg" onClick={onConfirm} disabled={confirming}>
+          {confirming ? "Preparing your dashboard…" : "Confirm and open dashboard"}
         </Button>
       </div>
     </div>

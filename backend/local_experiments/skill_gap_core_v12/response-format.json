@@ -1,0 +1,601 @@
+{
+  "name": "careergps_core_resume_evidence_v12",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "task": {
+        "type": "string",
+        "enum": [
+          "extract_resume_evidence"
+        ]
+      },
+      "result": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/SoftwareEngineer"
+          },
+          {
+            "$ref": "#/$defs/DataAnalyst"
+          },
+          {
+            "$ref": "#/$defs/AiEngineer"
+          }
+        ]
+      }
+    },
+    "required": [
+      "task",
+      "result"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "Proof": {
+        "type": "object",
+        "properties": {
+          "unit_id": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string",
+            "description": "Shortest sufficient exact contiguous original fragment."
+          }
+        },
+        "required": [
+          "unit_id",
+          "quote"
+        ],
+        "additionalProperties": false
+      },
+      "Capability": {
+        "type": "object",
+        "properties": {
+          "relation": {
+            "type": "string",
+            "enum": [
+              "direct_personal",
+              "related_context",
+              "unclear",
+              "other_person"
+            ]
+          },
+          "quote": {
+            "type": "string",
+            "description": "Exact core-defining mechanism within operation_id. Using/testing a component does not establish its internal algorithm or design."
+          }
+        },
+        "required": [
+          "relation",
+          "quote"
+        ],
+        "additionalProperties": false
+      },
+      "Method": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "named_method",
+              "mechanism_described",
+              "rationale_explained"
+            ]
+          },
+          "proof": {
+            "$ref": "#/$defs/Proof"
+          }
+        },
+        "required": [
+          "kind",
+          "proof"
+        ],
+        "additionalProperties": false
+      },
+      "Validation": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "check_only",
+              "workflow_only",
+              "unclear",
+              "observed",
+              "compared"
+            ]
+          },
+          "check": {
+            "$ref": "#/$defs/Proof"
+          },
+          "finding": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Proof"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A reported observation: 'checked correctness' is check-only; 'checks found no violations' supplies a finding."
+          },
+          "finding_type": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "measured_value",
+              "observed_state",
+              "diagnosed_cause",
+              "relative_difference",
+              "repeat_consistency",
+              null
+            ]
+          },
+          "reference": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Proof"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reported_value": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Exact literal numeric result within finding.quote for measured_value only; otherwise null."
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "same_capability",
+              "other_or_unclear"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "check",
+          "finding",
+          "finding_type",
+          "reference",
+          "reported_value",
+          "relation"
+        ],
+        "additionalProperties": false
+      },
+      "Absent": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "absent"
+            ]
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "additionalProperties": false
+      },
+      "Knowledge": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "knowledge"
+            ]
+          },
+          "evidence_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "evidence_id"
+        ],
+        "additionalProperties": false
+      },
+      "Practice": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "limited_practice"
+            ]
+          },
+          "operation_id": {
+            "type": "string"
+          },
+          "capability": {
+            "$ref": "#/$defs/Capability"
+          },
+          "application": {
+            "type": "string",
+            "enum": [
+              "task_only",
+              "concrete_action",
+              "decision_or_tradeoff"
+            ]
+          },
+          "method": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Method"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "validation": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/Validation"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "operation_id",
+          "capability",
+          "application",
+          "method",
+          "validation"
+        ],
+        "additionalProperties": false
+      },
+      "Uncertain": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "uncertain"
+            ]
+          },
+          "evidence_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "evidence_id",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "CoreEvidence": {
+        "anyOf": [
+          {
+            "$ref": "#/$defs/Absent"
+          },
+          {
+            "$ref": "#/$defs/Knowledge"
+          },
+          {
+            "$ref": "#/$defs/Practice"
+          },
+          {
+            "$ref": "#/$defs/Uncertain"
+          }
+        ]
+      },
+      "SoftwareEngineer": {
+        "type": "object",
+        "properties": {
+          "job_family": {
+            "type": "string",
+            "enum": [
+              "software_engineer"
+            ]
+          },
+          "programming": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "algorithms": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "object_oriented_design": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "ai_assisted_development": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "system_design": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "backend_apis": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "frontend": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "distributed_systems": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "relational_sql": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "nosql_search": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "code_quality": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "testing": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "debugging": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "code_review": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "version_control": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "cloud": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "containers": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "delivery_automation": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "performance": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "observability_operations": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "reliability": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "security": {
+            "$ref": "#/$defs/CoreEvidence"
+          }
+        },
+        "required": [
+          "job_family",
+          "programming",
+          "algorithms",
+          "object_oriented_design",
+          "ai_assisted_development",
+          "system_design",
+          "backend_apis",
+          "frontend",
+          "distributed_systems",
+          "relational_sql",
+          "nosql_search",
+          "code_quality",
+          "testing",
+          "debugging",
+          "code_review",
+          "version_control",
+          "cloud",
+          "containers",
+          "delivery_automation",
+          "performance",
+          "observability_operations",
+          "reliability",
+          "security"
+        ],
+        "additionalProperties": false
+      },
+      "DataAnalyst": {
+        "type": "object",
+        "properties": {
+          "job_family": {
+            "type": "string",
+            "enum": [
+              "data_analyst"
+            ]
+          },
+          "sql": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "analytical_scripting": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "spreadsheets": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "data_analysis": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "business_analytics": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "requirements_analysis": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "statistics": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "experimentation": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "causal_inference": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "data_pipelines": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "data_modeling": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "data_quality": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "dashboarding": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "data_visualization": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "bi_tools": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "warehousing": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "large_scale_processing": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "workflow_automation": {
+            "$ref": "#/$defs/CoreEvidence"
+          }
+        },
+        "required": [
+          "job_family",
+          "sql",
+          "analytical_scripting",
+          "spreadsheets",
+          "data_analysis",
+          "business_analytics",
+          "requirements_analysis",
+          "statistics",
+          "experimentation",
+          "causal_inference",
+          "data_pipelines",
+          "data_modeling",
+          "data_quality",
+          "dashboarding",
+          "data_visualization",
+          "bi_tools",
+          "warehousing",
+          "large_scale_processing",
+          "workflow_automation"
+        ],
+        "additionalProperties": false
+      },
+      "AiEngineer": {
+        "type": "object",
+        "properties": {
+          "job_family": {
+            "type": "string",
+            "enum": [
+              "ai_engineer"
+            ]
+          },
+          "general_programming": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "python": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "software_engineering": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "sql": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "machine_learning": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "deep_learning": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "math_statistics": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "data_preparation": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "data_pipelines": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "feature_engineering": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "model_training": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "fine_tuning": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "model_evaluation": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "experimentation": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "model_deployment": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "mlops": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "ai_infrastructure": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "generative_ai": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "llm": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "rag": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "ai_agents": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "prompt_engineering": {
+            "$ref": "#/$defs/CoreEvidence"
+          },
+          "vector_retrieval": {
+            "$ref": "#/$defs/CoreEvidence"
+          }
+        },
+        "required": [
+          "job_family",
+          "general_programming",
+          "python",
+          "software_engineering",
+          "sql",
+          "machine_learning",
+          "deep_learning",
+          "math_statistics",
+          "data_preparation",
+          "data_pipelines",
+          "feature_engineering",
+          "model_training",
+          "fine_tuning",
+          "model_evaluation",
+          "experimentation",
+          "model_deployment",
+          "mlops",
+          "ai_infrastructure",
+          "generative_ai",
+          "llm",
+          "rag",
+          "ai_agents",
+          "prompt_engineering",
+          "vector_retrieval"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

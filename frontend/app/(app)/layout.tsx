@@ -3,6 +3,7 @@ import { BackendStatusProvider } from "@/components/layout/backend-status-provid
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { CopilotProvider } from "@/components/panels/copilot-provider";
+import { SkillGapProvider } from "@/components/skill-gaps/skill-gap-provider";
 
 /**
  * Signed-in app shell: sidebar (lg+), sticky top bar with mobile nav (<lg),
@@ -12,6 +13,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <CopilotProvider>
       <BackendStatusProvider>
+        <SkillGapProvider>
         <div className="min-h-dvh lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)]">
           <Sidebar />
           <div className="flex min-w-0 flex-col">
@@ -22,6 +24,7 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
           </div>
           <AskButton />
         </div>
+        </SkillGapProvider>
       </BackendStatusProvider>
     </CopilotProvider>
   );

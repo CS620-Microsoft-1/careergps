@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeftRight, ChevronDown, LogOut, User } from "lucide-react";
 
 import { BackendStatus } from "@/components/layout/backend-status";
+import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,10 +14,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { PLACEHOLDER_USER } from "@/lib/placeholder-user";
+import { getResumeProfile } from "@/lib/resume-profile";
 
 export function UserMenu() {
-  const user = PLACEHOLDER_USER;
+  const { snapshot, loaded } = useSkillGapAnalysis();
+  const user = getResumeProfile(snapshot);
+  const name = loaded ? user.name : "Loading profile…";
+  const detail = loaded ? user.subtitle : "Your reviewed résumé";
 
   return (
     <DropdownMenu>
@@ -24,16 +28,16 @@ export function UserMenu() {
         <Avatar>
           <AvatarFallback>{user.initials}</AvatarFallback>
         </Avatar>
-        <span className="hidden leading-tight sm:block">
-          <b className="block text-control font-semibold">{user.name}</b>
-          <span className="text-xs text-muted-foreground">{user.detail}</span>
+        <span className="hidden min-w-0 max-w-44 leading-tight sm:block">
+          <b title={name} className="block truncate text-control font-semibold">{name}</b>
+          <span title={detail} className="block truncate text-xs text-muted-foreground">{detail}</span>
         </span>
         <ChevronDown aria-hidden className="size-4 text-muted-foreground" />
         <span className="sr-only">Open account menu</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
         <DropdownMenuLabel className="grid gap-1.5 text-xs font-normal text-muted-foreground">
-          Preview mode · no account yet
+          {snapshot ? "Reviewed résumé · local preview" : "Local preview · résumé not confirmed"}
           <BackendStatus interactive={false} />
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
