@@ -1,9 +1,0 @@
-{
-  "confirmed": true,
-  "candidate_skills": [
-    {"skill": "Python", "evidence_score": 0.8, "evidence": ["Synthetic example: built and tested a Python data-processing application."]},
-    {"skill": "JS", "evidence_score": 0.6, "evidence": ["Synthetic example: built a browser dashboard using JavaScript."]},
-    {"skill": "Postgres", "evidence_score": 0.25, "evidence": ["Synthetic example: PostgreSQL is listed in the skills section only."]},
-    {"skill": "Git", "evidence_score": 0.6, "evidence": ["Synthetic example: used branches and pull requests for a team project."]}
-  ]
-}
