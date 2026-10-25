@@ -2,8 +2,7 @@
 .env
 
 # Python
-.venv/
-.venv-skill-gap/
+.venv*/
 __pycache__/
 *.pyc
 
@@ -15,3 +14,7 @@ __pycache__/
 
 # Local Skill Gap runs (inputs, Agent responses, and reports)
 local_results/
+
+# Local experiments and exported API results
+local_tests/
+local_exports/
