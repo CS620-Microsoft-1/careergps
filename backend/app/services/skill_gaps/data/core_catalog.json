@@ -5,18 +5,18 @@
       "modules": [
         {
           "module_id": "programming_foundations",
-          "module_name": "编程基础",
+          "module_name": "Programming foundations",
           "skills": [
             {
               "skill_id": "programming",
-              "skill_name": "编程与语言能力",
+              "skill_name": "Programming & languages",
               "definition": "Programming in an explicitly named language. One language supports this core, not proficiency in other languages.",
               "direct_evidence": "Explicit language knowledge or personally implementing program logic in a named language.",
               "not_sufficient": "A job title, degree, or teammate's implementation alone."
             },
             {
               "skill_id": "algorithms",
-              "skill_name": "算法与数据结构",
+              "skill_name": "Algorithms & data structures",
               "definition": "Algorithms or data structures, with actual knowledge or application stated.",
               "direct_evidence": "Explicit algorithm/data-structure knowledge, or personally implementing/analyzing described processing steps, structure operations/invariants, or computational complexity.",
               "not_sufficient": "Using/comparing an existing component, generating records, or testing system behavior without describing that algorithmic mechanism. Accept relevant courses as knowledge, not inferred practice.",
@@ -25,14 +25,14 @@
             },
             {
               "skill_id": "object_oriented_design",
-              "skill_name": "面向对象与设计模式",
+              "skill_name": "Object-oriented design",
               "definition": "Object-oriented design/programming or explicit software design patterns.",
               "direct_evidence": "Explicit OO knowledge, or describing class responsibilities, encapsulation, interface-based substitution, polymorphic behavior, object collaboration, or a design pattern.",
               "not_sufficient": "Using an OO-capable language, writing an endpoint/handler, or using a framework alone. Do not infer an OO design from Java/C#/Python."
             },
             {
               "skill_id": "ai_assisted_development",
-              "skill_name": "AI 辅助开发",
+              "skill_name": "AI-assisted development",
               "definition": "Using AI for coding or software development; unrelated AI tasks are insufficient.",
               "direct_evidence": "Using an AI assistant specifically to write, inspect, test, or improve software.",
               "not_sufficient": "AI image generation/moderation, general LLM use, or unrelated model evaluation."
@@ -41,32 +41,32 @@
         },
         {
           "module_id": "application_system_design",
-          "module_name": "系统与应用设计",
+          "module_name": "Applications & system design",
           "skills": [
             {
               "skill_id": "system_design",
-              "skill_name": "系统与软件架构",
+              "skill_name": "System design",
               "definition": "Designing software components, their interfaces, or system architecture; implementation alone is insufficient.",
               "direct_evidence": "Explicit system-design knowledge or explaining component boundaries, interfaces, data/control flow, architecture decisions or tradeoffs.",
               "not_sufficient": "Implementing a feature or publishing API documentation without describing interface/architecture design."
             },
             {
               "skill_id": "backend_apis",
-              "skill_name": "后端与 API 开发",
+              "skill_name": "Backend & API development",
               "definition": "Implementing backend services or APIs; consuming an API alone does not establish backend development.",
               "direct_evidence": "Explicit backend/API knowledge or implementing server-side behavior, routes, request handling, or API contracts.",
               "not_sufficient": "Only consuming someone else's API or calling an SDK."
             },
             {
               "skill_id": "frontend",
-              "skill_name": "前端与界面开发",
+              "skill_name": "Frontend development",
               "definition": "Implementing user interfaces or frontend applications; producing static analytical charts alone is insufficient.",
               "direct_evidence": "Explicit frontend knowledge or implementing a user interface, client behavior, or accessibility.",
               "not_sufficient": "Handing an API to a frontend teammate, producing static charts, or claiming the team's frontend work."
             },
             {
               "skill_id": "distributed_systems",
-              "skill_name": "分布式与服务架构",
+              "skill_name": "Distributed systems",
               "definition": "Distributed systems, microservices, event-driven architectures, or multi-tenant architectures; a single local service alone is insufficient.",
               "direct_evidence": "Explicit distributed-system knowledge or describing coordination, service messaging, distributed state, microservice interactions or multi-tenant architecture.",
               "not_sufficient": "A generic component or policy comparison without an explicit cross-boundary mechanism. Do not infer topology or coordination from a tool or domain.",
@@ -77,18 +77,18 @@
         },
         {
           "module_id": "databases_data",
-          "module_name": "数据库与数据访问",
+          "module_name": "Databases & data",
           "skills": [
             {
               "skill_id": "relational_sql",
-              "skill_name": "SQL 与关系数据库",
+              "skill_name": "SQL & relational databases",
               "definition": "SQL queries or relational database work; generic structured JSON is insufficient.",
               "direct_evidence": "Explicit SQL/relational knowledge or querying, designing, migrating, or operating relational data.",
               "not_sufficient": "Structured JSON outputs or an unspecified database alone."
             },
             {
               "skill_id": "nosql_search",
-              "skill_name": "非关系数据与检索",
+              "skill_name": "NoSQL & search",
               "definition": "Non-relational data stores or search systems; name the actual supported technology.",
               "direct_evidence": "Explicit non-relational/search knowledge or using a named non-relational store/search mechanism for a described purpose.",
               "not_sufficient": "Generic database work, local text matching, or SQL alone."
@@ -97,39 +97,39 @@
         },
         {
           "module_id": "engineering_quality",
-          "module_name": "工程质量",
+          "module_name": "Engineering quality",
           "skills": [
             {
               "skill_id": "code_quality",
-              "skill_name": "代码质量与可维护性",
+              "skill_name": "Code quality",
               "definition": "Concrete practices for maintainable, clear software; code quality does not automatically establish tests or reviews.",
               "direct_evidence": "Explicit maintainability practices such as refactoring, modularity, clear contracts, meaningful tests, or reducing code complexity.",
               "not_sufficient": "Merely saying code was written or the system worked; do not infer separate code-review practice."
             },
             {
               "skill_id": "testing",
-              "skill_name": "软件测试",
+              "skill_name": "Software testing",
               "definition": "Software testing practices, test implementation, or executing software tests; unrelated model evaluation is insufficient.",
               "direct_evidence": "Explicit software-test knowledge or designing, implementing, or executing tests of software behavior.",
               "not_sufficient": "Unrelated model-quality evaluation or simply running the application."
             },
             {
               "skill_id": "debugging",
-              "skill_name": "调试与问题定位",
+              "skill_name": "Debugging",
               "definition": "Debugging or diagnosing software faults.",
               "direct_evidence": "Explicit debugging knowledge or diagnosing, tracing, reproducing, isolating, or correcting a software fault.",
               "not_sufficient": "Merely viewing failed CI runs or monitoring a status indicator without diagnostic work."
             },
             {
               "skill_id": "code_review",
-              "skill_name": "代码审查",
+              "skill_name": "Code review",
               "definition": "Reviewing source code or explicit participation in code review; document review is insufficient.",
               "direct_evidence": "Explicit source-code/PR review, examination of a proposed implementation, or actionable code-review feedback.",
               "not_sufficient": "Reviewing CI status, reading logs, approving documents, or merging alone."
             },
             {
               "skill_id": "version_control",
-              "skill_name": "版本控制",
+              "skill_name": "Version control",
               "definition": "Git or another explicit source/version-control practice.",
               "direct_evidence": "Explicit source-control knowledge or personally working with commits, branches, diffs, merges, or PRs.",
               "not_sufficient": "A GitHub link or configuring CI alone without a source-control claim/action."
@@ -138,25 +138,25 @@
         },
         {
           "module_id": "delivery_infrastructure",
-          "module_name": "交付与基础设施",
+          "module_name": "Delivery & infrastructure",
           "skills": [
             {
               "skill_id": "cloud",
-              "skill_name": "云平台",
+              "skill_name": "Cloud platforms",
               "definition": "Cloud platforms or services; record the actual provider, without inferring other providers.",
               "direct_evidence": "Explicit cloud knowledge or using an identified cloud platform/service for a described activity.",
               "not_sufficient": "Docker, local deployment, or remote collaboration alone; do not infer cloud providers."
             },
             {
               "skill_id": "containers",
-              "skill_name": "容器与编排",
+              "skill_name": "Containers",
               "definition": "Containerization or orchestration; Docker evidence does not establish Kubernetes experience.",
               "direct_evidence": "Explicit container/orchestration knowledge or building, configuring, or running containers or workloads.",
               "not_sufficient": "CI use or deployment alone; Docker does not establish Kubernetes."
             },
             {
               "skill_id": "delivery_automation",
-              "skill_name": "构建、交付与基础设施自动化",
+              "skill_name": "CI/CD & delivery automation",
               "definition": "Build, delivery, infrastructure-as-code, or configuration automation; ordinary use of Git alone is insufficient.",
               "direct_evidence": "Explicit build/delivery/IaC knowledge or automating builds, tests, releases, provisioning, or configuration.",
               "not_sufficient": "Merely using Git, writing a script unrelated to delivery, or claiming another person's pipeline."
@@ -165,25 +165,25 @@
         },
         {
           "module_id": "performance_operations",
-          "module_name": "性能与可靠性",
+          "module_name": "Performance & operations",
           "skills": [
             {
               "skill_id": "performance",
-              "skill_name": "性能分析与优化",
+              "skill_name": "Performance analysis",
               "definition": "Explicit performance analysis or optimization of software/systems.",
               "direct_evidence": "Explicit performance knowledge or measuring/optimizing latency, throughput, resource cost, query performance, or comparable performance properties.",
               "not_sufficient": "An unexplained improvement percentage or a product-success metric unrelated to performance."
             },
             {
               "skill_id": "observability_operations",
-              "skill_name": "可观测性与运行维护",
+              "skill_name": "Observability & operations",
               "definition": "Monitoring, telemetry, or operating software systems; ordinary written progress reports are insufficient.",
               "direct_evidence": "Explicit operational knowledge or implementing/using telemetry, monitoring, alerts, incident response, or maintenance of running systems.",
               "not_sufficient": "Ordinary progress reports, handover documents, or one-off local tests alone."
             },
             {
               "skill_id": "reliability",
-              "skill_name": "可靠性与可扩展性",
+              "skill_name": "Reliability",
               "definition": "Engineering reliability or scalability, supported by explicit relevant actions or knowledge.",
               "direct_evidence": "Explicit reliability/scalability knowledge or actions handling failures, correctness under load, recovery, redundancy, or scaling.",
               "not_sufficient": "Simply deploying software or saying it is robust/scalable without relevant knowledge or actions."
@@ -192,11 +192,11 @@
         },
         {
           "module_id": "security",
-          "module_name": "安全工程",
+          "module_name": "Security",
           "skills": [
             {
               "skill_id": "security",
-              "skill_name": "安全工程与访问控制",
+              "skill_name": "Security",
               "definition": "Software security, authentication, authorization, or access controls; general safety moderation is insufficient.",
               "direct_evidence": "Explicit software-security knowledge or implementing/testing authentication, authorization, access control, secure protocols, or vulnerability controls.",
               "not_sufficient": "Content moderation, ordinary data validation, or database use alone."
@@ -209,25 +209,25 @@
       "modules": [
         {
           "module_id": "query_scripting",
-          "module_name": "查询与分析编程",
+          "module_name": "Queries & scripting",
           "skills": [
             {
               "skill_id": "sql",
-              "skill_name": "SQL 与关系数据访问",
+              "skill_name": "SQL",
               "definition": "SQL queries or relational data access; structured JSON alone is insufficient.",
               "direct_evidence": "Explicit SQL/relational knowledge or SQL querying, relational joins, aggregations, or relational modeling/access.",
               "not_sufficient": "Structured JSON, generic data handling, or a degree alone."
             },
             {
               "skill_id": "analytical_scripting",
-              "skill_name": "分析编程与脚本",
+              "skill_name": "Analytical scripting",
               "definition": "Programming or scripting specifically used for data analysis.",
               "direct_evidence": "Explicit analytical-language knowledge or coding data transformations, analysis, or analytical automation.",
               "not_sufficient": "General programming unrelated to analysis or a teammate's script."
             },
             {
               "skill_id": "spreadsheets",
-              "skill_name": "电子表格分析",
+              "skill_name": "Spreadsheet analysis",
               "definition": "Spreadsheet-based analysis or explicit spreadsheet proficiency; ordinary documents are insufficient.",
               "direct_evidence": "Explicit spreadsheet proficiency or spreadsheet formulas, pivots, analysis, or workflow development.",
               "not_sufficient": "Ordinary documents, a static table, or a spreadsheet file merely being present."
@@ -236,25 +236,25 @@
         },
         {
           "module_id": "analysis_business",
-          "module_name": "分析与业务问题",
+          "module_name": "Analysis & business",
           "skills": [
             {
               "skill_id": "data_analysis",
-              "skill_name": "数据分析",
+              "skill_name": "Data analysis",
               "definition": "Inspecting or analyzing data to answer a question; collecting data alone is insufficient.",
               "direct_evidence": "Explicit analytical knowledge or inspecting/comparing/interpreting data to answer a stated question.",
               "not_sufficient": "Collecting, storing, or displaying data without an analytical purpose/action."
             },
             {
               "skill_id": "business_analytics",
-              "skill_name": "业务与产品指标分析",
+              "skill_name": "Business analytics",
               "definition": "Analyzing business/product metrics, defining metrics, or business intelligence.",
               "direct_evidence": "Explicit business/product analytics knowledge or defining/interpreting business metrics and decision-relevant analyses.",
               "not_sufficient": "A business job title, project management, or unexplained numerical results."
             },
             {
               "skill_id": "requirements_analysis",
-              "skill_name": "问题与需求定义",
+              "skill_name": "Requirements analysis",
               "definition": "Eliciting, analyzing, or translating stakeholder/problem requirements; merely following instructions is insufficient.",
               "direct_evidence": "Explicit requirements knowledge or eliciting, clarifying, translating, or negotiating a stakeholder/problem requirement.",
               "not_sufficient": "Merely receiving instructions, attending meetings, or completing assigned work."
@@ -263,25 +263,25 @@
         },
         {
           "module_id": "statistics_experiments",
-          "module_name": "统计与实验",
+          "module_name": "Statistics & experiments",
           "skills": [
             {
               "skill_id": "statistics",
-              "skill_name": "统计分析",
+              "skill_name": "Statistics",
               "definition": "Statistical methods or knowledge; a tool, degree, or unexplained percentage alone is insufficient.",
               "direct_evidence": "Explicit statistical knowledge or applying/interpreting a statistical method.",
               "not_sufficient": "A degree, tool name, chart, or unexplained percentage alone."
             },
             {
               "skill_id": "experimentation",
-              "skill_name": "实验设计与 A/B 测试",
+              "skill_name": "Experimentation",
               "definition": "Experimental design or conducting A/B/comparative experiments with an explicit setup.",
               "direct_evidence": "Explicit experimental knowledge or describing experimental setup, comparison groups, assignment, measures, or evaluation.",
               "not_sufficient": "Ordinary trial-and-error development or observing before/after numbers without an experimental setup."
             },
             {
               "skill_id": "causal_inference",
-              "skill_name": "因果推断",
+              "skill_name": "Causal inference",
               "definition": "Explicit causal inference or methods for estimating causal effects; correlation alone is insufficient.",
               "direct_evidence": "Explicit causal-method knowledge or estimating/arguing causal effects using a stated identification approach.",
               "not_sufficient": "Correlation, prediction, or saying a result caused improvement without a causal method."
@@ -290,25 +290,25 @@
         },
         {
           "module_id": "data_preparation_modeling",
-          "module_name": "数据处理与建模",
+          "module_name": "Data preparation & modeling",
           "skills": [
             {
               "skill_id": "data_pipelines",
-              "skill_name": "数据管道与集成",
+              "skill_name": "Data pipelines",
               "definition": "Building or operating repeatable data ingestion, ETL, or transformation pipelines.",
               "direct_evidence": "Explicit pipeline knowledge or building/operating repeatable ingestion, transformation, or ETL flows.",
               "not_sufficient": "A one-off manual download or isolated data edit."
             },
             {
               "skill_id": "data_modeling",
-              "skill_name": "数据建模",
+              "skill_name": "Data modeling",
               "definition": "Designing data schemas, entities/relationships, analytical models, or dimensional structures; merely outputting JSON is insufficient.",
               "direct_evidence": "Explicit modeling knowledge or defining entities, relationships, schemas, dimensions, or analytical data structures.",
               "not_sufficient": "Merely producing JSON, formatting a response, or training a predictive model."
             },
             {
               "skill_id": "data_quality",
-              "skill_name": "数据准备与质量",
+              "skill_name": "Data quality",
               "definition": "Data cleaning, preparation, validation, quality, or governance practices.",
               "direct_evidence": "Explicit quality knowledge or cleaning, validating, reconciling, preparing, or governing datasets.",
               "not_sufficient": "Data storage, a model-generated assertion of quality, or ordinary UI input checks alone."
@@ -317,25 +317,25 @@
         },
         {
           "module_id": "dashboards_visualization",
-          "module_name": "看板与可视化",
+          "module_name": "Dashboards & visualization",
           "skills": [
             {
               "skill_id": "dashboarding",
-              "skill_name": "Dashboard 构建",
+              "skill_name": "Dashboard development",
               "definition": "Building or maintaining an analytical/business dashboard; a document, handover note, spreadsheet, or isolated chart alone is insufficient.",
               "direct_evidence": "Explicit dashboard-building knowledge or personally building/maintaining a dashboard with analytical views, metrics, filters, or refresh behavior.",
               "not_sufficient": "A document, handover note, ordinary table, isolated chart, or unspecified reporting alone."
             },
             {
               "skill_id": "data_visualization",
-              "skill_name": "数据可视化",
+              "skill_name": "Data visualization",
               "definition": "Creating or explicitly designing data visualizations; this does not automatically establish dashboard construction.",
               "direct_evidence": "Explicit visualization knowledge or designing/creating charts or visual encodings to communicate data.",
               "not_sufficient": "A text report or claiming that the team's dashboard existed."
             },
             {
               "skill_id": "bi_tools",
-              "skill_name": "BI 工具",
+              "skill_name": "Business intelligence tools",
               "definition": "Explicit use or proficiency in BI software; record the actual supported tool.",
               "direct_evidence": "Explicit proficiency in BI software or using an identified BI platform for a described analytical activity.",
               "not_sufficient": "A generic chart, spreadsheet, or database alone; do not infer one BI tool from another."
@@ -344,25 +344,25 @@
         },
         {
           "module_id": "platforms_automation",
-          "module_name": "数据平台与自动化",
+          "module_name": "Platforms & automation",
           "skills": [
             {
               "skill_id": "warehousing",
-              "skill_name": "数据仓库",
+              "skill_name": "Data warehousing",
               "definition": "Data warehouses, warehouse platforms, or warehousing concepts; any ordinary database is not automatically a warehouse.",
               "direct_evidence": "Explicit warehousing knowledge or designing/querying/operating a warehouse or warehouse-specific analytical structure.",
               "not_sufficient": "Any ordinary database or storing files alone."
             },
             {
               "skill_id": "large_scale_processing",
-              "skill_name": "规模化数据处理",
+              "skill_name": "Large-scale processing",
               "definition": "Processing explicitly large-scale datasets or distributed data workloads; merely naming a framework is insufficient for applied evidence.",
               "direct_evidence": "Explicit large-scale processing knowledge or described large/distributed workloads, partitioning, resource handling, or scale constraints.",
               "not_sufficient": "Merely naming Spark or saying a dataset was big without explicit scale knowledge or work."
             },
             {
               "skill_id": "workflow_automation",
-              "skill_name": "分析工作流自动化",
+              "skill_name": "Workflow automation",
               "definition": "Automating or orchestrating analytical/data workflows; a one-off manual analysis is insufficient.",
               "direct_evidence": "Explicit workflow-automation knowledge or automating/orchestrating repeated analytical work.",
               "not_sufficient": "A single manually executed analysis or unrelated software CI."
@@ -375,32 +375,32 @@
       "modules": [
         {
           "module_id": "programming_engineering",
-          "module_name": "编程与软件工程",
+          "module_name": "Programming & engineering",
           "skills": [
             {
               "skill_id": "general_programming",
-              "skill_name": "通用编程能力",
+              "skill_name": "General programming",
               "definition": "Programming in explicitly named non-Python languages. Python is assessed in the separate python core.",
               "direct_evidence": "Explicit knowledge or personal programming work in a named non-Python language.",
               "not_sufficient": "Python-only evidence; Python has its own core."
             },
             {
               "skill_id": "python",
-              "skill_name": "Python 开发",
+              "skill_name": "Python development",
               "definition": "Python programming or Python-specific development/data libraries; usage does not establish unrelated languages.",
               "direct_evidence": "Explicit Python knowledge or personally implementing Python logic or using Python libraries for a stated task.",
               "not_sufficient": "An AI tool's implementation language or a teammate's Python code."
             },
             {
               "skill_id": "software_engineering",
-              "skill_name": "软件工程实践",
+              "skill_name": "Software engineering",
               "definition": "Software implementation, code quality, testing, debugging, or API engineering in a concrete software context.",
               "direct_evidence": "Explicit engineering knowledge or personal software implementation, testing, debugging, maintainability, or API work.",
               "not_sufficient": "Only using a finished AI product or claiming a team built software."
             },
             {
               "skill_id": "sql",
-              "skill_name": "SQL 与关系数据库",
+              "skill_name": "SQL",
               "definition": "SQL queries or relational database work; structured JSON alone is insufficient.",
               "direct_evidence": "Explicit SQL/relational knowledge or querying, designing, or accessing relational data.",
               "not_sufficient": "Structured JSON or generic data storage alone."
@@ -409,25 +409,25 @@
         },
         {
           "module_id": "ml_foundations",
-          "module_name": "机器学习与数学基础",
+          "module_name": "Machine learning foundations",
           "skills": [
             {
               "skill_id": "machine_learning",
-              "skill_name": "机器学习与框架应用",
+              "skill_name": "Machine learning",
               "definition": "Machine-learning concepts, methods, or frameworks; merely calling an AI product is insufficient for applied ML development.",
               "direct_evidence": "Explicit ML-method/framework knowledge or applying ML methods in a described modeling activity.",
               "not_sufficient": "Calling a finished AI API without ML-specific knowledge or development."
             },
             {
               "skill_id": "deep_learning",
-              "skill_name": "深度学习",
+              "skill_name": "Deep learning",
               "definition": "Neural/deep-learning methods or models, explicitly stated.",
               "direct_evidence": "Explicit neural/deep-learning knowledge or working with a described neural architecture/training/inference task.",
               "not_sufficient": "Unspecified AI use or ordinary statistical modeling alone."
             },
             {
               "skill_id": "math_statistics",
-              "skill_name": "数学与统计基础",
+              "skill_name": "Mathematics & statistics",
               "definition": "Mathematical, probability, or statistical foundations; a degree or unexplained numerical result alone is insufficient.",
               "direct_evidence": "Explicit mathematical/statistical knowledge or applying a named/clearly described mathematical or statistical method.",
               "not_sufficient": "A degree title, numerical output, or unspecified evaluation alone."
@@ -436,25 +436,25 @@
         },
         {
           "module_id": "data_feature_engineering",
-          "module_name": "数据与特征工程",
+          "module_name": "Data & feature engineering",
           "skills": [
             {
               "skill_id": "data_preparation",
-              "skill_name": "数据准备与质量",
+              "skill_name": "Data preparation",
               "definition": "Preparing, cleaning, validating, or modeling datasets for analytical/ML use.",
               "direct_evidence": "Explicit preparation knowledge or cleaning, validating, labeling, structuring, or preparing data for ML/analysis.",
               "not_sufficient": "Merely saving model output or invoking inference."
             },
             {
               "skill_id": "data_pipelines",
-              "skill_name": "数据管道",
+              "skill_name": "Data pipelines",
               "definition": "Building or operating repeatable data ingestion, transformation, or processing pipelines.",
               "direct_evidence": "Explicit pipeline knowledge or building/operating repeatable ingestion, transformation, or processing flows.",
               "not_sufficient": "One-off file loading or a standalone inference call."
             },
             {
               "skill_id": "feature_engineering",
-              "skill_name": "特征工程",
+              "skill_name": "Feature engineering",
               "definition": "Creating, selecting, or transforming model input features; merely formatting model outputs is insufficient.",
               "direct_evidence": "Explicit feature-engineering knowledge or creating/selecting/transforming inputs used by a model.",
               "not_sufficient": "Formatting output JSON or describing a product feature."
@@ -463,18 +463,18 @@
         },
         {
           "module_id": "training_adaptation",
-          "module_name": "模型训练与适配",
+          "module_name": "Training & adaptation",
           "skills": [
             {
               "skill_id": "model_training",
-              "skill_name": "模型训练",
+              "skill_name": "Model training",
               "definition": "Actually training a model; inference or API calls alone are insufficient.",
               "direct_evidence": "Explicit training knowledge or fitting/updating model parameters in a described training process.",
               "not_sufficient": "Prompt editing, inference, model selection, or API integration alone."
             },
             {
               "skill_id": "fine_tuning",
-              "skill_name": "模型微调",
+              "skill_name": "Fine-tuning",
               "definition": "Explicit fine-tuning/adaptation of a pretrained model; training from scratch or prompt editing alone is insufficient.",
               "direct_evidence": "Explicit fine-tuning knowledge or adapting pretrained model weights with a stated process/data.",
               "not_sufficient": "Training from scratch, prompt edits, or RAG configuration alone."
@@ -483,18 +483,18 @@
         },
         {
           "module_id": "evaluation_experiments",
-          "module_name": "模型评估与实验",
+          "module_name": "Evaluation & experiments",
           "skills": [
             {
               "skill_id": "model_evaluation",
-              "skill_name": "模型评估",
+              "skill_name": "Model evaluation",
               "definition": "Evaluating model quality/performance using a stated evaluation approach; successful execution alone is insufficient.",
               "direct_evidence": "Explicit evaluation knowledge or evaluating model behavior using stated data, criteria, metrics, or error analysis.",
               "not_sufficient": "Successful execution, outputting a score, or software unit tests unrelated to model quality."
             },
             {
               "skill_id": "experimentation",
-              "skill_name": "实验与效果验证",
+              "skill_name": "Experimentation",
               "definition": "Designing or running controlled/comparative experiments; ordinary iterative implementation alone is insufficient.",
               "direct_evidence": "Explicit experimental knowledge or designing/running a stated comparison, ablation, controlled test, or experiment.",
               "not_sufficient": "Ordinary implementation iterations with no described experimental setup."
@@ -503,11 +503,11 @@
         },
         {
           "module_id": "deployment_mlops",
-          "module_name": "部署与 MLOps",
+          "module_name": "Deployment & MLOps",
           "skills": [
             {
               "skill_id": "model_deployment",
-              "skill_name": "模型部署与服务",
+              "skill_name": "Model deployment & serving",
               "definition": "Making model inference available through a runnable serving interface and configuring, launching or operating its serving path; local serving can qualify.",
               "direct_evidence": "Explicit model-serving knowledge, or personally implementing/configuring/launching/operating a stated inference-serving runtime or endpoint.",
               "not_sufficient": "Answer-generation behavior, a prototype label, an API framework name, a notebook or a hosted-model request alone, without an actual serving path. Production/cloud scale is not required.",
@@ -523,7 +523,7 @@
             },
             {
               "skill_id": "ai_infrastructure",
-              "skill_name": "AI 系统基础设施",
+              "skill_name": "AI infrastructure",
               "definition": "Cloud, distributed, container, or operational infrastructure used for AI workloads.",
               "direct_evidence": "Explicit AI-infrastructure knowledge or personally configuring/operating cloud, compute, distributed, container, or operational infrastructure for AI.",
               "not_sufficient": "Calling a cloud AI API without infrastructure work."
@@ -532,32 +532,32 @@
         },
         {
           "module_id": "generative_llm_applications",
-          "module_name": "生成式 AI 与 LLM 应用",
+          "module_name": "Generative AI applications",
           "skills": [
             {
               "skill_id": "generative_ai",
-              "skill_name": "生成式 AI",
+              "skill_name": "Generative AI",
               "definition": "Explicit generative-AI knowledge or use; record the actual modality/activity without inferring coding assistance or model training.",
               "direct_evidence": "Explicit generative-AI knowledge or using/building a system that generates text, images, audio, or other content.",
               "not_sufficient": "Generic classification or inferring coding assistance from image-generation work."
             },
             {
               "skill_id": "llm",
-              "skill_name": "大语言模型",
+              "skill_name": "Large language models",
               "definition": "Explicit large-language-model knowledge or use; this alone does not establish training, RAG, or agent orchestration.",
               "direct_evidence": "Explicit LLM knowledge or personal use/development involving a language model.",
               "not_sufficient": "Unspecified AI/ML work or assuming every generative model is an LLM."
             },
             {
               "skill_id": "rag",
-              "skill_name": "RAG",
+              "skill_name": "Retrieval-augmented generation",
               "definition": "Retrieval of external context followed by grounded generation; embeddings alone do not establish RAG.",
               "direct_evidence": "Explicit RAG knowledge or describing retrieval of external context used to ground generated answers.",
               "not_sufficient": "Embeddings, a vector database, keyword search, or an LLM alone without retrieval-to-generation linkage."
             },
             {
               "skill_id": "ai_agents",
-              "skill_name": "Agent 与工具调用",
+              "skill_name": "Agents & tool use",
               "definition": "Model-mediated assistant/agent systems with tool invocation or action orchestration and explicit control flow; bounded single-tool systems qualify.",
               "direct_evidence": "Explicit agent-system knowledge, or personally designing/implementing a model-mediated tool/action workflow with described invocation, result handling or control logic.",
               "not_sufficient": "An agent project name, a plain generation request, fixed search alone or personal decision-making. Autonomy, multiple tools and AI-assisted coding are not prerequisites; denying one does not deny building an agent.",
@@ -566,14 +566,14 @@
             },
             {
               "skill_id": "prompt_engineering",
-              "skill_name": "Prompt 工程",
+              "skill_name": "Prompt engineering",
               "definition": "Explicit design, refinement, or evaluation of prompts; a casual model query alone is insufficient for applied evidence.",
               "direct_evidence": "Explicit prompt-design knowledge or deliberately designing/refining/evaluating prompts for a defined behavior.",
               "not_sufficient": "A casual model question or claiming the model followed a prompt."
             },
             {
               "skill_id": "vector_retrieval",
-              "skill_name": "向量表示与检索",
+              "skill_name": "Vector representations & retrieval",
               "definition": "Embeddings, vector search, or vector storage/retrieval; this alone does not establish a complete RAG pipeline.",
               "direct_evidence": "Explicit embedding/vector-search knowledge or using embeddings, similarity search, vector indexing, or vector storage for a stated task.",
               "not_sufficient": "Generic arrays, a relational database, or LLM use alone."

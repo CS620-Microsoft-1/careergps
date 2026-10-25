@@ -61,7 +61,7 @@
   "prompt_revision": "method-selection.v1",
   "instructions_sha256": "a49bc04979cb10b97629e3054166c314adf4673a26ce9ef889eb0ed5c474fec8",
   "response_processing_version": "v12-reference-cleanup.v2",
-  "calculation_fingerprint": "e99982c046f7f774a8f1758ccc0b436980f266f5b656cff405fcb33fbae0f686",
+  "calculation_fingerprint": "ceb33aca9df6a56b99ff8d2aa739651c45f95531b018c264d71acc753fad46ab",
   "agent_name": "synthetic-example-no-agent-call",
   "agent_version": null,
   "status": "completed",
@@ -85,9 +85,9 @@
     "skills": [
       {
         "skill_id": "programming",
-        "skill_name": "编程与语言能力",
+        "skill_name": "Programming & languages",
         "module_id": "programming_foundations",
-        "module_name": "编程基础",
+        "module_name": "Programming foundations",
         "agent_assessment": {
           "kind": "practice",
           "operation_id": "e002",
@@ -215,9 +215,9 @@
       },
       {
         "skill_id": "algorithms",
-        "skill_name": "算法与数据结构",
+        "skill_name": "Algorithms & data structures",
         "module_id": "programming_foundations",
-        "module_name": "编程基础",
+        "module_name": "Programming foundations",
         "agent_assessment": {
           "kind": "knowledge",
           "evidence_id": "e001"
@@ -278,9 +278,9 @@
       },
       {
         "skill_id": "object_oriented_design",
-        "skill_name": "面向对象与设计模式",
+        "skill_name": "Object-oriented design",
         "module_id": "programming_foundations",
-        "module_name": "编程基础",
+        "module_name": "Programming foundations",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -321,9 +321,9 @@
       },
       {
         "skill_id": "ai_assisted_development",
-        "skill_name": "AI 辅助开发",
+        "skill_name": "AI-assisted development",
         "module_id": "programming_foundations",
-        "module_name": "编程基础",
+        "module_name": "Programming foundations",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -364,9 +364,9 @@
       },
       {
         "skill_id": "system_design",
-        "skill_name": "系统与软件架构",
+        "skill_name": "System design",
         "module_id": "application_system_design",
-        "module_name": "系统与应用设计",
+        "module_name": "Applications & system design",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -407,9 +407,9 @@
       },
       {
         "skill_id": "backend_apis",
-        "skill_name": "后端与 API 开发",
+        "skill_name": "Backend & API development",
         "module_id": "application_system_design",
-        "module_name": "系统与应用设计",
+        "module_name": "Applications & system design",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -450,9 +450,9 @@
       },
       {
         "skill_id": "frontend",
-        "skill_name": "前端与界面开发",
+        "skill_name": "Frontend development",
         "module_id": "application_system_design",
-        "module_name": "系统与应用设计",
+        "module_name": "Applications & system design",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -493,9 +493,9 @@
       },
       {
         "skill_id": "distributed_systems",
-        "skill_name": "分布式与服务架构",
+        "skill_name": "Distributed systems",
         "module_id": "application_system_design",
-        "module_name": "系统与应用设计",
+        "module_name": "Applications & system design",
         "agent_assessment": {
           "kind": "uncertain",
           "evidence_id": null,
@@ -538,9 +538,9 @@
       },
       {
         "skill_id": "relational_sql",
-        "skill_name": "SQL 与关系数据库",
+        "skill_name": "SQL & relational databases",
         "module_id": "databases_data",
-        "module_name": "数据库与数据访问",
+        "module_name": "Databases & data",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -581,9 +581,9 @@
       },
       {
         "skill_id": "nosql_search",
-        "skill_name": "非关系数据与检索",
+        "skill_name": "NoSQL & search",
         "module_id": "databases_data",
-        "module_name": "数据库与数据访问",
+        "module_name": "Databases & data",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -624,9 +624,9 @@
       },
       {
         "skill_id": "code_quality",
-        "skill_name": "代码质量与可维护性",
+        "skill_name": "Code quality",
         "module_id": "engineering_quality",
-        "module_name": "工程质量",
+        "module_name": "Engineering quality",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -667,9 +667,9 @@
       },
       {
         "skill_id": "testing",
-        "skill_name": "软件测试",
+        "skill_name": "Software testing",
         "module_id": "engineering_quality",
-        "module_name": "工程质量",
+        "module_name": "Engineering quality",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -710,9 +710,9 @@
       },
       {
         "skill_id": "debugging",
-        "skill_name": "调试与问题定位",
+        "skill_name": "Debugging",
         "module_id": "engineering_quality",
-        "module_name": "工程质量",
+        "module_name": "Engineering quality",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -753,9 +753,9 @@
       },
       {
         "skill_id": "code_review",
-        "skill_name": "代码审查",
+        "skill_name": "Code review",
         "module_id": "engineering_quality",
-        "module_name": "工程质量",
+        "module_name": "Engineering quality",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -796,9 +796,9 @@
       },
       {
         "skill_id": "version_control",
-        "skill_name": "版本控制",
+        "skill_name": "Version control",
         "module_id": "engineering_quality",
-        "module_name": "工程质量",
+        "module_name": "Engineering quality",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -839,9 +839,9 @@
       },
       {
         "skill_id": "cloud",
-        "skill_name": "云平台",
+        "skill_name": "Cloud platforms",
         "module_id": "delivery_infrastructure",
-        "module_name": "交付与基础设施",
+        "module_name": "Delivery & infrastructure",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -882,9 +882,9 @@
       },
       {
         "skill_id": "containers",
-        "skill_name": "容器与编排",
+        "skill_name": "Containers",
         "module_id": "delivery_infrastructure",
-        "module_name": "交付与基础设施",
+        "module_name": "Delivery & infrastructure",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -925,9 +925,9 @@
       },
       {
         "skill_id": "delivery_automation",
-        "skill_name": "构建、交付与基础设施自动化",
+        "skill_name": "CI/CD & delivery automation",
         "module_id": "delivery_infrastructure",
-        "module_name": "交付与基础设施",
+        "module_name": "Delivery & infrastructure",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -968,9 +968,9 @@
       },
       {
         "skill_id": "performance",
-        "skill_name": "性能分析与优化",
+        "skill_name": "Performance analysis",
         "module_id": "performance_operations",
-        "module_name": "性能与可靠性",
+        "module_name": "Performance & operations",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -1011,9 +1011,9 @@
       },
       {
         "skill_id": "observability_operations",
-        "skill_name": "可观测性与运行维护",
+        "skill_name": "Observability & operations",
         "module_id": "performance_operations",
-        "module_name": "性能与可靠性",
+        "module_name": "Performance & operations",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -1054,9 +1054,9 @@
       },
       {
         "skill_id": "reliability",
-        "skill_name": "可靠性与可扩展性",
+        "skill_name": "Reliability",
         "module_id": "performance_operations",
-        "module_name": "性能与可靠性",
+        "module_name": "Performance & operations",
         "agent_assessment": {
           "kind": "absent"
         },
@@ -1097,9 +1097,9 @@
       },
       {
         "skill_id": "security",
-        "skill_name": "安全工程与访问控制",
+        "skill_name": "Security",
         "module_id": "security",
-        "module_name": "安全工程",
+        "module_name": "Security",
         "agent_assessment": {
           "kind": "absent"
         },
