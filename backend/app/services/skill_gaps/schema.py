@@ -1,8 +1,5 @@
 """Separate source-exact proof spans without duplicating the family or result shapes."""
-import json
-from pathlib import Path
 
-ROOT = Path(__file__).parent
 SCHEMA_NAME = "careergps_core_resume_evidence_v12"
 
 
@@ -58,9 +55,3 @@ def build_schema(catalog):
     schema = obj({"task": choice("extract_resume_evidence"), "result": {"anyOf": branches}})
     schema["$defs"] = definitions
     return {"name": SCHEMA_NAME, "strict": True, "schema": schema}
-
-
-if __name__ == "__main__":
-    catalog = json.loads((ROOT / "core_catalog.json").read_text(encoding="utf-8"))
-    (ROOT / "response-format.json").write_text(
-        json.dumps(build_schema(catalog), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

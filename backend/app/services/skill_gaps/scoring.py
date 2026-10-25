@@ -1,12 +1,12 @@
 """Source-exact proof gates around the unchanged core evidence arithmetic."""
 import json
-from pathlib import Path
-from ..skill_gap_core_v9.policy import calculate as _calculate
+from .assets import ASSET_ROOT
+from .evidence_scoring import calculate as _calculate
 from .sources import build_index, attach_source_index
 from .validation import validate_response
 from .coverage import audit_coverage
 
-POLICY = json.loads(Path(__file__).with_name("scoring_policy.json").read_text(encoding="utf-8"))
+POLICY = json.loads((ASSET_ROOT / "scoring_policy.json").read_text(encoding="utf-8"))
 POLICY_VERSION = POLICY["policy_version"]
 RELATIONS = {"direct_personal": "direct_personal_operation", "related_context": "related_context",
              "unclear": "unclear_ownership", "other_person": "other_person"}

@@ -1,0 +1,1555 @@
+{
+  "storage_schema_version": "careergps.skill_gap_run_storage.v1",
+  "id": "33333333-3333-4333-8333-333333333333",
+  "user_id": "11111111-1111-4111-8111-111111111111",
+  "resume_id": "22222222-2222-4222-8222-222222222222",
+  "resume_hash": "60d024c36b73109744ea6069a7e16d72dcd184bb5cf69a4141e2f58a3266ec08",
+  "reviewed_resume_snapshot": {
+    "personal_information": {
+      "name": "Alex Example",
+      "emails": [
+        "alex@example.invalid"
+      ],
+      "phones": [],
+      "location": null,
+      "linkedin": null,
+      "github": null,
+      "website": null
+    },
+    "research_interests": [],
+    "education": [
+      {
+        "institution": "Example University",
+        "degree": "BS",
+        "major": "Computer Science",
+        "start_date": null,
+        "end_date": null,
+        "gpa": null,
+        "content": [
+          "Coursework: Algorithms and Data Structures."
+        ]
+      }
+    ],
+    "work_experience": [],
+    "research_experience": [],
+    "projects": [
+      {
+        "name": "Example API",
+        "url": null,
+        "technologies": [
+          "Python"
+        ],
+        "content": [
+          "Implemented Python API endpoints using request validation and unit tests."
+        ]
+      }
+    ],
+    "technical_skills": [],
+    "languages": [],
+    "publications": [],
+    "awards_honors": [],
+    "certifications": [],
+    "leadership_activities": [],
+    "other": []
+  },
+  "job_family": "software_engineer",
+  "demand_snapshot_id": "44444444-4444-4444-8444-444444444444",
+  "demand_snapshot_fingerprint": "8766af4a81703dc686566d8a316e18f9e184c704a73e7da3d732b57a76eadf44",
+  "catalog_version": "core-evidence-v5",
+  "policy_version": "core-evidence-gap.v12",
+  "response_schema_name": "careergps_core_resume_evidence_v12",
+  "prompt_revision": "method-selection.v1",
+  "instructions_sha256": "a49bc04979cb10b97629e3054166c314adf4673a26ce9ef889eb0ed5c474fec8",
+  "response_processing_version": "v12-reference-cleanup.v2",
+  "calculation_fingerprint": "e99982c046f7f774a8f1758ccc0b436980f266f5b656cff405fcb33fbae0f686",
+  "agent_name": "synthetic-example-no-agent-call",
+  "agent_version": null,
+  "status": "completed",
+  "phase": "completed",
+  "created_at": "2026-10-25T12:00:00Z",
+  "completed_at": "2026-10-25T12:00:03Z",
+  "elapsed_seconds": 3,
+  "model_calls": 0,
+  "error": null,
+  "error_code": null,
+  "report": {
+    "policy_version": "core-evidence-gap.v12",
+    "calibration_status": "initial_rubric_not_empirically_calibrated",
+    "job_family": "software_engineer",
+    "metric": "core-skill resume evidence strength and evidence gap",
+    "agent_output_verified": false,
+    "database_used": false,
+    "core_skill_count": 22,
+    "module_count": 7,
+    "demand_snapshot_fingerprint": "8766af4a81703dc686566d8a316e18f9e184c704a73e7da3d732b57a76eadf44",
+    "skills": [
+      {
+        "skill_id": "programming",
+        "skill_name": "编程与语言能力",
+        "module_id": "programming_foundations",
+        "module_name": "编程基础",
+        "agent_assessment": {
+          "kind": "practice",
+          "operation_id": "e002",
+          "capability": {
+            "relation": "direct_personal",
+            "quote": "Implemented Python API endpoints"
+          },
+          "application": "concrete_action",
+          "method": {
+            "kind": "mechanism_described",
+            "proof": {
+              "unit_id": "e002",
+              "quote": "request validation"
+            }
+          },
+          "validation": {
+            "kind": "check_only",
+            "check": {
+              "unit_id": "e002",
+              "quote": "unit tests"
+            },
+            "finding": null,
+            "finding_type": null,
+            "reference": null,
+            "reported_value": null,
+            "relation": "same_capability"
+          }
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.65,
+        "scoring_breakdown": {
+          "state": "scored",
+          "score": 0.65,
+          "reason": "direct_personal_practice",
+          "categories": {
+            "application": "concrete_action",
+            "method": "mechanism_described",
+            "validation": "method_only"
+          },
+          "points": {
+            "application": 9,
+            "method": 3,
+            "validation": 1
+          },
+          "total_points": 13,
+          "points_denominator": 20,
+          "caps_applied": [],
+          "selected_evidence_index": 0,
+          "item_results": [
+            {
+              "state": "scored",
+              "score": 0.65,
+              "reason": "direct_personal_practice",
+              "categories": {
+                "application": "concrete_action",
+                "method": "mechanism_described",
+                "validation": "method_only"
+              },
+              "points": {
+                "application": 9,
+                "method": 3,
+                "validation": 1
+              },
+              "total_points": 13,
+              "points_denominator": 20,
+              "caps_applied": []
+            }
+          ],
+          "has_unscored_items": false,
+          "grounding_and_result_gate": {
+            "validation_relation": "same_capability",
+            "reported_validation_kind": "check_only",
+            "validation_points_withheld": false,
+            "reason": "selected_grounded_practice",
+            "effective_method_level": "mechanism_described",
+            "effective_validation_level": "method_only",
+            "grounding_check": "field_presence_only_not_source_or_semantic_verification"
+          },
+          "selected_source_id": "a002"
+        },
+        "skill_gap": 0.35,
+        "skill_gap_grade": "B",
+        "demand": {
+          "required_job_count": 1239,
+          "preferred_only_job_count": 227,
+          "unspecified_job_count": 220,
+          "required_ratio": 0.43352,
+          "preferred_only_ratio": 0.079426,
+          "unspecified_ratio": 0.076977,
+          "N": 2858
+        },
+        "demand_weight": 0.512946,
+        "priority": 0.179531,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [
+            "e002"
+          ],
+          "derived_activity_id": "a002",
+          "activity_derivation": "original_operation_unit_parent_not_semantic_verification",
+          "proof_spans": [
+            {
+              "field": "/result/programming/capability/quote",
+              "unit_id": "e002",
+              "start": 0,
+              "end": 32
+            },
+            {
+              "field": "/result/programming/method/proof/quote",
+              "unit_id": "e002",
+              "start": 39,
+              "end": 57
+            },
+            {
+              "field": "/result/programming/validation/check/quote",
+              "unit_id": "e002",
+              "start": 62,
+              "end": 72
+            }
+          ],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "algorithms",
+        "skill_name": "算法与数据结构",
+        "module_id": "programming_foundations",
+        "module_name": "编程基础",
+        "agent_assessment": {
+          "kind": "knowledge",
+          "evidence_id": "e001"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.2,
+        "scoring_breakdown": {
+          "state": "scored",
+          "score": 0.2,
+          "reason": "direct_knowledge_claim_only",
+          "points": null,
+          "caps_applied": [
+            "listed_score"
+          ],
+          "selected_evidence_index": 0,
+          "item_results": [
+            {
+              "state": "scored",
+              "score": 0.2,
+              "reason": "direct_knowledge_claim_only",
+              "points": null,
+              "caps_applied": [
+                "listed_score"
+              ]
+            }
+          ],
+          "has_unscored_items": false,
+          "grounding_and_result_gate": {
+            "reason": "selected_explicit_knowledge"
+          },
+          "selected_source_id": "a001"
+        },
+        "skill_gap": 0.8,
+        "skill_gap_grade": "D",
+        "demand": {
+          "required_job_count": 52,
+          "preferred_only_job_count": 1,
+          "unspecified_job_count": 16,
+          "required_ratio": 0.018195,
+          "preferred_only_ratio": 0.00035,
+          "unspecified_ratio": 0.005598,
+          "N": 2858
+        },
+        "demand_weight": 0.018544,
+        "priority": 0.014836,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [
+            "e001"
+          ],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "object_oriented_design",
+        "skill_name": "面向对象与设计模式",
+        "module_id": "programming_foundations",
+        "module_name": "编程基础",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 61,
+          "preferred_only_job_count": 17,
+          "unspecified_job_count": 7,
+          "required_ratio": 0.021344,
+          "preferred_only_ratio": 0.005948,
+          "unspecified_ratio": 0.002449,
+          "N": 2858
+        },
+        "demand_weight": 0.027292,
+        "priority": 0.027292,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "ai_assisted_development",
+        "skill_name": "AI 辅助开发",
+        "module_id": "programming_foundations",
+        "module_name": "编程基础",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 194,
+          "preferred_only_job_count": 19,
+          "unspecified_job_count": 15,
+          "required_ratio": 0.06788,
+          "preferred_only_ratio": 0.006648,
+          "unspecified_ratio": 0.005248,
+          "N": 2858
+        },
+        "demand_weight": 0.074528,
+        "priority": 0.074528,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "system_design",
+        "skill_name": "系统与软件架构",
+        "module_id": "application_system_design",
+        "module_name": "系统与应用设计",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 174,
+          "preferred_only_job_count": 116,
+          "unspecified_job_count": 46,
+          "required_ratio": 0.060882,
+          "preferred_only_ratio": 0.040588,
+          "unspecified_ratio": 0.016095,
+          "N": 2858
+        },
+        "demand_weight": 0.10147,
+        "priority": 0.10147,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "backend_apis",
+        "skill_name": "后端与 API 开发",
+        "module_id": "application_system_design",
+        "module_name": "系统与应用设计",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 333,
+          "preferred_only_job_count": 85,
+          "unspecified_job_count": 64,
+          "required_ratio": 0.116515,
+          "preferred_only_ratio": 0.029741,
+          "unspecified_ratio": 0.022393,
+          "N": 2858
+        },
+        "demand_weight": 0.146256,
+        "priority": 0.146256,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "frontend",
+        "skill_name": "前端与界面开发",
+        "module_id": "application_system_design",
+        "module_name": "系统与应用设计",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 141,
+          "preferred_only_job_count": 119,
+          "unspecified_job_count": 75,
+          "required_ratio": 0.049335,
+          "preferred_only_ratio": 0.041638,
+          "unspecified_ratio": 0.026242,
+          "N": 2858
+        },
+        "demand_weight": 0.090973,
+        "priority": 0.090973,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "distributed_systems",
+        "skill_name": "分布式与服务架构",
+        "module_id": "application_system_design",
+        "module_name": "系统与应用设计",
+        "agent_assessment": {
+          "kind": "uncertain",
+          "evidence_id": null,
+          "reason": "The example contains no direct evidence to confirm this assessment."
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": null,
+        "scoring_breakdown": {
+          "score": null,
+          "state": "unscored",
+          "reason": "needs_confirmation",
+          "grounding_and_result_gate": {
+            "reason": "unknown_or_uncertain_evidence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": null,
+        "skill_gap_grade": null,
+        "demand": {
+          "required_job_count": 570,
+          "preferred_only_job_count": 158,
+          "unspecified_job_count": 184,
+          "required_ratio": 0.19944,
+          "preferred_only_ratio": 0.055283,
+          "unspecified_ratio": 0.064381,
+          "N": 2858
+        },
+        "demand_weight": 0.254724,
+        "priority": null,
+        "calculation_state": "needs_confirmation",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "relational_sql",
+        "skill_name": "SQL 与关系数据库",
+        "module_id": "databases_data",
+        "module_name": "数据库与数据访问",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 198,
+          "preferred_only_job_count": 209,
+          "unspecified_job_count": 62,
+          "required_ratio": 0.069279,
+          "preferred_only_ratio": 0.073128,
+          "unspecified_ratio": 0.021693,
+          "N": 2858
+        },
+        "demand_weight": 0.142407,
+        "priority": 0.142407,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "nosql_search",
+        "skill_name": "非关系数据与检索",
+        "module_id": "databases_data",
+        "module_name": "数据库与数据访问",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 102,
+          "preferred_only_job_count": 58,
+          "unspecified_job_count": 9,
+          "required_ratio": 0.035689,
+          "preferred_only_ratio": 0.020294,
+          "unspecified_ratio": 0.003149,
+          "N": 2858
+        },
+        "demand_weight": 0.055983,
+        "priority": 0.055983,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "code_quality",
+        "skill_name": "代码质量与可维护性",
+        "module_id": "engineering_quality",
+        "module_name": "工程质量",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 188,
+          "preferred_only_job_count": 8,
+          "unspecified_job_count": 20,
+          "required_ratio": 0.06578,
+          "preferred_only_ratio": 0.002799,
+          "unspecified_ratio": 0.006998,
+          "N": 2858
+        },
+        "demand_weight": 0.068579,
+        "priority": 0.068579,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "testing",
+        "skill_name": "软件测试",
+        "module_id": "engineering_quality",
+        "module_name": "工程质量",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 55,
+          "preferred_only_job_count": 85,
+          "unspecified_job_count": 11,
+          "required_ratio": 0.019244,
+          "preferred_only_ratio": 0.029741,
+          "unspecified_ratio": 0.003849,
+          "N": 2858
+        },
+        "demand_weight": 0.048985,
+        "priority": 0.048985,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "debugging",
+        "skill_name": "调试与问题定位",
+        "module_id": "engineering_quality",
+        "module_name": "工程质量",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 332,
+          "preferred_only_job_count": 152,
+          "unspecified_job_count": 68,
+          "required_ratio": 0.116165,
+          "preferred_only_ratio": 0.053184,
+          "unspecified_ratio": 0.023793,
+          "N": 2858
+        },
+        "demand_weight": 0.169349,
+        "priority": 0.169349,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "code_review",
+        "skill_name": "代码审查",
+        "module_id": "engineering_quality",
+        "module_name": "工程质量",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 68,
+          "preferred_only_job_count": 7,
+          "unspecified_job_count": 9,
+          "required_ratio": 0.023793,
+          "preferred_only_ratio": 0.002449,
+          "unspecified_ratio": 0.003149,
+          "N": 2858
+        },
+        "demand_weight": 0.026242,
+        "priority": 0.026242,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "version_control",
+        "skill_name": "版本控制",
+        "module_id": "engineering_quality",
+        "module_name": "工程质量",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 48,
+          "preferred_only_job_count": 202,
+          "unspecified_job_count": 8,
+          "required_ratio": 0.016795,
+          "preferred_only_ratio": 0.070679,
+          "unspecified_ratio": 0.002799,
+          "N": 2858
+        },
+        "demand_weight": 0.087474,
+        "priority": 0.087474,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "cloud",
+        "skill_name": "云平台",
+        "module_id": "delivery_infrastructure",
+        "module_name": "交付与基础设施",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 236,
+          "preferred_only_job_count": 154,
+          "unspecified_job_count": 93,
+          "required_ratio": 0.082575,
+          "preferred_only_ratio": 0.053884,
+          "unspecified_ratio": 0.03254,
+          "N": 2858
+        },
+        "demand_weight": 0.136459,
+        "priority": 0.136459,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "containers",
+        "skill_name": "容器与编排",
+        "module_id": "delivery_infrastructure",
+        "module_name": "交付与基础设施",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 187,
+          "preferred_only_job_count": 240,
+          "unspecified_job_count": 49,
+          "required_ratio": 0.06543,
+          "preferred_only_ratio": 0.083975,
+          "unspecified_ratio": 0.017145,
+          "N": 2858
+        },
+        "demand_weight": 0.149405,
+        "priority": 0.149405,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "delivery_automation",
+        "skill_name": "构建、交付与基础设施自动化",
+        "module_id": "delivery_infrastructure",
+        "module_name": "交付与基础设施",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 260,
+          "preferred_only_job_count": 340,
+          "unspecified_job_count": 111,
+          "required_ratio": 0.090973,
+          "preferred_only_ratio": 0.118964,
+          "unspecified_ratio": 0.038838,
+          "N": 2858
+        },
+        "demand_weight": 0.209937,
+        "priority": 0.209937,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "performance",
+        "skill_name": "性能分析与优化",
+        "module_id": "performance_operations",
+        "module_name": "性能与可靠性",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 49,
+          "preferred_only_job_count": 163,
+          "unspecified_job_count": 16,
+          "required_ratio": 0.017145,
+          "preferred_only_ratio": 0.057033,
+          "unspecified_ratio": 0.005598,
+          "N": 2858
+        },
+        "demand_weight": 0.074178,
+        "priority": 0.074178,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "observability_operations",
+        "skill_name": "可观测性与运行维护",
+        "module_id": "performance_operations",
+        "module_name": "性能与可靠性",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 156,
+          "preferred_only_job_count": 133,
+          "unspecified_job_count": 42,
+          "required_ratio": 0.054584,
+          "preferred_only_ratio": 0.046536,
+          "unspecified_ratio": 0.014696,
+          "N": 2858
+        },
+        "demand_weight": 0.10112,
+        "priority": 0.10112,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "reliability",
+        "skill_name": "可靠性与可扩展性",
+        "module_id": "performance_operations",
+        "module_name": "性能与可靠性",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 27,
+          "preferred_only_job_count": 2,
+          "unspecified_job_count": 2,
+          "required_ratio": 0.009447,
+          "preferred_only_ratio": 0.0007,
+          "unspecified_ratio": 0.0007,
+          "N": 2858
+        },
+        "demand_weight": 0.010147,
+        "priority": 0.010147,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      },
+      {
+        "skill_id": "security",
+        "skill_name": "安全工程与访问控制",
+        "module_id": "security",
+        "module_name": "安全工程",
+        "agent_assessment": {
+          "kind": "absent"
+        },
+        "evidence_verification": "source_exact_proof_integrity_not_semantic_truth",
+        "resume_evidence_strength": 0.0,
+        "scoring_breakdown": {
+          "score": 0.0,
+          "state": "scored",
+          "reason": "no_positive_resume_evidence",
+          "grounding_and_result_gate": {
+            "reason": "explicit_absence"
+          },
+          "selected_source_id": null
+        },
+        "skill_gap": 1.0,
+        "skill_gap_grade": "F",
+        "demand": {
+          "required_job_count": 99,
+          "preferred_only_job_count": 107,
+          "unspecified_job_count": 30,
+          "required_ratio": 0.03464,
+          "preferred_only_ratio": 0.037439,
+          "unspecified_ratio": 0.010497,
+          "N": 2858
+        },
+        "demand_weight": 0.072078,
+        "priority": 0.072078,
+        "calculation_state": "scored",
+        "local_reference_check": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      }
+    ],
+    "priority_order": [
+      "delivery_automation",
+      "programming",
+      "debugging",
+      "containers",
+      "backend_apis",
+      "relational_sql",
+      "cloud",
+      "system_design",
+      "observability_operations",
+      "frontend",
+      "version_control",
+      "ai_assisted_development",
+      "performance",
+      "security",
+      "code_quality",
+      "nosql_search",
+      "testing",
+      "object_oriented_design",
+      "code_review",
+      "algorithms",
+      "reliability"
+    ],
+    "unscored_skill_ids": [
+      "distributed_systems"
+    ],
+    "limitations": [
+      "Operation-bound capability text and cited proof spans are checked against original units, not judged semantically.",
+      "A literal reported number is a necessary reference prerequisite, not proof that the number is an actual measurement result.",
+      "Related/unclear capability and invalid references/proofs remain pending, without automatic fallback, repair or score downgrade.",
+      "Potential same-operation method/check references are review candidates only; they never fill fields or change scores.",
+      "All original points, caps, grade thresholds and demand are unchanged and not empirically calibrated.",
+      "A indicates a smaller resume evidence gap; F means no positive selected evidence, not inability."
+    ],
+    "base_numeric_rubric": "core-evidence-gap.v5",
+    "reference_validation": {
+      "status": "passed",
+      "scope": "structure_reference_and_exact_quote_integrity_not_semantic_verification",
+      "global_errors": [],
+      "unexpected_skill_ids": [],
+      "skills": {
+        "programming": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [
+            "e002"
+          ],
+          "derived_activity_id": "a002",
+          "activity_derivation": "original_operation_unit_parent_not_semantic_verification",
+          "proof_spans": [
+            {
+              "field": "/result/programming/capability/quote",
+              "unit_id": "e002",
+              "start": 0,
+              "end": 32
+            },
+            {
+              "field": "/result/programming/method/proof/quote",
+              "unit_id": "e002",
+              "start": 39,
+              "end": 57
+            },
+            {
+              "field": "/result/programming/validation/check/quote",
+              "unit_id": "e002",
+              "start": 62,
+              "end": 72
+            }
+          ],
+          "reported_value_spans": []
+        },
+        "algorithms": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [
+            "e001"
+          ],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "object_oriented_design": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "ai_assisted_development": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "system_design": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "backend_apis": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "frontend": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "distributed_systems": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "relational_sql": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "nosql_search": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "code_quality": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "testing": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "debugging": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "code_review": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "version_control": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "cloud": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "containers": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "delivery_automation": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "performance": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "observability_operations": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "reliability": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        },
+        "security": {
+          "status": "passed",
+          "errors": [],
+          "evidence_ids": [],
+          "derived_activity_id": null,
+          "activity_derivation": null,
+          "proof_spans": [],
+          "reported_value_spans": []
+        }
+      }
+    },
+    "evidence_coverage": {
+      "scope": "candidate_references_only_no_semantic_reuse_or_score_changes",
+      "method_null_skill_ids": [],
+      "validation_null_skill_ids": [],
+      "candidate_references": {}
+    },
+    "mechanical_integrity_checked": true,
+    "exact_quotes_checked": true,
+    "semantic_evidence_verified": false,
+    "source_index": {
+      "e001": {
+        "id": "e001",
+        "path": "/education/0/content/0",
+        "kind": "claim",
+        "text": "Coursework: Algorithms and Data Structures.",
+        "activity_id": "a001",
+        "activity_path": "/education/0",
+        "activity_context": {
+          "degree": "BS",
+          "end_date": null,
+          "gpa": null,
+          "institution": "Example University",
+          "major": "Computer Science",
+          "start_date": null
+        }
+      },
+      "e002": {
+        "id": "e002",
+        "path": "/projects/0/content/0",
+        "kind": "claim",
+        "text": "Implemented Python API endpoints using request validation and unit tests.",
+        "activity_id": "a002",
+        "activity_path": "/projects/0",
+        "activity_context": {
+          "name": "Example API",
+          "url": null
+        }
+      }
+    },
+    "unresolved_display_sources": [],
+    "source_lookup_scope": "original_unit_display_with_checked_model_span_references_not_semantic_truth",
+    "response_processing": {
+      "version": "v12-reference-cleanup.v2",
+      "scope": "duplicate_nonresult_reference_and_unique_omitted_prose_commas",
+      "adjustments": [],
+      "count": 0
+    },
+    "resume_id": "reviewed_60d024c36b73109744ea6069a7e16d72dcd184bb5cf69a4141e2f58a3266ec08"
+  },
+  "raw_agent_output": {
+    "task": "extract_resume_evidence",
+    "result": {
+      "job_family": "software_engineer",
+      "programming": {
+        "kind": "practice",
+        "operation_id": "e002",
+        "capability": {
+          "relation": "direct_personal",
+          "quote": "Implemented Python API endpoints"
+        },
+        "application": "concrete_action",
+        "method": {
+          "kind": "mechanism_described",
+          "proof": {
+            "unit_id": "e002",
+            "quote": "request validation"
+          }
+        },
+        "validation": {
+          "kind": "check_only",
+          "check": {
+            "unit_id": "e002",
+            "quote": "unit tests"
+          },
+          "finding": null,
+          "finding_type": null,
+          "reference": null,
+          "reported_value": null,
+          "relation": "same_capability"
+        }
+      },
+      "algorithms": {
+        "kind": "knowledge",
+        "evidence_id": "e001"
+      },
+      "object_oriented_design": {
+        "kind": "absent"
+      },
+      "ai_assisted_development": {
+        "kind": "absent"
+      },
+      "system_design": {
+        "kind": "absent"
+      },
+      "backend_apis": {
+        "kind": "absent"
+      },
+      "frontend": {
+        "kind": "absent"
+      },
+      "distributed_systems": {
+        "kind": "uncertain",
+        "evidence_id": null,
+        "reason": "The example contains no direct evidence to confirm this assessment."
+      },
+      "relational_sql": {
+        "kind": "absent"
+      },
+      "nosql_search": {
+        "kind": "absent"
+      },
+      "code_quality": {
+        "kind": "absent"
+      },
+      "testing": {
+        "kind": "absent"
+      },
+      "debugging": {
+        "kind": "absent"
+      },
+      "code_review": {
+        "kind": "absent"
+      },
+      "version_control": {
+        "kind": "absent"
+      },
+      "cloud": {
+        "kind": "absent"
+      },
+      "containers": {
+        "kind": "absent"
+      },
+      "delivery_automation": {
+        "kind": "absent"
+      },
+      "performance": {
+        "kind": "absent"
+      },
+      "observability_operations": {
+        "kind": "absent"
+      },
+      "reliability": {
+        "kind": "absent"
+      },
+      "security": {
+        "kind": "absent"
+      }
+    }
+  }
+}

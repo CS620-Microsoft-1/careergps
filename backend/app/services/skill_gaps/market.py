@@ -2,10 +2,10 @@
 import json
 from pathlib import Path
 
-from app.core.config import BACKEND_ROOT
+from .assets import ASSET_ROOT
 from app.schemas.skill_gap_web import JobFamily
 
-SNAPSHOT_ROOT = BACKEND_ROOT / "local_experiments" / "skill_gap_core_v12"
+SNAPSHOT_ROOT = ASSET_ROOT
 
 
 def get_market_demand(family: JobFamily, root: Path = SNAPSHOT_ROOT) -> dict:

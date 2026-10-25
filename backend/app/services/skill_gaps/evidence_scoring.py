@@ -4,10 +4,10 @@ Only categorical inputs and field availability are considered here. There is no
 source/quote/ID lookup, semantic verifier, content-specific override or repair.
 """
 import json
-from pathlib import Path
-from ..skill_gap_core_v5.policy import assess_strength as _assess, calculate as _calculate, grade
+from .assets import ASSET_ROOT
+from .scoring_math import assess_strength as _assess, calculate as _calculate, grade
 
-POLICY = json.loads(Path(__file__).with_name("scoring_policy.json").read_text(encoding="utf-8"))
+POLICY = json.loads((ASSET_ROOT / "scoring_policy.json").read_text(encoding="utf-8"))
 POLICY_VERSION = POLICY["policy_version"]
 VALIDATION_LEVELS = {"check_only": "method_only", "workflow_only": "none", "unclear": "none",
                      "observed": "method_and_result", "compared": "comparative_or_repeated"}

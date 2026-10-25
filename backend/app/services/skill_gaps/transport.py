@@ -1,6 +1,6 @@
-"""Web Agent configuration, separate from the preserved v12 experiment.
+"""Skill Gap Agent configuration and single-call transport.
 
-Check the approved local Instructions and unchanged v12 response schema before
+Check the approved local Instructions and unchanged response schema before
 the single inference. Diagnostics contain hashes, never credentials or prompts.
 """
 import hashlib
@@ -8,9 +8,8 @@ import json
 import time
 
 from app.core.config import BACKEND_ROOT
-from local_experiments.skill_gap_core_v12.run import ROOT as V12_ROOT
-from local_experiments.skill_gap_core_v12.schema import SCHEMA_NAME
-from local_experiments.skill_gap_core_v12.transport import create_response, decode_response
+from .assets import ASSET_ROOT
+from .schema import SCHEMA_NAME
 
 ACTIVE_INSTRUCTIONS_PATH = BACKEND_ROOT / "app" / "prompts" / "skill_gaps" / "Instructions.md"
 ACTIVE_PROMPT_REVISION = "method-selection.v1"
@@ -31,7 +30,7 @@ def _digest(value) -> str:
 def load_local_contract() -> tuple[str, dict]:
     try:
         instructions = ACTIVE_INSTRUCTIONS_PATH.read_text(encoding="utf-8")
-        format_ = json.loads((V12_ROOT / "response-format.json").read_text(encoding="utf-8"))
+        format_ = json.loads((ASSET_ROOT / "response-format.json").read_text(encoding="utf-8"))
         if not instructions.strip() or not isinstance(format_, dict) or "schema" not in format_:
             raise ValueError("Local contract is empty")
         return instructions, format_
@@ -71,6 +70,46 @@ def validate_definition(definition: dict, version: str | None, save) -> dict:
         raise SkillGapConfigurationError("instructions_mismatch",
             "The Azure Agent Instructions differ from the local version. Synchronize the Instructions and restart the local API, then retry. No model call was made.")
     return diagnostics
+
+
+def decode_response(response, save):
+    raw = response.model_dump(mode="json")
+    save("agent.raw.json", raw)
+    # Transport/version compatibility only: no content, keys, IDs or quotes
+    # from the generated evidence object are checked here.
+    if response.status != "completed":
+        raise RuntimeError("Agent response incomplete; raw response saved. No automatic retry or repair")
+    fmt = (raw.get("text") or {}).get("format") or {}
+    if fmt.get("name") != SCHEMA_NAME or fmt.get("type") != "json_schema" or fmt.get("strict") is not True:
+        raise RuntimeError("Bound endpoint served a different response format; raw response saved, no score generated")
+    return json.loads(response.output_text)
+
+
+def create_response(client, payload, on_request=lambda: None, timings=None):
+    timings = {} if timings is None else timings
+    started = time.perf_counter()
+    conversation = client.conversations.create()
+    timings["conversation_create_seconds"] = round(time.perf_counter() - started, 3)
+    try:
+        on_request()
+        started = time.perf_counter()
+        try:
+            return client.responses.create(
+                conversation=conversation.id,
+                input=[{"role": "user", "content":
+                        "Execute extract_resume_evidence using your saved Instructions and response format. INPUT_JSON:\n"
+                        + json.dumps(payload, ensure_ascii=False)}],
+                max_output_tokens=40000,
+            )
+        finally:
+            timings["inference_seconds"] = round(time.perf_counter() - started, 3)
+    finally:
+        started = time.perf_counter()
+        try:
+            client.conversations.delete(conversation_id=conversation.id)
+        except Exception:
+            pass
+        timings["conversation_delete_seconds"] = round(time.perf_counter() - started, 3)
 
 
 def invoke(payload, save, on_request=lambda: None, timings=None):

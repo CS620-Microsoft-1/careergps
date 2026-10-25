@@ -1,4 +1,4 @@
-"""Local-only, single-worker bridge to the preserved v12 evidence pipeline.
+"""Local-only, single-worker manager for the Skill Gap evidence pipeline.
 
 No database imports or connections. A run owns its reviewed snapshot, original
 Agent response and unchanged scoring report. Polling never calls the Agent.
@@ -18,13 +18,15 @@ from uuid import uuid4
 
 from app.core.config import BACKEND_ROOT
 from app.schemas.skill_gap_web import SkillGapRun, SkillGapRunRequest
-from app.services.skill_gap_response import RESPONSE_PROCESSING_VERSION, calculate_web_report
-from app.services.skill_gap_transport import (
+from .response import RESPONSE_PROCESSING_VERSION, calculate_web_report
+from .transport import (
     ACTIVE_INSTRUCTIONS_PATH, ACTIVE_PROMPT_REVISION, SkillGapConfigurationError, invoke,
 )
-from local_experiments.skill_gap_core_v12.policy import POLICY_VERSION, calculate as calculate_v12
-from local_experiments.skill_gap_core_v12.run import ROOT as V12_ROOT, load, prepare, save_json
-from local_experiments.skill_gap_core_v12.schema import SCHEMA_NAME
+from .scoring import POLICY_VERSION, calculate as calculate_baseline
+from .assets import ASSET_ROOT
+from .input import prepare
+from .storage import load, save_json
+from .schema import SCHEMA_NAME
 
 _ID = re.compile(r"[0-9a-f]{32}\Z")
 _ARTIFACTS = {"input.json", "reviewed_resume.json", "observed_agent.json", "agent.raw.json",
@@ -53,12 +55,12 @@ class SkillGapRunManager:
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="local-skill-gap")
         self._states: dict[str, dict] = {}
         self._keys: dict[str, str] = {}
-        self.catalog = load(V12_ROOT / "core_catalog.json")
-        self.market = load(V12_ROOT / "market_snapshot.json")
+        self.catalog = load(ASSET_ROOT / "core_catalog.json")
+        self.market = load(ASSET_ROOT / "market_snapshot.json")
         self.instructions_sha256 = hashlib.sha256(ACTIVE_INSTRUCTIONS_PATH.read_bytes()).hexdigest()
         self.fingerprint = _sha({"response_processing": RESPONSE_PROCESSING_VERSION,
                                 "web_instructions": self.instructions_sha256,
-                                "v12_assets": {name: hashlib.sha256((V12_ROOT / name).read_bytes()).hexdigest()
+                                "v12_assets": {name: hashlib.sha256((ASSET_ROOT / name).read_bytes()).hexdigest()
                                  for name in ("core_catalog.json", "market_snapshot.json", "scoring_policy.json",
                                               "response-format.json")}})
         self._recover()
@@ -187,7 +189,7 @@ class SkillGapRunManager:
                     or payload != prepare(state["job_family"], reviewed["reviewed_resume"],
                                           "reviewed_" + state["resume_hash"], self.catalog)):
                 raise ValueError("Saved input does not match the confirmed resume snapshot")
-            baseline = calculate_v12(state["job_family"], output, self.catalog, self.market, payload["resume_sources"])
+            baseline = calculate_baseline(state["job_family"], output, self.catalog, self.market, payload["resume_sources"])
             for key in ("policy_version", "skills", "source_index", "priority_order",
                         "unscored_skill_ids", "demand_snapshot_fingerprint"):
                 if baseline.get(key) != old.get(key):

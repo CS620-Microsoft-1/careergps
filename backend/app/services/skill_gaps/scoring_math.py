@@ -5,9 +5,9 @@ Unknown arithmetic inputs stay unscored instead of becoming zero.
 """
 from decimal import Decimal
 import json
-from pathlib import Path
+from .assets import ASSET_ROOT
 
-POLICY = json.loads(Path(__file__).with_name("scoring_policy.json").read_text(encoding="utf-8"))
+POLICY = json.loads((ASSET_ROOT / "scoring_policy.json").read_text(encoding="utf-8"))
 POLICY_VERSION = POLICY["policy_version"]
 
 

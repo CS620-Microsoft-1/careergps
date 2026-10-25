@@ -116,27 +116,30 @@ def build_index(sources):
     return index
 
 
-def _references(record):
+def references(record):
     if not isinstance(record, dict):
         return []
-    references = [record.get(key) for key in ("evidence_id", "target_id", "operation_id")]
-    for key, fields in (("method", ("evidence_id",)),
-                        ("validation", ("check_id", "finding_id", "reference_id"))):
-        child = record.get(key)
-        if isinstance(child, dict):
-            references.extend(child.get(field) for field in fields)
-    return [value for value in references if isinstance(value, str)]
+    refs = [record.get("evidence_id"), record.get("operation_id")]
+    method = record.get("method")
+    if isinstance(method, dict) and isinstance(method.get("proof"), dict):
+        refs.append(method["proof"].get("unit_id"))
+    validation = record.get("validation")
+    if isinstance(validation, dict):
+        for name in ("check", "finding", "reference"):
+            proof = validation.get(name)
+            if isinstance(proof, dict):
+                refs.append(proof.get("unit_id"))
+    return [value for value in refs if isinstance(value, str)]
 
 
 def attach_source_index(report, sources):
-    """Add original referenced units/context for display without modifying scores."""
     index = build_index(sources)
-    used = {value for row in report["skills"] for value in _references(row.get("agent_assessment"))}
     activities = {source["id"]: source for source in sources}
+    used = {value for row in report["skills"] for value in references(row.get("agent_assessment"))}
     report["source_index"] = {
         key: {**index[key], "activity_path": activities[index[key]["activity_id"]]["path"],
               "activity_context": deepcopy(activities[index[key]["activity_id"]]["context"])}
         for key in sorted(used) if key in index}
-    report["unresolved_display_sources"] = sorted(used - index.keys())
-    report["source_lookup_scope"] = "original_numbered_unit_display_not_semantic_verification"
+    report["unresolved_display_sources"] = sorted(used-index.keys())
+    report["source_lookup_scope"] = "original_unit_display_with_checked_model_span_references_not_semantic_truth"
     return report

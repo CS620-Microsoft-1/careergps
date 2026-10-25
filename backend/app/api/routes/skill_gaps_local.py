@@ -2,8 +2,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.schemas.skill_gap_web import JobFamily, MarketDemandSnapshot, SkillGapRun, SkillGapRunRequest
-from app.services.skill_gap_market import get_market_demand
-from app.services.skill_gap_web import SkillGapRunManager, get_skill_gap_run_manager
+from app.services.skill_gaps.market import get_market_demand
+from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
 
 router = APIRouter(prefix="/skill-gaps", tags=["local-skill-gaps"])
 

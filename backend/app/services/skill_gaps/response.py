@@ -5,9 +5,9 @@ commas from the original source. No semantic evidence, tier or points are added.
 """
 from copy import deepcopy
 
-from local_experiments.skill_gap_core_v12.policy import calculate as calculate_v12
-from local_experiments.skill_gap_core_v12.sources import build_index
-from local_experiments.skill_gap_core_v12.validation import validate_response
+from .scoring import calculate as calculate_baseline
+from .sources import build_index
+from .validation import validate_response
 
 RESPONSE_PROCESSING_VERSION = "v12-reference-cleanup.v2"
 _NON_RESULT_TIERS = {"check_only", "workflow_only", "unclear"}
@@ -186,7 +186,7 @@ def normalize_response(family, agent_output, catalog, sources):
 
 def calculate_web_report(family, agent_output, catalog, market, sources):
     normalized, audit = normalize_response(family, agent_output, catalog, sources)
-    report = calculate_v12(family, normalized, catalog, market, sources)
+    report = calculate_baseline(family, normalized, catalog, market, sources)
     changed = {item["skill_id"] for item in audit["adjustments"]}
     for row in report["skills"]:
         if row["skill_id"] in changed:
