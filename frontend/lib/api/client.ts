@@ -36,6 +36,8 @@ type RequestOptions = {
   form?: FormData;
   /** Defaults to 5 s; uploads need longer. */
   timeoutMs?: number;
+  /** Lets the caller cancel, e.g. a Cancel button. Cancelling rejects with the browser's AbortError. */
+  signal?: AbortSignal;
 };
 
 /** Thrown for any failed API call. */
@@ -73,11 +75,17 @@ export function apiPut<T>(path: string, options?: RequestOptions): Promise<T> {
   return apiRequest<T>("PUT", path, options);
 }
 
-async function apiRequest<T>(
+async function apiRequest<T>(method: string, path: string, options?: RequestOptions): Promise<T> {
+  const response = await sendRequest(method, path, options);
+  return (await response.json()) as T;
+}
+
+/** Send the request with the access token; throw ApiError unless the response is 2xx. */
+async function sendRequest(
   method: string,
   path: string,
-  { json, form, timeoutMs = DEFAULT_TIMEOUT_MS }: RequestOptions = {},
-): Promise<T> {
+  { json, form, timeoutMs = DEFAULT_TIMEOUT_MS, signal }: RequestOptions = {},
+): Promise<Response> {
   const url = `${API_BASE_URL}${path}`;
   const headers = new Headers();
   const token = await getAccessToken();
@@ -92,9 +100,10 @@ async function apiRequest<T>(
       // FormData sets its own multipart Content-Type with the boundary.
       body: form ?? (json !== undefined ? JSON.stringify(json) : undefined),
       cache: "no-store",
-      signal: AbortSignal.timeout(timeoutMs),
+      signal: withTimeout(timeoutMs, signal),
     });
-  } catch {
+  } catch (error) {
+    if (signal?.aborted) throw error;
     throw new ApiError(0, `Couldn't reach the API at ${API_BASE_URL}`);
   }
 
@@ -103,8 +112,12 @@ async function apiRequest<T>(
     if (response.status === 401) onUnauthorized();
     throw new ApiError(response.status, `${method} ${path} failed with ${response.status}`, detail);
   }
+  return response;
+}
 
-  return (await response.json()) as T;
+function withTimeout(timeoutMs: number, signal?: AbortSignal): AbortSignal {
+  const timeout = AbortSignal.timeout(timeoutMs);
+  return signal ? AbortSignal.any([timeout, signal]) : timeout;
 }
 
 /** POST multipart form data. The browser supplies the boundary in Content-Type. */
@@ -114,6 +127,45 @@ export function apiPostForm<T>(
   timeoutMs = DEFAULT_TIMEOUT_MS,
 ): Promise<T> {
   return apiRequest<T>("POST", path, { form, timeoutMs });
+}
+
+/**
+ * POST multipart form data to an NDJSON endpoint and call onLine with each parsed line as it
+ * arrives. An exception thrown by onLine stops reading and rejects with that exception.
+ */
+export async function apiPostFormLines<T>(
+  path: string,
+  form: FormData,
+  onLine: (value: T) => void,
+  { timeoutMs = DEFAULT_TIMEOUT_MS, signal }: Pick<RequestOptions, "timeoutMs" | "signal"> = {},
+): Promise<void> {
+  const response = await sendRequest("POST", path, { form, timeoutMs, signal });
+  if (!response.body) throw new ApiError(0, `POST ${path} returned no body`);
+
+  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+  let buffered = "";
+  try {
+    while (true) {
+      let chunk: ReadableStreamReadResult<string>;
+      try {
+        chunk = await reader.read();
+      } catch (error) {
+        // Cancelled by the caller, timed out, or the connection dropped mid-stream.
+        if (signal?.aborted) throw error;
+        throw new ApiError(0, `POST ${path} stopped before it finished`);
+      }
+      if (chunk.done) break;
+      buffered += chunk.value;
+      const lines = buffered.split("\n");
+      buffered = lines.pop() ?? "";
+      for (const line of lines) {
+        if (line.trim()) onLine(JSON.parse(line) as T);
+      }
+    }
+    if (buffered.trim()) onLine(JSON.parse(buffered) as T);
+  } finally {
+    reader.cancel().catch(() => {});
+  }
 }
 
 async function readDetail(response: Response): Promise<string | undefined> {
