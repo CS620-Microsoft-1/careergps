@@ -34,6 +34,8 @@ type Row = {
   /** What the backend reported when the step finished. */
   detail?: string;
   startedAt?: number;
+  /** Why the analysis failed, on the step that failed. */
+  error?: string;
 };
 
 const LABELS: Record<ResumeAnalysisStep, string> = {
@@ -112,7 +114,7 @@ export function ResumeAnalysisProgress({
               key={row.step}
               row={row}
               now={now}
-              error={row.status === "failed" ? error : undefined}
+              error={row.error}
             />
           ))}
         </ol>
@@ -214,7 +216,7 @@ function StepIcon({ status }: { status: RowStatus }) {
   return <Circle aria-hidden className={cn(base, "text-muted-foreground/40")} />;
 }
 
-/** The rows to show: OCR only when it ran; the first unfinished row fails when there's an error. */
+/** The rows to show: OCR only when it ran; every running row fails when there's an error. */
 function buildRows(events: TimedStepEvent[], finished: boolean, error?: string): Row[] {
   const started = new Map<ResumeAnalysisStep, TimedStepEvent>();
   const done = new Map<ResumeAnalysisStep, TimedStepEvent>();
@@ -226,8 +228,7 @@ function buildRows(events: TimedStepEvent[], finished: boolean, error?: string):
   if (started.has("ocr")) steps.push("ocr");
   steps.push("classify");
 
-  let current = false;
-  return steps.map((step, index) => {
+  const rows = steps.map((step): Row => {
     const finishedEvent = done.get(step);
     if (finishedEvent || finished) {
       const detail = finishedEvent && describe(finishedEvent);
@@ -235,11 +236,15 @@ function buildRows(events: TimedStepEvent[], finished: boolean, error?: string):
     }
     // Upload has no "started" event: it's running from the moment the request is sent.
     const isRunning = step === "upload" || started.has(step);
-    const isCurrent = !current && (isRunning || index === 0);
-    if (isCurrent) current = true;
-    const status: RowStatus = isCurrent && error ? "failed" : isRunning ? "running" : "pending";
+    const status: RowStatus = !isRunning ? "pending" : error ? "failed" : "running";
     return { step, label: LABELS[step], status, startedAt: started.get(step)?.at };
   });
+
+  // OCR runs inside "Reading the text", so two rows can be running at once. The message goes on
+  // the last one: the step that actually failed.
+  const failed = rows.filter((row) => row.status === "failed").at(-1);
+  if (failed) failed.error = error;
+  return rows;
 }
 
 function describe(event: TimedStepEvent): string | undefined {
