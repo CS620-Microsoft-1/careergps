@@ -1,0 +1,13 @@
+<!--
+  Supabase "Confirm signup" email template (Authentication → Emails → Templates → Confirm signup).
+  Paste the part below this comment as the message body; keep this file in sync with the dashboard.
+
+  The link opens /auth/confirm, which confirms the email only when the student presses
+  "Confirm my email" (supabase.auth.verifyOtp). University mail scanners (Microsoft 365 Safe Links)
+  open every link to check it; a link that confirmed on open would be used up before the student
+  clicked it. {{ .SiteURL }} is the Site URL in Authentication → URL Configuration.
+-->
+<h2>Confirm your CareerGPS account</h2>
+<p>Open the link below, then press <strong>Confirm my email</strong> to finish signing up.</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email">Confirm my email</a></p>
+<p>If you didn't sign up for CareerGPS, you can ignore this email.</p>

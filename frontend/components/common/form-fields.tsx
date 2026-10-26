@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { Controller, type Control, type FieldPath, type FieldValues } from "react-hook-form";
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui";
 
@@ -45,6 +47,50 @@ export function TextField<T extends FieldValues>({
             value={field.value ?? ""}
             aria-invalid={fieldState.invalid}
           />
+          <FieldError errors={[fieldState.error]} />
+        </Field>
+      )}
+    />
+  );
+}
+
+/** A password input with an eye button that shows what was typed. */
+export function PasswordField<T extends FieldValues>({
+  control,
+  name,
+  label,
+  ...inputProps
+}: BaseProps<T> & Pick<React.ComponentProps<"input">, "placeholder" | "autoComplete">) {
+  const [visible, setVisible] = useState(false);
+  const Icon = visible ? EyeOff : Eye;
+  return (
+    <Controller
+      control={control}
+      name={name}
+      render={({ field, fieldState }) => (
+        <Field data-invalid={fieldState.invalid}>
+          <FieldLabel htmlFor={name}>{label}</FieldLabel>
+          <div className="relative">
+            <Input
+              {...field}
+              {...inputProps}
+              id={name}
+              type={visible ? "text" : "password"}
+              value={field.value ?? ""}
+              aria-invalid={fieldState.invalid}
+              className="pr-10"
+            />
+            <button
+              type="button"
+              onClick={() => setVisible((v) => !v)}
+              aria-label={visible ? "Hide password" : "Show password"}
+              aria-pressed={visible}
+              aria-controls={name}
+              className="absolute inset-y-0 right-0 grid w-10 place-items-center rounded-r-lg text-muted-foreground transition-colors outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <Icon aria-hidden className="size-4" />
+            </button>
+          </div>
           <FieldError errors={[fieldState.error]} />
         </Field>
       )}

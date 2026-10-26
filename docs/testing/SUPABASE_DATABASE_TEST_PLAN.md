@@ -45,7 +45,7 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-008 | Authenticated user updates their own profile | Allowed fields are updated | NOT RUN |
 | DB-009 | Authenticated user updates another profile | Update is denied | NOT RUN |
 | DB-010 | Authenticated user deletes another profile | Delete is denied | NOT RUN |
-| DB-011 | Client changes a user ID in the request | Backend authorization rejects cross-user access | NOT RUN |
+| DB-011 | Client changes a user ID in the request | Backend authorization rejects cross-user access | PARTIAL — `/me` endpoints only use the user id from the verified token, never one from the request (`tests/test_me.py`); not yet run against the shared DB |
 | DB-012 | Limited application database role connects | Required operations work without administrator privileges | BLOCKED — role not created |
 | DB-013 | Secret scan and Git status | `.env` and credentials are absent from tracked files | PASS |
 | DB-014 | Alembic after applying `02a858fed0df` (users + résumé tables) | `alembic current` shows `02a858fed0df (head)`; `alembic check` reports no new operations | NOT RUN — not applied yet |
@@ -78,6 +78,11 @@ The configuration tests in `tests/test_baseline_configuration.py` check, without
 9. A committed migration links `users.id` to Supabase Auth (`auth.users`).
 
 These checks validate repository configuration only. They do not prove that the remote database is reachable or that future user-level RLS policies correctly isolate data.
+
+The same workflow also runs the auth tests from `feat/supabase-auth`. None of them connect to the shared database; API tests use in-memory SQLite:
+
+- `test_security.py`: Supabase token verification (expired, wrong audience/issuer, wrong key, unsigned tokens are rejected).
+- `test_me.py`: onboarding (`POST /me`), `GET /me`, `PATCH /me` and the résumé endpoints, with the database layer faked, including missing or invalid tokens. `test_accounts_postgres.py` runs the same service against a throwaway Postgres when `TEST_DATABASE_URL` is set (skipped in CI).
 
 ## Local verification steps
 

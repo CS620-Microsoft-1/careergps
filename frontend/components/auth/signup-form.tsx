@@ -1,106 +1,93 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { MailCheck } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
-import { SegmentedField, SelectField, TextField } from "@/components/common/form-fields";
+import { EmptyState } from "@/components/common/empty-state";
+import { PasswordField, TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Field, FieldContent, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
-import {
-  DEFAULT_UNIVERSITY,
-  EXPERIENCE_LEVELS,
-  TARGET_ROLES,
-} from "@/lib/options";
+import { authErrorMessage } from "@/lib/auth/errors";
+import type { SignupMetadata } from "@/lib/auth/account";
+import { getSupabase } from "@/lib/supabase/client";
 import { signupSchema, type SignupValues } from "@/lib/validation/auth";
 
-/** Two fields side by side when the form is wide enough, stacked otherwise. */
-function FieldRow({ children }: { children: React.ReactNode }) {
-  return <div className="grid gap-4 @sm/field-group:grid-cols-2">{children}</div>;
-}
-
-export function SignupForm({ graduationYears }: { graduationYears: string[] }) {
+export function SignupForm() {
   const router = useRouter();
   const form = useForm<SignupValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: {
-      fullName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      graduationYear: "",
-      university: DEFAULT_UNIVERSITY,
-      acceptTerms: false,
-    },
+    defaultValues: { email: "", password: "", confirmPassword: "", acceptTerms: false },
   });
 
-  // No backend yet: a valid form simply continues to onboarding.
-  const onSubmit = () => router.push("/onboarding");
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  // Set once Supabase has emailed the confirmation link.
+  const [sentTo, setSentTo] = useState<string | null>(null);
+
+  async function onSubmit(values: SignupValues) {
+    setSubmitError(null);
+    // Kept by Supabase until the email is confirmed; /auth/confirm then sends it to POST /me.
+    const metadata: SignupMetadata = { accept_terms: true };
+    const { data, error } = await getSupabase().auth.signUp({
+      email: values.email,
+      password: values.password,
+      options: { data: metadata, emailRedirectTo: `${window.location.origin}/auth/confirm` },
+    });
+    if (error) return setSubmitError(authErrorMessage(error));
+
+    // Only when email confirmation is turned off in Supabase: logged in right away.
+    if (data.session && data.user) {
+      // Email confirmation is off: logged in straight away. The account is created at the end of onboarding.
+      return router.push("/onboarding");
+    }
+    // Same message whether or not the email was already registered, so this form
+    // can't be used to find out who has an account.
+    setSentTo(values.email);
+  }
+
+  if (sentTo) {
+    return (
+      <EmptyState
+        icon={MailCheck}
+        title="Check your email"
+        description={`We sent a confirmation link to ${sentTo}. Open it on this device to finish creating your account.`}
+        action={
+          <Button variant="outline" asChild>
+            <Link href="/login">Back to Sign In</Link>
+          </Button>
+        }
+      />
+    );
+  }
 
   return (
     <form noValidate onSubmit={form.handleSubmit(onSubmit)}>
       <FieldGroup>
         <TextField
           control={form.control}
-          name="fullName"
-          label="Full Name"
-          placeholder="Your full name"
-          autoComplete="name"
-        />
-        <TextField
-          control={form.control}
           name="email"
-          label="University Email"
+          label="Email"
           type="email"
-          placeholder="student@wisc.edu"
+          placeholder="you@example.com"
           autoComplete="email"
         />
-        <FieldRow>
-          <TextField
-            control={form.control}
-            name="password"
-            label="Password"
-            type="password"
-            placeholder="At least 8 characters"
-            autoComplete="new-password"
-          />
-          <TextField
-            control={form.control}
-            name="confirmPassword"
-            label="Confirm Password"
-            type="password"
-            autoComplete="new-password"
-          />
-        </FieldRow>
-        <FieldRow>
-          <SelectField
-            control={form.control}
-            name="targetRole"
-            label="Target Role"
-            placeholder="Select a role"
-            options={TARGET_ROLES}
-          />
-          <SelectField
-            control={form.control}
-            name="graduationYear"
-            label="Graduation Year"
-            placeholder="Select a year"
-            options={graduationYears}
-          />
-        </FieldRow>
-        <TextField
+        <PasswordField
           control={form.control}
-          name="university"
-          label="University"
-          autoComplete="organization"
+          name="password"
+          label="Password"
+          placeholder="At least 8 characters"
+          autoComplete="new-password"
         />
-        <SegmentedField
+        <PasswordField
           control={form.control}
-          name="experienceLevel"
-          label="Experience Level"
-          options={EXPERIENCE_LEVELS}
+          name="confirmPassword"
+          label="Confirm Password"
+          placeholder="Type it again"
+          autoComplete="new-password"
         />
         <Controller
           control={form.control}
@@ -122,8 +109,18 @@ export function SignupForm({ graduationYears }: { graduationYears: string[] }) {
             </Field>
           )}
         />
-        <Button type="submit" size="lg" className="w-full">
-          Create Account
+        {submitError && (
+          <p role="alert" className="text-control text-destructive">
+            {submitError}
+          </p>
+        )}
+        <Button
+          type="submit"
+          size="lg"
+          className="w-full"
+          disabled={form.formState.isSubmitting}
+        >
+          {form.formState.isSubmitting ? "Creating account…" : "Create Account"}
         </Button>
       </FieldGroup>
       <p className="mt-6 text-center text-control text-muted-foreground">

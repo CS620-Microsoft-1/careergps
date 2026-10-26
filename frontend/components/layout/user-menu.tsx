@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeftRight, ChevronDown, LogOut, User } from "lucide-react";
 
 import { BackendStatus } from "@/components/layout/backend-status";
@@ -13,10 +15,52 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getMe } from "@/lib/api/me";
 import { PLACEHOLDER_USER } from "@/lib/placeholder-user";
+import { getSupabase } from "@/lib/supabase/client";
+
+type MenuUser = { name: string; initials: string; detail: string };
 
 export function UserMenu() {
-  const user = PLACEHOLDER_USER;
+  const router = useRouter();
+  const [user, setUser] = useState<MenuUser>(PLACEHOLDER_USER);
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSupabase()
+      .auth.getUser()
+      .then(async ({ data }) => {
+        if (cancelled || !data.user) return;
+        const address = data.user.email ?? "";
+        // Until onboarding saves a name (or if the API is down), the email stands in for it.
+        setUser({
+          name: address.split("@")[0] || PLACEHOLDER_USER.name,
+          initials: address[0]?.toUpperCase() || PLACEHOLDER_USER.initials,
+          detail: address.split("@")[1] ?? "",
+        });
+        setEmail(address || null);
+
+        const me = await getMe().catch(() => null);
+        if (cancelled || !me?.user) return;
+        const { first_name, last_name } = me.user;
+        setUser((current) => ({
+          ...current,
+          name: first_name,
+          initials: `${first_name[0] ?? ""}${last_name[0] ?? ""}`.toUpperCase() || current.initials,
+        }));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function signOut() {
+    // Local scope: sign out this browser only, not the user's other devices.
+    await getSupabase().auth.signOut({ scope: "local" });
+    router.replace("/login");
+    router.refresh();
+  }
 
   return (
     <DropdownMenu>
@@ -33,7 +77,7 @@ export function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
         <DropdownMenuLabel className="grid gap-1.5 text-xs font-normal text-muted-foreground">
-          Preview mode · no account yet
+          {email ?? "Signed in"}
           <BackendStatus interactive={false} />
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -42,15 +86,11 @@ export function UserMenu() {
             <User /> My Profile
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/login">
-            <ArrowLeftRight /> Switch account
-          </Link>
+        <DropdownMenuItem onSelect={signOut}>
+          <ArrowLeftRight /> Switch account
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <Link href="/login">
-            <LogOut /> Sign out
-          </Link>
+        <DropdownMenuItem onSelect={signOut}>
+          <LogOut /> Sign out
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
