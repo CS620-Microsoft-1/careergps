@@ -6,6 +6,8 @@ import unittest
 import uuid
 from copy import deepcopy
 from pathlib import Path
+from subprocess import CompletedProcess
+from unittest import mock
 
 os.environ.setdefault(
     "DATABASE_URL",
@@ -28,6 +30,7 @@ from app.services.foundry_agent import (
     validate_classification,
 )
 from app.services.resume_extraction import detect_file_type, extract_resume
+from app.services.resume_pipeline import ResumePipeline
 from tests.support import SUPABASE_URL, FakeJwks, new_signing_key
 
 
@@ -177,6 +180,69 @@ class ClassificationTests(unittest.TestCase):
     def test_rejects_unknown_categories(self) -> None:
         with self.assertRaises(ClassificationValidationError):
             validate_classification({"Invented Category": []})
+
+
+class FakeAgent:
+    agent_name = "test-agent"
+
+    def classify(self, extracted_resume_text: str) -> dict:
+        return classification_fixture()
+
+
+def make_blank_pdf() -> bytes:
+    document = pymupdf.open()
+    document.new_page()
+    data = document.tobytes()
+    document.close()
+    return data
+
+
+class PipelineStepTests(unittest.TestCase):
+    def analyze(self, data: bytes) -> list[tuple]:
+        steps: list[tuple] = []
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "resume.pdf"
+            path.write_bytes(data)
+            ResumePipeline(FakeAgent()).analyze(
+                path, ".pdf", "resume.pdf", on_step=lambda *step: steps.append(step)
+            )
+        return steps
+
+    def test_reports_steps_in_order_without_ocr_for_a_text_pdf(self) -> None:
+        steps = self.analyze(
+            make_pdf("Ada Lovelace software engineer with Python and analytical experience")
+        )
+
+        self.assertEqual(
+            [("extract", "started"), ("extract", "done"), ("classify", "started"), ("classify", "done")],
+            [step[:2] for step in steps],
+        )
+        self.assertEqual("PyMuPDF", steps[1][2]["parser"])
+        self.assertEqual([], steps[1][2]["ocr_pages"])
+        self.assertTrue(steps[3][2]["validated"])
+
+    def test_reports_ocr_steps_for_an_image_only_page(self) -> None:
+        def fake_ocrmypdf(command: list[str], **kwargs) -> CompletedProcess:
+            # Stand in for OCRmyPDF: write a PDF that now has a text layer.
+            Path(command[-1]).write_bytes(make_pdf("Ada Lovelace scanned résumé with Python experience"))
+            return CompletedProcess(command, 0)
+
+        with mock.patch("app.services.resume_extraction.subprocess.run", side_effect=fake_ocrmypdf):
+            steps = self.analyze(make_blank_pdf())
+
+        self.assertEqual(
+            [
+                ("extract", "started"),
+                ("ocr", "started"),
+                ("ocr", "done"),
+                ("extract", "done"),
+                ("classify", "started"),
+                ("classify", "done"),
+            ],
+            [step[:2] for step in steps],
+        )
+        self.assertEqual({"pages": [1]}, steps[1][2])
+        self.assertEqual([1], steps[3][2]["ocr_pages"])
 
 
 class FakePipeline:
