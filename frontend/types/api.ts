@@ -115,3 +115,36 @@ export type ResumeAnalysis = {
   };
   classification: ResumeClassification;
 };
+
+/** The stages POST /resumes/analyze/stream reports. "ocr" appears only when a PDF page is an image. */
+export type ResumeAnalysisStep = "upload" | "extract" | "ocr" | "classify";
+
+/** What each step reports; which fields are set depends on the step and status. */
+export type ResumeStepDetail = {
+  /** upload */
+  filename?: string;
+  file_type?: "pdf" | "docx";
+  bytes?: number;
+  /** extract done */
+  parser?: string;
+  characters?: number;
+  ocr_pages?: number[];
+  /** ocr: one-based page numbers being scanned */
+  pages?: number[];
+  /** classify done */
+  seconds?: number;
+  validated?: boolean;
+};
+
+export type ResumeStepEvent = {
+  type: "step";
+  step: ResumeAnalysisStep;
+  status: "started" | "done";
+  detail: ResumeStepDetail;
+};
+
+/** One NDJSON line from POST /resumes/analyze/stream. The last line is a result or an error. */
+export type ResumeAnalysisEvent =
+  | ResumeStepEvent
+  | { type: "result"; data: ResumeAnalysis }
+  | { type: "error"; status: number; detail: string };
