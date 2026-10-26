@@ -309,15 +309,16 @@ unset.
 
 Supabase Auth settings (dashboard, not migrations; record any change here):
 
-| Setting | Value (checked 2026-10-14) |
+| Setting | Value (checked 2026-10-25) |
 |---|---|
 | Email sign-up | On, **Confirm email** on |
-| Site URL | `http://localhost:3000` |
+| Site URL | `http://localhost:3000` for now; change to the production URL when we deploy |
 | Sign-ups and sign-ins | 30 requests / 5 min per IP |
 | Token verifications | 30 requests / 5 min per IP |
 | Token refreshes | 150 requests / 5 min per IP |
-| Emails | 2 / hour for the whole project (built-in sender; only delivers to members of the Supabase organization). Create test users in Authentication → Users with auto-confirm instead of signing up |
-| "Confirm signup" template | Should be `docs/supabase/confirm-signup.html` (a button page, so mail scanners can't use up the link). Required: with the default template, the confirmation link only shows "Try signing in" |
+| SMTP | Resend, `smtp.resend.com:465`, user `resend`, password = Resend API key (sending access only, never committed). Sender `CareerGPS <noreply@career-gps.me>`. Domain verified in Resend (DKIM, SPF, DMARC), DNS at Namecheap |
+| Emails | 100 / hour in Supabase. Resend free plan caps at 100 / day and 3,000 / month across all auth emails |
+| "Confirm signup" template | Applied (`docs/supabase/confirm-signup.html`), a button page so mail scanners can't use up the link. Needs custom SMTP first |
 
 - `Depends(get_current_user)`: the Supabase account (id, email). Use for endpoints onboarding calls before the `users` row exists (`POST /me`, `GET /me`, `POST /resumes/analyze`).
 - `Depends(get_current_db_user)`: also requires the `users` row; **403** until onboarding is finished.
