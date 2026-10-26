@@ -26,6 +26,7 @@ from app.core.security import AuthenticatedUser, SupabaseTokenVerifier
 from app.main import app
 from app.services.foundry_agent import (
     ClassificationValidationError,
+    FoundryAgentError,
     parse_json_response,
     validate_classification,
 )
@@ -246,12 +247,20 @@ class PipelineStepTests(unittest.TestCase):
 
 
 class FakePipeline:
-    def __init__(self) -> None:
+    def __init__(self, error: Exception | None = None) -> None:
         self.temporary_path: Path | None = None
+        self.error = error
 
-    def analyze(self, path: Path, suffix: str, filename: str) -> dict:
+    def analyze(self, path: Path, suffix: str, filename: str, on_step=None) -> dict:
         self.temporary_path = path
         self.assertions(path, suffix)
+        report = on_step or (lambda *step: None)
+        report("extract", "started", None)
+        report("extract", "done", {"parser": "PyMuPDF", "characters": 12, "ocr_pages": []})
+        report("classify", "started", None)
+        if self.error:
+            raise self.error
+        report("classify", "done", {"seconds": 0.01, "validated": True})
         return {
             "filename": filename,
             "extraction": {
@@ -309,6 +318,79 @@ class ResumeRouteTests(unittest.TestCase):
         )
 
         self.assertEqual(401, response.status_code)
+        self.assertIsNone(self.pipeline.temporary_path)
+
+    def stream(self, data: bytes) -> tuple[int, list[dict]]:
+        import json
+
+        response = self.client.post(
+            "/resumes/analyze/stream",
+            files={"file": ("resume.pdf", data, "application/pdf")},
+        )
+        if response.status_code != 200:
+            return response.status_code, []
+        self.assertTrue(response.headers["content-type"].startswith("application/x-ndjson"))
+        return 200, [json.loads(line) for line in response.text.splitlines()]
+
+    def test_stream_sends_each_step_then_the_result(self) -> None:
+        status_code, events = self.stream(make_pdf("Ada Lovelace"))
+
+        self.assertEqual(200, status_code)
+        self.assertEqual(
+            [
+                ("step", "upload", "done"),
+                ("step", "extract", "started"),
+                ("step", "extract", "done"),
+                ("step", "classify", "started"),
+                ("step", "classify", "done"),
+                ("result", None, None),
+            ],
+            [(event["type"], event.get("step"), event.get("status")) for event in events],
+        )
+        self.assertEqual("pdf", events[0]["detail"]["file_type"])
+        self.assertEqual({}, events[1]["detail"])
+        self.assertEqual(
+            "Ada Lovelace", events[-1]["data"]["classification"]["personal_information"]["name"]
+        )
+        self.assertFalse(self.pipeline.temporary_path.exists())
+
+    def test_stream_rejects_non_resume_content_before_streaming(self) -> None:
+        status_code, events = self.stream(b"not really a pdf")
+
+        self.assertEqual(415, status_code)
+        self.assertIsNone(self.pipeline.temporary_path)
+
+    def test_stream_reports_agent_failure_as_an_error_event(self) -> None:
+        self.pipeline.error = FoundryAgentError("The Foundry Agent is not configured on the backend.")
+
+        status_code, events = self.stream(make_pdf("Ada Lovelace"))
+
+        self.assertEqual(200, status_code)
+        self.assertEqual(("step", "classify", "started"), (events[-2]["type"], events[-2]["step"], events[-2]["status"]))
+        self.assertEqual(
+            {"type": "error", "status": 503, "detail": "The Foundry Agent is not configured on the backend."},
+            events[-1],
+        )
+        self.assertFalse(self.pipeline.temporary_path.exists())
+
+    def test_stream_reports_unexpected_failure_without_internal_details(self) -> None:
+        self.pipeline.error = RuntimeError("secret internal detail")
+
+        with self.assertLogs("app.api.routes.resumes", level="ERROR"):
+            status_code, events = self.stream(make_pdf("Ada Lovelace"))
+
+        self.assertEqual(200, status_code)
+        self.assertEqual(500, events[-1]["status"])
+        self.assertNotIn("secret", events[-1]["detail"])
+
+    def test_stream_requires_login(self) -> None:
+        del app.dependency_overrides[get_current_user]
+        verifier = SupabaseTokenVerifier(SUPABASE_URL, jwks_client=FakeJwks(new_signing_key()))
+        app.dependency_overrides[get_token_verifier] = lambda: verifier
+
+        status_code, _ = self.stream(make_pdf("Ada Lovelace"))
+
+        self.assertEqual(401, status_code)
         self.assertIsNone(self.pipeline.temporary_path)
 
 
