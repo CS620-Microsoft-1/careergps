@@ -1,8 +1,15 @@
 import type { Metadata } from "next";
-import { ProfileWorkspace } from "@/components/profile/profile-workspace";
+
+import { PageHeader } from "@/components/layout/page-header";
+import { ProfileView } from "@/components/profile/profile-view";
 
 export const metadata: Metadata = { title: "Your Profile" };
 
 export default function ProfilePage() {
-  return <ProfileWorkspace />;
+  return (
+    <>
+      <PageHeader title="Your Profile" description="What CareerGPS found in your résumé." />
+      <ProfileView />
+    </>
+  );
 }

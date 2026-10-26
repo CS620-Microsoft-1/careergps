@@ -12,6 +12,73 @@ export type DatabaseHealthResponse = {
   database: "connected";
 };
 
+/** GET /me, POST /me (backend: app/schemas/me.py). user is null until onboarding is finished. */
+export type MeResponse = {
+  user: User | null;
+};
+
+/** The users row: created at the end of onboarding, together with the first résumé. */
+export type User = {
+  id: string;
+  primary_email: string;
+  first_name: string;
+  last_name: string;
+  full_name: string | null;
+  target_role: string;
+  experience_level: string;
+  graduation_year: number;
+  university: string;
+  preferred_location: string;
+  resume_emails: string[];
+  phones: string[];
+  current_location: string | null;
+  linkedin_url: string | null;
+  github_url: string | null;
+  website_url: string | null;
+  active_resume_id: string | null;
+  created_at: string;
+};
+
+/** A résumé confirmed on the review page, with how POST /resumes/analyze read it. */
+export type ResumeSubmitRequest = {
+  original_filename: string;
+  parser: string;
+  ocr_pages: number[];
+  agent_name: string;
+  classification: ResumeClassification;
+};
+
+/** The career goal asked in onboarding. */
+export type Goals = {
+  target_role: string;
+  experience_level: string;
+  graduation_year: number;
+  preferred_location: string;
+};
+
+/** Asked in onboarding: the name (the résumé's own is kept as full_name) and the university,
+ * which the review page pre-fills from the résumé. */
+export type PersonalDetails = {
+  first_name: string;
+  last_name: string;
+  university: string;
+};
+
+/** POST /me body: finishes onboarding. The email comes from the access token. */
+export type AccountCreateRequest = Goals & PersonalDetails & {
+  accept_terms: true;
+  resume: ResumeSubmitRequest;
+};
+
+/** GET /me/resume, POST /me/resumes: a confirmed résumé version. */
+export type SavedResume = {
+  id: string;
+  original_filename: string;
+  file_type: "pdf" | "docx";
+  classification: ResumeClassification;
+  created_at: string;
+};
+
 export type ResumeFieldValue = string | null | string[];
 export type ResumeRecord = Record<string, ResumeFieldValue>;
 
@@ -31,7 +98,7 @@ export type ResumeClassification = {
   other: ResumeRecord[];
 };
 
-/** POST /resumes/analyze: transient result; the backend stores none of these fields. */
+/** POST /resumes/analyze: transient result; onboarding saves the reviewed classification (POST /me or POST /me/resumes). */
 export type ResumeAnalysis = {
   filename: string;
   extraction: {
@@ -71,6 +138,11 @@ export type MarketDemandSnapshot = {
   responsibilities_available: false;
   common_responsibilities: [];
   database_used: false;
+  snapshot_generated_at: string;
+  posting_window: string | null;
+  company_coverage: number | null;
+  source_description: string;
+  coverage_limitations: string[];
 };
 export type EvidenceProof = { unit_id: string; quote: string };
 export type CoreAssessment = {
@@ -128,11 +200,15 @@ export type CoreSkillGapReport = {
   priority_order: string[];
   unscored_skill_ids: string[];
   source_index: Record<string, ResumeSourceUnit>;
-  database_used: false;
+  database_used: boolean;
+  user_id?: string;
+  resume_id?: string;
   limitations: string[];
 };
 export type SkillGapRun = {
   id: string;
+  user_id: string;
+  resume_id: string;
   status: "queued" | "running" | "completed" | "failed";
   phase: string;
   job_family: JobFamily;

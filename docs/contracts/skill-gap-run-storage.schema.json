@@ -966,7 +966,12 @@
           "minLength": 1
         },
         "resume_id": {
-          "type": "string"
+          "type": "string",
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
         },
         "response_processing": {
           "$ref": "#/$defs/ResponseProcessing"

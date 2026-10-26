@@ -1,10 +1,9 @@
 """Local web contract. Scores and demand are always selected by the server."""
-from datetime import datetime
 from typing import Any, Literal
+from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 
-from app.schemas.resume import ResumeClassification
 
 JobFamily = Literal["software_engineer", "data_analyst", "ai_engineer"]
 
@@ -12,39 +11,18 @@ JobFamily = Literal["software_engineer", "data_analyst", "ai_engineer"]
 class SkillGapRunRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    confirmed: StrictBool
-    reviewed_resume: ResumeClassification
-    job_family: JobFamily
-    filename: str = Field(min_length=1, max_length=255)
-    confirmed_at: datetime
+    # The authenticated backend loads the confirmed resume; never accept a
+    # browser-supplied snapshot or an asserted confirmation flag.
+    job_family: JobFamily | None = None
     force: bool = False
-
-    @field_validator("confirmed")
-    @classmethod
-    def must_be_confirmed(cls, value: bool) -> bool:
-        if value is not True:
-            raise ValueError("Review and confirm the resume before analysis")
-        return value
-
-    @field_validator("filename")
-    @classmethod
-    def nonempty_filename(cls, value: str) -> str:
-        if not value.strip():
-            raise ValueError("A resume filename is required")
-        return value.strip()
-
-    @field_validator("confirmed_at")
-    @classmethod
-    def timezone_required(cls, value: datetime) -> datetime:
-        if value.tzinfo is None:
-            raise ValueError("Confirmation time must include a timezone")
-        return value
 
 
 class SkillGapRun(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str
+    user_id: UUID
+    resume_id: UUID
     status: Literal["queued", "running", "completed", "failed"]
     phase: str
     job_family: JobFamily
@@ -77,6 +55,11 @@ class MarketDemandSnapshot(BaseModel):
     core_skill_count: int = Field(gt=0)
     source_analysis_version: str
     snapshot_fingerprint: str
+    snapshot_generated_at: str
+    source_description: str
+    posting_window: str | None = None
+    company_coverage: int | None = Field(default=None, ge=0)
+    coverage_limitations: list[str]
     skills: list[MarketDemandSkill]
     responsibilities_available: Literal[False] = False
     common_responsibilities: list[str] = Field(default_factory=list, max_length=0)

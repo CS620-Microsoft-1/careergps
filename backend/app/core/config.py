@@ -15,6 +15,11 @@ class Settings(BaseSettings):
     database_url: str
     # Comma-separated list of frontend origins allowed to call the API from a browser.
     cors_origins: str = "http://localhost:3000"
+    # Supabase project URL (https://<project-ref>.supabase.co). Needed to verify login tokens.
+    supabase_url: str | None = None
+    # Only for projects still on the legacy shared JWT secret (HS256). Leave unset with signing keys.
+    supabase_jwt_secret: str | None = None
+
     # Existing Microsoft Foundry resume-classification Agent. Authentication uses
     # DefaultAzureCredential (Azure CLI locally; managed identity when deployed).
     foundry_project_endpoint: str | None = None
@@ -41,7 +46,7 @@ def get_settings() -> Settings:
 
 
 class SkillGapSettings(BaseSettings):
-    """Independent local experiment: no required database setting or DB imports."""
+    """Skill Gap Agent settings; analysis results stay in backend-local JSON."""
 
     model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
 

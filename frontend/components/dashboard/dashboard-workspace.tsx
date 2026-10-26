@@ -10,7 +10,7 @@ import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { FAMILY_LABELS } from "@/lib/confirmed-resume";
+import { FAMILY_LABELS } from "@/lib/skill-gap-profile";
 import { summarizeSkillGaps } from "@/lib/skill-gap-dashboard";
 import { MODULE_LABELS, SKILL_LABELS } from "@/lib/skill-gap-labels";
 import { useMarketDemand } from "@/lib/use-market-demand";
@@ -33,7 +33,7 @@ export function DashboardWorkspace() {
       description="Here's how you'll compare with the job market for your target role."
       actions={<div className="flex items-center gap-2.5 rounded-lg border bg-card py-1.5 pr-1.5 pl-3 text-control">
         <Target aria-hidden className="size-4" /><span className="font-semibold">{role}</span>
-        <Button asChild size="sm" variant="secondary" className="bg-background"><Link href={snapshot ? "/onboarding?edit=1" : "/onboarding"}>{snapshot ? "Edit profile" : "Set goal"}</Link></Button>
+        <Button asChild size="sm" variant="secondary" className="bg-background"><Link href="/onboarding">{snapshot ? "Edit profile" : "Set goal"}</Link></Button>
       </div>} />
 
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

@@ -1,0 +1,15 @@
+{
+  "snapshot_generated_at": "2026-10-24T18:35:44.029431Z",
+  "source_description": "Fixed snapshot computed from a user-provided six-table job analysis export, joining job family and qualifications by job_posting_id.",
+  "source_archive_name": "six_tables_split.zip",
+  "source_archive_sha256": "bfb06458c984b5fd7f76e892af95eb68ab373a9fa63fec7f81150695795fa9cd",
+  "source_aggregate_sha256": "d47b1bafc91c7f0ae98ff5cf0c5f3f2f85f1c848ab03455de56b4bc34e7546ab",
+  "posting_window": null,
+  "company_coverage": null,
+  "coverage_limitations": [
+    "The timestamp is the aggregate calculation time, not the posting date range.",
+    "Posting first-seen dates, company coverage and source URLs are unavailable in the supplied export; a 90-day or 180-day window cannot be verified.",
+    "Geographic coverage and cross-source duplicate postings cannot be independently verified from this export.",
+    "117 records without a supported job family were excluded; sample sizes are 2858 Software Engineer, 174 Data Analyst and 566 AI Engineer postings."
+  ]
+}

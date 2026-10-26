@@ -44,6 +44,12 @@ export function MarketDemandChart({ snapshot }: { snapshot: MarketDemandSnapshot
       {expanded ? "Show top 10 skills" : `Show all ${ordered.length} skills`}
     </Button>}
     <p className="mt-4 text-xs leading-relaxed text-muted-foreground">Each share uses the same {snapshot.sample_size.toLocaleString()}-posting sample. Skills are sorted by required plus preferred demand; unspecified requirements are shown separately.</p>
+    <div className="mt-3 border-t border-line-soft pt-3 text-xs leading-relaxed text-muted-foreground">
+      <p>Fixed export snapshot · calculated {new Date(snapshot.snapshot_generated_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" })}.</p>
+      <p>Posting date window: {snapshot.posting_window ?? "unknown"}. Company coverage: {snapshot.company_coverage ?? "unknown"}.</p>
+      <p>{snapshot.source_description}</p>
+      {snapshot.coverage_limitations.length > 0 && <ul className="mt-1 list-disc pl-4">{snapshot.coverage_limitations.map((item) => <li key={item}>{item}</li>)}</ul>}
+    </div>
   </>;
 }
 

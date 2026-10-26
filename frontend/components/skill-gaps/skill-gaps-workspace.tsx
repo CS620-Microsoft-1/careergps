@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/common/empty-state";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FAMILY_LABELS } from "@/lib/confirmed-resume";
+import { FAMILY_LABELS } from "@/lib/skill-gap-profile";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { MODULE_LABELS, SKILL_LABELS } from "@/lib/skill-gap-labels";
 import type { CoreAssessment, CoreSkillGapReport, CoreSkillResult, SkillGapRun } from "@/types/api";
@@ -74,7 +74,7 @@ export function SkillGapsWorkspace() {
             {submitting || busy(run) ? <LoaderCircle className="animate-spin" data-icon="inline-start" /> : run ? <RotateCcw data-icon="inline-start" /> : <Play data-icon="inline-start" />}
             {submitting ? "Starting analysis…" : busy(run) ? "Analyzing…" : run ? "Analyze again" : "Analyze skill gaps"}
           </Button>
-          <Button asChild variant="ghost" size="sm"><Link href="/onboarding?edit=1"><ArrowLeft data-icon="inline-start" />Edit confirmed résumé</Link></Button>
+          <Button asChild variant="ghost" size="sm"><Link href="/onboarding"><ArrowLeft data-icon="inline-start" />Edit confirmed résumé</Link></Button>
           <p className="max-w-60 text-xs text-muted-foreground sm:text-right">Results use your confirmed résumé and the current market-demand snapshot.</p>
         </div>
       </CardContent>
@@ -102,7 +102,7 @@ export function SkillGapsWorkspace() {
       </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div><h2 className="text-lg font-semibold">Your skill evidence gaps</h2>
-          <p className="mt-1 text-xs text-muted-foreground">A means a smaller evidence gap. F means not evidenced in this résumé. These are not ability grades or hiring probabilities.</p></div>
+          <p className="mt-1 text-xs text-muted-foreground">A means a smaller evidence gap. F means not evidenced in this résumé. These are not ability grades or hiring probabilities. The scoring rubric has not been empirically calibrated.</p></div>
         <Button variant="outline" size="sm" onClick={() => downloadReport(run)}><Download data-icon="inline-start" />Download JSON</Button>
       </div>
       <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">

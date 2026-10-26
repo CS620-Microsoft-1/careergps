@@ -85,7 +85,7 @@ def decode_response(response, save):
     return json.loads(response.output_text)
 
 
-def create_response(client, payload, on_request=lambda: None, timings=None):
+def create_response(client, payload, on_request=lambda: None, timings=None, *, agent_reference=None):
     timings = {} if timings is None else timings
     started = time.perf_counter()
     conversation = client.conversations.create()
@@ -100,6 +100,7 @@ def create_response(client, payload, on_request=lambda: None, timings=None):
                         "Execute extract_resume_evidence using your saved Instructions and response format. INPUT_JSON:\n"
                         + json.dumps(payload, ensure_ascii=False)}],
                 max_output_tokens=40000,
+                **({"extra_body": {"agent_reference": agent_reference}} if agent_reference else {}),
             )
         finally:
             timings["inference_seconds"] = round(time.perf_counter() - started, 3)
@@ -127,13 +128,16 @@ def invoke(payload, save, on_request=lambda: None, timings=None):
         with AIProjectClient(endpoint=settings.skill_gap_foundry_project_endpoint,
                              credential=credential, allow_preview=True) as project:
             version = next(iter(project.agents.list_versions(
-                settings.skill_gap_foundry_agent_name, limit=1, order="desc", include_drafts=True)), None)
+                settings.skill_gap_foundry_agent_name, limit=1, order="desc", include_drafts=False)), None)
             definition = version.definition.as_dict() if version else {}
             validate_definition(definition, str(version.version) if version else None, save)
             save("observed_agent.json", {"name": settings.skill_gap_foundry_agent_name,
                                         "version": str(version.version), "definition": definition})
-            with project.get_openai_client(agent_name=settings.skill_gap_foundry_agent_name,
-                                           timeout=480, max_retries=0) as client:
+            # Use the explicit immutable version that passed the configuration
+            # checks, rather than the Agent endpoint's mutable deployment target.
+            with project.get_openai_client(timeout=480, max_retries=0) as client:
                 timings["sdk_auth_configuration_seconds"] = round(time.perf_counter() - started, 3)
-                response = create_response(client, payload, on_request, timings)
+                response = create_response(client, payload, on_request, timings,
+                    agent_reference={"type": "agent_reference", "name": settings.skill_gap_foundry_agent_name,
+                                     "version": str(version.version)})
     return decode_response(response, save)

@@ -11,7 +11,7 @@ import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FAMILY_LABELS } from "@/lib/confirmed-resume";
+import { FAMILY_LABELS } from "@/lib/skill-gap-profile";
 import { useMarketDemand } from "@/lib/use-market-demand";
 import type { JobFamily } from "@/types/api";
 
