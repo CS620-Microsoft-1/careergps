@@ -123,8 +123,9 @@ export function ResourcesView() {
 
 /** pick: undefined when not recommended, otherwise the reason (null when the rule ranking chose it). */
 function ResourceCard({ resource, gaps, pick }: { resource: Resource; gaps: string[]; pick?: string | null }) {
-  // The gaps it closes first, in gap order, then anything else it covers.
-  const closes = [...resource.skills].sort((a, b) => rank(gaps, a) - rank(gaps, b)).slice(0, 2);
+  // Only skills that are gaps, in gap order; strengths it also practices aren't "closed".
+  const closes = resource.skills.filter((skill) => gaps.includes(skill))
+    .sort((a, b) => rank(gaps, a) - rank(gaps, b)).slice(0, 2);
   return (
     <article className="flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center gap-3">
@@ -136,8 +137,8 @@ function ResourceCard({ resource, gaps, pick }: { resource: Resource; gaps: stri
       <p className="mt-1 font-mono text-[0.8125rem] text-muted-foreground">{resource.meta}</p>
       {resource.description && <p className="mt-3 text-sm/6 text-muted-foreground">{resource.description}</p>}
       {pick && <p className="mt-3 rounded-lg bg-accent px-3 py-2 text-sm/6">{pick}</p>}
-      <p className="mt-auto pt-4 text-sm">Closes: <b>{closes.map(skillLabel).join(", ")}</b></p>
-      <div className="mt-4 flex items-center gap-2">
+      {closes.length > 0 && <p className="mt-auto pt-4 text-sm">Closes: <b>{closes.map(skillLabel).join(", ")}</b></p>}
+      <div className={cn("flex items-center gap-2", closes.length ? "mt-4" : "mt-auto pt-4")}>
         <SaveButton resourceId={resource.id} />
         {resource.url && <Button asChild size="icon-sm" variant="ghost">
           <a href={resource.url} target="_blank" rel="noreferrer" aria-label={`Open ${resource.title} in a new tab`}><ExternalLink /></a>
@@ -183,7 +184,8 @@ function usePicks(family: JobFamily, runId: string | null) {
         for (const pick of certifications.value.recommendations) byId.set(pick.certification_id, pick.reason);
       }
       if (projects.status === "fulfilled") {
-        for (const pick of projects.value.recommendations) byId.set(pick.project_id, pick.why_recommended);
+        // Its reason only restates the skills the card already lists under Closes.
+        for (const pick of projects.value.recommendations) byId.set(pick.project_id, null);
       }
       setPicks({ runId, byId });
     });
