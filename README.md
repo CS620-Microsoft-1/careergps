@@ -13,7 +13,8 @@ and turns them into an action plan.
 | Résumé parsing: PDF/DOCX extraction, OCR fallback for scanned pages, classification by a Microsoft Foundry Agent, editable review | Working (results are not saved yet) |
 | Job-market data: daily ingest of public Greenhouse, Ashby and Lever job postings | Working |
 | Database schema for users and confirmed résumés | Migrated, not yet used by the API |
-| Market statistics, skill-gap analysis, action roadmap, Ask CareerGPS Copilot | Planned (UI placeholders) |
+| Skill-gap analysis with a demand-weighted match score, curated resources per gap, saved action plan | Working (results and plans are local JSON on the backend host) |
+| Ask CareerGPS Copilot | Planned |
 | Sign-up / login | Planned |
 
 The analysis runs as four agents in order: **Student Profile → Market Intelligence → Gap Analysis → Action**.
@@ -49,13 +50,13 @@ Next.js frontend ──HTTP/JSON──▶ FastAPI backend ──▶ Supabase Pos
 careergps/
 ├── backend/               FastAPI service
 │   ├── app/               api/routes, core config, db, models, schemas, services
-│   ├── data/              curated company job-board lists
+│   ├── data/              curated company job-board lists and the resource catalog (resources.yaml)
 │   ├── migrations/        Alembic migrations
 │   ├── scripts/           job-posting ingest and board probe
 │   └── tests/             unittest suite (no DB or network needed)
 ├── frontend/              Next.js app
-│   ├── app/               routes: auth, onboarding, dashboard, market, gaps, opportunities, roadmap, profile
-│   ├── components/        UI primitives, layout, auth, onboarding, Copilot panel
+│   ├── app/               routes: auth, onboarding (setup), dashboard (home), gaps, resources, plan, destinations, profile
+│   ├── components/        UI primitives, layout, auth, setup, one folder per page
 │   ├── lib/               API client, navigation, validation, utilities
 │   └── types/             shared TypeScript types
 ├── docs/
@@ -95,7 +96,7 @@ cp .env.example .env.local        # NEXT_PUBLIC_API_URL, defaults to http://loca
 npm run dev                       # http://localhost:3000
 ```
 
-The **backend status badge** in the sidebar shows whether the app can reach the API and the database.
+The **backend status badge** in the profile menu and on the Profile page shows whether the app can reach the API and the database.
 
 Windows setup, Foundry access, and troubleshooting are covered in the [backend README](backend/README.md) and the
 [frontend README](frontend/README.md).
