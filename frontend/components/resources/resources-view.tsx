@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { BookmarkCheck, Check, ChevronRight, ExternalLink, Layers, LoaderCircle } from "lucide-react";
@@ -16,21 +16,25 @@ import {
 import { useAccount } from "@/components/layout/account-provider";
 import { usePlan } from "@/components/plan/plan-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getCertificationPicks, getProjectPicks } from "@/lib/api/resources";
 import { rankGaps } from "@/lib/career";
 import { cn } from "@/lib/utils";
-import type { Resource, ResourceType } from "@/types/api";
+import type { JobFamily, Resource, ResourceType } from "@/types/api";
 
 export function ResourcesView() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const { run, snapshot, loaded } = useSkillGapAnalysis();
+  const { run, snapshot, loaded, family } = useSkillGapAnalysis();
   const { user } = useAccount();
   const plan = usePlan();
   const [type, setType] = useState<ResourceType | "all">("all");
 
   const report = run?.status === "completed" ? run.report : null;
+  const picks = usePicks(family, report ? run!.id : null);
+  const pickOrder = [...picks.keys()];
   const gaps = report ? rankGaps(report).map((gap) => gap.skill_id) : [];
   const requestedGap = params.get("gap");
   const gap = requestedGap && plan.resources.some((r) => r.skills.includes(requestedGap)) ? requestedGap : null;
@@ -93,7 +97,9 @@ export function ResourcesView() {
 
           <div className="grid gap-10">
             {RESOURCE_TYPE_ORDER.map((key) => {
-              const group = visible.filter((r) => r.type === key);
+              // Recommended ones first, in the order they were picked; the rest keep catalog order.
+              const group = visible.filter((r) => r.type === key)
+                .sort((a, b) => rank(pickOrder, a.id) - rank(pickOrder, b.id));
               if (!group.length) return null;
               return (
                 <section key={key} aria-labelledby={`type-${key}`}>
@@ -103,7 +109,7 @@ export function ResourcesView() {
                     <span className="text-sm text-muted-foreground">{RESOURCE_TYPES[key].blurb}</span>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {group.map((resource) => <ResourceCard key={resource.id} resource={resource} gaps={gaps} />)}
+                    {group.map((resource) => <ResourceCard key={resource.id} resource={resource} gaps={gaps} pick={picks.get(resource.id)} />)}
                   </div>
                 </section>
               );
@@ -115,18 +121,21 @@ export function ResourcesView() {
   </>;
 }
 
-function ResourceCard({ resource, gaps }: { resource: Resource; gaps: string[] }) {
+/** pick: undefined when not recommended, otherwise the reason (null when the rule ranking chose it). */
+function ResourceCard({ resource, gaps, pick }: { resource: Resource; gaps: string[]; pick?: string | null }) {
   // The gaps it closes first, in gap order, then anything else it covers.
   const closes = [...resource.skills].sort((a, b) => rank(gaps, a) - rank(gaps, b)).slice(0, 2);
   return (
     <article className="flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center gap-3">
         <ResourceIcon type={resource.type} className="bg-sunken" />
-        <p className="min-w-0 truncate text-sm text-muted-foreground">{resource.provider}</p>
+        <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{resource.provider}</p>
+        {pick !== undefined && <Badge variant="brand">Recommended</Badge>}
       </div>
       <h3 className="mt-4 text-title">{resource.title}</h3>
       <p className="mt-1 font-mono text-[0.8125rem] text-muted-foreground">{resource.meta}</p>
-      <p className="mt-3 text-sm/6 text-muted-foreground">{resource.description}</p>
+      {resource.description && <p className="mt-3 text-sm/6 text-muted-foreground">{resource.description}</p>}
+      {pick && <p className="mt-3 rounded-lg bg-accent px-3 py-2 text-sm/6">{pick}</p>}
       <p className="mt-auto pt-4 text-sm">Closes: <b>{closes.map(skillLabel).join(", ")}</b></p>
       <div className="mt-4 flex items-center gap-2">
         <SaveButton resourceId={resource.id} />
@@ -158,8 +167,33 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
   );
 }
 
-const rank = (gaps: string[], skill: string) => {
-  const index = gaps.indexOf(skill);
+const NO_PICKS = new Map<string, string | null>();
+
+/** Certification and project picks for the role's analysis: resource id → reason, in pick order. */
+function usePicks(family: JobFamily, runId: string | null) {
+  const [picks, setPicks] = useState<{ runId: string; byId: Map<string, string | null> } | null>(null);
+  useEffect(() => {
+    if (!runId) return;
+    let active = true;
+    // Either list can fail on its own; the catalog below still shows everything.
+    void Promise.allSettled([getCertificationPicks(family), getProjectPicks(runId)]).then(([certifications, projects]) => {
+      if (!active) return;
+      const byId = new Map<string, string | null>();
+      if (certifications.status === "fulfilled") {
+        for (const pick of certifications.value.recommendations) byId.set(pick.certification_id, pick.reason);
+      }
+      if (projects.status === "fulfilled") {
+        for (const pick of projects.value.recommendations) byId.set(pick.project_id, pick.why_recommended);
+      }
+      setPicks({ runId, byId });
+    });
+    return () => { active = false; };
+  }, [family, runId]);
+  return picks?.runId === runId ? picks.byId : NO_PICKS;
+}
+
+const rank = (order: string[], key: string) => {
+  const index = order.indexOf(key);
   return index < 0 ? Number.POSITIVE_INFINITY : index;
 };
 

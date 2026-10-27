@@ -1,22 +1,31 @@
 """Resources that close skill gaps, the student's saved plan for each role, and project
 recommendations from the resources agent."""
 import json
+import logging
+import re
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from app.api.deps import get_account_service, get_current_db_user
+from app.core.config import BACKEND_ROOT, get_settings
 from app.models import User
 from app.schemas.resources import Plan, PlanItem, PlanItemUpdate, ResourceList
 from app.schemas.skill_gap_web import JobFamily
 from app.services.accounts import AccountService
 from app.services.plans import LocalPlanStore, get_plan_store
-from app.services.resources import resources_for
-from app.services.resources_agent import recommend_projects
+from app.services.resources import FAMILY_TO_CATALOG, resources_for
+from app.services.resources_agent import rank_projects, recommend_projects
 from app.services.skill_gaps.assets import ASSET_ROOT
 from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
+from app.services.skill_gaps.storage import load, save_json
 
 router = APIRouter(tags=["resources"])
+logger = logging.getLogger(__name__)
+
+# Agent picks per completed run, so a page visit doesn't pay for another model call.
+PROJECT_PICKS_DIR = BACKEND_ROOT / "local_results" / "project_recommendations"
+_RUN_ID = re.compile(r"[0-9a-f]{32}\Z")
 
 
 @router.get("/resources", response_model=ResourceList)
@@ -66,11 +75,6 @@ class RunProjectRequest(BaseModel):
     available_hours: int | None = Field(default=None, gt=0)
 
 
-FAMILY_TO_CATALOG = {
-    "software_engineer": "Software Engineering",
-    "data_analyst": "Data Analyst",
-    "ai_engineer": "AI/ML Engineering",
-}
 
 
 def inputs_from_report(report: dict, family: str) -> dict:
@@ -122,11 +126,22 @@ def projects_from_skill_gap(
     except (ValueError, KeyError, TypeError):
         raise HTTPException(status_code=422, detail="Skill-gap report cannot be used for recommendations.") from None
     if not inputs["skill_gaps"]:
-        return {"recommendations": [], "no_match_reason": "No scored skill gaps are available for this analysis."}
-    try:
-        return recommend_projects(**inputs, available_hours=request.available_hours)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Could not generate project recommendations.") from None
+        return {"recommendations": [], "no_match_reason": "No scored skill gaps are available for this analysis.",
+                "source": "rules"}
+    # Only the default (no time budget) answer is cached; the rule fallback is free and never cached.
+    cache = PROJECT_PICKS_DIR / f"{run.id}.json" if request.available_hours is None and _RUN_ID.fullmatch(str(run.id)) else None
+    if cache is not None and cache.exists():
+        return load(cache)
+    if get_settings().resources_project_endpoint:
+        try:
+            result = {**recommend_projects(**inputs, available_hours=request.available_hours), "source": "agent"}
+        except Exception as error:
+            logger.warning("Resources agent failed (%s); using gap ranking", type(error).__name__)
+        else:
+            if cache is not None:
+                save_json(cache, result)
+            return result
+    return {**rank_projects(**inputs, available_hours=request.available_hours), "source": "rules"}
 
 
 @router.post("/resources/projects")

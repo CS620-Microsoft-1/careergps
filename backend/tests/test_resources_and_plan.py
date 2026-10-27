@@ -37,6 +37,16 @@ class ResourceCatalogTests(unittest.TestCase):
         self.assertNotIn("uw-cs-564", ids("Purdue University"))
         self.assertNotIn("uw-cs-564", ids(None))
 
+    def test_certifications_come_from_the_certification_catalog(self) -> None:
+        self.assertFalse([entry["id"] for entry in load_catalog() if entry["type"] == "certification"])
+        practitioner = {entry["id"]: entry for entry in resources_for("software_engineer", None)}["aws-cloud-practitioner"]
+        self.assertEqual("certification", practitioner["type"])
+        self.assertEqual(["cloud"], practitioner["skills"])
+        self.assertNotIn("aws-cloud-practitioner", {entry["id"] for entry in resources_for("data_analyst", None)})
+        for family in ("software_engineer", "data_analyst", "ai_engineer"):
+            family_ids = [entry["id"] for entry in resources_for(family, None)]
+            self.assertEqual(len(family_ids), len(set(family_ids)), family)
+
     def test_catalog_skill_ids_exist(self) -> None:
         known = family_skills("software_engineer") | family_skills("data_analyst") | family_skills("ai_engineer")
         for entry in load_catalog():

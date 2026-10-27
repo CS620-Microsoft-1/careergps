@@ -1,5 +1,7 @@
-import { apiDelete, apiGet, apiPut } from "@/lib/api/client";
-import type { JobFamily, Plan, PlanItem, PlanStatus, ResourceList } from "@/types/api";
+import { apiDelete, apiGet, apiPost, apiPut } from "@/lib/api/client";
+import type {
+  CertificationRecommendations, JobFamily, Plan, PlanItem, PlanStatus, ProjectRecommendations, ResourceList,
+} from "@/types/api";
 
 // backend: app/api/routes/resources.py
 
@@ -19,4 +21,14 @@ export function setPlanItem(family: JobFamily, resourceId: string, status: PlanS
 
 export function removePlanItem(family: JobFamily, resourceId: string) {
   return apiDelete(`/plan/items/${encodeURIComponent(resourceId)}?job_family=${encodeURIComponent(family)}`);
+}
+
+/** Certifications picked for a role's latest analysis (backend: app/api/routes/certifications.py). */
+export function getCertificationPicks(family: JobFamily) {
+  return apiPost<CertificationRecommendations>("/certifications/recommendations", { json: { job_family: family } });
+}
+
+/** Projects picked for one completed analysis. */
+export function getProjectPicks(runId: string) {
+  return apiPost<ProjectRecommendations>("/resources/projects/from-skill-gap", { json: { run_id: runId } });
 }

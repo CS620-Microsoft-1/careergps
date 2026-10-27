@@ -267,6 +267,22 @@ export type Resource = {
 };
 export type ResourceList = { job_family: JobFamily; resources: Resource[] };
 
+/** POST /certifications/recommendations. reason is null when source is "rules". */
+export type CertificationRecommendations = {
+  job_family: JobFamily;
+  skill_gap_run_id: string;
+  source: "agent" | "rules";
+  generated_at: string;
+  recommendations: { certification_id: string; skill_ids: string[]; reason: string | null }[];
+};
+
+/** POST /resources/projects/from-skill-gap: up to three projects from data/projects.json. */
+export type ProjectRecommendations = {
+  source: "agent" | "rules";
+  recommendations: { project_id: string; addressed_skill_ids?: string[]; why_recommended: string }[];
+  no_match_reason: string | null;
+};
+
 /** GET /plan: saved resources for one role; the browser orders them from the gap ranking. */
 export type PlanStatus = "saved" | "done";
 export type PlanItem = { resource_id: string; status: PlanStatus; saved_at: string; done_at: string | null };
