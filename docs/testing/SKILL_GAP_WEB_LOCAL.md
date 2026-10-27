@@ -18,8 +18,11 @@ or hiring probability; the rubric has not been empirically calibrated.
 - Each run records real user/resume IDs and an immutable input snapshot. Creation,
   retrieval, reuse and latest-result lookup are owner-scoped. Pre-auth experiments
   without an owner remain on disk but are inaccessible through this API.
-- The shared demand snapshot is unchanged: Software Engineer N=2858 (22 skills),
-  Data Analyst N=174 (18 skills), AI Engineer N=566 (23 skills).
+- The shared demand snapshot comes from
+  [PR #20's six-table job-analysis output](https://github.com/CS620-Microsoft-1/careergps/pull/20),
+  supplied as `six_tables_split.zip`. Its counts and ratios are unchanged:
+  Software Engineer N=2858 (22 skills), Data Analyst N=174 (18 skills),
+  AI Engineer N=566 (23 skills).
   [Source, limitations and portable reproduction](SKILL_GAP_DEMAND_SOURCE.md)
   explain why this fixed export is not a verified 90-day market sample.
 - Runtime code is in `backend/app/services/skill_gaps/`; historical experiments,

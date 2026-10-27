@@ -21,9 +21,10 @@ presented as a verified sample of postings from the last 90 days.
 | Original aggregate SHA-256 | `d47b1bafc91c7f0ae98ff5cf0c5f3f2f85f1c848ab03455de56b4bc34e7546ab` |
 | Original analysis fingerprint | `8766af4a81703dc686566d8a316e18f9e184c704a73e7da3d732b57a76eadf44` |
 
-The original input was a team-supplied `six_tables_split.zip`. Its schema resembles
-the job-analysis tables, but the export alone does not establish that it was
-produced by PR #20 or exported from the production database. The source export and
+The original input was the six-table job-analysis output from
+[PR #20](https://github.com/CS620-Microsoft-1/careergps/pull/20), supplied locally as
+`six_tables_split.zip`. This identifies the job-analysis source; it does not establish
+that the ZIP was exported from the production database. The source export and
 historical outputs are not committed to this repository.
 
 The original calculation time is a **computation timestamp**, not a posting date
