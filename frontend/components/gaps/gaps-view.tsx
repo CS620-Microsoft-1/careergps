@@ -35,9 +35,6 @@ import {
 import { cn } from "@/lib/utils";
 import type { CoreSkillGapReport, CoreSkillResult, SkillGapRun } from "@/types/api";
 
-/** Gaps open with their ways to close them; the rest open on request. */
-const EXPANDED = 3;
-
 export function GapsView() {
   const { family, run, snapshot } = useSkillGapAnalysis();
   const role = ROLE_NAMES[family];
@@ -73,7 +70,7 @@ export function GapsView() {
           <p className="mt-1">Every skill postings ask for shows strong evidence in your résumé.</p>
         </div>}
         {gaps.map((gap, index) => <GapCard key={gap.skill_id} gap={gap} rank={index + 1} report={report}
-          variant={index === 0 ? "lead" : index < EXPANDED ? "open" : "closed"} />)}
+          defaultOpen={index === 0} />)}
       </div>
 
       <aside className="grid gap-5">
@@ -102,51 +99,47 @@ export function GapsView() {
   </>;
 }
 
-function GapCard({ gap, rank, report, variant }: {
-  gap: CoreSkillResult; rank: number; report: CoreSkillGapReport; variant: "lead" | "open" | "closed";
+/** One gap: always its name, demand and bar; the ways to close it and the rating open and close. */
+function GapCard({ gap, rank, report, defaultOpen }: {
+  gap: CoreSkillResult; rank: number; report: CoreSkillGapReport; defaultOpen: boolean;
 }) {
   const plan = usePlan();
-  const [open, setOpen] = useState(variant !== "closed");
+  const [open, setOpen] = useState(defaultOpen);
   const share = demandShare(gap);
   const level = demandLevel(share);
   const ways = resourcesForSkill(plan.resources, gap.skill_id);
   const shown = ways.slice(0, 3);
   const name = skillLabel(gap.skill_id);
+  const panel = `gap-panel-${gap.skill_id}`;
   return (
     <section aria-labelledby={`gap-${gap.skill_id}`} className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-        <h2 id={`gap-${gap.skill_id}`} className={cn("flex min-w-0 flex-1 basis-56 items-baseline gap-3", variant === "lead" ? "text-section" : "text-xl")}>
+        <h2 id={`gap-${gap.skill_id}`} className="flex min-w-0 flex-1 basis-56 items-baseline gap-3 text-section">
           <span className="font-mono text-sm font-normal text-muted-foreground">{String(rank).padStart(2, "0")}</span>{name}
         </h2>
         <Badge variant={level === "high" ? "warning" : "default"}>{DEMAND_LABELS[level]}</Badge>
         <span className="font-mono text-sm text-muted-foreground">In {percent(share)} of postings</span>
+        <Button variant="ghost" size="icon-sm" aria-expanded={open} aria-controls={panel}
+          aria-label={`${open ? "Hide" : "Show"} ways to close ${name}`} onClick={() => setOpen(!open)}>
+          <ChevronDown className={cn("transition-transform", open && "rotate-180")} />
+        </Button>
       </div>
       <GapBar skill={gap} className="mt-5" />
       <div className="mt-3"><GapMeta skill={gap} /></div>
 
-      {open ? <>
+      {open ? <div id={panel}>
         <p className="eyebrow mt-6 mb-3">Ways to close it</p>
         {plan.status === "loading" ? <p className="text-muted-foreground">Loading resources…</p>
           : shown.length === 0 ? <p className="text-muted-foreground">No resources for this skill yet.</p>
-          : variant === "lead" ? <div className="grid gap-3 sm:grid-cols-3">
+          : <div className="grid gap-3 sm:grid-cols-3">
             {shown.map((resource) => <div key={resource.id} className="flex flex-col rounded-xl bg-sunken p-4">
               <ResourceIcon type={resource.type} />
               <p className="eyebrow mt-3">{RESOURCE_TYPES[resource.type].label}</p>
               <p className="mt-0.5 font-bold">{resource.title}</p>
-              <p className="mt-1 font-mono text-[0.8125rem] text-muted-foreground">{resource.meta}</p>
+              <p className="mt-1 mb-3 font-mono text-[0.8125rem] text-muted-foreground">{resource.meta}</p>
               <SaveButton resourceId={resource.id} tone="tile" className="mt-auto self-start" />
             </div>)}
-          </div>
-          : <ul className="grid gap-3 rounded-xl bg-sunken p-4">
-            {shown.map((resource) => <li key={resource.id} className="flex flex-wrap items-center gap-3">
-              <ResourceIcon type={resource.type} />
-              <div className="min-w-0 flex-1 basis-48">
-                <p className="font-bold">{resource.title}</p>
-                <p className="font-mono text-[0.8125rem] text-muted-foreground">{resource.provider} · {resource.meta}</p>
-              </div>
-              <SaveButton resourceId={resource.id} tone="tile" />
-            </li>)}
-          </ul>}
+          </div>}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <Link href={`/resources?gap=${gap.skill_id}`} className="inline-flex items-center gap-1 font-bold hover:underline">
             Browse all {ways.length} resources for this skill<ChevronRight aria-hidden className="size-4" />
@@ -158,10 +151,11 @@ function GapCard({ gap, rank, report, variant }: {
           </summary>
           <div className="mt-4"><SkillEvidence skill={gap} report={report} /></div>
         </details>
-      </> : (
-        <Button variant="outline" className="mt-5" aria-expanded={false} onClick={() => setOpen(true)}>
-          Show {ways.length} ways to close it<ChevronDown data-icon="inline-end" />
-        </Button>
+      </div> : (
+        <button type="button" aria-expanded={false} aria-controls={panel} onClick={() => setOpen(true)}
+          className="mt-4 inline-flex items-center gap-1 text-sm font-bold hover:underline">
+          Show {ways.length} ways to close it<ChevronDown aria-hidden className="size-4" />
+        </button>
       )}
     </section>
   );
