@@ -222,8 +222,10 @@ function SchoolCard({ email }: { email: string | null }) {
           <Button type="submit" size="sm" disabled={state.saving}>{state.saving ? "Saving…" : "Save"}</Button>
           <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
         </div>
-      </form> : <button type="button" onClick={() => { setValue(user?.university ?? ""); setEditing(true); }}
-        className="mt-3 font-bold hover:underline">Change school</button>}
+      </form> : <div className="mt-3 flex justify-end">
+        <button type="button" onClick={() => { setValue(user?.university ?? ""); setEditing(true); }}
+          className="font-bold hover:underline">Change school</button>
+      </div>}
     </section>
   );
 }
@@ -267,8 +269,10 @@ function GoalCard() {
           <dt className="text-muted-foreground">Where</dt><dd className="font-bold">{user.preferred_location}</dd>
           <dt className="text-muted-foreground">Graduating</dt><dd className="font-bold">{user.graduation_year}</dd>
         </dl>
-        <button type="button" onClick={() => { setDraft({ location: user.preferred_location, level: user.experience_level }); setEditing(true); }}
-          className="mt-3 font-bold hover:underline">Edit</button>
+        <div className="mt-3 flex justify-end">
+          <button type="button" onClick={() => { setDraft({ location: user.preferred_location, level: user.experience_level }); setEditing(true); }}
+            className="font-bold hover:underline">Edit</button>
+        </div>
       </>}
     </section>
   );
