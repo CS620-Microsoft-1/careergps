@@ -177,7 +177,8 @@ export function SetupFlow({ graduationYears, addRole = false }: { graduationYear
       const [{ user }, saved] = await Promise.all([getMe(), getSavedResume()]);
       if (user && saved) queueSkillGapAnalysis(profileForAnalysis(user, saved));
     } catch { /* Saving succeeded; the analysis can still be started from the route page. */ }
-    router.push("/onboarding/route");
+    // A new destination opens on its home page; first-time setup shows the route result first.
+    router.push(addRole ? "/dashboard" : "/onboarding/route");
   };
 
   /** Add a destination that uses the current résumé, and select it. */
@@ -198,7 +199,7 @@ export function SetupFlow({ graduationYears, addRole = false }: { graduationYear
       return;
     }
     queueSkillGapAnalysis(profile);
-    router.push("/onboarding/route");
+    router.push("/dashboard");
   };
 
   if (addRole && resumeChoice === null) {
