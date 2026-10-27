@@ -1,101 +1,342 @@
 [
-    {
-      "id": "swe_01",
-      "career_path": "Software Engineering",
-      "title": "Full-Stack Task Tracker",
-      "description": "Build an app where users can create, edit, filter, and complete tasks stored in a database.",
-      "skills_practiced": ["React", "REST APIs", "SQL", "input validation", "testing"],
-      "prerequisites": ["JavaScript basics", "HTML and CSS basics"],
-      "difficulty": "beginner",
-      "estimated_hours": 20,
-      "deliverables": ["Working app", "Database schema", "API tests", "GitHub repository", "README"]
-    },
-    {
-      "id": "swe_02",
-      "career_path": "Software Engineering",
-      "title": "Campus Event Finder",
-      "description": "Build a searchable campus event app with category filters, saved events, and user accounts using an established authentication library.",
-      "skills_practiced": ["React", "REST APIs", "SQL", "authentication", "authorization", "responsive design"],
-      "prerequisites": ["JavaScript basics", "React basics", "REST API basics"],
-      "difficulty": "intermediate",
-      "estimated_hours": 30,
-      "deliverables": ["Working app", "Event search and filters", "User accounts", "Authorization tests", "GitHub repository", "README"]
-    },
-    {
-      "id": "swe_03",
-      "career_path": "Software Engineering",
-      "title": "Reliable Background Job Queue",
-      "description": "Build an API that accepts report-generation jobs and processes them with a separate worker, including retries, status tracking, and duplicate-request handling.",
-      "skills_practiced": ["Python", "REST APIs", "Redis", "background processing", "error handling", "Docker", "integration testing"],
-      "prerequisites": ["Python basics", "REST API basics", "Database basics"],
-      "difficulty": "advanced",
-      "estimated_hours": 40,
-      "deliverables": ["Job submission API", "Background worker", "Retry and duplicate-handling tests", "Docker Compose setup", "GitHub repository", "README"]
-    },
-    {
-      "id": "data_01",
-      "career_path": "Data Analyst",
-      "title": "Public Transit Reliability Analysis",
-      "description": "Analyze a public transit dataset to identify routes and time periods with frequent delays, documenting missing data and limitations.",
-      "skills_practiced": ["Python", "pandas", "data cleaning", "exploratory data analysis", "data visualization"],
-      "prerequisites": ["Python basics", "Basic descriptive statistics"],
-      "difficulty": "beginner",
-      "estimated_hours": 15,
-      "deliverables": ["Data cleaning script", "Analysis notebook", "Three annotated visualizations", "Findings and limitations report", "GitHub repository", "README"]
-    },
-    {
-      "id": "data_02",
-      "career_path": "Data Analyst",
-      "title": "Sales Performance Dashboard",
-      "description": "Analyze public or synthetic sales data to identify trends by product, region, and time; build an interactive dashboard and explain actionable findings and data limitations.",
-      "skills_practiced": ["SQL", "data cleaning", "data analysis", "data visualization", "dashboard design", "business communication"],
-      "prerequisites": ["SQL basics", "Basic descriptive statistics"],
-      "difficulty": "intermediate",
-      "estimated_hours": 25,
-      "deliverables": ["Data cleaning and analysis queries", "Interactive dashboard", "Findings and limitations report", "GitHub repository", "README"]
-    },
-    {
-      "id": "data_03",
-      "career_path": "Data Analyst",
-      "title": "E-Commerce Experiment Analysis",
-      "description": "Analyze a public or synthetic A/B test dataset to estimate a checkout change's effect on conversion, check experiment assumptions, and explain uncertainty.",
-      "skills_practiced": ["SQL", "Python", "data cleaning", "hypothesis testing", "confidence intervals", "data visualization", "statistical communication"],
-      "prerequisites": ["SQL basics", "Python basics", "Probability and statistics basics"],
-      "difficulty": "intermediate",
-      "estimated_hours": 25,
-      "deliverables": ["SQL analysis queries", "Experiment analysis notebook", "Assumption checks", "Effect estimate with confidence interval", "Recommendation report", "GitHub repository", "README"]
-    },
-    {
-      "id": "aiml_01",
-      "career_path": "AI/ML Engineering",
-      "title": "Support Ticket Classifier",
-      "description": "Train a model to categorize support tickets using a public or synthetic dataset, compare it against a baseline, and expose predictions through an API.",
-      "skills_practiced": ["Python", "natural language processing", "scikit-learn", "classification", "model evaluation", "FastAPI", "testing"],
-      "prerequisites": ["Python basics", "Basic machine learning", "REST API basics"],
-      "difficulty": "intermediate",
-      "estimated_hours": 25,
-      "deliverables": ["Training pipeline", "Baseline comparison", "Per-category evaluation", "Prediction API", "API tests", "GitHub repository", "README"]
-    },
-    {
-      "id": "aiml_02",
-      "career_path": "AI/ML Engineering",
-      "title": "Document Question-Answering Assistant",
-      "description": "Build an assistant that answers questions about a small collection of public documents using retrieval, cites supporting passages, and abstains when evidence is insufficient.",
-      "skills_practiced": ["Python", "LLM APIs", "embeddings", "vector search", "retrieval-augmented generation", "evaluation", "prompt-injection defenses"],
-      "prerequisites": ["Python basics", "REST API basics", "Basic LLM concepts"],
-      "difficulty": "intermediate",
-      "estimated_hours": 30,
-      "deliverables": ["Document ingestion pipeline", "Question-answering interface", "Source citations", "Evaluation question set", "Unsupported-question and prompt-injection tests", "GitHub repository", "README"]
-    },
-    {
-      "id": "aiml_03",
-      "career_path": "AI/ML Engineering",
-      "title": "Model Deployment and Monitoring Service",
-      "description": "Train a small prediction model, deploy it as a containerized API, and simulate changing input data to monitor validation failures, latency, and data drift.",
-      "skills_practiced": ["Python", "scikit-learn", "FastAPI", "Docker", "model deployment", "data validation", "monitoring", "data drift detection"],
-      "prerequisites": ["Python basics", "Model training and evaluation", "REST API basics", "Docker basics"],
-      "difficulty": "advanced",
-      "estimated_hours": 40,
-      "deliverables": ["Reproducible training pipeline", "Containerized prediction API", "Monitoring report or dashboard", "Simulated drift demonstration", "Integration tests", "GitHub repository", "README"]
-    }
-  ]
+  {
+    "id": "swe_01",
+    "career_path": "Software Engineering",
+    "title": "Full-Stack Task Tracker",
+    "description": "Build an app where users can create, edit, filter, and complete tasks stored in a database.",
+    "skills_practiced": [
+      "React",
+      "REST APIs",
+      "SQL",
+      "input validation",
+      "testing"
+    ],
+    "prerequisites": [
+      "JavaScript basics",
+      "HTML and CSS basics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Working app",
+      "Database schema",
+      "API tests",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "programming",
+      "frontend",
+      "backend_apis",
+      "relational_sql",
+      "testing",
+      "version_control"
+    ]
+  },
+  {
+    "id": "swe_02",
+    "career_path": "Software Engineering",
+    "title": "Campus Event Finder",
+    "description": "Build a searchable campus event app with category filters, saved events, and user accounts using an established authentication library.",
+    "skills_practiced": [
+      "React",
+      "REST APIs",
+      "SQL",
+      "authentication",
+      "authorization",
+      "responsive design"
+    ],
+    "prerequisites": [
+      "JavaScript basics",
+      "React basics",
+      "REST API basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working app",
+      "Event search and filters",
+      "User accounts",
+      "Authorization tests",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "programming",
+      "frontend",
+      "backend_apis",
+      "relational_sql",
+      "security",
+      "testing",
+      "version_control"
+    ]
+  },
+  {
+    "id": "swe_03",
+    "career_path": "Software Engineering",
+    "title": "Reliable Background Job Queue",
+    "description": "Build an API that accepts report-generation jobs and processes them with a separate worker, including retries, status tracking, and duplicate-request handling.",
+    "skills_practiced": [
+      "Python",
+      "REST APIs",
+      "Redis",
+      "background processing",
+      "error handling",
+      "Docker",
+      "integration testing"
+    ],
+    "prerequisites": [
+      "Python basics",
+      "REST API basics",
+      "Database basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 40,
+    "deliverables": [
+      "Job submission API",
+      "Background worker",
+      "Retry and duplicate-handling tests",
+      "Docker Compose setup",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "programming",
+      "backend_apis",
+      "distributed_systems",
+      "nosql_search",
+      "testing",
+      "containers",
+      "reliability",
+      "version_control"
+    ]
+  },
+  {
+    "id": "data_01",
+    "career_path": "Data Analyst",
+    "title": "Public Transit Reliability Analysis",
+    "description": "Analyze a public transit dataset to identify routes and time periods with frequent delays, documenting missing data and limitations.",
+    "skills_practiced": [
+      "Python",
+      "pandas",
+      "data cleaning",
+      "exploratory data analysis",
+      "data visualization"
+    ],
+    "prerequisites": [
+      "Python basics",
+      "Basic descriptive statistics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 15,
+    "deliverables": [
+      "Data cleaning script",
+      "Analysis notebook",
+      "Three annotated visualizations",
+      "Findings and limitations report",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_quality",
+      "data_visualization"
+    ]
+  },
+  {
+    "id": "data_02",
+    "career_path": "Data Analyst",
+    "title": "Sales Performance Dashboard",
+    "description": "Analyze public or synthetic sales data to identify trends by product, region, and time; build an interactive dashboard and explain actionable findings and data limitations.",
+    "skills_practiced": [
+      "SQL",
+      "data cleaning",
+      "data analysis",
+      "data visualization",
+      "dashboard design",
+      "business communication"
+    ],
+    "prerequisites": [
+      "SQL basics",
+      "Basic descriptive statistics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 25,
+    "deliverables": [
+      "Data cleaning and analysis queries",
+      "Interactive dashboard",
+      "Findings and limitations report",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "data_analysis",
+      "business_analytics",
+      "data_quality",
+      "dashboarding",
+      "data_visualization"
+    ]
+  },
+  {
+    "id": "data_03",
+    "career_path": "Data Analyst",
+    "title": "E-Commerce Experiment Analysis",
+    "description": "Analyze a public or synthetic A/B test dataset to estimate a checkout change's effect on conversion, check experiment assumptions, and explain uncertainty.",
+    "skills_practiced": [
+      "SQL",
+      "Python",
+      "data cleaning",
+      "hypothesis testing",
+      "confidence intervals",
+      "data visualization",
+      "statistical communication"
+    ],
+    "prerequisites": [
+      "SQL basics",
+      "Python basics",
+      "Probability and statistics basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 25,
+    "deliverables": [
+      "SQL analysis queries",
+      "Experiment analysis notebook",
+      "Assumption checks",
+      "Effect estimate with confidence interval",
+      "Recommendation report",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis",
+      "statistics",
+      "experimentation",
+      "data_quality",
+      "data_visualization"
+    ]
+  },
+  {
+    "id": "aiml_01",
+    "career_path": "AI/ML Engineering",
+    "title": "Support Ticket Classifier",
+    "description": "Train a model to categorize support tickets using a public or synthetic dataset, compare it against a baseline, and expose predictions through an API.",
+    "skills_practiced": [
+      "Python",
+      "natural language processing",
+      "scikit-learn",
+      "classification",
+      "model evaluation",
+      "FastAPI",
+      "testing"
+    ],
+    "prerequisites": [
+      "Python basics",
+      "Basic machine learning",
+      "REST API basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 25,
+    "deliverables": [
+      "Training pipeline",
+      "Baseline comparison",
+      "Per-category evaluation",
+      "Prediction API",
+      "API tests",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "python",
+      "software_engineering",
+      "machine_learning",
+      "data_preparation",
+      "model_training",
+      "model_evaluation",
+      "model_deployment"
+    ]
+  },
+  {
+    "id": "aiml_02",
+    "career_path": "AI/ML Engineering",
+    "title": "Document Question-Answering Assistant",
+    "description": "Build an assistant that answers questions about a small collection of public documents using retrieval, cites supporting passages, and abstains when evidence is insufficient.",
+    "skills_practiced": [
+      "Python",
+      "LLM APIs",
+      "embeddings",
+      "vector search",
+      "retrieval-augmented generation",
+      "evaluation",
+      "prompt-injection defenses"
+    ],
+    "prerequisites": [
+      "Python basics",
+      "REST API basics",
+      "Basic LLM concepts"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Document ingestion pipeline",
+      "Question-answering interface",
+      "Source citations",
+      "Evaluation question set",
+      "Unsupported-question and prompt-injection tests",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "python",
+      "generative_ai",
+      "llm",
+      "rag",
+      "vector_retrieval"
+    ]
+  },
+  {
+    "id": "aiml_03",
+    "career_path": "AI/ML Engineering",
+    "title": "Model Deployment and Monitoring Service",
+    "description": "Train a small prediction model, deploy it as a containerized API, and simulate changing input data to monitor validation failures, latency, and data drift.",
+    "skills_practiced": [
+      "Python",
+      "scikit-learn",
+      "FastAPI",
+      "Docker",
+      "model deployment",
+      "data validation",
+      "monitoring",
+      "data drift detection"
+    ],
+    "prerequisites": [
+      "Python basics",
+      "Model training and evaluation",
+      "REST API basics",
+      "Docker basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 40,
+    "deliverables": [
+      "Reproducible training pipeline",
+      "Containerized prediction API",
+      "Monitoring report or dashboard",
+      "Simulated drift demonstration",
+      "Integration tests",
+      "GitHub repository",
+      "README"
+    ],
+    "supported_skill_ids": [
+      "python",
+      "software_engineering",
+      "machine_learning",
+      "model_training",
+      "model_deployment",
+      "mlops",
+      "ai_infrastructure"
+    ]
+  }
+]

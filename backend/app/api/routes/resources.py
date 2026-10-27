@@ -5,6 +5,8 @@ from app.services.resources_agent import recommend_projects
 from app.api.routes.skill_gaps import SavedResume, get_saved_resume
 from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
 from fastapi import Depends
+import json
+from app.services.skill_gaps.assets import ASSET_ROOT
 
 
 router = APIRouter(prefix="/resources", tags=["resources"])
@@ -38,15 +40,20 @@ def inputs_from_report(report: dict, family: str) -> dict:
     if not isinstance(skills, list) or not isinstance(priority_order, list):
         raise ValueError("Invalid skill-gap report.")
     by_id = {item["skill_id"]: item for item in skills if isinstance(item, dict) and isinstance(item.get("skill_id"), str)}
+    catalog = json.loads((ASSET_ROOT / "core_catalog.json").read_text(encoding="utf-8"))
+    definitions = {skill["skill_id"]: skill for module in catalog["families"][family]["modules"] for skill in module["skills"]}
     gaps = []
+    verified_skill_gaps = []
     for identifier in priority_order:
         item = by_id.get(identifier)
         if not item or item.get("calculation_state") != "scored":
             continue
         gap, name = item.get("skill_gap"), item.get("skill_name")
-        if isinstance(gap, (int, float)) and not isinstance(gap, bool) and gap > 0 and isinstance(name, str) and name.strip() and name not in gaps:
+        definition = definitions.get(identifier)
+        if isinstance(gap, (int, float)) and not isinstance(gap, bool) and gap > 0 and definition and name == definition["skill_name"] and name not in gaps:
             gaps.append(name)
-    return {"career_path": FAMILY_TO_CATALOG[family], "existing_skills": [], "skill_gaps": gaps}
+            verified_skill_gaps.append({"skill_id": identifier, "skill_name": name, "definition": definition["definition"]})
+    return {"career_path": FAMILY_TO_CATALOG[family], "existing_skills": [], "skill_gaps": gaps, "verified_skill_gaps": verified_skill_gaps}
 
 
 @router.post("/projects/from-skill-gap")
