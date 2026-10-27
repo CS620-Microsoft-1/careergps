@@ -10,12 +10,15 @@ and turns them into an action plan.
 
 | Area | Status |
 | --- | --- |
-| Résumé parsing: PDF/DOCX extraction, OCR fallback for scanned pages, classification by a Microsoft Foundry Agent, editable review | Working (results are not saved yet) |
-| Job-market data: daily ingest of public Greenhouse, Ashby and Lever job postings | Working |
-| Database schema for users and confirmed résumés | Migrated, not yet used by the API |
-| Skill-gap analysis with a demand-weighted match score, curated resources per gap, saved action plan | Working (results and plans are local JSON on the backend host) |
+| Sign-up / login with Supabase Auth (email confirmation), onboarding, profile | Working |
+| Résumé parsing: PDF/DOCX extraction, OCR fallback for scanned pages, classification by a Microsoft Foundry Agent, editable review, saved to the user's account | Working |
+| Job-market data: daily ingest of public Greenhouse, Ashby and Lever job postings; job-description field extraction by a Foundry Agent | Working |
+| Skill-gap analysis: résumé evidence scored against market demand, with a demand-weighted match score | Working (runs are local JSON on the backend host) |
+| Destinations: compare one résumé against several target roles | Working |
+| Resources: courses, student orgs, certifications and projects matched to each gap | Working (static catalogs) |
+| Action plan: saved resources in order, biggest gap first | Working (plans are local JSON on the backend host) |
 | Ask CareerGPS Copilot | Planned |
-| Sign-up / login | Planned |
+| `plan_items` and `skill_gap_runs` tables | Migrated, not yet used by the API |
 
 The analysis runs as four agents in order: **Student Profile → Market Intelligence → Gap Analysis → Action**.
 
@@ -25,8 +28,8 @@ The analysis runs as four agents in order: **Student Profile → Market Intellig
 | --- | --- |
 | Frontend | Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, shadcn/ui, Zod, React Hook Form |
 | Backend | Python 3.12+, FastAPI, Pydantic, SQLAlchemy 2, Alembic |
-| Database | PostgreSQL on Supabase (one shared team database) |
-| AI | Microsoft Foundry Agent via `azure-ai-projects` and `azure-identity` |
+| Database and auth | PostgreSQL and Supabase Auth (one shared team project) |
+| AI | Microsoft Foundry Agents via `azure-ai-projects` and `azure-identity` |
 | Document processing | PyMuPDF, python-docx, OCRmyPDF + Tesseract, Ghostscript |
 | CI | GitHub Actions (backend unit tests on PRs to `dev`) |
 
@@ -36,11 +39,14 @@ Each choice is explained in the [architecture decision records](docs/decisions/)
 
 ```text
 Next.js frontend ──HTTP/JSON──▶ FastAPI backend ──▶ Supabase PostgreSQL
-  (localhost:3000)               (localhost:8000)  ├─▶ Microsoft Foundry Agent (résumé classification)
-                                                   └─▶ Greenhouse / Ashby / Lever public job-board APIs
+  (localhost:3000)               (localhost:8000)  ├─▶ Supabase Auth (verifies login tokens)
+        │                                          ├─▶ Microsoft Foundry Agents (résumé, job description,
+        │                                          │   skill gap, certification)
+        │                                          └─▶ Greenhouse / Ashby / Lever public job-board APIs
+        └──▶ Supabase Auth (sign-up / login)
 ```
 
-- The frontend calls the API only through `frontend/lib/api/`, with one file per backend router.
+- The frontend calls the API only through `frontend/lib/api/`, with one file per backend area.
 - Market statistics are computed with SQL over stored postings. LLMs only extract fields or explain results that
   were already computed ([ADR-003](docs/decisions/ADR-003-Career-Market-Data-Sources.md)).
 
@@ -50,18 +56,22 @@ Next.js frontend ──HTTP/JSON──▶ FastAPI backend ──▶ Supabase Pos
 careergps/
 ├── backend/               FastAPI service
 │   ├── app/               api/routes, core config, db, models, schemas, services
-│   ├── data/              curated company job-board lists and the resource catalog (resources.yaml)
+│   ├── data/              company job-board lists and the resource, certification and project catalogs
 │   ├── migrations/        Alembic migrations
-│   ├── scripts/           job-posting ingest and board probe
+│   ├── scripts/           job-posting ingest, board probe, job-analysis worker, demand snapshot
 │   └── tests/             unittest suite (no DB or network needed)
 ├── frontend/              Next.js app
 │   ├── app/               routes: auth, onboarding (setup), dashboard (home), gaps, resources, plan, destinations, profile
 │   ├── components/        UI primitives, layout, auth, setup, one folder per page
-│   ├── lib/               API client, navigation, validation, utilities
+│   ├── lib/               API client, Supabase client, navigation, validation, skill-gap helpers
 │   └── types/             shared TypeScript types
 ├── docs/
-│   ├── decisions/         ADR-001 frontend, ADR-002 backend, ADR-003 market data sources
-│   ├── testing/           Supabase database test plan
+│   ├── contracts/         skill-gap run storage schema and example
+│   ├── decisions/         ADR-001 frontend, ADR-002 backend, ADR-003 market data sources, JPA storage schema
+│   ├── infrastructure/    domain setup
+│   ├── specs/             SPEC-001 sign-up and login
+│   ├── supabase/          email templates
+│   ├── testing/           Supabase database test plan, skill-gap test guides
 │   └── resume-classifier-agent-prompt.md   Foundry Agent instructions and JSON contract
 └── .github/workflows/     CI
 ```
@@ -107,8 +117,15 @@ Windows setup, Foundry access, and troubleshooting are covered in the [backend R
 | --- | --- | --- |
 | `backend/.env` | `DATABASE_URL` | Supabase PostgreSQL connection (session pooler) |
 | | `CORS_ORIGINS` | Frontend origins allowed to call the API (never `*`) |
+| | `SUPABASE_URL` | Supabase project, used to verify login tokens |
 | | `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME` | Résumé classification Agent |
+| | `SKILL_GAP_FOUNDRY_PROJECT_ENDPOINT`, `SKILL_GAP_FOUNDRY_AGENT_NAME` | Skill gap evidence Agent |
+| | `JOB_ANALYSIS_*` | Job-description extraction Agent and its local queue |
+| | `CERTIFICATION_FOUNDRY_PROJECT_ENDPOINT`, `CERTIFICATION_FOUNDRY_AGENT_NAME` | Certification Agent (optional; falls back to the catalog) |
 | `frontend/.env.local` | `NEXT_PUBLIC_API_URL` | Backend URL (public: never put secrets here) |
+| | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase Auth (publishable key only) |
+
+See `backend/.env.example` and `frontend/.env.example` for every variable.
 
 Never commit `.env` or `.env.local`.
 
@@ -116,7 +133,7 @@ Never commit `.env` or `.env.local`.
 
 ```bash
 cd backend && python -m unittest discover -s tests -v   # also runs in CI
-cd frontend && npm run lint && npm run typecheck && npm run build
+cd frontend && npm test && npm run lint && npm run typecheck && npm run build
 ```
 
 `backend/tests/manual_resume_smoke.py` runs a live test against the Foundry Agent. It is not part of CI.
@@ -128,6 +145,10 @@ cd backend
 python -m scripts.ingest_postings          # all boards in data/companies.yaml; run once a day
 python -m scripts.probe_boards             # find job boards for companies in data/company_candidates.yaml
 ```
+
+Job-description extraction (`scripts.job_posting_analysis_worker`) and market demand snapshots
+(`scripts.demand_snapshot`) are covered in the [backend README](backend/README.md#job-posting-analysis) and
+[docs/testing/SKILL_GAP_DEMAND_SOURCE.md](docs/testing/SKILL_GAP_DEMAND_SOURCE.md).
 
 ## Contributing
 
@@ -143,5 +164,8 @@ python -m scripts.probe_boards             # find job boards for companies in da
 - [Backend README](backend/README.md): setup, résumé pipeline, schema workflow, database rules
 - [Frontend README](frontend/README.md): setup, API client, responsive rules, Copilot
 - [Architecture decision records](docs/decisions/)
+- [Sign-up and login spec](docs/specs/SPEC-001-signup-and-login.md)
 - [Supabase database test plan](docs/testing/SUPABASE_DATABASE_TEST_PLAN.md)
+- [Skill gaps: local web test](docs/testing/SKILL_GAP_WEB_LOCAL.md) and
+  [demand source](docs/testing/SKILL_GAP_DEMAND_SOURCE.md)
 - [Résumé classifier prompt](docs/resume-classifier-agent-prompt.md)
