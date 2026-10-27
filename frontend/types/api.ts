@@ -255,3 +255,33 @@ export type ResumeAnalysisEvent =
   | ResumeStepEvent
   | { type: "result"; data: ResumeAnalysis }
   | { type: "error"; status: number; detail: string };
+
+/** One entry of GET /certifications/catalog/{family}. */
+export type Certification = {
+  id: string;
+  name: string;
+  provider: string;
+  url: string;
+  /** null when the price depends on a subscription or is not published. */
+  cost_usd: number | null;
+  cost_note: string;
+  level: "beginner" | "intermediate" | "advanced";
+  /** Core skill ids per job family. */
+  skills: Partial<Record<JobFamily, string[]>>;
+  last_verified: string;
+};
+
+export type CertificationCatalog = {
+  job_family: JobFamily;
+  version: string;
+  certifications: Certification[];
+};
+
+/** POST /certifications/recommendations. Reasons are null when source is "rules". */
+export type CertificationRecommendations = {
+  job_family: JobFamily;
+  skill_gap_run_id: string;
+  source: "agent" | "rules";
+  generated_at: string;
+  recommendations: { certification_id: string; skill_ids: string[]; reason: string | null }[];
+};
