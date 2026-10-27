@@ -85,6 +85,7 @@ export function CertificationsPanel() {
           picks={currentPicks}
           byId={byId}
           catalogReady={Boolean(currentCatalog?.data)}
+          catalogError={currentCatalog?.error}
           onRetry={retry}
         />
       </section>
@@ -111,13 +112,14 @@ export function CertificationsPanel() {
   );
 }
 
-function Recommendations({ family, hasResume, runStatus, picks, byId, catalogReady, onRetry }: {
+function Recommendations({ family, hasResume, runStatus, picks, byId, catalogReady, catalogError, onRetry }: {
   family: JobFamily;
   hasResume: boolean;
   runStatus: "restoring" | "queued" | "running" | "completed" | "failed" | null;
   picks: Loadable<CertificationRecommendations> | null;
   byId: Map<string, Certification>;
   catalogReady: boolean;
+  catalogError?: string;
   onRetry: () => void;
 }) {
   if (!hasResume) {
@@ -140,14 +142,16 @@ function Recommendations({ family, hasResume, runStatus, picks, byId, catalogRea
       description={`Recommendations are matched to your ${FAMILY_LABELS[family]} skill gaps.`}
       action={<Button asChild><Link href="/gaps">Go to Skill Gaps</Link></Button>} /></Card>;
   }
+  // Picks are shown with catalog details, so a failed catalog would otherwise spin here forever.
+  if (picks?.error || catalogError) {
+    return <ErrorNotice text={picks?.error ?? catalogError ?? ""} onRetry={onRetry} />;
+  }
   if (!picks || !catalogReady) {
     return <Card><CardContent className="flex items-center gap-3 text-sm text-muted-foreground" role="status">
       <LoaderCircle className="size-5 shrink-0 animate-spin text-primary" />
       Matching certifications to your gaps. The first time can take up to 30 seconds.
     </CardContent></Card>;
   }
-  if (picks.error) return <ErrorNotice text={picks.error} onRetry={onRetry} />;
-
   const items = picks.data?.recommendations.filter((item) => byId.has(item.certification_id)) ?? [];
   if (!items.length) {
     return <Card><EmptyState icon={Award} title="No matching certification yet"
