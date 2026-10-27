@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     # DefaultAzureCredential (Azure CLI locally; managed identity when deployed).
     foundry_project_endpoint: str | None = None
     foundry_agent_name: str | None = None
+
+    resources_project_endpoint: str | None = None
+    resources_agent_name: str = "resources-agent"
     # Independent endpoint for the existing job-analysis-agent, pinned to version 13.
     job_analysis_project_endpoint: str | None = None
     # Local storage base; the JD factory appends v13 to isolate older output formats.
