@@ -1,7 +1,10 @@
+import importlib
+import os
 import subprocess
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from alembic.config import Config
 from alembic.script import ScriptDirectory
@@ -10,7 +13,11 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY_ROOT = BACKEND_ROOT.parent
 sys.path.insert(0, str(BACKEND_ROOT))
 
+os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://tester:placeholder@localhost:6543/test")
+
+from app.core.config import Settings, get_settings
 from app.db.base import Base
+import app.db.session
 import app.models  # noqa: F401  (registers all models on Base.metadata)
 from app.models.user import User
 
@@ -72,8 +79,33 @@ class RepositorySafetyTests(unittest.TestCase):
         self.assertIn("<db-password>", example)
         self.assertIn("<region>", example)
 
+    def test_environment_example_uses_transaction_pooler_for_the_app(self) -> None:
+        example = (BACKEND_ROOT / ".env.example").read_text(encoding="utf-8")
+        app_url = next(line for line in example.splitlines() if line.startswith("DATABASE_URL="))
+
+        self.assertIn(".pooler.supabase.com:6543/", app_url)
+        self.assertIn("MIGRATION_DATABASE_URL=", example)
+        self.assertIn(".pooler.supabase.com:5432/", example.split("MIGRATION_DATABASE_URL=", 1)[1])
+
 
 class BackendConfigurationTests(unittest.TestCase):
+    def test_engine_disables_prepared_statements_for_the_transaction_pooler(self) -> None:
+        env = {"DATABASE_URL": "postgresql+psycopg://tester:placeholder@localhost:6543/test"}
+        with patch.dict(os.environ, env), patch("sqlalchemy.create_engine") as create_engine:
+            get_settings.cache_clear()
+            try:
+                importlib.reload(app.db.session)
+            finally:
+                get_settings.cache_clear()
+        importlib.reload(app.db.session)
+
+        self.assertEqual({"prepare_threshold": None}, create_engine.call_args.kwargs["connect_args"])
+
+    def test_migration_url_is_optional(self) -> None:
+        settings = Settings(_env_file=None, database_url="postgresql+psycopg://x:y@localhost:6543/z")
+
+        self.assertIsNone(settings.migration_database_url)
+
     def test_required_dependencies_are_declared(self) -> None:
         requirements = (BACKEND_ROOT / "requirements.txt").read_text(encoding="utf-8")
 
