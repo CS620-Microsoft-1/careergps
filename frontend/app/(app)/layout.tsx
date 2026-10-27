@@ -4,6 +4,7 @@ import { OnboardingGuard } from "@/components/layout/onboarding-guard";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { CopilotProvider } from "@/components/panels/copilot-provider";
+import { SkillGapProvider } from "@/components/skill-gaps/skill-gap-provider";
 
 /**
  * Signed-in app shell: sidebar (lg+), sticky top bar with mobile nav (<lg),
@@ -14,16 +15,18 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
     <CopilotProvider>
       <BackendStatusProvider>
         <OnboardingGuard />
-        <div className="min-h-dvh lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)]">
-          <Sidebar />
-          <div className="flex min-w-0 flex-col">
-            <Topbar />
-            <main className="mx-auto w-full max-w-290 px-4 pt-6 pb-24 sm:px-8 sm:pt-8">
-              {children}
-            </main>
+        <SkillGapProvider>
+          <div className="min-h-dvh lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)]">
+            <Sidebar />
+            <div className="flex min-w-0 flex-col">
+              <Topbar />
+              <main className="mx-auto w-full max-w-290 px-4 pt-6 pb-24 sm:px-8 sm:pt-8">
+                {children}
+              </main>
+            </div>
+            <AskButton />
           </div>
-          <AskButton />
-        </div>
+        </SkillGapProvider>
       </BackendStatusProvider>
     </CopilotProvider>
   );

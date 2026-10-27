@@ -12,6 +12,12 @@ __pycache__/
 # Logs
 *.log
 
+# Local Skill Gap runs (inputs, Agent responses, and reports)
+local_results/
+
+# Historical experiments; the runtime lives in app/services/skill_gaps/.
+local_experiments/
+
 # Local experiments and exported API results
 local_tests/
 local_exports/

@@ -1,0 +1,1953 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:careergps:skill-gap-run-storage:v1",
+  "title": "Proposed Skill Gap run storage record",
+  "description": "Database-owner review contract only. No table, migration, API change or Agent response format is created by this file.",
+  "type": "object",
+  "properties": {
+    "storage_schema_version": {
+      "const": "careergps.skill_gap_run_storage.v1"
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "user_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "resume_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "resume_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reviewed_resume_snapshot": {
+      "$ref": "#/$defs/ReviewedResume"
+    },
+    "job_family": {
+      "type": "string",
+      "enum": [
+        "software_engineer",
+        "data_analyst",
+        "ai_engineer"
+      ]
+    },
+    "demand_snapshot_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "demand_snapshot_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "catalog_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "response_schema_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "prompt_revision": {
+      "type": "string",
+      "minLength": 1
+    },
+    "instructions_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "response_processing_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "calculation_fingerprint": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "agent_name": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "agent_version": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "status": {
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "failed"
+      ]
+    },
+    "phase": {
+      "enum": [
+        "queued",
+        "preparing",
+        "agent",
+        "checking",
+        "completed",
+        "failed"
+      ]
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "elapsed_seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "model_calls": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "error": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "error_code": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "report": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Report"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "raw_agent_output": {}
+  },
+  "required": [
+    "storage_schema_version",
+    "id",
+    "user_id",
+    "resume_id",
+    "resume_hash",
+    "reviewed_resume_snapshot",
+    "job_family",
+    "demand_snapshot_id",
+    "demand_snapshot_fingerprint",
+    "catalog_version",
+    "policy_version",
+    "response_schema_name",
+    "prompt_revision",
+    "instructions_sha256",
+    "response_processing_version",
+    "calculation_fingerprint",
+    "agent_name",
+    "agent_version",
+    "status",
+    "phase",
+    "created_at",
+    "completed_at",
+    "elapsed_seconds",
+    "model_calls",
+    "error",
+    "error_code",
+    "report",
+    "raw_agent_output"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "CheckError": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "code",
+        "field",
+        "detail"
+      ],
+      "additionalProperties": false
+    },
+    "Proof": {
+      "type": "object",
+      "properties": {
+        "unit_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "quote": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "unit_id",
+        "quote"
+      ],
+      "additionalProperties": false
+    },
+    "ProofSpan": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "unit_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "field",
+        "unit_id",
+        "start",
+        "end"
+      ],
+      "additionalProperties": false
+    },
+    "NumericSpan": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "unit_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "finding_start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "finding_end": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "value_start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "value_end": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "numeric_start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "numeric_end": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "field",
+        "unit_id",
+        "finding_start",
+        "finding_end",
+        "value_start",
+        "value_end",
+        "numeric_start",
+        "numeric_end"
+      ],
+      "additionalProperties": false
+    },
+    "SkillCheck": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "needs_confirmation"
+          ]
+        },
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CheckError"
+          }
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "derived_activity_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "activity_derivation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "proof_spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ProofSpan"
+          }
+        },
+        "reported_value_spans": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NumericSpan"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "errors",
+        "evidence_ids",
+        "derived_activity_id",
+        "activity_derivation",
+        "proof_spans",
+        "reported_value_spans"
+      ],
+      "additionalProperties": false
+    },
+    "ReferenceValidation": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "passed",
+            "partial",
+            "failed"
+          ]
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "global_errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CheckError"
+          }
+        },
+        "unexpected_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "skills": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/SkillCheck"
+          }
+        }
+      },
+      "required": [
+        "status",
+        "scope",
+        "global_errors",
+        "unexpected_skill_ids",
+        "skills"
+      ],
+      "additionalProperties": false
+    },
+    "Demand": {
+      "type": "object",
+      "properties": {
+        "N": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "required_job_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "preferred_only_job_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "unspecified_job_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "required_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "preferred_only_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "unspecified_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "N",
+        "required_job_count",
+        "preferred_only_job_count",
+        "unspecified_job_count",
+        "required_ratio",
+        "preferred_only_ratio",
+        "unspecified_ratio"
+      ],
+      "additionalProperties": false
+    },
+    "SourceUnit": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "path": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "claim",
+            "listed",
+            "interest"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "activity_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "activity_path": {
+          "type": "string"
+        },
+        "activity_context": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "path",
+        "kind",
+        "text",
+        "activity_id",
+        "activity_path",
+        "activity_context"
+      ],
+      "additionalProperties": false
+    },
+    "CandidateProof": {
+      "type": "object",
+      "properties": {
+        "from_skill": {
+          "type": "string",
+          "minLength": 1
+        },
+        "proof": {
+          "$ref": "#/$defs/Proof"
+        }
+      },
+      "required": [
+        "from_skill",
+        "proof"
+      ],
+      "additionalProperties": false
+    },
+    "Coverage": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method_null_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "validation_null_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "candidate_references": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/CandidateProof"
+                }
+              },
+              "check": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/CandidateProof"
+                }
+              }
+            },
+            "required": [
+              "method",
+              "check"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "scope",
+        "method_null_skill_ids",
+        "validation_null_skill_ids",
+        "candidate_references"
+      ],
+      "additionalProperties": false
+    },
+    "Adjustment": {
+      "type": "object",
+      "properties": {
+        "skill_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "field": {
+          "type": "string"
+        },
+        "code": {
+          "enum": [
+            "omitted_comma_restored",
+            "duplicate_nonresult_reference_removed",
+            "bounded_quote_alignment",
+            "same_activity_reference_rebound"
+          ]
+        },
+        "before": {},
+        "after": {},
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "exterior_ellipsis_removed",
+              "sentence_initial_case_restored",
+              "omitted_comma_restored"
+            ]
+          }
+        },
+        "original_errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CheckError"
+          }
+        },
+        "source_span": {
+          "type": "object",
+          "properties": {
+            "unit_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "start": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "end": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "required": [
+            "unit_id",
+            "start",
+            "end"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "skill_id",
+        "field",
+        "code",
+        "before",
+        "after",
+        "original_errors"
+      ],
+      "additionalProperties": false
+    },
+    "ResponseProcessing": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "adjustments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Adjustment"
+          }
+        }
+      },
+      "required": [
+        "version",
+        "scope",
+        "count",
+        "adjustments"
+      ],
+      "additionalProperties": false
+    },
+    "SkillResult": {
+      "type": "object",
+      "properties": {
+        "skill_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "skill_name": {
+          "type": "string"
+        },
+        "module_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module_name": {
+          "type": "string"
+        },
+        "resume_evidence_strength": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "skill_gap": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "skill_gap_grade": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "A",
+                "A-",
+                "B+",
+                "B",
+                "C",
+                "D",
+                "F"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "priority": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "demand_weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "calculation_state": {
+          "enum": [
+            "scored",
+            "needs_confirmation"
+          ]
+        },
+        "demand": {
+          "$ref": "#/$defs/Demand"
+        },
+        "agent_assessment": {},
+        "original_agent_assessment": {},
+        "scoring_breakdown": {
+          "type": "object"
+        },
+        "evidence_verification": {
+          "type": "string",
+          "minLength": 1
+        },
+        "local_reference_check": {
+          "$ref": "#/$defs/SkillCheck"
+        }
+      },
+      "required": [
+        "skill_id",
+        "skill_name",
+        "module_id",
+        "module_name",
+        "resume_evidence_strength",
+        "skill_gap",
+        "skill_gap_grade",
+        "priority",
+        "demand_weight",
+        "calculation_state",
+        "demand",
+        "agent_assessment",
+        "scoring_breakdown",
+        "evidence_verification",
+        "local_reference_check"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "calculation_state": {
+                "const": "needs_confirmation"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "resume_evidence_strength": {
+                "type": "null"
+              },
+              "skill_gap": {
+                "type": "null"
+              },
+              "skill_gap_grade": {
+                "type": "null"
+              },
+              "priority": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "resume_evidence_strength": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "skill_gap": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "skill_gap_grade": {
+                "type": "string",
+                "enum": [
+                  "A",
+                  "A-",
+                  "B+",
+                  "B",
+                  "C",
+                  "D",
+                  "F"
+                ]
+              },
+              "priority": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "calculation_state": {
+                "const": "scored"
+              },
+              "resume_evidence_strength": {
+                "const": 0
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "skill_gap": {
+                "const": 1
+              },
+              "skill_gap_grade": {
+                "const": "F"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Report": {
+      "type": "object",
+      "properties": {
+        "policy_version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_numeric_rubric": {
+          "type": "string",
+          "minLength": 1
+        },
+        "calibration_status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "job_family": {
+          "type": "string",
+          "enum": [
+            "software_engineer",
+            "data_analyst",
+            "ai_engineer"
+          ]
+        },
+        "metric": {
+          "type": "string"
+        },
+        "core_skill_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "module_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "demand_snapshot_fingerprint": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SkillResult"
+          }
+        },
+        "priority_order": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "unscored_skill_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "source_index": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/SourceUnit"
+          }
+        },
+        "reference_validation": {
+          "$ref": "#/$defs/ReferenceValidation"
+        },
+        "evidence_coverage": {
+          "$ref": "#/$defs/Coverage"
+        },
+        "mechanical_integrity_checked": {
+          "type": "boolean"
+        },
+        "exact_quotes_checked": {
+          "type": "boolean"
+        },
+        "semantic_evidence_verified": {
+          "type": "boolean"
+        },
+        "agent_output_verified": {
+          "type": "boolean"
+        },
+        "database_used": {
+          "type": "boolean"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "unresolved_display_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "source_lookup_scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "resume_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "user_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "response_processing": {
+          "$ref": "#/$defs/ResponseProcessing"
+        }
+      },
+      "required": [
+        "policy_version",
+        "base_numeric_rubric",
+        "calibration_status",
+        "job_family",
+        "metric",
+        "core_skill_count",
+        "module_count",
+        "demand_snapshot_fingerprint",
+        "skills",
+        "priority_order",
+        "unscored_skill_ids",
+        "source_index",
+        "reference_validation",
+        "evidence_coverage",
+        "mechanical_integrity_checked",
+        "exact_quotes_checked",
+        "semantic_evidence_verified",
+        "agent_output_verified",
+        "database_used",
+        "limitations",
+        "unresolved_display_sources",
+        "source_lookup_scope"
+      ],
+      "additionalProperties": false
+    },
+    "ResumeAwardEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "issuer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Issuer"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Date"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "issuer",
+        "date",
+        "content"
+      ],
+      "title": "AwardEntry",
+      "type": "object"
+    },
+    "ResumeCertificationEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "issuer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Issuer"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Date"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "issuer",
+        "date",
+        "url",
+        "content"
+      ],
+      "title": "CertificationEntry",
+      "type": "object"
+    },
+    "ResumeEducationEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "institution": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Institution"
+        },
+        "degree": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Degree"
+        },
+        "major": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Major"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Date"
+        },
+        "gpa": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Gpa"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "institution",
+        "degree",
+        "major",
+        "start_date",
+        "end_date",
+        "gpa",
+        "content"
+      ],
+      "title": "EducationEntry",
+      "type": "object"
+    },
+    "ResumeLanguageEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "proficiency": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Proficiency"
+        }
+      },
+      "required": [
+        "name",
+        "proficiency"
+      ],
+      "title": "LanguageEntry",
+      "type": "object"
+    },
+    "ResumeLeadershipEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "organization": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Organization"
+        },
+        "role": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Role"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Date"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Location"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "organization",
+        "role",
+        "start_date",
+        "end_date",
+        "location",
+        "content"
+      ],
+      "title": "LeadershipEntry",
+      "type": "object"
+    },
+    "ResumeOtherEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "content": {
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "content"
+      ],
+      "title": "OtherEntry",
+      "type": "object"
+    },
+    "ResumePersonalInformation": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "emails": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Emails",
+          "type": "array"
+        },
+        "phones": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Phones",
+          "type": "array"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Location"
+        },
+        "linkedin": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Linkedin"
+        },
+        "github": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Github"
+        },
+        "website": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Website"
+        }
+      },
+      "required": [
+        "name",
+        "emails",
+        "phones",
+        "location",
+        "linkedin",
+        "github",
+        "website"
+      ],
+      "title": "PersonalInformation",
+      "type": "object"
+    },
+    "ResumeProjectEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Name"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        },
+        "technologies": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Technologies",
+          "type": "array"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "name",
+        "url",
+        "technologies",
+        "content"
+      ],
+      "title": "ProjectEntry",
+      "type": "object"
+    },
+    "ResumePublicationEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "authors": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Authors"
+        },
+        "venue": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Venue"
+        },
+        "date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Date"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "title",
+        "authors",
+        "venue",
+        "date",
+        "url",
+        "content"
+      ],
+      "title": "PublicationEntry",
+      "type": "object"
+    },
+    "ResumeResearchExperienceEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "organization": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Organization"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Date"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Location"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "organization",
+        "title",
+        "start_date",
+        "end_date",
+        "location",
+        "content"
+      ],
+      "title": "ResearchExperienceEntry",
+      "type": "object"
+    },
+    "ResumeWorkExperienceEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "company": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Company"
+        },
+        "title": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Title"
+        },
+        "start_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Start Date"
+        },
+        "end_date": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "End Date"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Location"
+        },
+        "content": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Content",
+          "type": "array"
+        }
+      },
+      "required": [
+        "company",
+        "title",
+        "start_date",
+        "end_date",
+        "location",
+        "content"
+      ],
+      "title": "WorkExperienceEntry",
+      "type": "object"
+    },
+    "ReviewedResume": {
+      "additionalProperties": false,
+      "description": "Exact JSON contract shared by the Foundry Agent, backend, and Review UI.",
+      "properties": {
+        "personal_information": {
+          "$ref": "#/$defs/ResumePersonalInformation"
+        },
+        "research_interests": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Research Interests",
+          "type": "array"
+        },
+        "education": {
+          "items": {
+            "$ref": "#/$defs/ResumeEducationEntry"
+          },
+          "title": "Education",
+          "type": "array"
+        },
+        "work_experience": {
+          "items": {
+            "$ref": "#/$defs/ResumeWorkExperienceEntry"
+          },
+          "title": "Work Experience",
+          "type": "array"
+        },
+        "research_experience": {
+          "items": {
+            "$ref": "#/$defs/ResumeResearchExperienceEntry"
+          },
+          "title": "Research Experience",
+          "type": "array"
+        },
+        "projects": {
+          "items": {
+            "$ref": "#/$defs/ResumeProjectEntry"
+          },
+          "title": "Projects",
+          "type": "array"
+        },
+        "technical_skills": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Technical Skills",
+          "type": "array"
+        },
+        "languages": {
+          "items": {
+            "$ref": "#/$defs/ResumeLanguageEntry"
+          },
+          "title": "Languages",
+          "type": "array"
+        },
+        "publications": {
+          "items": {
+            "$ref": "#/$defs/ResumePublicationEntry"
+          },
+          "title": "Publications",
+          "type": "array"
+        },
+        "awards_honors": {
+          "items": {
+            "$ref": "#/$defs/ResumeAwardEntry"
+          },
+          "title": "Awards Honors",
+          "type": "array"
+        },
+        "certifications": {
+          "items": {
+            "$ref": "#/$defs/ResumeCertificationEntry"
+          },
+          "title": "Certifications",
+          "type": "array"
+        },
+        "leadership_activities": {
+          "items": {
+            "$ref": "#/$defs/ResumeLeadershipEntry"
+          },
+          "title": "Leadership Activities",
+          "type": "array"
+        },
+        "other": {
+          "items": {
+            "$ref": "#/$defs/ResumeOtherEntry"
+          },
+          "title": "Other",
+          "type": "array"
+        }
+      },
+      "required": [
+        "personal_information",
+        "research_interests",
+        "education",
+        "work_experience",
+        "research_experience",
+        "projects",
+        "technical_skills",
+        "languages",
+        "publications",
+        "awards_honors",
+        "certifications",
+        "leadership_activities",
+        "other"
+      ],
+      "title": "ResumeClassification",
+      "type": "object"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "completed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "report": {
+            "$ref": "#/$defs/Report"
+          },
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "phase": {
+            "const": "completed"
+          },
+          "error": {
+            "type": "null"
+          },
+          "error_code": {
+            "type": "null"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "report": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "queued",
+              "running"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "completed_at": {
+            "type": "null"
+          },
+          "error": {
+            "type": "null"
+          },
+          "error_code": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "failed"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "completed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": "string",
+            "minLength": 1
+          },
+          "error_code": {
+            "type": "string",
+            "minLength": 1
+          },
+          "phase": {
+            "const": "failed"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "queued"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "phase": {
+            "const": "queued"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "const": "running"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "phase": {
+            "enum": [
+              "preparing",
+              "agent",
+              "checking"
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

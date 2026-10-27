@@ -1,0 +1,2231 @@
+{
+  "analysis_version": "career-gps-demand-v1.3",
+  "skills": [
+    {
+      "skill_id": "python",
+      "skill_name": "Python",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "python"
+      ]
+    },
+    {
+      "skill_id": "java",
+      "skill_name": "Java",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "java(?!script)",
+        "\\bjdk\\b"
+      ]
+    },
+    {
+      "skill_id": "javascript",
+      "skill_name": "JavaScript",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "javascript",
+        "java\\s*script",
+        "ecmascript",
+        "\\bjs\\b"
+      ]
+    },
+    {
+      "skill_id": "typescript",
+      "skill_name": "TypeScript",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "typescript",
+        "type\\s*script",
+        "\\bts\\b"
+      ]
+    },
+    {
+      "skill_id": "cpp",
+      "skill_name": "C++",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "c\\+\\+",
+        "cpp"
+      ]
+    },
+    {
+      "skill_id": "csharp",
+      "skill_name": "C#",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "c#",
+        "c\\s*sharp"
+      ]
+    },
+    {
+      "skill_id": "golang",
+      "skill_name": "Go",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "golang",
+        "go programming",
+        "go language",
+        "knowledge of go",
+        "experience (?:with|in) go",
+        "proficiency (?:with|in) go"
+      ]
+    },
+    {
+      "skill_id": "ruby",
+      "skill_name": "Ruby",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "ruby"
+      ]
+    },
+    {
+      "skill_id": "php",
+      "skill_name": "PHP",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "php"
+      ]
+    },
+    {
+      "skill_id": "swift",
+      "skill_name": "Swift",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "swift(?:ui)?"
+      ]
+    },
+    {
+      "skill_id": "kotlin",
+      "skill_name": "Kotlin",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "kotlin"
+      ]
+    },
+    {
+      "skill_id": "scala",
+      "skill_name": "Scala",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "scala"
+      ]
+    },
+    {
+      "skill_id": "r_programming",
+      "skill_name": "R",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "r programming",
+        "r language",
+        "rstudio"
+      ]
+    },
+    {
+      "skill_id": "matlab",
+      "skill_name": "MATLAB",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "matlab"
+      ]
+    },
+    {
+      "skill_id": "shell_scripting",
+      "skill_name": "Shell scripting",
+      "category": "programming_language",
+      "group": "programming_languages",
+      "patterns": [
+        "shell scripting",
+        "bash",
+        "powershell"
+      ]
+    },
+    {
+      "skill_id": "html",
+      "skill_name": "HTML",
+      "category": "web_technology",
+      "group": "web_technologies",
+      "patterns": [
+        "html5?"
+      ]
+    },
+    {
+      "skill_id": "css",
+      "skill_name": "CSS",
+      "category": "web_technology",
+      "group": "web_technologies",
+      "patterns": [
+        "css3?",
+        "sass",
+        "scss"
+      ]
+    },
+    {
+      "skill_id": "react",
+      "skill_name": "React",
+      "category": "frontend_framework",
+      "group": "frontend_frameworks",
+      "patterns": [
+        "react(?:\\.js|js)?"
+      ]
+    },
+    {
+      "skill_id": "angular",
+      "skill_name": "Angular",
+      "category": "frontend_framework",
+      "group": "frontend_frameworks",
+      "patterns": [
+        "angular(?:\\.js|js)?"
+      ]
+    },
+    {
+      "skill_id": "vue",
+      "skill_name": "Vue",
+      "category": "frontend_framework",
+      "group": "frontend_frameworks",
+      "patterns": [
+        "vue(?:\\.js|js)?"
+      ]
+    },
+    {
+      "skill_id": "nextjs",
+      "skill_name": "Next.js",
+      "category": "frontend_framework",
+      "group": "frontend_frameworks",
+      "patterns": [
+        "next(?:\\.js|js)"
+      ]
+    },
+    {
+      "skill_id": "svelte",
+      "skill_name": "Svelte",
+      "category": "frontend_framework",
+      "group": "frontend_frameworks",
+      "patterns": [
+        "svelte"
+      ]
+    },
+    {
+      "skill_id": "nodejs",
+      "skill_name": "Node.js",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "node(?:\\.js|js)"
+      ]
+    },
+    {
+      "skill_id": "express",
+      "skill_name": "Express",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "express(?:\\.js|js)?"
+      ]
+    },
+    {
+      "skill_id": "django",
+      "skill_name": "Django",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "django"
+      ]
+    },
+    {
+      "skill_id": "flask",
+      "skill_name": "Flask",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "flask"
+      ]
+    },
+    {
+      "skill_id": "fastapi",
+      "skill_name": "FastAPI",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "fastapi"
+      ]
+    },
+    {
+      "skill_id": "spring",
+      "skill_name": "Spring",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "spring boot",
+        "spring framework"
+      ]
+    },
+    {
+      "skill_id": "dotnet",
+      "skill_name": ".NET",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "\\.net",
+        "dotnet",
+        "asp\\.net"
+      ]
+    },
+    {
+      "skill_id": "rails",
+      "skill_name": "Ruby on Rails",
+      "category": "backend_framework",
+      "group": "backend_frameworks",
+      "patterns": [
+        "ruby on rails",
+        "rails framework"
+      ]
+    },
+    {
+      "skill_id": "graphql",
+      "skill_name": "GraphQL",
+      "category": "api_technology",
+      "group": "api_technologies",
+      "patterns": [
+        "graphql"
+      ]
+    },
+    {
+      "skill_id": "rest_api",
+      "skill_name": "REST APIs",
+      "category": "api_technology",
+      "group": "api_technologies",
+      "patterns": [
+        "restful(?:\\s+api(?:s)?)?",
+        "rest api(?:s)?",
+        "\\bREST\\b"
+      ]
+    },
+    {
+      "skill_id": "api_design",
+      "skill_name": "API design and integration",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "api design",
+        "api integration",
+        "api integrations",
+        "designing apis",
+        "building apis",
+        "(?:design(?:ing)?|building|developing) (?:clean and maintainable |thoughtful and robust |web |REST )?apis?",
+        "api architecture"
+      ]
+    },
+    {
+      "skill_id": "mobile_development",
+      "skill_name": "Mobile development",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "mobile development",
+        "mobile applications?",
+        "ios development",
+        "android development"
+      ]
+    },
+    {
+      "skill_id": "sql",
+      "skill_name": "SQL",
+      "category": "query_language",
+      "group": null,
+      "patterns": [
+        "\\bsql\\b"
+      ]
+    },
+    {
+      "skill_id": "postgresql",
+      "skill_name": "PostgreSQL",
+      "category": "relational_database",
+      "group": "relational_databases",
+      "patterns": [
+        "postgresql",
+        "postgres"
+      ]
+    },
+    {
+      "skill_id": "mysql",
+      "skill_name": "MySQL",
+      "category": "relational_database",
+      "group": "relational_databases",
+      "patterns": [
+        "mysql"
+      ]
+    },
+    {
+      "skill_id": "sql_server",
+      "skill_name": "SQL Server",
+      "category": "relational_database",
+      "group": "relational_databases",
+      "patterns": [
+        "sql server",
+        "mssql"
+      ]
+    },
+    {
+      "skill_id": "oracle_database",
+      "skill_name": "Oracle Database",
+      "category": "relational_database",
+      "group": "relational_databases",
+      "patterns": [
+        "oracle database",
+        "oracle db"
+      ]
+    },
+    {
+      "skill_id": "sqlite",
+      "skill_name": "SQLite",
+      "category": "relational_database",
+      "group": "relational_databases",
+      "patterns": [
+        "sqlite"
+      ]
+    },
+    {
+      "skill_id": "mongodb",
+      "skill_name": "MongoDB",
+      "category": "nosql_database",
+      "group": "nosql_databases",
+      "patterns": [
+        "mongodb",
+        "mongo db"
+      ]
+    },
+    {
+      "skill_id": "redis",
+      "skill_name": "Redis",
+      "category": "nosql_database",
+      "group": "nosql_databases",
+      "patterns": [
+        "redis"
+      ]
+    },
+    {
+      "skill_id": "dynamodb",
+      "skill_name": "DynamoDB",
+      "category": "nosql_database",
+      "group": "nosql_databases",
+      "patterns": [
+        "dynamodb"
+      ]
+    },
+    {
+      "skill_id": "cassandra",
+      "skill_name": "Cassandra",
+      "category": "nosql_database",
+      "group": "nosql_databases",
+      "patterns": [
+        "cassandra"
+      ]
+    },
+    {
+      "skill_id": "elasticsearch",
+      "skill_name": "Elasticsearch",
+      "category": "search_database",
+      "group": null,
+      "patterns": [
+        "elasticsearch",
+        "elastic search"
+      ]
+    },
+    {
+      "skill_id": "snowflake",
+      "skill_name": "Snowflake",
+      "category": "data_warehouse",
+      "group": "data_warehouses",
+      "patterns": [
+        "snowflake"
+      ]
+    },
+    {
+      "skill_id": "bigquery",
+      "skill_name": "BigQuery",
+      "category": "data_warehouse",
+      "group": "data_warehouses",
+      "patterns": [
+        "bigquery",
+        "big query"
+      ]
+    },
+    {
+      "skill_id": "redshift",
+      "skill_name": "Amazon Redshift",
+      "category": "data_warehouse",
+      "group": "data_warehouses",
+      "patterns": [
+        "redshift"
+      ]
+    },
+    {
+      "skill_id": "databricks",
+      "skill_name": "Databricks",
+      "category": "data_platform",
+      "group": "data_platforms",
+      "patterns": [
+        "databricks"
+      ]
+    },
+    {
+      "skill_id": "spark",
+      "skill_name": "Apache Spark",
+      "category": "data_processing",
+      "group": "data_processing_frameworks",
+      "patterns": [
+        "apache spark",
+        "\\bspark\\b"
+      ]
+    },
+    {
+      "skill_id": "pyspark",
+      "skill_name": "PySpark",
+      "category": "data_processing",
+      "group": "data_processing_frameworks",
+      "patterns": [
+        "pyspark"
+      ]
+    },
+    {
+      "skill_id": "hadoop",
+      "skill_name": "Hadoop",
+      "category": "data_processing",
+      "group": "data_processing_frameworks",
+      "patterns": [
+        "hadoop"
+      ]
+    },
+    {
+      "skill_id": "flink",
+      "skill_name": "Apache Flink",
+      "category": "data_processing",
+      "group": "data_processing_frameworks",
+      "patterns": [
+        "apache flink",
+        "\\bflink\\b"
+      ]
+    },
+    {
+      "skill_id": "kafka",
+      "skill_name": "Apache Kafka",
+      "category": "streaming_platform",
+      "group": "streaming_platforms",
+      "patterns": [
+        "apache kafka",
+        "\\bkafka\\b"
+      ]
+    },
+    {
+      "skill_id": "airflow",
+      "skill_name": "Apache Airflow",
+      "category": "orchestration_tool",
+      "group": "workflow_orchestration",
+      "patterns": [
+        "apache airflow",
+        "\\bairflow\\b"
+      ]
+    },
+    {
+      "skill_id": "flyte",
+      "skill_name": "Flyte",
+      "category": "orchestration_tool",
+      "group": "workflow_orchestration",
+      "patterns": [
+        "\\bflyte\\b"
+      ]
+    },
+    {
+      "skill_id": "dagster",
+      "skill_name": "Dagster",
+      "category": "orchestration_tool",
+      "group": "workflow_orchestration",
+      "patterns": [
+        "dagster"
+      ]
+    },
+    {
+      "skill_id": "prefect",
+      "skill_name": "Prefect",
+      "category": "orchestration_tool",
+      "group": "workflow_orchestration",
+      "patterns": [
+        "prefect"
+      ]
+    },
+    {
+      "skill_id": "dbt",
+      "skill_name": "dbt",
+      "category": "data_transformation_tool",
+      "group": null,
+      "patterns": [
+        "\\bdbt\\b"
+      ]
+    },
+    {
+      "skill_id": "pandas",
+      "skill_name": "pandas",
+      "category": "data_library",
+      "group": "python_data_libraries",
+      "patterns": [
+        "pandas"
+      ]
+    },
+    {
+      "skill_id": "numpy",
+      "skill_name": "NumPy",
+      "category": "data_library",
+      "group": "python_data_libraries",
+      "patterns": [
+        "numpy"
+      ]
+    },
+    {
+      "skill_id": "tableau",
+      "skill_name": "Tableau",
+      "category": "bi_tool",
+      "group": "bi_tools",
+      "patterns": [
+        "tableau"
+      ]
+    },
+    {
+      "skill_id": "power_bi",
+      "skill_name": "Power BI",
+      "category": "bi_tool",
+      "group": "bi_tools",
+      "patterns": [
+        "power\\s*bi"
+      ]
+    },
+    {
+      "skill_id": "looker",
+      "skill_name": "Looker",
+      "category": "bi_tool",
+      "group": "bi_tools",
+      "patterns": [
+        "looker"
+      ]
+    },
+    {
+      "skill_id": "excel",
+      "skill_name": "Excel",
+      "category": "analysis_tool",
+      "group": "spreadsheet_tools",
+      "patterns": [
+        "microsoft excel",
+        "\\bexcel\\b"
+      ]
+    },
+    {
+      "skill_id": "google_sheets",
+      "skill_name": "Google Sheets",
+      "category": "analysis_tool",
+      "group": "spreadsheet_tools",
+      "patterns": [
+        "google sheets"
+      ]
+    },
+    {
+      "skill_id": "aws",
+      "skill_name": "AWS",
+      "category": "cloud_platform",
+      "group": "cloud_platforms",
+      "patterns": [
+        "amazon web services",
+        "\\baws\\b"
+      ]
+    },
+    {
+      "skill_id": "azure",
+      "skill_name": "Microsoft Azure",
+      "category": "cloud_platform",
+      "group": "cloud_platforms",
+      "patterns": [
+        "microsoft azure",
+        "\\bazure\\b"
+      ]
+    },
+    {
+      "skill_id": "gcp",
+      "skill_name": "Google Cloud Platform",
+      "category": "cloud_platform",
+      "group": "cloud_platforms",
+      "patterns": [
+        "google cloud platform",
+        "google cloud",
+        "\\bgcp\\b"
+      ]
+    },
+    {
+      "skill_id": "docker",
+      "skill_name": "Docker",
+      "category": "container_technology",
+      "group": "container_technologies",
+      "patterns": [
+        "docker"
+      ]
+    },
+    {
+      "skill_id": "kubernetes",
+      "skill_name": "Kubernetes",
+      "category": "container_orchestration",
+      "group": null,
+      "patterns": [
+        "kubernetes",
+        "\\bk8s\\b"
+      ]
+    },
+    {
+      "skill_id": "terraform",
+      "skill_name": "Terraform",
+      "category": "infrastructure_as_code",
+      "group": "infrastructure_as_code_tools",
+      "patterns": [
+        "terraform"
+      ]
+    },
+    {
+      "skill_id": "cloudformation",
+      "skill_name": "CloudFormation",
+      "category": "infrastructure_as_code",
+      "group": "infrastructure_as_code_tools",
+      "patterns": [
+        "cloudformation",
+        "cloud formation"
+      ]
+    },
+    {
+      "skill_id": "linux",
+      "skill_name": "Linux",
+      "category": "operating_system",
+      "group": null,
+      "patterns": [
+        "linux",
+        "unix"
+      ]
+    },
+    {
+      "skill_id": "git",
+      "skill_name": "Git",
+      "category": "version_control",
+      "group": null,
+      "patterns": [
+        "\\bgit\\b",
+        "github",
+        "gitlab"
+      ]
+    },
+    {
+      "skill_id": "bazel",
+      "skill_name": "Bazel",
+      "category": "build_tool",
+      "group": "build_tools",
+      "patterns": [
+        "bazel"
+      ]
+    },
+    {
+      "skill_id": "make",
+      "skill_name": "Make",
+      "category": "build_tool",
+      "group": "build_tools",
+      "patterns": [
+        "\\bmakefiles?\\b",
+        "\\bgnu make\\b"
+      ]
+    },
+    {
+      "skill_id": "gradle",
+      "skill_name": "Gradle",
+      "category": "build_tool",
+      "group": "build_tools",
+      "patterns": [
+        "gradle"
+      ]
+    },
+    {
+      "skill_id": "buck",
+      "skill_name": "Buck",
+      "category": "build_tool",
+      "group": "build_tools",
+      "patterns": [
+        "\\bbuck\\b"
+      ]
+    },
+    {
+      "skill_id": "pants",
+      "skill_name": "Pants",
+      "category": "build_tool",
+      "group": "build_tools",
+      "patterns": [
+        "pants build"
+      ]
+    },
+    {
+      "skill_id": "npm",
+      "skill_name": "npm",
+      "category": "package_manager",
+      "group": "package_management_tools",
+      "patterns": [
+        "\\bnpm\\b"
+      ]
+    },
+    {
+      "skill_id": "pip",
+      "skill_name": "pip",
+      "category": "package_manager",
+      "group": "package_management_tools",
+      "patterns": [
+        "\\bpip\\b"
+      ]
+    },
+    {
+      "skill_id": "cicd",
+      "skill_name": "CI/CD",
+      "category": "software_delivery",
+      "group": null,
+      "patterns": [
+        "ci\\s*/\\s*cd",
+        "continuous integration",
+        "continuous delivery",
+        "continuous deployment",
+        "\\b(?:CI|CD) (?:pipelines?|workflows?|systems?)"
+      ]
+    },
+    {
+      "skill_id": "devops",
+      "skill_name": "DevOps",
+      "category": "software_delivery",
+      "group": null,
+      "patterns": [
+        "devops"
+      ]
+    },
+    {
+      "skill_id": "mlops",
+      "skill_name": "MLOps",
+      "category": "ml_engineering",
+      "group": null,
+      "patterns": [
+        "mlops",
+        "machine learning operations"
+      ]
+    },
+    {
+      "skill_id": "observability",
+      "skill_name": "Observability",
+      "category": "software_operations",
+      "group": null,
+      "patterns": [
+        "observability",
+        "monitoring and alerting",
+        "logging and monitoring"
+      ]
+    },
+    {
+      "skill_id": "networking",
+      "skill_name": "Computer networking",
+      "category": "systems_engineering",
+      "group": null,
+      "patterns": [
+        "computer networking",
+        "network protocols?",
+        "tcp\\s*/\\s*ip",
+        "\\budp\\b",
+        "networking knowledge"
+      ]
+    },
+    {
+      "skill_id": "gpu_computing",
+      "skill_name": "GPU computing",
+      "category": "systems_engineering",
+      "group": null,
+      "patterns": [
+        "gpu computing",
+        "gpu infrastructure",
+        "gpu deployment",
+        "\\bcuda\\b",
+        "\\bnccl\\b",
+        "GPU programming",
+        "GPU time"
+      ]
+    },
+    {
+      "skill_id": "systems_programming",
+      "skill_name": "Systems programming",
+      "category": "systems_engineering",
+      "group": null,
+      "patterns": [
+        "systems programming",
+        "kernel development",
+        "device drivers?",
+        "operating system internals",
+        "(?:device|peripheral) drivers?",
+        "kernel programming"
+      ]
+    },
+    {
+      "skill_id": "real_time_systems",
+      "skill_name": "Real-time systems",
+      "category": "systems_engineering",
+      "group": null,
+      "patterns": [
+        "real[- ]time systems?",
+        "real[- ]time rendering",
+        "resource[- ]constrained"
+      ]
+    },
+    {
+      "skill_id": "debugging",
+      "skill_name": "Debugging",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "\\bdebugging\\b",
+        "debug complex",
+        "debug services?",
+        "troubleshoot(?:ing)?",
+        "\\bdebug\\b",
+        "diagnos(?:e|ing) .{0,20}(?:issues|failures)"
+      ]
+    },
+    {
+      "skill_id": "version_control",
+      "skill_name": "Version control",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "version control",
+        "source[- ]control"
+      ]
+    },
+    {
+      "skill_id": "configuration_management",
+      "skill_name": "Configuration management",
+      "category": "software_operations",
+      "group": null,
+      "patterns": [
+        "configuration management"
+      ]
+    },
+    {
+      "skill_id": "identity_protocols",
+      "skill_name": "Identity and access protocols",
+      "category": "security",
+      "group": null,
+      "patterns": [
+        "oauth(?:\\s*2\\.0)?",
+        "\\boidc\\b",
+        "\\bsaml\\b",
+        "identity protocols?"
+      ]
+    },
+    {
+      "skill_id": "hardware_security",
+      "skill_name": "Hardware security",
+      "category": "security",
+      "group": null,
+      "patterns": [
+        "trusted platform modules?",
+        "\\btpms?\\b",
+        "hardware security modules?",
+        "\\bhsms?\\b"
+      ]
+    },
+    {
+      "skill_id": "machine_learning",
+      "skill_name": "Machine learning",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "machine learning",
+        "\\bml models?\\b",
+        "\\bml systems?\\b",
+        "machine[- ]learning",
+        "\\bML engineering\\b"
+      ]
+    },
+    {
+      "skill_id": "deep_learning",
+      "skill_name": "Deep learning",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "deep learning",
+        "neural networks?"
+      ]
+    },
+    {
+      "skill_id": "generative_ai",
+      "skill_name": "Generative AI",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "generative ai",
+        "genai",
+        "gen ai"
+      ]
+    },
+    {
+      "skill_id": "llm",
+      "skill_name": "Large language models",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "large language models?",
+        "\\bllms?\\b",
+        "large[- ]language[- ]models?"
+      ]
+    },
+    {
+      "skill_id": "ai_agents",
+      "skill_name": "AI agents",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "ai agents?",
+        "agentic (?:ai|systems?|workflows?)",
+        "multi[- ]agent systems?",
+        "autonomous agents?",
+        "agent frameworks?",
+        "building agents with"
+      ]
+    },
+    {
+      "skill_id": "rag",
+      "skill_name": "Retrieval-augmented generation",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "retrieval[- ]augmented generation",
+        "\\brag\\b"
+      ]
+    },
+    {
+      "skill_id": "model_context_protocol",
+      "skill_name": "Model Context Protocol",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "model context protocol",
+        "\\bmcp servers?\\b",
+        "public mcp",
+        "\\bMCP\\b"
+      ]
+    },
+    {
+      "skill_id": "nlp",
+      "skill_name": "Natural language processing",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "natural language processing",
+        "\\bnlp\\b"
+      ]
+    },
+    {
+      "skill_id": "computer_vision",
+      "skill_name": "Computer vision",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "computer vision"
+      ]
+    },
+    {
+      "skill_id": "recommendation_systems",
+      "skill_name": "Recommendation systems",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "recommend(?:ation|er) systems?",
+        "ranking systems?"
+      ]
+    },
+    {
+      "skill_id": "pytorch",
+      "skill_name": "PyTorch",
+      "category": "ml_framework",
+      "group": "ml_frameworks",
+      "patterns": [
+        "pytorch"
+      ]
+    },
+    {
+      "skill_id": "tensorflow",
+      "skill_name": "TensorFlow",
+      "category": "ml_framework",
+      "group": "ml_frameworks",
+      "patterns": [
+        "tensorflow"
+      ]
+    },
+    {
+      "skill_id": "scikit_learn",
+      "skill_name": "scikit-learn",
+      "category": "ml_framework",
+      "group": "ml_frameworks",
+      "patterns": [
+        "scikit[- ]learn",
+        "sklearn"
+      ]
+    },
+    {
+      "skill_id": "xgboost",
+      "skill_name": "XGBoost",
+      "category": "ml_framework",
+      "group": "ml_frameworks",
+      "patterns": [
+        "xgboost"
+      ]
+    },
+    {
+      "skill_id": "keras",
+      "skill_name": "Keras",
+      "category": "ml_framework",
+      "group": "ml_frameworks",
+      "patterns": [
+        "keras"
+      ]
+    },
+    {
+      "skill_id": "model_training",
+      "skill_name": "Model training",
+      "category": "ml_engineering",
+      "group": null,
+      "patterns": [
+        "model training",
+        "training (?:machine learning |ml )?models?",
+        "train(?:ing)? and evaluat(?:e|ing) (?:machine learning |ml )?models?",
+        "train(?:ing)? (?:ML|AI|language|foundation) models?"
+      ]
+    },
+    {
+      "skill_id": "model_evaluation",
+      "skill_name": "Model evaluation",
+      "category": "ml_engineering",
+      "group": null,
+      "patterns": [
+        "model evaluation",
+        "evaluating (?:machine learning |ml )?models?",
+        "model performance",
+        "language model evaluation",
+        "LLM (?:evaluation|evals?|benchmarking)",
+        "evaluat(?:e|ing) AI (?:systems|models)"
+      ]
+    },
+    {
+      "skill_id": "model_deployment",
+      "skill_name": "Model deployment",
+      "category": "ml_engineering",
+      "group": null,
+      "patterns": [
+        "model deployment",
+        "deploy(?:ing|ed)? (?:machine learning |ml )?models?",
+        "model serving",
+        "deploy(?:ing|ed)? (?:AI|LLM) models?",
+        "productionizing LLM"
+      ]
+    },
+    {
+      "skill_id": "feature_engineering",
+      "skill_name": "Feature engineering",
+      "category": "ml_engineering",
+      "group": null,
+      "patterns": [
+        "feature engineering",
+        "feature pipelines?",
+        "feature stores?"
+      ]
+    },
+    {
+      "skill_id": "statistics",
+      "skill_name": "Statistics",
+      "category": "quantitative",
+      "group": null,
+      "patterns": [
+        "statistical (?:analysis|modeling|methods?|techniques?)",
+        "\\bstatistics\\b",
+        "\\bstatistical\\b"
+      ]
+    },
+    {
+      "skill_id": "experiment_design",
+      "skill_name": "Experiment design",
+      "category": "quantitative",
+      "group": null,
+      "patterns": [
+        "experiment design",
+        "design(?:ing)? experiments?",
+        "experimental design"
+      ]
+    },
+    {
+      "skill_id": "ab_testing",
+      "skill_name": "A/B testing",
+      "category": "quantitative",
+      "group": null,
+      "patterns": [
+        "a\\s*/\\s*b test(?:ing|s)?",
+        "ab test(?:ing|s)?"
+      ]
+    },
+    {
+      "skill_id": "causal_inference",
+      "skill_name": "Causal inference",
+      "category": "quantitative",
+      "group": null,
+      "patterns": [
+        "causal inference",
+        "causal analysis"
+      ]
+    },
+    {
+      "skill_id": "optimization",
+      "skill_name": "Optimization",
+      "category": "quantitative",
+      "group": null,
+      "patterns": [
+        "optimization techniques?",
+        "mathematical optimization"
+      ]
+    },
+    {
+      "skill_id": "data_analysis",
+      "skill_name": "Data analysis",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "data analysis",
+        "analy(?:ze|zing|sis of) data",
+        "analysing data",
+        "analy[sz]e .{0,20}datasets?"
+      ]
+    },
+    {
+      "skill_id": "data_visualization",
+      "skill_name": "Data visualization",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "data visualization",
+        "visualizing data",
+        "data visualisations?"
+      ]
+    },
+    {
+      "skill_id": "data_modeling",
+      "skill_name": "Data modeling",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "data model(?:ing|ling)",
+        "dimensional modeling",
+        "(?:database|relational) schema design",
+        "design(?:ing)? (?:relational |database )schemas"
+      ]
+    },
+    {
+      "skill_id": "data_pipelines",
+      "skill_name": "Data pipelines",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "data pipelines?",
+        "data ingestion pipelines?"
+      ]
+    },
+    {
+      "skill_id": "etl",
+      "skill_name": "ETL/ELT",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "\\betl\\b",
+        "\\belt\\b",
+        "extract[, ]+transform[, ]+(?:and )?load"
+      ]
+    },
+    {
+      "skill_id": "data_warehousing",
+      "skill_name": "Data warehousing",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "data warehous(?:e|es|ing)"
+      ]
+    },
+    {
+      "skill_id": "dashboarding",
+      "skill_name": "Dashboarding and reporting",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "dashboards?",
+        "business reporting",
+        "reporting solutions?"
+      ]
+    },
+    {
+      "skill_id": "business_intelligence",
+      "skill_name": "Business intelligence",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "business intelligence",
+        "\\bbi solutions?\\b"
+      ]
+    },
+    {
+      "skill_id": "distributed_systems",
+      "skill_name": "Distributed systems",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "distributed systems?",
+        "distributed computing",
+        "distributed[- ]systems?"
+      ]
+    },
+    {
+      "skill_id": "microservices",
+      "skill_name": "Microservices",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "microservices?",
+        "service[- ]oriented architecture",
+        "\\bsoa\\b"
+      ]
+    },
+    {
+      "skill_id": "system_design",
+      "skill_name": "System design",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "system[- ]design",
+        "systems[- ]design",
+        "designing scalable systems?"
+      ]
+    },
+    {
+      "skill_id": "data_structures_algorithms",
+      "skill_name": "Data structures and algorithms",
+      "category": "computer_science",
+      "group": null,
+      "patterns": [
+        "data structures? and algorithms?",
+        "algorithms? and data structures?",
+        "algorithmic problem solving"
+      ]
+    },
+    {
+      "skill_id": "algorithms",
+      "skill_name": "Algorithms",
+      "category": "computer_science",
+      "group": null,
+      "patterns": [
+        "technical proficiency in algorithms?",
+        "algorithm design",
+        "algorithm development",
+        "complex algorithms?"
+      ]
+    },
+    {
+      "skill_id": "software_testing",
+      "skill_name": "Software testing",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "software testing",
+        "expertise in testing",
+        "unit test(?:ing|s)?",
+        "integration test(?:ing|s)?",
+        "automated test(?:ing|s)?",
+        "test automation",
+        "testing frameworks?",
+        "test software",
+        "test[- ]driven development",
+        "\\bTDD\\b",
+        "test coverage",
+        "testing software"
+      ]
+    },
+    {
+      "skill_id": "software_architecture",
+      "skill_name": "Software architecture",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "software architecture",
+        "application architecture",
+        "systems architecture",
+        "production architecture"
+      ]
+    },
+    {
+      "skill_id": "object_oriented_programming",
+      "skill_name": "Object-oriented programming",
+      "category": "computer_science",
+      "group": null,
+      "patterns": [
+        "object[- ]oriented (?:programming|design)",
+        "\\boop\\b",
+        "object[- ]oriented languages?"
+      ]
+    },
+    {
+      "skill_id": "security",
+      "skill_name": "Security engineering",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "security engineering",
+        "application security",
+        "cybersecurity",
+        "secure coding",
+        "secure software"
+      ]
+    },
+    {
+      "skill_id": "performance_optimization",
+      "skill_name": "Performance optimization",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "performance optimization",
+        "performance tuning",
+        "optimiz(?:e|ing) performance",
+        "application performance",
+        "performance bottlenecks?",
+        "performance[- ]improvement",
+        "profiling and improving",
+        "optimi[sz](?:e|ing) (?:system )?performance"
+      ]
+    },
+    {
+      "skill_id": "technical_writing",
+      "skill_name": "Technical writing and documentation",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "technical writing",
+        "technical documentation",
+        "documenting technical",
+        "documentation(?: and whiteboarding)? skills?",
+        "create (?:tools, )?documentation",
+        "well[- ]documented code",
+        "creating .{0,15}documentation",
+        "write technical documentation"
+      ]
+    },
+    {
+      "skill_id": "software_design",
+      "skill_name": "Software design",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "software design",
+        "designing software systems?",
+        "design and development skills?"
+      ]
+    },
+    {
+      "skill_id": "code_quality",
+      "skill_name": "Code quality",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "code quality",
+        "high[- ]quality code",
+        "maintainable code",
+        "well[- ]tested(?:,| and)? extensible code",
+        "clean code",
+        "well[- ]tested,?(?: and)? extensible code",
+        "well[- ]tested,? and extensible code",
+        "well[- ]structured,? maintainable",
+        "clean,? (?:effective|maintainable) code"
+      ]
+    },
+    {
+      "skill_id": "code_review",
+      "skill_name": "Code review",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "code reviews?",
+        "reviewing code",
+        "feedback on code"
+      ]
+    },
+    {
+      "skill_id": "build_systems",
+      "skill_name": "Build systems",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "build systems?",
+        "build tooling"
+      ]
+    },
+    {
+      "skill_id": "package_management",
+      "skill_name": "Package management",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "package[- ]management",
+        "package managers?"
+      ]
+    },
+    {
+      "skill_id": "search_retrieval",
+      "skill_name": "Search and retrieval systems",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "search (?:systems?|platforms?|infrastructure)",
+        "retrieval systems?",
+        "search or retrieval"
+      ]
+    },
+    {
+      "skill_id": "lucene",
+      "skill_name": "Apache Lucene",
+      "category": "search_technology",
+      "group": null,
+      "patterns": [
+        "\\blucene\\b"
+      ]
+    },
+    {
+      "skill_id": "vector_databases",
+      "skill_name": "Vector databases",
+      "category": "database_technology",
+      "group": null,
+      "patterns": [
+        "vector databases?",
+        "vector search",
+        "vector similarity"
+      ]
+    },
+    {
+      "skill_id": "time_series_data",
+      "skill_name": "Time-series and log data",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "time[- ]series",
+        "logs data",
+        "log data"
+      ]
+    },
+    {
+      "skill_id": "event_driven_architecture",
+      "skill_name": "Event-driven architecture",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "event[- ]driven",
+        "event based architecture"
+      ]
+    },
+    {
+      "skill_id": "workflow_engines",
+      "skill_name": "Workflow engines",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "workflow engines?",
+        "routing systems?",
+        "finite state machines?",
+        "bpm[- ]style"
+      ]
+    },
+    {
+      "skill_id": "cryptography",
+      "skill_name": "Cryptography",
+      "category": "security",
+      "group": null,
+      "patterns": [
+        "cryptography",
+        "cryptographic"
+      ]
+    },
+    {
+      "skill_id": "incident_response",
+      "skill_name": "Incident response",
+      "category": "security",
+      "group": null,
+      "patterns": [
+        "incident response"
+      ]
+    },
+    {
+      "skill_id": "automation",
+      "skill_name": "Automation",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "automat(?:e|ed|ing|ion) (?:highly )?(?:manual |repetitive |operational )?(?:tasks?|workflows?|processes?)",
+        "passion for automation"
+      ]
+    },
+    {
+      "skill_id": "ai_assisted_development",
+      "skill_name": "AI-assisted development",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "ai[- ]assisted development",
+        "ai coding assistants?",
+        "ai tools? to accelerate",
+        "using ai to accelerate development",
+        "using ai tools?"
+      ]
+    },
+    {
+      "skill_id": "backend_development",
+      "skill_name": "Backend development",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "back[- ]end development",
+        "backend engineering",
+        "backend systems?",
+        "back[- ]end (?:systems?|applications?)"
+      ]
+    },
+    {
+      "skill_id": "frontend_development",
+      "skill_name": "Frontend development",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "front[- ]end development",
+        "frontend engineering",
+        "single[- ]page (?:web )?applications?"
+      ]
+    },
+    {
+      "skill_id": "full_stack_development",
+      "skill_name": "Full-stack development",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "full[- ]stack development",
+        "full stack engineering",
+        "full[- ]stack (?:systems?|applications?)"
+      ]
+    },
+    {
+      "skill_id": "database_systems",
+      "skill_name": "Database systems",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "working with databases?",
+        "database systems?"
+      ]
+    },
+    {
+      "skill_id": "large_scale_data",
+      "skill_name": "Large-scale data",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "large[- ]scale data",
+        "massive data sets?",
+        "large datasets?"
+      ]
+    },
+    {
+      "skill_id": "telemetry",
+      "skill_name": "Telemetry",
+      "category": "software_operations",
+      "group": null,
+      "patterns": [
+        "\\btelemetry\\b",
+        "instrument(?:ing)? (?:new )?events?(?: or telemetry)? data",
+        "event instrumentation"
+      ]
+    },
+    {
+      "skill_id": "salesforce",
+      "skill_name": "Salesforce",
+      "category": "business_system",
+      "group": null,
+      "patterns": [
+        "salesforce"
+      ]
+    },
+    {
+      "skill_id": "crm",
+      "skill_name": "CRM systems",
+      "category": "business_system",
+      "group": null,
+      "patterns": [
+        "\\bcrm\\b",
+        "customer relationship management"
+      ]
+    },
+    {
+      "skill_id": "web_analytics",
+      "skill_name": "Web analytics",
+      "category": "data_capability",
+      "group": null,
+      "patterns": [
+        "web analytics"
+      ]
+    },
+    {
+      "skill_id": "software_engineering",
+      "skill_name": "Software engineering",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "software engineering skills?",
+        "software engineering background",
+        "software engineering best practices?"
+      ]
+    },
+    {
+      "skill_id": "reliability_scalability",
+      "skill_name": "Reliability and scalability",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "reliability,? scalability",
+        "reliable and scalable",
+        "scalability and reliability",
+        "high[- ]reliability"
+      ]
+    },
+    {
+      "skill_id": "developer_tooling",
+      "skill_name": "Developer tooling",
+      "category": "software_engineering",
+      "group": null,
+      "patterns": [
+        "developer tool(?:ing|s)",
+        "developer productivity",
+        "development tooling"
+      ]
+    },
+    {
+      "skill_id": "communication",
+      "skill_name": "Communication",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "communication(?!\\s+protocols?)",
+        "communicat(?:e|ing) (?:clearly|effectively|complex|technical)",
+        "written and verbal communication",
+        "written and oral communication"
+      ]
+    },
+    {
+      "skill_id": "collaboration",
+      "skill_name": "Collaboration",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "\\bcollaboration\\b",
+        "\\bcollaborative\\b",
+        "collaborat(?:e|ing) with",
+        "teamwork",
+        "team player",
+        "cross[- ]functional (?:work|partnership)",
+        "collaborat(?:e|ing) (?:across|in|on)",
+        "work(?:ing)? (?:effectively )?(?:cross[- ]functionally|across teams|as part of a .{0,45}team)",
+        "work(?:ing)? with .{0,25}teams"
+      ]
+    },
+    {
+      "skill_id": "leadership",
+      "skill_name": "Leadership",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "leadership skills?",
+        "technical leadership",
+        "team leadership",
+        "leading (?:teams?|projects?|initiatives?)",
+        "lead(?:ing)? large[- ]scale projects?",
+        "lead(?:ing)? (?:large[- ]scale )?engineering (?:teams|projects)"
+      ]
+    },
+    {
+      "skill_id": "mentoring",
+      "skill_name": "Mentoring",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "mentor(?:ing|ship)?",
+        "coach(?:ing)? (?:engineers?|team members?)"
+      ]
+    },
+    {
+      "skill_id": "problem_solving",
+      "skill_name": "Problem solving",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "problem[- ]solving",
+        "solve complex problems?",
+        "analytical problem solving",
+        "solve .{0,20}(?:complex )?problems",
+        "solving complex problems"
+      ]
+    },
+    {
+      "skill_id": "stakeholder_management",
+      "skill_name": "Stakeholder management",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "stakeholder management",
+        "manage(?:ment|ing) of stakeholders?",
+        "partner(?:ing)? with stakeholders?"
+      ]
+    },
+    {
+      "skill_id": "project_management",
+      "skill_name": "Project management",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "project management",
+        "program management",
+        "manage(?:ment|ing) (?:complex )?projects?"
+      ]
+    },
+    {
+      "skill_id": "product_management",
+      "skill_name": "Product management",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "product management",
+        "product strategy",
+        "product development lifecycle"
+      ]
+    },
+    {
+      "skill_id": "customer_facing",
+      "skill_name": "Customer-facing delivery",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "customer[- ]facing",
+        "client[- ]facing",
+        "working with customers?",
+        "working with clients?"
+      ]
+    },
+    {
+      "skill_id": "ownership",
+      "skill_name": "Ownership and autonomy",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "\\bownership\\b",
+        "take ownership",
+        "work independently",
+        "independent(?:ly)?",
+        "autonom(?:y|ous|ously)",
+        "self[- ]directed",
+        "projects? from (?:beginning|start) to end"
+      ]
+    },
+    {
+      "skill_id": "agile",
+      "skill_name": "Agile delivery",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "agile methodologies?",
+        "agile development",
+        "\\bscrum\\b",
+        "\\bkanban\\b"
+      ]
+    },
+    {
+      "skill_id": "requirements_analysis",
+      "skill_name": "Requirements analysis",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "requirements analysis",
+        "gather(?:ing)? requirements?",
+        "translate business requirements?",
+        "technical requirements?"
+      ]
+    },
+    {
+      "skill_id": "adaptability",
+      "skill_name": "Adaptability",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "adaptab(?:le|ility)",
+        "dynamic environment",
+        "changing needs and requirements",
+        "rapidly changing environment",
+        "constantly evolving environment"
+      ]
+    },
+    {
+      "skill_id": "ambiguity_management",
+      "skill_name": "Working through ambiguity",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "\\bambiguity\\b",
+        "ambiguous problems?",
+        "uncertain(?:ty)?"
+      ]
+    },
+    {
+      "skill_id": "learning_agility",
+      "skill_name": "Learning agility",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "learn new technologies?",
+        "learn quickly",
+        "willingness to learn",
+        "ability to learn",
+        "curiosity",
+        "eagerness to learn",
+        "learn new languages?",
+        "continuously (?:learn|grow)",
+        "stay current with .{0,35}(?:technologies|developments)"
+      ]
+    },
+    {
+      "skill_id": "decision_making",
+      "skill_name": "Decision making",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "decision[- ]making",
+        "make (?:fast,? )?(?:sound |technical )?decisions?",
+        "drive decisions?",
+        "technical judgment",
+        "professional judg(?:e)?ment"
+      ]
+    },
+    {
+      "skill_id": "conflict_management",
+      "skill_name": "Conflict management",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "conflict management",
+        "managing conflicts?",
+        "resolve conflicts?"
+      ]
+    },
+    {
+      "skill_id": "feedback",
+      "skill_name": "Giving and receiving feedback",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "giving and receiving feedback",
+        "seeking feedback",
+        "solicitation of feedback",
+        "proactively seek(?:ing)? feedback",
+        "(?:gathering|iterating on|receiving|giving|acting on) feedback",
+        "give and receive feedback"
+      ]
+    },
+    {
+      "skill_id": "prioritization",
+      "skill_name": "Prioritization",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "prioriti[sz](?:e|ing|ation)",
+        "business priorities"
+      ]
+    },
+    {
+      "skill_id": "customer_orientation",
+      "skill_name": "Customer and user focus",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "customer value",
+        "customer impact",
+        "user value",
+        "user impact",
+        "customer needs?",
+        "user needs?",
+        "customer[- ]focused mindset",
+        "customer experiences?",
+        "customer's problem"
+      ]
+    },
+    {
+      "skill_id": "execution",
+      "skill_name": "Technical execution and delivery",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "technical execution",
+        "deliver(?:ing)? technical projects?",
+        "execution plan",
+        "measurable outcomes?",
+        "incremental deliverables?",
+        "measurable business outcomes?"
+      ]
+    },
+    {
+      "skill_id": "attention_to_detail",
+      "skill_name": "Attention to detail",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "attention to detail"
+      ]
+    },
+    {
+      "skill_id": "strategic_thinking",
+      "skill_name": "Strategic thinking",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "strategic thinking",
+        "long[- ]term technical vision",
+        "multi[- ]year vision",
+        "see the big picture"
+      ]
+    },
+    {
+      "skill_id": "cross_functional_leadership",
+      "skill_name": "Cross-functional leadership",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "leading,? and owning cross[- ]functional initiatives?",
+        "lead(?:ing)? cross[- ]functional initiatives?",
+        "cross[- ]functional initiatives?"
+      ]
+    },
+    {
+      "skill_id": "influence_alignment",
+      "skill_name": "Influence and technical alignment",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "influence without authority",
+        "technical alignment",
+        "align technical strategy"
+      ]
+    },
+    {
+      "skill_id": "risk_management",
+      "skill_name": "Risk management",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "identify risks? early",
+        "spot risks? early",
+        "risk management"
+      ]
+    },
+    {
+      "skill_id": "working_under_pressure",
+      "skill_name": "Working under pressure",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "work(?:ing)? under pressure",
+        "when the stakes are high",
+        "under tight timelines?",
+        "think critically under pressure"
+      ]
+    },
+    {
+      "skill_id": "product_thinking",
+      "skill_name": "Product thinking",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "product thinking",
+        "product mindset",
+        "technical decisions affect the user",
+        "user[- ]focused mindset",
+        "product sensibility"
+      ]
+    },
+    {
+      "skill_id": "research_engineering",
+      "skill_name": "Research engineering",
+      "category": "professional_skill",
+      "group": null,
+      "patterns": [
+        "research exploration",
+        "engineering implementation",
+        "research breakthroughs?"
+      ]
+    },
+    {
+      "skill_id": "responsible_ai",
+      "skill_name": "Responsible AI",
+      "category": "ai_ml",
+      "group": null,
+      "patterns": [
+        "responsible ai",
+        "safe,? beneficial ai",
+        "ai risk mitigation"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "skill_id": "api_technologies",
+      "skill_name": "API technologies",
+      "category": "skill_group",
+      "description": "API technology experience"
+    },
+    {
+      "skill_id": "backend_frameworks",
+      "skill_name": "Backend frameworks",
+      "category": "skill_group",
+      "description": "Backend-framework experience"
+    },
+    {
+      "skill_id": "bi_tools",
+      "skill_name": "Business-intelligence tools",
+      "category": "skill_group",
+      "description": "Business-intelligence tool experience"
+    },
+    {
+      "skill_id": "build_tools",
+      "skill_name": "Build tools",
+      "category": "skill_group",
+      "description": "Build-tool experience"
+    },
+    {
+      "skill_id": "cloud_platforms",
+      "skill_name": "Cloud platforms",
+      "category": "skill_group",
+      "description": "Cloud-platform experience"
+    },
+    {
+      "skill_id": "container_technologies",
+      "skill_name": "Container technologies",
+      "category": "skill_group",
+      "description": "Container technology experience"
+    },
+    {
+      "skill_id": "data_platforms",
+      "skill_name": "Data platforms",
+      "category": "skill_group",
+      "description": "Data-platform experience"
+    },
+    {
+      "skill_id": "data_processing_frameworks",
+      "skill_name": "Data-processing frameworks",
+      "category": "skill_group",
+      "description": "Data-processing framework experience"
+    },
+    {
+      "skill_id": "data_warehouses",
+      "skill_name": "Data warehouses",
+      "category": "skill_group",
+      "description": "Data-warehouse platform experience"
+    },
+    {
+      "skill_id": "frontend_frameworks",
+      "skill_name": "Frontend frameworks",
+      "category": "skill_group",
+      "description": "Frontend-framework experience"
+    },
+    {
+      "skill_id": "infrastructure_as_code_tools",
+      "skill_name": "Infrastructure-as-code tools",
+      "category": "skill_group",
+      "description": "Infrastructure-as-code experience"
+    },
+    {
+      "skill_id": "ml_frameworks",
+      "skill_name": "Machine-learning frameworks",
+      "category": "skill_group",
+      "description": "Machine-learning framework experience"
+    },
+    {
+      "skill_id": "nosql_databases",
+      "skill_name": "NoSQL databases",
+      "category": "skill_group",
+      "description": "NoSQL-database experience"
+    },
+    {
+      "skill_id": "package_management_tools",
+      "skill_name": "Package-management tools",
+      "category": "skill_group",
+      "description": "Package-management tool experience"
+    },
+    {
+      "skill_id": "programming_languages",
+      "skill_name": "Programming languages",
+      "category": "skill_group",
+      "description": "Programming-language proficiency"
+    },
+    {
+      "skill_id": "python_data_libraries",
+      "skill_name": "Python data libraries",
+      "category": "skill_group",
+      "description": "Python data-library experience"
+    },
+    {
+      "skill_id": "relational_databases",
+      "skill_name": "Relational databases",
+      "category": "skill_group",
+      "description": "Relational-database experience"
+    },
+    {
+      "skill_id": "spreadsheet_tools",
+      "skill_name": "Spreadsheet tools",
+      "category": "skill_group",
+      "description": "Spreadsheet-tool proficiency"
+    },
+    {
+      "skill_id": "streaming_platforms",
+      "skill_name": "Streaming platforms",
+      "category": "skill_group",
+      "description": "Streaming-platform experience"
+    },
+    {
+      "skill_id": "web_technologies",
+      "skill_name": "Web technologies",
+      "category": "skill_group",
+      "description": "Web technology proficiency"
+    },
+    {
+      "skill_id": "workflow_orchestration",
+      "skill_name": "Workflow orchestration",
+      "category": "skill_group",
+      "description": "Workflow-orchestration experience"
+    }
+  ]
+}

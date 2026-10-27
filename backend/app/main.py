@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import health, job_postings, me, resumes, resources
+from app.api.routes import health, job_postings, me, resumes, resources, skill_gaps
 from app.core.config import get_settings
 
 settings = get_settings()
@@ -22,4 +22,7 @@ app.include_router(health.router)
 app.include_router(me.router)
 app.include_router(resumes.router)
 app.include_router(job_postings.router)
+
 app.include_router(resources.router)
+app.include_router(skill_gaps.router)
+

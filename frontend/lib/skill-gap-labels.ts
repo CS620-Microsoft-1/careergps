@@ -1,0 +1,38 @@
+/** Display labels only. Scoring and skill definitions remain in the backend v12 catalog. */
+export const SKILL_LABELS: Record<string, string> = {
+  programming: "Programming & languages", algorithms: "Algorithms & data structures",
+  object_oriented_design: "Object-oriented design", ai_assisted_development: "AI-assisted development",
+  system_design: "System design", backend_apis: "Backend & API development", frontend: "Frontend development",
+  distributed_systems: "Distributed systems", relational_sql: "SQL & relational databases",
+  nosql_search: "NoSQL & search", code_quality: "Code quality", testing: "Software testing",
+  debugging: "Debugging", code_review: "Code review", version_control: "Version control",
+  cloud: "Cloud platforms", containers: "Containers", delivery_automation: "CI/CD & delivery automation",
+  performance: "Performance analysis", observability_operations: "Observability & operations",
+  reliability: "Reliability", security: "Security", sql: "SQL", analytical_scripting: "Analytical scripting",
+  spreadsheets: "Spreadsheet analysis", data_analysis: "Data analysis", business_analytics: "Business analytics",
+  requirements_analysis: "Requirements analysis", statistics: "Statistics", experimentation: "Experimentation",
+  causal_inference: "Causal inference", data_pipelines: "Data pipelines", data_modeling: "Data modeling",
+  data_quality: "Data quality", dashboarding: "Dashboard development", data_visualization: "Data visualization",
+  bi_tools: "Business intelligence tools", warehousing: "Data warehousing",
+  large_scale_processing: "Large-scale processing", workflow_automation: "Workflow automation",
+  general_programming: "General programming", python: "Python development", software_engineering: "Software engineering",
+  machine_learning: "Machine learning", deep_learning: "Deep learning", math_statistics: "Mathematics & statistics",
+  data_preparation: "Data preparation", feature_engineering: "Feature engineering", model_training: "Model training",
+  fine_tuning: "Fine-tuning", model_evaluation: "Model evaluation", model_deployment: "Model deployment & serving",
+  mlops: "MLOps", ai_infrastructure: "AI infrastructure", generative_ai: "Generative AI",
+  llm: "Large language models", rag: "Retrieval-augmented generation", ai_agents: "Agents & tool use",
+  prompt_engineering: "Prompt engineering", vector_retrieval: "Vector representations & retrieval",
+};
+
+export const MODULE_LABELS: Record<string, string> = {
+  programming_foundations: "Programming foundations", application_system_design: "Applications & system design",
+  databases_data: "Databases & data", engineering_quality: "Engineering quality",
+  delivery_infrastructure: "Delivery & infrastructure", performance_operations: "Performance & operations",
+  security: "Security", query_scripting: "Queries & scripting", analysis_business: "Analysis & business",
+  statistics_experiments: "Statistics & experiments", data_preparation_modeling: "Data preparation & modeling",
+  dashboards_visualization: "Dashboards & visualization", platforms_automation: "Platforms & automation",
+  programming_engineering: "Programming & engineering", ml_foundations: "Machine learning foundations",
+  data_feature_engineering: "Data & feature engineering", training_adaptation: "Training & adaptation",
+  evaluation_experiments: "Evaluation & experiments", deployment_mlops: "Deployment & MLOps",
+  generative_llm_applications: "Generative AI applications",
+};

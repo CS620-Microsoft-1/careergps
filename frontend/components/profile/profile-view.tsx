@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CircleCheck } from "lucide-react";
+import { ProfileSkillSection } from "@/components/profile/profile-skill-section";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,13 +19,6 @@ type ProfileState = {
   me: MeResponse | null;
   saved: SavedResume | null;
 };
-
-// Placeholder until skill ratings come from the gap analysis (ADR-001); the résumé alone has no evidence levels.
-const SKILL_COLUMNS = [
-  { title: "Strong", dot: "bg-success" },
-  { title: "Some experience", dot: "bg-warning-fill" },
-  { title: "Not yet demonstrated", dot: "bg-danger" },
-];
 
 export function ProfileView() {
   const [state, setState] = useState<ProfileState>({
@@ -73,7 +67,7 @@ export function ProfileView() {
             Skills are rated by demonstrated evidence, not keywords.
           </p>
 
-          <SkillColumns />
+          <ProfileSkillSection />
 
           {classification && <ResumeSections classification={classification} />}
         </>
@@ -148,27 +142,6 @@ function IdentityCard({ state }: { state: ProfileState }) {
         )}
       </CardContent>
     </Card>
-  );
-}
-
-function SkillColumns() {
-  return (
-    <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {SKILL_COLUMNS.map(({ title, dot }) => (
-        <Card key={title} size="sm">
-          <CardContent>
-            <h3 className="flex items-center gap-2 text-sm">
-              <span aria-hidden className={`size-2 rounded-full ${dot}`} />
-              {title}
-              <span className="ml-auto font-normal text-muted-foreground">0</span>
-            </h3>
-            <p className="mt-3 border-t border-line-soft pt-3 text-control text-muted-foreground">
-              Skill ratings will appear here once the gap analysis is ready.
-            </p>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
   );
 }
 
