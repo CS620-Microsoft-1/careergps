@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Check, FileText, Search, Upload, X } from "lucide-react";
 
 import { ROLE_NAMES } from "@/components/career/route-parts";
@@ -35,11 +35,12 @@ type Goal = { family: JobFamily | null; level: ExperienceLevel | null; location:
 /**
  * Setup: 1 upload a résumé, 2 check what was read, 3 choose a target role. The account (or, for a
  * returning student, a new résumé version) is saved only at the end, then the route is calculated.
- * addRole: another destination. The student first picks the saved résumé (then only step 3) or a
- * new one (all three steps).
+ * ?step=role (addRole): another destination. The student first picks the saved résumé (then only
+ * step 3) or a new one (all three steps).
  */
-export function SetupFlow({ graduationYears, addRole = false }: { graduationYears: string[]; addRole?: boolean }) {
+export function SetupFlow({ graduationYears }: { graduationYears: string[] }) {
   const router = useRouter();
+  const addRole = useSearchParams().get("step") === "role";
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [file, setFile] = useState<File>();
   const [fileError, setFileError] = useState<string>();

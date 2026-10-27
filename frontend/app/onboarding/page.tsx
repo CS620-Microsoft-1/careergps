@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 import { SetupFlow } from "@/components/setup/setup-flow";
 import { getGraduationYears } from "@/lib/graduation-years";
 
 export const metadata: Metadata = { title: "Set up your route" };
 
-/** ?step=role: only choose another target role for the saved résumé (Add a destination). */
-export default async function OnboardingPage({ searchParams }: PageProps<"/onboarding">) {
-  const { step } = await searchParams;
-  return <SetupFlow graduationYears={await getGraduationYears()} addRole={step === "role"} />;
+export default async function OnboardingPage() {
+  const graduationYears = await getGraduationYears();
+  // ?step= is read in the browser (useSearchParams), so the flow renders below a Suspense boundary.
+  return (
+    <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
+      <SetupFlow graduationYears={graduationYears} />
+    </Suspense>
+  );
 }
