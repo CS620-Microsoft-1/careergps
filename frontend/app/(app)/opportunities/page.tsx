@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { BookOpen, CalendarDays, FolderGit2, GraduationCap, Users, type LucideIcon } from "lucide-react";
 
 import { EmptyState } from "@/components/common/empty-state";
+import { CertificationsPanel } from "@/components/resources/certifications-panel";
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -54,8 +55,11 @@ export default function OpportunitiesPage() {
         description="Projects, courses, and communities that turn your gaps into demonstrated skills."
       />
 
-      <Tabs defaultValue="projects" className="gap-5">
+      <Tabs defaultValue="certifications" className="gap-5">
         <TabsList>
+          <TabsTrigger value="certifications">
+            Certifications
+          </TabsTrigger>
           {TABS.map(({ value, label }) => (
             <TabsTrigger key={value} value={value}>
               {label}
@@ -63,6 +67,9 @@ export default function OpportunitiesPage() {
             </TabsTrigger>
           ))}
         </TabsList>
+        <TabsContent value="certifications">
+          <CertificationsPanel />
+        </TabsContent>
         {TABS.map(({ value, noun, icon, empty }) => (
           <TabsContent key={value} value={value}>
             <Card>
