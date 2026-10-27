@@ -77,7 +77,8 @@ function HomeReady() {
               : total === 0 ? <p className="mt-3 text-muted-foreground">Save resources and they’ll appear here in the order to do them.</p>
               : <ul className="mt-3 grid gap-3">
                 {ordered.ahead.slice(1, 3).map((step) => <PlanLine key={step.resource.id} step={step} />)}
-                {ordered.alongside.slice(0, 2).map((step) => <PlanLine key={step.resource.id} step={step} alongside />)}
+                {/* With nothing ahead, Next turn is the first alongside step, so skip it here. */}
+                {ordered.alongside.slice(ordered.ahead.length ? 0 : 1).slice(0, 2).map((step) => <PlanLine key={step.resource.id} step={step} alongside />)}
               </ul>}
             {total > 0 && <p className="mt-auto pt-4 text-sm text-muted-foreground">{ordered.done.length} of {total} steps done</p>}
           </section>
