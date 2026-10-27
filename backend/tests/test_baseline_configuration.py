@@ -157,7 +157,6 @@ class BackendConfigurationTests(unittest.TestCase):
                 "linkedin_url",
                 "github_url",
                 "website_url",
-                "active_resume_id",
                 "terms_accepted_at",
                 "created_at",
                 "updated_at",

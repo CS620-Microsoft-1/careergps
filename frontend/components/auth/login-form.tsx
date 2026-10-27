@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -54,19 +53,18 @@ export function LoginForm() {
           name="email"
           label="Email"
           type="email"
-          placeholder="you@example.com"
+          placeholder="you@school.edu"
           autoComplete="email"
         />
         <PasswordField
           control={form.control}
           name="password"
           label="Password"
-          placeholder="Enter your password"
           autoComplete="current-password"
         />
         <div className="flex justify-end">
           <ComingSoon>
-            <Button type="button" variant="link" disabled className="h-auto p-0">
+            <Button type="button" variant="link" disabled className="h-auto text-sm">
               Forgot password?
             </Button>
           </ComingSoon>
@@ -82,15 +80,9 @@ export function LoginForm() {
           className="w-full"
           disabled={form.formState.isSubmitting}
         >
-          {form.formState.isSubmitting ? "Signing in…" : "Sign In"}
+          {form.formState.isSubmitting ? "Logging in…" : "Log in"}
         </Button>
       </FieldGroup>
-      <p className="mt-6 text-center text-control text-muted-foreground">
-        Don&apos;t have an account?{" "}
-        <Link href="/signup" className="font-semibold text-primary hover:underline">
-          Create Account
-        </Link>
-      </p>
     </form>
   );
 }

@@ -1,11 +1,4 @@
-import {
-  BriefcaseBusiness,
-  ChartColumn,
-  ClipboardList,
-  LayoutGrid,
-  Target,
-  type LucideIcon,
-} from "lucide-react";
+import { BookOpen, Flag, House, Layers, Route, type LucideIcon } from "lucide-react";
 
 export type NavItem = {
   href: string;
@@ -13,13 +6,13 @@ export type NavItem = {
   icon: LucideIcon;
 };
 
-/** Main app navigation, shared by the desktop sidebar and the mobile nav. */
+/** Main app navigation, shared by the nav bar and its phone menu. Profile sits apart, on the right. */
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
-  { href: "/market", label: "Career Analysis", icon: Target },
-  { href: "/gaps", label: "Skill Gaps", icon: ChartColumn },
-  { href: "/opportunities", label: "Resources", icon: BriefcaseBusiness },
-  { href: "/roadmap", label: "Action Plan", icon: ClipboardList },
+  { href: "/dashboard", label: "Home", icon: House },
+  { href: "/gaps", label: "Gaps", icon: Layers },
+  { href: "/resources", label: "Resources", icon: BookOpen },
+  { href: "/plan", label: "Action plan", icon: Route },
+  { href: "/destinations", label: "Destinations", icon: Flag },
 ];
 
 export function isActive(pathname: string, href: string) {

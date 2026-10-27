@@ -85,13 +85,14 @@ class AccountServicePostgresTests(unittest.TestCase):
     def onboard(self, auth_user, **changes) -> User:
         return self.service.create_account(auth_user, AccountCreate.model_validate(onboarding_body(**changes)))
 
-    def test_creates_the_user_and_an_active_first_resume(self) -> None:
+    def test_creates_the_user_and_a_first_resume_for_the_target_role(self) -> None:
         user = self.onboard(self.auth_user("Ada@Example.com"))
 
         self.assertEqual("ada@example.com", user.primary_email)
         self.assertEqual(self.SIGNED_UP_AT, user.terms_accepted_at)  # from auth.users, not the request time
-        resume = self.service.get_active_resume(user)
+        resume = self.service.get_resume(user, "data_analyst")
         self.assertEqual(user.id, resume.user_id)
+        self.assertEqual(["data_analyst"], [d.job_family for d in self.service.list_destinations(user)])
         self.assertEqual("pdf", resume.file_type)
 
     def test_unconfirmed_email_is_refused(self) -> None:
@@ -104,14 +105,15 @@ class AccountServicePostgresTests(unittest.TestCase):
         with self.assertRaises(accounts.AccountAlreadyExistsError):
             self.onboard(self.auth_user("ada@example.com"))
 
-    def test_a_newer_resume_is_kept_alongside_and_becomes_active(self) -> None:
+    def test_a_newer_resume_is_used_by_its_role_and_the_old_one_is_kept(self) -> None:
         user = self.onboard(self.auth_user(), resume=resume_body(classification=classification(linkedin=None)))
 
         newer = self.service.add_resume(
-            user, ResumeSubmit.model_validate(resume_body(original_filename="v2.docx", classification=classification(linkedin="li")))
+            user, ResumeSubmit.model_validate(resume_body(original_filename="v2.docx", classification=classification(linkedin="li"))),
+            "data_analyst",
         )
 
-        self.assertEqual(newer.id, self.service.get_user(user.id).active_resume_id)
+        self.assertEqual(newer.id, self.service.get_resume(user, "data_analyst").id)
         self.assertEqual(2, self.db.query(Resume).filter_by(user_id=user.id).count())
         self.assertEqual("li", self.service.get_user(user.id).linkedin_url)
 

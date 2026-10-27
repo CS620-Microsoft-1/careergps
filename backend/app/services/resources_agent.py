@@ -3,8 +3,65 @@ import json
 from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
 
-from app.core.config import BACKEND_ROOT, get_settings
+from app.core.config import get_settings
 from app.schemas.resources import ResourceRecommendations
+from app.services.resources import load_projects
+
+
+MAX_PROJECTS = 3
+
+
+def _candidates(career_path: str, available_hours: int | None,
+                verified_skill_gaps: list[dict[str, str]] | None) -> list[dict]:
+    """Approved projects for the career path, within the time budget and touching a verified gap."""
+    candidates = [
+        project
+        for project in load_projects()
+        if project["career_path"] == career_path
+        and (available_hours is None or project["estimated_hours"] <= available_hours)
+    ]
+    if verified_skill_gaps is not None:
+        ids = {item["skill_id"] for item in verified_skill_gaps}
+        candidates = [p for p in candidates if ids.intersection(p.get("supported_skill_ids", []))]
+    return candidates
+
+
+def rank_projects(
+    career_path: str,
+    existing_skills: list[str],
+    skill_gaps: list[str],
+    available_hours: int | None = None,
+    verified_skill_gaps: list[dict[str, str]] | None = None,
+) -> dict:
+    """The free fallback: greedy cover of the verified gaps, higher-priority gaps weighing more.
+
+    verified_skill_gaps is in priority order. Same response shape as recommend_projects.
+    """
+    gaps = verified_skill_gaps or []
+    weight = {gap["skill_id"]: len(gaps) - index for index, gap in enumerate(gaps)}
+    names = {gap["skill_id"]: gap["skill_name"] for gap in gaps}
+    remaining = _candidates(career_path, available_hours, gaps)
+    covered: set[str] = set()
+    recommendations = []
+    while remaining and len(recommendations) < MAX_PROJECTS:
+        def gain(project: dict) -> int:
+            return sum(weight[skill] for skill in set(project["supported_skill_ids"]) & weight.keys() - covered)
+        best = max(remaining, key=lambda project: (gain(project), -remaining.index(project)))
+        if gain(best) <= 0:
+            break
+        skill_ids = [gap["skill_id"] for gap in gaps if gap["skill_id"] in best["supported_skill_ids"]]
+        matched = [names[skill] for skill in skill_ids]
+        recommendations.append({
+            "project_id": best["id"], "addressed_gaps": matched, "addressed_skill_ids": skill_ids,
+            "why_recommended": "This project provides practice in: " + ", ".join(matched) + ".",
+            "prerequisites_to_check": list(best.get("prerequisites", [])), "project": best,
+        })
+        covered.update(skill_ids)
+        remaining.remove(best)
+    return {
+        "recommendations": recommendations,
+        "no_match_reason": None if recommendations else "No projects match the career path, skill gaps, and time budget.",
+    }
 
 
 def recommend_projects(
@@ -19,21 +76,7 @@ def recommend_projects(
     if not settings.resources_project_endpoint:
         raise ValueError("RESOURCES_PROJECT_ENDPOINT is not configured.")
 
-    # Read the approved project catalog.
-    catalog_path = BACKEND_ROOT / "data" / "projects.json"
-    projects = json.loads(catalog_path.read_text(encoding="utf-8"))
-
-    # Send only projects for the selected career path.
-    candidates = [
-        project
-        for project in projects
-        if project["career_path"] == career_path
-        and (available_hours is None or project["estimated_hours"] <= available_hours)
-    ]
-
-    if verified_skill_gaps is not None:
-        ids = {item["skill_id"] for item in verified_skill_gaps}
-        candidates = [p for p in candidates if ids.intersection(p.get("supported_skill_ids", []))]
+    candidates = _candidates(career_path, available_hours, verified_skill_gaps)
     if not candidates:
         return {"recommendations": [], "no_match_reason": "No projects match the career path, skill gaps, and time budget."}
 

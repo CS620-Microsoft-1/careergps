@@ -1,0 +1,410 @@
+# Ways to close skill gaps, shown on the Resources page and saved into the action plan.
+#
+# skills: skill_ids from app/services/skill_gaps/data/core_catalog.json. A resource appears for every
+#   role whose catalog contains one of its skills, and "closes" only those skills there.
+# type: student_org | online_course | school_course. Certifications come from data/certifications.json
+#   and projects from data/projects.json (app/services/resources.py).
+# school: only shown to students whose account lists this university.
+# alongside: true for ongoing commitments (clubs, meetups) that run next to the main plan.
+#
+# Seed list: check names, costs and links before a public launch. School courses and clubs should
+# be confirmed against the current course guide and the student organization directory.
+
+resources:
+  # ── Student organizations ────────────────────────────────────────────────────────────────────
+  - id: uw-madhacks
+    type: student_org
+    title: MadHacks
+    provider: UW–Madison student hackathon
+    meta: Each semester · free
+    description: Build a working project with a team in one weekend and demo it to judges.
+    skills: [programming, frontend, backend_apis, general_programming, python, llm, ai_agents, version_control]
+    school: University of Wisconsin–Madison
+    alongside: true
+    url: https://www.madhacks.io/
+  - id: uw-data-science-hub
+    type: student_org
+    title: Data Science Hub workshops
+    provider: UW–Madison Data Science Hub
+    meta: Weekly coding meetups · free
+    description: Drop-in help and workshops on Python, R, statistics and data visualization.
+    skills: [analytical_scripting, python, statistics, data_visualization, data_analysis, machine_learning]
+    school: University of Wisconsin–Madison
+    alongside: true
+    url: https://datascience.wisc.edu/hub/
+
+  # ── Online courses and programs ──────────────────────────────────────────────────────────────
+  - id: mode-sql-tutorial
+    type: online_course
+    title: SQL Tutorial for Data Analysis
+    provider: Mode
+    meta: Self-paced · free
+    description: From SELECT to window functions, practiced on real datasets in the browser.
+    skills: [sql, relational_sql, data_analysis]
+    url: https://mode.com/sql-tutorial
+  - id: sqlbolt
+    type: online_course
+    title: SQLBolt
+    provider: SQLBolt
+    meta: About 2 hours · free
+    description: Short interactive lessons that cover the queries most interviews test.
+    skills: [sql, relational_sql]
+    url: https://sqlbolt.com/
+  - id: kaggle-pandas
+    type: online_course
+    title: Pandas
+    provider: Kaggle Learn
+    meta: About 4 hours · free
+    description: Select, group, reshape and clean data in Python notebooks.
+    skills: [analytical_scripting, data_analysis, data_preparation, python]
+    url: https://www.kaggle.com/learn/pandas
+  - id: kaggle-data-visualization
+    type: online_course
+    title: Data Visualization
+    provider: Kaggle Learn
+    meta: About 4 hours · free
+    description: Line, bar, heatmap and distribution charts with seaborn.
+    skills: [data_visualization, analytical_scripting]
+    url: https://www.kaggle.com/learn/data-visualization
+  - id: kaggle-intro-ml
+    type: online_course
+    title: Intro to Machine Learning
+    provider: Kaggle Learn
+    meta: About 3 hours · free
+    description: Train and validate your first models with scikit-learn.
+    skills: [machine_learning, model_training, model_evaluation]
+    url: https://www.kaggle.com/learn/intro-to-machine-learning
+  - id: kaggle-feature-engineering
+    type: online_course
+    title: Feature Engineering
+    provider: Kaggle Learn
+    meta: About 5 hours · free
+    description: Mutual information, clustering features and target encoding.
+    skills: [feature_engineering, data_preparation]
+    url: https://www.kaggle.com/learn/feature-engineering
+  - id: excel-skills-business
+    type: online_course
+    title: Excel Skills for Business
+    provider: Macquarie University on Coursera
+    meta: About 6 months part-time · free to audit
+    description: Formulas, lookups, pivot tables and modeling, from essentials to advanced.
+    skills: [spreadsheets, business_analytics]
+    url: https://www.coursera.org/specializations/excel
+  - id: storytelling-with-data
+    type: online_course
+    title: Storytelling with Data
+    provider: Cole Nussbaumer Knaflic (book)
+    meta: Book · about $30
+    description: Choose the right chart and turn it into a recommendation people act on.
+    skills: [data_visualization, dashboarding, business_analytics]
+    url: https://www.storytellingwithdata.com/books
+  - id: khan-statistics
+    type: online_course
+    title: Statistics and Probability
+    provider: Khan Academy
+    meta: Self-paced · free
+    description: Distributions, sampling, confidence intervals and hypothesis tests.
+    skills: [statistics, math_statistics]
+    url: https://www.khanacademy.org/math/statistics-probability
+  - id: udacity-ab-testing
+    type: online_course
+    title: A/B Testing
+    provider: Google on Udacity
+    meta: About 1 month · free
+    description: Design an experiment, choose metrics, size it and analyze the results.
+    skills: [experimentation, statistics]
+    url: https://www.udacity.com/course/ab-testing--ud257
+  - id: causal-inference-mixtape
+    type: online_course
+    title: "Causal Inference: The Mixtape"
+    provider: Scott Cunningham (free online book)
+    meta: Self-paced · free
+    description: Regression, matching, difference-in-differences and synthetic control with code.
+    skills: [causal_inference, statistics]
+    url: https://mixtape.scunning.com/
+  - id: de-zoomcamp
+    type: online_course
+    title: Data Engineering Zoomcamp
+    provider: DataTalks.Club
+    meta: About 9 weeks · free
+    description: Orchestration, a cloud warehouse, dbt, Spark and streaming in one project.
+    skills: [data_pipelines, warehousing, large_scale_processing, workflow_automation, data_modeling]
+    url: https://github.com/DataTalksClub/data-engineering-zoomcamp
+  - id: mlops-zoomcamp
+    type: online_course
+    title: MLOps Zoomcamp
+    provider: DataTalks.Club
+    meta: About 9 weeks · free
+    description: Experiment tracking, orchestration, deployment and monitoring for ML models.
+    skills: [mlops, model_deployment, experimentation, data_pipelines]
+    url: https://github.com/DataTalksClub/mlops-zoomcamp
+  - id: llm-zoomcamp
+    type: online_course
+    title: LLM Zoomcamp
+    provider: DataTalks.Club
+    meta: About 10 weeks · free
+    description: Build a retrieval-augmented assistant with vector search, evaluation and monitoring.
+    skills: [rag, vector_retrieval, llm, model_evaluation]
+    url: https://github.com/DataTalksClub/llm-zoomcamp
+  - id: ml-specialization
+    type: online_course
+    title: Machine Learning Specialization
+    provider: Stanford and DeepLearning.AI on Coursera
+    meta: About 2 months part-time · free to audit
+    description: Andrew Ng's course on regression, neural networks, trees and recommender systems.
+    skills: [machine_learning, math_statistics, model_training, model_evaluation]
+    url: https://www.coursera.org/specializations/machine-learning-introduction
+  - id: fastai-practical-dl
+    type: online_course
+    title: Practical Deep Learning for Coders
+    provider: fast.ai
+    meta: About 9 lessons · free
+    description: Train vision and language models first, then learn how they work underneath.
+    skills: [deep_learning, model_training, fine_tuning]
+    url: https://course.fast.ai/
+  - id: hf-llm-course
+    type: online_course
+    title: LLM Course
+    provider: Hugging Face
+    meta: Self-paced · free
+    description: Transformers, tokenizers, fine-tuning and sharing models with the Hugging Face stack.
+    skills: [llm, fine_tuning, deep_learning, generative_ai]
+    url: https://huggingface.co/learn/llm-course
+  - id: dlai-prompt-engineering
+    type: online_course
+    title: ChatGPT Prompt Engineering for Developers
+    provider: DeepLearning.AI
+    meta: About 1 hour · free
+    description: Write prompts that summarize, transform and extract reliably through an API.
+    skills: [prompt_engineering, llm, generative_ai]
+    url: https://www.deeplearning.ai/short-courses/chatgpt-prompt-engineering-for-developers/
+  - id: dlai-advanced-rag
+    type: online_course
+    title: Building and Evaluating Advanced RAG
+    provider: DeepLearning.AI
+    meta: About 1 hour · free
+    description: Sentence-window and auto-merging retrieval, measured with the RAG triad.
+    skills: [rag, vector_retrieval, model_evaluation]
+    url: https://www.deeplearning.ai/short-courses/building-evaluating-advanced-rag/
+  - id: dlai-agents-langgraph
+    type: online_course
+    title: AI Agents in LangGraph
+    provider: DeepLearning.AI
+    meta: About 1.5 hours · free
+    description: Build an agent with tools, memory and human-in-the-loop checkpoints.
+    skills: [ai_agents, llm]
+    url: https://www.deeplearning.ai/short-courses/ai-agents-in-langgraph/
+  - id: made-with-ml
+    type: online_course
+    title: Made With ML
+    provider: Goku Mohandas
+    meta: Self-paced · free
+    description: Take a model from notebook to tested, versioned and served production code.
+    skills: [mlops, model_deployment, software_engineering, testing]
+    url: https://madewithml.com/
+  - id: full-stack-open
+    type: online_course
+    title: Full Stack Open
+    provider: University of Helsinki
+    meta: Self-paced · free
+    description: React, Node.js APIs, testing, TypeScript, containers and CI/CD in one course.
+    skills: [frontend, backend_apis, testing, delivery_automation, containers, programming]
+    url: https://fullstackopen.com/en/
+  - id: missing-semester
+    type: online_course
+    title: The Missing Semester of Your CS Education
+    provider: MIT
+    meta: 11 lectures · free
+    description: The shell, Git, debugging and profiling tools most courses skip.
+    skills: [version_control, debugging, performance, software_engineering]
+    url: https://missing.csail.mit.edu/
+  - id: pro-git
+    type: online_course
+    title: Pro Git
+    provider: Scott Chacon and Ben Straub (free online book)
+    meta: Self-paced · free
+    description: Branching, rebasing and collaborating with Git, explained from the inside.
+    skills: [version_control, code_review]
+    url: https://git-scm.com/book/en/v2
+  - id: neetcode-150
+    type: online_course
+    title: NeetCode 150
+    provider: NeetCode
+    meta: Self-paced · free
+    description: The interview problems grouped by pattern, each with a video walkthrough.
+    skills: [algorithms, programming, general_programming]
+    url: https://neetcode.io/practice
+  - id: system-design-primer
+    type: online_course
+    title: The System Design Primer
+    provider: GitHub (open source)
+    meta: Self-paced · free
+    description: Caching, load balancing, databases and worked interview designs.
+    skills: [system_design, distributed_systems, nosql_search, reliability]
+    url: https://github.com/donnemartin/system-design-primer
+  - id: ddia
+    type: online_course
+    title: Designing Data-Intensive Applications
+    provider: Martin Kleppmann (book)
+    meta: Book · about $50
+    description: Replication, partitioning, transactions and stream processing, clearly explained.
+    skills: [distributed_systems, system_design, nosql_search, relational_sql, data_pipelines]
+    url: https://dataintensive.net/
+  - id: refactoring-guru
+    type: online_course
+    title: Design Patterns and Refactoring
+    provider: Refactoring.Guru
+    meta: Self-paced · free
+    description: Classic object-oriented patterns and code smells, with examples in several languages.
+    skills: [object_oriented_design, code_quality, software_engineering]
+    url: https://refactoring.guru/design-patterns
+  - id: testing-goat
+    type: online_course
+    title: Test-Driven Development with Python
+    provider: Harry Percival (free online book)
+    meta: Self-paced · free
+    description: Build a web app test-first, from unit tests to functional browser tests.
+    skills: [testing, code_quality, python, backend_apis]
+    url: https://www.obeythetestinggoat.com/
+  - id: docker-getting-started
+    type: online_course
+    title: Docker Get Started guide
+    provider: Docker
+    meta: About 3 hours · free
+    description: Containerize an app, use volumes and networks, and run it with Compose.
+    skills: [containers, delivery_automation]
+    url: https://docs.docker.com/get-started/
+  - id: google-sre-book
+    type: online_course
+    title: Site Reliability Engineering
+    provider: Google (free online book)
+    meta: Self-paced · free
+    description: Service levels, monitoring, incident response and postmortems from Google's SRE teams.
+    skills: [reliability, observability_operations, performance]
+    url: https://sre.google/sre-book/table-of-contents/
+  - id: portswigger-academy
+    type: online_course
+    title: Web Security Academy
+    provider: PortSwigger
+    meta: Self-paced · free
+    description: Interactive labs on injection, authentication and access-control flaws.
+    skills: [security]
+    url: https://portswigger.net/web-security
+  - id: github-copilot-learn
+    type: online_course
+    title: GitHub Copilot fundamentals
+    provider: Microsoft Learn
+    meta: About 2 hours · free
+    description: Use an AI pair programmer for code, tests and refactoring, and review what it writes.
+    skills: [ai_assisted_development]
+    url: https://learn.microsoft.com/training/paths/copilot/
+
+  # ── UW–Madison courses ───────────────────────────────────────────────────────────────────────
+  - id: uw-stat-240
+    type: school_course
+    title: "STAT 240: Data Science Modeling I"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Hands-on data wrangling, visualization and inference in R with real datasets.
+    skills: [data_visualization, statistics, analytical_scripting, data_analysis]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/stat/
+  - id: uw-stat-333
+    type: school_course
+    title: "STAT 333: Applied Regression Analysis"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Linear and generalized regression, diagnostics and model choice on applied problems.
+    skills: [statistics, causal_inference, math_statistics]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/stat/
+  - id: uw-cs-320
+    type: school_course
+    title: "COMP SCI 320: Data Science Programming II"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Python for larger data projects, including pandas, plotting, web data and the cloud.
+    skills: [analytical_scripting, python, data_visualization, data_pipelines, general_programming]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-400
+    type: school_course
+    title: "COMP SCI 400: Programming III"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Data structures, object-oriented design and team projects in Java.
+    skills: [programming, algorithms, object_oriented_design, testing, version_control]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-506
+    type: school_course
+    title: "COMP SCI 506: Software Engineering"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Requirements, design, testing and teamwork on a semester-long software project.
+    skills: [software_engineering, testing, code_review, requirements_analysis, code_quality]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-537
+    type: school_course
+    title: "COMP SCI 537: Introduction to Operating Systems"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Processes, concurrency, memory and file systems, with projects in C.
+    skills: [performance, debugging, distributed_systems]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-540
+    type: school_course
+    title: "COMP SCI 540: Introduction to Artificial Intelligence"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Search, probabilistic reasoning, machine learning and neural networks.
+    skills: [machine_learning, deep_learning, math_statistics]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-544
+    type: school_course
+    title: "COMP SCI 544: Introduction to Big Data Systems"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Distributed storage and processing with tools like Spark, Kafka and cloud warehouses.
+    skills: [large_scale_processing, distributed_systems, data_pipelines, cloud, containers, warehousing]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-564
+    type: school_course
+    title: "COMP SCI 564: Database Management Systems"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Relational design, SQL and how database engines store and query data.
+    skills: [sql, relational_sql, data_modeling]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-571
+    type: school_course
+    title: "COMP SCI 571: Building User Interfaces"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Design and build web and mobile interfaces with React and user testing.
+    skills: [frontend]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-577
+    type: school_course
+    title: "COMP SCI 577: Introduction to Algorithms"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Divide and conquer, dynamic programming, graphs and complexity.
+    skills: [algorithms]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/
+  - id: uw-cs-642
+    type: school_course
+    title: "COMP SCI 642: Introduction to Information Security"
+    provider: UW–Madison course
+    meta: Check the course guide for terms
+    description: Cryptography, software and network security, and how systems are attacked.
+    skills: [security]
+    school: University of Wisconsin–Madison
+    url: https://guide.wisc.edu/courses/comp_sci/

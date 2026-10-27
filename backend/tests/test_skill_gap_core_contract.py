@@ -164,18 +164,20 @@ class StorageAndProvenanceTests(unittest.TestCase):
         Draft202012Validator(schema, format_checker=FormatChecker()).validate(example)
         self.assertEqual(example["report"]["resume_id"], example["resume_id"])
 
-    def test_market_api_preserves_counts_and_exposes_unknown_coverage(self):
+    def test_market_api_preserves_counts_and_exposes_coverage(self):
         from app.schemas.skill_gap_web import MarketDemandSnapshot
         from app.services.skill_gaps.assets import ASSET_ROOT
         from app.services.skill_gaps.market import get_market_demand
 
         stored = json.loads((ASSET_ROOT / "market_snapshot.json").read_text(encoding="utf-8"))
-        for family, expected_skills in [("software_engineer", 22), ("data_analyst", 18), ("ai_engineer", 23)]:
+        for family, expected_skills, companies in [
+            ("software_engineer", 22, 45), ("data_analyst", 18, 37), ("ai_engineer", 23, 43),
+        ]:
             with self.subTest(family=family):
                 result = MarketDemandSnapshot.model_validate(get_market_demand(family))
                 self.assertEqual(len(result.skills), expected_skills)
                 self.assertIsNone(result.posting_window)
-                self.assertIsNone(result.company_coverage)
+                self.assertEqual(result.company_coverage, companies)
                 self.assertTrue(result.coverage_limitations)
                 for skill in result.skills:
                     raw = stored["families"][family]["skills"][skill.skill_id]

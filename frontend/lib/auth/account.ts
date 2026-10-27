@@ -2,8 +2,9 @@ import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 import { getMe } from "@/lib/api/me";
 
-/** What signUp() saves in Supabase user_metadata, read back when onboarding finishes. */
-export type SignupMetadata = { accept_terms: true };
+/** What signUp() saves in Supabase user_metadata. Setup pre-fills the name and school from it, and
+ * sends the terms consent with POST /me. */
+export type SignupMetadata = { accept_terms: true; full_name?: string; university?: string };
 
 /**
  * Where a logged-in user goes next: /onboarding until it is finished (the account row is created

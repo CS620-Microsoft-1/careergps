@@ -292,11 +292,14 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 |---|---|
 | `/health` | `{"status": "ok"}` when the API is running (no database access) |
 | `/health/db` | `{"status": "ok", "database": "connected"}`, or **503** if the database is unreachable |
-| `POST /me` | Finish onboarding: creates the `users` row and the first confirmed résumé (made active). **403** until the email is confirmed, **409** if it exists |
+| `POST /me` | Finish onboarding: creates the `users` row, the first confirmed résumé and the destination for `target_role`. **403** until the email is confirmed, **409** if it exists |
 | `GET /me` | `{user}` for the logged-in account; `null` until onboarding is finished. Syncs `primary_email` with the token |
 | `PATCH /me` | Change the name (`first_name`, `last_name`), `university` or goal (`target_role`, `experience_level`, `graduation_year`, `preferred_location`). **403** until onboarding is finished |
-| `GET /me/resume` | The active résumé (`original_filename`, `file_type`, `classification`). **404** if none |
-| `POST /me/resumes` | Save a newer confirmed résumé; it becomes active and fills empty contact fields on `users`. Earlier versions are kept
+| `GET /me/resume` | The résumé a destination uses (`original_filename`, `file_type`, `classification`): `?job_family=`, or the target role's by default. **404** if none |
+| `POST /me/resumes` | Save a confirmed résumé; the destination for `job_family` uses it from now on (added if new). Fills empty contact fields on `users`. Earlier versions are kept |
+| `GET /me/resumes` | Every version, newest first; `destinations` lists the roles that use each one |
+| `GET /me/destinations` | The roles the student added, with the résumé each one uses |
+| `PUT /me/destinations/{job_family}` | Add a role or change its résumé (`{"resume_id": ...}`); several roles can share one. **404** if the résumé isn't theirs
 | `/docs` | Interactive API docs (Swagger UI), generated from the code |
 | `/openapi.json` | The API contract; the source of truth for frontend types (ADR-002) |
 | `POST /resumes/analyze` | Temporary PDF/DOCX extraction, OCR fallback and Foundry classification. **401** without a token. Works before onboarding is finished (onboarding calls it) |
@@ -832,7 +835,9 @@ The unrelated existing résumé tests are unchanged.
 - `resumes.confirmed_data` keeps all 13 sections as confirmed and is the source of truth. The child
   tables (`resume_experiences`, `resume_educations`, `resume_projects`, `resume_achievements`,
   `resume_skills`) hold the parts the agents query and are rebuilt from it whenever a résumé is edited.
-- A student keeps every version; `users.active_resume_id` points to the one the agents use.
+- A student keeps every résumé version. `destinations` has one row per (user, role) with the
+  `resume_id` that role is matched against; several roles can use the same résumé, and a résumé in
+  use can't be deleted. `users.target_role` selects the destination the app shows.
 - The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
   autogenerate from proposing to drop it.
 - `POST /me` reads `auth.users` (`email_confirmed_at` and `created_at`, the terms consent time)

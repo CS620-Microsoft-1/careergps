@@ -14,10 +14,15 @@ export type SkillGapProfile = {
   job_family: JobFamily;
 };
 
-export function profileForAnalysis(user: User, resume: SavedResume): SkillGapProfile {
-  if (user.active_resume_id !== resume.id) throw new Error("Your active résumé changed. Refresh before analyzing it.");
-  const family = (Object.entries(FAMILY_LABELS) as [JobFamily, string][])
-    .find(([id, label]) => user.target_role === label || user.target_role === id)?.[0];
+/** The account's target role as a job family, or null for an unsupported one. */
+export function roleFamily(targetRole: string): JobFamily | null {
+  return (Object.entries(FAMILY_LABELS) as [JobFamily, string][])
+    .find(([id, label]) => targetRole === label || targetRole === id)?.[0] ?? null;
+}
+
+/** A destination: its role (the target role unless given) and the résumé it uses (GET /me/resume for that role). */
+export function profileForAnalysis(user: User, resume: SavedResume, selected?: JobFamily): SkillGapProfile {
+  const family = selected ?? roleFamily(user.target_role);
   if (!family) throw new Error("Choose a supported target role in your profile before analyzing skill gaps.");
   return { user_id: user.id, resume_id: resume.id, filename: resume.original_filename,
     confirmed_at: resume.created_at, job_family: family };

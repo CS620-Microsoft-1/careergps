@@ -1,4 +1,5 @@
 # Import every model here so Alembic's autogenerate can see it.
+from app.models.destination import Destination
 from app.models.job_posting import IngestRun, JobPosting
 from app.models.job_posting_analysis import (
     JobAnalysisCompensation,
@@ -19,6 +20,7 @@ from app.models.resume import (
 from app.models.user import User
 
 __all__ = [
+    "Destination",
     "JobPostingAnalysis",
     "JobAnalysisLocation",
     "JobAnalysisResponsibility",

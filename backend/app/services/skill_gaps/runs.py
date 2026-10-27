@@ -25,6 +25,7 @@ from .transport import (
 from .scoring import POLICY_VERSION
 from .assets import ASSET_ROOT
 from .input import prepare
+from .match import summarize_match
 from .storage import load, save_json
 from .schema import SCHEMA_NAME
 
@@ -134,6 +135,7 @@ class SkillGapRunManager:
                                                     datetime.fromisoformat(state["created_at"])).total_seconds()), 3)
         value["report"] = load(self._folder(state["id"]) / "skill_gaps.json") if state["status"] == "completed" else None
         value["reused"] = reused
+        value["match"] = summarize_match(value["report"])
         return SkillGapRun.model_validate(value)
 
     def _cache_key(self, user_id: str, resume_id: str, resume_hash: str,

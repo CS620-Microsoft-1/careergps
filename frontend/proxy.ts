@@ -7,12 +7,12 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabase/config";
 // Pages that need a logged-in user. Everything else is public.
 const PROTECTED_PREFIXES = [
   "/dashboard",
+  "/destinations",
   "/gaps",
-  "/market",
   "/onboarding",
-  "/opportunities",
+  "/plan",
   "/profile",
-  "/roadmap",
+  "/resources",
 ];
 const AUTH_PAGES = ["/login", "/signup"];
 

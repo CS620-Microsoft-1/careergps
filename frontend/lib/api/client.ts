@@ -75,6 +75,11 @@ export function apiPut<T>(path: string, options?: RequestOptions): Promise<T> {
   return apiRequest<T>("PUT", path, options);
 }
 
+/** DELETE an endpoint that answers 204 No Content. */
+export async function apiDelete(path: string, options?: RequestOptions): Promise<void> {
+  await sendRequest("DELETE", path, options);
+}
+
 async function apiRequest<T>(method: string, path: string, options?: RequestOptions): Promise<T> {
   const response = await sendRequest(method, path, options);
   return (await response.json()) as T;
