@@ -250,7 +250,7 @@ app/
 │   └── routes/
 │       ├── health.py        # GET /health, GET /health/db
 │       ├── me.py            # POST /me, GET /me, PATCH /me, GET /me/resume, POST /me/resumes
-│       └── resumes.py       # POST /resumes/analyze (no persistence)
+│       └── resumes.py       # POST /resumes/analyze, /analyze/stream (no persistence)
 ├── db/
 │   ├── base.py              # SQLAlchemy Base; every model inherits from it
 │   ├── session.py           # engine + SessionLocal, built from settings
@@ -297,6 +297,7 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 | `/docs` | Interactive API docs (Swagger UI), generated from the code |
 | `/openapi.json` | The API contract; the source of truth for frontend types (ADR-002) |
 | `POST /resumes/analyze` | Temporary PDF/DOCX extraction, OCR fallback and Foundry classification. **401** without a token. Works before onboarding is finished (onboarding calls it) |
+| `POST /resumes/analyze/stream` | Same analysis, streamed as NDJSON for the onboarding progress card: one `step` line per stage (`upload`, `extract`, `ocr` only when needed, `classify`; `started`/`done` with details), then a `result` line or an `error` line (`status`, `detail`). 413/415/422 for the upload itself are still plain HTTP errors |
 
 ### Authentication
 

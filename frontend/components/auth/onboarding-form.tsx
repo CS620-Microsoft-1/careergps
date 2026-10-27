@@ -1,18 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronRight } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 
 import { ResumeDropzone } from "@/components/auth/resume-dropzone";
+import {
+  ResumeAnalysisProgress,
+  type TimedStepEvent,
+} from "@/components/onboarding/resume-analysis-progress";
 import { ResumeReview } from "@/components/onboarding/resume-review";
 import { SegmentedField, SelectField, TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field";
 import { DEFAULT_UNIVERSITY, EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
-import { analyzeResume } from "@/lib/api/resumes";
+import { streamResumeAnalysis } from "@/lib/api/resumes";
 import { ApiError, errorMessage } from "@/lib/api/client";
 import { addResume, createAccount, getMe, getSavedResume, updateAccount } from "@/lib/api/me";
 import { acceptedTerms } from "@/lib/auth/account";
@@ -21,11 +25,24 @@ import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
 import { profileForAnalysis, queueSkillGapAnalysis } from "@/lib/skill-gap-profile";
 import type { ResumeAnalysis, ResumeClassification } from "@/types/api";
 
+/** How long the "Found …" summary stays on the progress card before the review opens. */
+const AUTO_ADVANCE_MS = 1500;
+
+/** One résumé analysis shown on the progress card. */
+type AnalysisRun = {
+  file: File;
+  events: TimedStepEvent[];
+  result?: ResumeAnalysis;
+  error?: string;
+};
+
 export function OnboardingForm({ graduationYears }: { graduationYears: string[] }) {
   const router = useRouter();
+  const [run, setRun] = useState<AnalysisRun>();
+  const runController = useRef<AbortController>(null);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout>>(null);
   const [analysis, setAnalysis] = useState<ResumeAnalysis>();
   const [classification, setClassification] = useState<ResumeClassification>();
-  const [submitError, setSubmitError] = useState<string>();
   const [confirming, setConfirming] = useState(false);
   const [confirmError, setConfirmError] = useState<string>();
   const [university, setUniversity] = useState("");
@@ -60,21 +77,75 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
     };
   }, [form, graduationYears]);
 
-  const onSubmit = async ({ resume }: OnboardingValues) => {
-    setSubmitError(undefined);
+  // Leaving the page stops a running analysis and the pending switch to the review.
+  useEffect(
+    () => () => {
+      runController.current?.abort();
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    },
+    [],
+  );
+
+  /** Stop the current analysis, if any; its late events are then ignored. */
+  const stopRun = () => {
+    runController.current?.abort();
+    runController.current = null;
+    if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    advanceTimer.current = null;
+  };
+
+  const startAnalysis = async (file: File) => {
+    stopRun();
+    const controller = new AbortController();
+    runController.current = controller;
+    setRun({ file, events: [] });
     try {
-      const result = await analyzeResume(resume);
-      setAnalysis(result);
-      setClassification(result.classification);
-      setUniversity(firstSchool(result.classification) ?? savedUniversity ?? DEFAULT_UNIVERSITY);
+      const result = await streamResumeAnalysis(
+        file,
+        (event) => {
+          if (controller.signal.aborted) return;
+          const timed = { ...event, at: Date.now() };
+          setRun((current) => current && { ...current, events: [...current.events, timed] });
+        },
+        controller.signal,
+      );
+      if (controller.signal.aborted) return;
+      setRun((current) => current && { ...current, result });
+      // Show the "Found …" summary briefly, then open the review.
+      advanceTimer.current = setTimeout(() => {
+        setAnalysis(result);
+        setClassification(result.classification);
+        setUniversity(firstSchool(result.classification) ?? savedUniversity ?? DEFAULT_UNIVERSITY);
+        setRun(undefined);
+      }, AUTO_ADVANCE_MS);
     } catch (error) {
-      if (error instanceof ApiError) {
-        setSubmitError(error.detail ?? error.message);
-      } else {
-        setSubmitError("Something went wrong while reading the résumé.");
-      }
+      if (controller.signal.aborted) return;
+      setRun((current) => current && { ...current, error: analysisErrorMessage(error) });
     }
   };
+
+  const onSubmit = ({ resume }: OnboardingValues) => startAnalysis(resume);
+
+  if (run) {
+    return (
+      <ResumeAnalysisProgress
+        file={run.file}
+        events={run.events}
+        result={run.result}
+        error={run.error}
+        onCancel={() => {
+          stopRun();
+          setRun(undefined);
+        }}
+        onRetry={() => startAnalysis(run.file)}
+        onChooseAnotherFile={() => {
+          stopRun();
+          setRun(undefined);
+          form.resetField("resume");
+        }}
+      />
+    );
+  }
 
   if (analysis && classification) {
     return (
@@ -206,23 +277,25 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
             </Field>
           )}
         />
-        {submitError && (
-          <p role="alert" className="text-control text-destructive">
-            {submitError}
-          </p>
-        )}
         <Button
           type="submit"
           size="lg"
           className="w-full"
           disabled={form.formState.isSubmitting}
         >
-          {form.formState.isSubmitting ? "Reading résumé…" : "Analyze My Career Profile"}
+          Analyze My Career Profile
           <ChevronRight data-icon="inline-end" />
         </Button>
       </FieldGroup>
     </form>
   );
+}
+
+/** The backend's own explanation when it gave one; friendlier text for "unreachable" and "logged out". */
+function analysisErrorMessage(error: unknown): string {
+  if (!(error instanceof ApiError)) return "Something went wrong while reading the résumé.";
+  if (error.status === 0 || error.status === 401) return errorMessage(error);
+  return error.detail ?? error.message;
 }
 
 /** The first school listed in the résumé's education, to pre-fill the University field. */

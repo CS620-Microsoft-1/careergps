@@ -253,3 +253,24 @@ unchanged until an explicit result-update step is requested.
   AI-infrastructure evidence may be too broad. Exact-reference validation does
   not establish semantic relevance. This verifies one real AI Engineer flow,
   not live runs for all families or the PostgreSQL RLS policy matrix.
+
+## Integration with resume progress from dev
+
+On 2026-10-26, `origin/dev` at `3da5a2d` (PR #23) was integrated into the local
+`test/skill-gaps` branch. The resume upload flow now displays the streamed
+extraction, OCR and classification steps before Review. Review still saves the
+confirmed resume through the account API before queuing Skill Gaps on Dashboard.
+Both resume-progress and Skill Gaps types are retained in the shared API contract.
+
+All 374 backend tests passed, with eight opt-in PostgreSQL tests skipped. All
+27 frontend tests, ESLint and the production build passed, including five new
+stream-client regressions for chunk decoding, authentication, errors and cancel
+behavior without automatic retry. No Agent call or migration was run during this
+integration. Scoring, demand, Instructions and local reference-alignment code were
+preserved; previous personal run files were not changed.
+
+The API must be restarted after syncing to expose `/resumes/analyze/stream`.
+Response-processing versions are part of the result-reuse fingerprint. A saved
+result from an earlier configuration stays on disk but may not be selected as
+the latest result for the current configuration; page restoration does not start
+a replacement model call automatically.
