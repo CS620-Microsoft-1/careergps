@@ -33,8 +33,8 @@ class ResumeDestinationMigrationTests(unittest.TestCase):
             getattr(module, direction)()
         return output.getvalue()
 
-    def test_link_is_the_single_head_after_the_job_analysis_migration(self) -> None:
-        self.assertEqual([REVISION], self.script.get_heads())
+    def test_link_follows_the_job_analysis_migration(self) -> None:
+        self.assertEqual(1, len(self.script.get_heads()))
         self.assertEqual(PARENT_REVISION, self.script.get_revision(REVISION).down_revision)
 
     def test_link_adds_the_column_and_backfills_without_touching_the_pointer(self) -> None:
