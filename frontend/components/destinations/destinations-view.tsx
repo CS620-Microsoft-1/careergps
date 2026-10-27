@@ -33,7 +33,7 @@ export function DestinationsView() {
   const role = ROLE_NAMES[family];
 
   return <>
-    <RoutePageHeader eyebrow={`Destinations · ${explored.length} of ${FAMILIES.length} roles`} title="Your destinations"
+    <RoutePageHeader title="Your destinations"
       description="Focus on a few. Pick one to see what its job market is asking for right now." />
 
     <div className="grid gap-4 md:grid-cols-3">

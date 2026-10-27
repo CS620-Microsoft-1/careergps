@@ -8,7 +8,6 @@ import { BookmarkCheck, Check, ChevronRight, ExternalLink, Layers, LoaderCircle 
 import {
   RESOURCE_TYPES,
   RESOURCE_TYPE_ORDER,
-  ROLE_NAMES,
   ResourceIcon,
   RoutePageHeader,
   SaveButton,
@@ -26,7 +25,7 @@ export function ResourcesView() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const { family, run, snapshot, loaded } = useSkillGapAnalysis();
+  const { run, snapshot, loaded } = useSkillGapAnalysis();
   const { user } = useAccount();
   const plan = usePlan();
   const [type, setType] = useState<ResourceType | "all">("all");
@@ -51,7 +50,7 @@ export function ResourcesView() {
   const school = plan.resources.find((r) => r.school)?.school ?? null;
 
   return <>
-    <RoutePageHeader eyebrow={snapshot ? `Resources · ${ROLE_NAMES[family]}` : "Resources"} title="Ways to close your gaps"
+    <RoutePageHeader title="Ways to close your gaps"
       description="Save the ones you’ll actually do. We’ll put them in your action plan in the best order."
       aside={<div className="flex items-center gap-3 rounded-full border border-border bg-card py-1.5 pr-1.5 pl-4 shadow-card">
         <BookmarkCheck aria-hidden className="size-4.5 text-success" />

@@ -41,11 +41,9 @@ const EXPANDED = 3;
 export function GapsView() {
   const { family, run, snapshot } = useSkillGapAnalysis();
   const role = ROLE_NAMES[family];
-  // The session starts on a default role until the profile loads; don't name it before then.
-  const eyebrow = snapshot ? `Gaps · ${role}` : "Gaps";
   if (run?.status !== "completed" || !run.report || !snapshot) {
     return <>
-      <RoutePageHeader eyebrow={eyebrow} title="Your gaps" />
+      <RoutePageHeader title="Your gaps" />
       <AnalysisGate />
     </>;
   }
@@ -56,7 +54,7 @@ export function GapsView() {
   const sample = report.skills[0]?.demand.N;
 
   return <>
-    <RoutePageHeader eyebrow={`Gaps · ${role}`}
+    <RoutePageHeader
       title={gaps.length === 1 ? "1 gap to close" : `${gaps.length} gaps to close`}
       description="Ranked by how often employers ask for them and how little your résumé shows. Close one and your match goes up."
       aside={<div className="flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 shadow-card">

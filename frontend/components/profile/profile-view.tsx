@@ -40,8 +40,7 @@ export function ProfileView() {
     <div className="mb-8 flex flex-wrap items-center gap-5">
       <span aria-hidden className="grid size-18 shrink-0 place-items-center rounded-full bg-tint-blue text-2xl font-extrabold">{initials}</span>
       <div className="min-w-0">
-        <p className="eyebrow">Profile · your start</p>
-        <h1 className="mt-1 text-page-title">{displayName || (status === "loading" ? "Loading…" : "Your profile")}</h1>
+        <h1 className="text-page-title">{displayName || (status === "loading" ? "Loading…" : "Your profile")}</h1>
         <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <span className="font-mono text-sm text-muted-foreground">
             {[major, user && `Class of ${user.graduation_year}`].filter(Boolean).join(" · ")}

@@ -136,18 +136,16 @@ export function SaveButton({ resourceId, tone = "card", className }: {
 }
 
 type PageHeaderProps = {
-  eyebrow?: React.ReactNode;
   title: React.ReactNode;
   description?: React.ReactNode;
   /** Right side: a summary card or buttons; drops below the title when narrow. */
   aside?: React.ReactNode;
 };
 
-export function RoutePageHeader({ eyebrow, title, description, aside }: PageHeaderProps) {
+export function RoutePageHeader({ title, description, aside }: PageHeaderProps) {
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
       <div className="min-w-0 flex-1 basis-96">
-        {eyebrow && <p className="eyebrow mb-2">{eyebrow}</p>}
         <h1 className="text-page-title">{title}</h1>
         {description && <p className="mt-2 max-w-3xl text-base/7 text-muted-foreground">{description}</p>}
       </div>

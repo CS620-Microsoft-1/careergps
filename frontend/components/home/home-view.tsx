@@ -13,7 +13,6 @@ import {
   skillLabel,
 } from "@/components/career/route-parts";
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
-import { useAccount } from "@/components/layout/account-provider";
 import { useSwitchRoute } from "@/components/layout/use-switch-route";
 import { usePlan } from "@/components/plan/plan-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
@@ -35,7 +34,6 @@ export function HomeView() {
 
 function HomeReady() {
   const { snapshot, family, run } = useSkillGapAnalysis();
-  const { user } = useAccount();
   const plan = usePlan();
   const report = run!.report!;
   const match = run!.match?.score ?? null;
@@ -52,8 +50,7 @@ function HomeReady() {
         <section aria-labelledby="where" className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-0 flex-1 basis-72">
-              <p className="eyebrow">Your goal · {role}{user?.preferred_location ? ` · ${user.preferred_location}` : ""}</p>
-              <h1 id="where" className="mt-2 text-page-title">
+              <h1 id="where" className="text-page-title">
                 {match === null ? "Your route is ready" : `You’re ${percent(match)} of the way there`}
               </h1>
               <p className="mt-2 text-base/7 text-muted-foreground">

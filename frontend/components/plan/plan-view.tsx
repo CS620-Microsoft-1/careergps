@@ -31,7 +31,7 @@ export function PlanView() {
   const role = ROLE_NAMES[family];
 
   return <>
-    <RoutePageHeader eyebrow={snapshot ? `Action plan · ${role}` : "Action plan"} title="What to do, in order"
+    <RoutePageHeader title="What to do, in order"
       description={total ? `Built from the ${total} resources you saved. Biggest gaps first, then everything that builds on them.`
         : "Save resources and we’ll put them in the best order."}
       aside={<div className="flex flex-wrap items-center gap-3">
