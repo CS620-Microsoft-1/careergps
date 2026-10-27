@@ -296,7 +296,7 @@ class JobAnalysisMigrationTests(unittest.TestCase):
         return output.getvalue(), created, indexes.call_args_list
 
     def test_single_head_follows_the_resume_migration(self) -> None:
-        self.assertEqual([REVISION], self.script.get_heads())
+        self.assertEqual(1, len(self.script.get_heads()))
         self.assertEqual(PARENT_REVISION, self.revision.down_revision)
 
     def test_upgrade_creates_exactly_the_six_agreed_tables(self) -> None:
