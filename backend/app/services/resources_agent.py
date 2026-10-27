@@ -79,6 +79,7 @@ def recommend_projects(
     allowed_projects = {project["id"]: project for project in candidates}
     seen_ids = set()
 
+    recommendations = []
     for recommendation in validated.recommendations:
         project_id = recommendation.project_id
 
@@ -98,8 +99,6 @@ def recommend_projects(
             raise ValueError("Agent recommended a project over the time budget.")
 
         seen_ids.add(project_id)
-
-        recommendations = []
 
     for recommendation in validated.recommendations:
         project = allowed_projects[recommendation.project_id]
