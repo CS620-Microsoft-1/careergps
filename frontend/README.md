@@ -161,5 +161,47 @@ The **Ask CareerGPS** panel (`components/panels/`) is the single place for quest
 explanations and sources: there are no separate "why", source or analysis-detail panels.
 Each answer will carry its citations and the agent steps behind it. Any component can open
 it with `useCopilot().openCopilot("Why is Docker a high-priority gap?")`.
-The answer format is designed together with the backend Copilot API; until then the
-panel is a shell with the input disabled.
+The panel currently runs a clearly labeled interactive prototype with scripted SQL explanations,
+expandable sample evidence, suggested questions, typed follow-ups, loading, error recovery, and
+reset. It uses no personal data or AI service. The conversation survives closing the panel and
+navigation within the app shell, but clears on refresh.
+
+### Demo the prototype
+
+1. Run the frontend using the instructions above and open `/dashboard` (sign in if configured).
+2. Click **Ask CareerGPS** in the bottom-right corner.
+3. Click **Why was this skill flagged as a gap?** and expand **View sample evidence**.
+4. Ask **What should I focus on first?** to see the sample next steps.
+5. Ask **What evidence would show that I already have this skill?** or type
+   **I used SQL during my internship** to demonstrate a follow-up.
+6. Close/reopen to show the conversation is retained; use **Reset** for a clean demo.
+
+The sample resume, role requirement, and gap are fictional. Suggested questions remain available
+without uploading a resume, because this is explicitly sample mode. Unsupported questions receive
+an honest demo-limitation response rather than a fabricated answer.
+
+### Backend handoff
+
+`lib/api/copilot.ts` exports the async `CopilotResponder` contract. The panel accepts a `respond`
+prop and otherwise calls `respondToCopilot`, the scripted adapter. UI rendering is independent of
+the response implementation.
+
+Proposed request: `{ question, history: [{ role, text }], analysisId }`.
+Proposed response: `{ text, sources: [{ label, excerpt }] }`.
+These are frontend contracts to agree on with the backend team, not existing endpoints.
+
+To integrate:
+
+1. Implement an authenticated FastAPI chat endpoint. Resolve the user from the access token,
+   verify analysis ownership, and retrieve the actual stored profile, gap, and role evidence.
+2. Supply that evidence and bounded conversation history to the model, treating uploaded text
+   and messages as untrusted input. Require explanations to distinguish missing evidence from
+   missing skill and avoid unsupported claims or changes to saved analysis.
+3. Replace the scripted adapter with `apiPost<CopilotReply>("/copilot/chat", { json: request,
+   timeoutMs: 30000 })` through the existing API client. That URL is proposed, not implemented.
+   Send a real authorized analysis ID rather than `DEMO_ANALYSIS_ID` and change the sample labels
+   only once actual data is connected. Keep model credentials on the backend.
+4. Validate response/source shapes and verify returned references against retrieved evidence.
+   Profile corrections and reassessment should be explicit separate actions.
+
+No new dependencies or backend changes are required for this prototype.
