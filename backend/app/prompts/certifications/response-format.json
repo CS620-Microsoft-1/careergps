@@ -1,0 +1,25 @@
+{
+  "type": "json_schema",
+  "name": "careergps_certification_recommendations_v1",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "recommendations": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "certification_id": {"type": "string"},
+            "skill_ids": {"type": "array", "items": {"type": "string"}},
+            "reason": {"type": "string"}
+          },
+          "required": ["certification_id", "skill_ids", "reason"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": ["recommendations"],
+    "additionalProperties": false
+  }
+}
