@@ -5,10 +5,15 @@
   "source_archive_sha256": "bfb06458c984b5fd7f76e892af95eb68ab373a9fa63fec7f81150695795fa9cd",
   "source_aggregate_sha256": "d47b1bafc91c7f0ae98ff5cf0c5f3f2f85f1c848ab03455de56b4bc34e7546ab",
   "posting_window": null,
-  "company_coverage": null,
+  "company_coverage": {
+    "software_engineer": 45,
+    "data_analyst": 37,
+    "ai_engineer": 43
+  },
   "coverage_limitations": [
     "The timestamp is the aggregate calculation time, not the posting date range.",
-    "Posting first-seen dates, company coverage and source URLs are unavailable in the supplied export; a 90-day or 180-day window cannot be verified.",
+    "Posting first-seen dates and source URLs are unavailable in the supplied export; a 90-day or 180-day window cannot be verified.",
+    "The supplied export has no company field. Company coverage counts distinct companies among each role's analyzed postings in the team database on 2026-10-27, whose posting counts (2844 Software Engineer, 174 Data Analyst, 565 AI Engineer) differ slightly from this export.",
     "Geographic coverage and cross-source duplicate postings cannot be independently verified from this export.",
     "117 records without a supported job family were excluded; sample sizes are 2858 Software Engineer, 174 Data Analyst and 566 AI Engineer postings."
   ]

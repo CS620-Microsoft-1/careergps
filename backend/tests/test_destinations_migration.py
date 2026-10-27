@@ -13,8 +13,11 @@ from alembic.script import ScriptDirectory
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
+from app.models import Destination, Resume, User  # noqa: E402
+
 REVISION = "1a7c4e9b2d60"
 PARENT_REVISION = "7d2c91a4e8b6"
+DROP_REVISION = "9c4d2a7f1b3e"
 
 
 class DestinationsMigrationTests(unittest.TestCase):
@@ -50,8 +53,18 @@ class DestinationsMigrationTests(unittest.TestCase):
         self.assertIn("u.active_resume_id IS NOT NULL", sql)
         self.assertIn("DROP TABLE destinations", self.render(REVISION, "downgrade"))
 
-    def test_chain_has_a_single_head(self) -> None:
-        self.assertEqual(1, len(self.script.get_heads()))
+    def test_drop_is_the_single_head_and_syncs_the_pointer_first(self) -> None:
+        self.assertEqual([DROP_REVISION], self.script.get_heads())
+        sql = self.render(DROP_REVISION, "upgrade")
+        self.assertIn("ON CONFLICT (user_id, job_family) DO UPDATE", sql)
+        self.assertLess(sql.index("INSERT INTO destinations"), sql.index("DROP COLUMN active_resume_id"))
+        self.assertIn("ADD COLUMN active_resume_id UUID", self.render(DROP_REVISION, "downgrade"))
+
+    def test_models_match(self) -> None:
+        self.assertEqual({"user_id", "job_family", "resume_id", "created_at", "updated_at"},
+                         set(Destination.__table__.columns.keys()))
+        self.assertNotIn("job_family", Resume.__table__.columns)
+        self.assertNotIn("active_resume_id", User.__table__.columns)
 
 
 if __name__ == "__main__":

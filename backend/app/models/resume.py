@@ -41,11 +41,11 @@ def _empty_array() -> Any:
 
 
 class Resume(Base):
-    """One confirmed résumé version. A user keeps every version; users.active_resume_id picks one."""
+    """One confirmed résumé version. A user keeps every version; destinations pick which one each role uses."""
 
     __tablename__ = "resumes"
     __table_args__ = (
-        # Lets child rows and users.active_resume_id check that the résumé belongs to the same user.
+        # Lets child rows and destinations check that the résumé belongs to the same user.
         UniqueConstraint("id", "user_id", name="uq_resumes_id_user_id"),
         CheckConstraint("file_type IN ('pdf', 'docx')", name="ck_resumes_file_type"),
         CheckConstraint("jsonb_typeof(confirmed_data) = 'object'", name="ck_resumes_confirmed_data_object"),

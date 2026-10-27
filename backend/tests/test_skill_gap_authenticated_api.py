@@ -21,17 +21,19 @@ from tests.test_skill_gap_run_ownership import wait_for
 
 class FakeAccounts:
     def __init__(self):
-        self.user = SimpleNamespace(id=USER_ID, active_resume_id=RESUME_ID, target_role="Software Engineer")
+        self.user = SimpleNamespace(id=USER_ID, target_role="Software Engineer")
         self.resume = SimpleNamespace(id=RESUME_ID, user_id=USER_ID, original_filename="saved-example.pdf",
             created_at=CONFIRMED_AT, confirmed_data=reviewed_resume())
+        # (user id, job family) -> résumé id: each destination has its own résumé.
+        self.links = {(USER_ID, family): RESUME_ID for family in ("software_engineer", "data_analyst", "ai_engineer")}
         self.users = {USER_ID: self.user}
         self.resumes = {RESUME_ID: self.resume}
 
     def get_user(self, user_id):
         return self.users.get(user_id)
 
-    def get_active_resume(self, user):
-        return self.resumes.get(user.active_resume_id)
+    def get_resume(self, user, job_family):
+        return self.resumes.get(self.links.get((user.id, job_family)))
 
 
 class FakeVerifier:
@@ -104,9 +106,22 @@ class AuthenticatedSkillGapApiTests(unittest.TestCase):
         self.accounts.resume.user_id = USER_ID
         self.accounts.resume.confirmed_data = {"invalid": True}
         self.assertEqual(self.client.post("/skill-gaps/runs", json={}, headers=self.headers).status_code, 409)
-        self.accounts.user.active_resume_id = None
+        self.accounts.links.clear()
         self.assertEqual(self.client.get("/skill-gaps/runs/latest", headers=self.headers).status_code, 404)
         self.assertEqual(self.calls, [])
+
+    def test_each_role_is_analyzed_with_its_own_resume(self):
+        analyst = uuid4()
+        self.accounts.resumes[analyst] = SimpleNamespace(id=analyst, user_id=USER_ID, original_filename="analyst.pdf",
+            created_at=CONFIRMED_AT, confirmed_data=reviewed_resume())
+        self.accounts.links[(USER_ID, "data_analyst")] = analyst
+        response = self.client.post("/skill-gaps/runs", json={"job_family": "data_analyst"}, headers=self.headers)
+        self.assertEqual(response.status_code, 202, response.text)
+        result = wait_for(self.manager, self.manager.get(response.json()["id"], user_id=USER_ID))
+        self.assertEqual(str(result.resume_id), str(analyst))
+        self.assertEqual(result.filename, "analyst.pdf")
+        # The selected role (Software Engineer) still has its own résumé and no analysis.
+        self.assertEqual(self.client.get("/skill-gaps/runs/latest", headers=self.headers).status_code, 404)
 
     def test_latest_restores_by_server_identity_and_hides_other_users(self):
         self.assertEqual(self.client.get("/skill-gaps/runs/latest", headers=self.headers).status_code, 404)
@@ -118,8 +133,8 @@ class AuthenticatedSkillGapApiTests(unittest.TestCase):
         self.assertEqual(restored.json()["id"], run.id)
         # A different account with identical text must neither retrieve nor reuse this run.
         other_resume_id = uuid4()
-        self.accounts.users[self.other] = SimpleNamespace(id=self.other, active_resume_id=other_resume_id,
-            target_role="Software Engineer")
+        self.accounts.users[self.other] = SimpleNamespace(id=self.other, target_role="Software Engineer")
+        self.accounts.links[(self.other, "software_engineer")] = other_resume_id
         self.accounts.resumes[other_resume_id] = SimpleNamespace(id=other_resume_id, user_id=self.other,
             original_filename="other.pdf", created_at=CONFIRMED_AT, confirmed_data=reviewed_resume())
         headers = {"Authorization": "Bearer other-token"}

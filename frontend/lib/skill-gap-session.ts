@@ -12,7 +12,8 @@ export type SkillGapSessionState = {
   elapsed: number;
 };
 export type SkillGapSessionDependencies = {
-  loadProfile: () => Promise<SkillGapProfile | null>;
+  /** The destination's role and résumé: the account's target role, or `family` when switching. */
+  loadProfile: (family?: JobFamily) => Promise<SkillGapProfile | null>;
   consumeIntent: (profile: SkillGapProfile) => boolean;
   getLatest: (family: JobFamily) => Promise<SkillGapRun>;
   getRun: (id: string) => Promise<SkillGapRun>;
@@ -124,8 +125,16 @@ export class SkillGapSession {
     if (!["software_engineer", "data_analyst", "ai_engineer"].includes(value)) return;
     this.stopTimers();
     const selected = value as JobFamily;
-    this.update({ family: selected, run: null, error: undefined, elapsed: 0 });
-    void this.restore(snapshot, selected, false);
+    const generation = ++this.generation;
+    this.update({ family: selected, run: null, error: undefined, elapsed: 0, restoring: true });
+    // Each destination has its own résumé, so load it before restoring that role's analysis.
+    void this.deps.loadProfile(selected).then((next) => {
+      if (generation !== this.generation) return;
+      this.update({ snapshot: next, restoring: false });
+      if (next) void this.restore(next, selected, false);
+    }, (error) => {
+      if (generation === this.generation) this.update({ restoring: false, error: this.deps.errorMessage(error) });
+    });
   };
   private elapsedFor(run: SkillGapRun) {
     return isActiveSkillGapRun(run)

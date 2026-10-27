@@ -1,36 +1,33 @@
 "use client";
 
-import { Plus, RotateCcw, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Pencil, Plus, Trash2, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { dateRange, list, text } from "@/lib/resume-format";
+import { cn } from "@/lib/utils";
 import type {
   ResumeAnalysis,
   ResumeClassification,
   ResumeRecord,
 } from "@/types/api";
 
+/** Asked for the account on this step; first/last name and school are pre-filled from the résumé. */
+export type Basics = { firstName: string; lastName: string; university: string; graduationYear: string };
+
 type ResumeReviewProps = {
   result: ResumeAnalysis;
   classification: ResumeClassification;
   onChange: (classification: ResumeClassification) => void;
-  onStartOver: () => void;
-  onConfirm: () => void;
-  /** True while the confirmed result is being saved. */
-  confirming?: boolean;
-  /** Why saving failed, shown above the buttons. */
-  confirmError?: string;
-  /** The student's university, pre-filled from the résumé; they confirm or change it here. */
-  university: string;
-  onUniversityChange: (university: string) => void;
+  basics: Basics;
+  onBasicsChange: (basics: Basics) => void;
+  graduationYears: string[];
+  onBack: () => void;
+  onContinue: () => void;
+  /** Why continuing isn't possible yet, shown above the buttons. */
+  error?: string;
 };
 
 type StringListKey = "research_interests" | "technical_skills";
@@ -169,21 +166,6 @@ const OBJECT_SECTIONS: Record<
   },
 };
 
-const SECTION_ORDER: Array<StringListKey | ObjectListKey> = [
-  "research_interests",
-  "education",
-  "work_experience",
-  "research_experience",
-  "projects",
-  "technical_skills",
-  "languages",
-  "publications",
-  "awards_honors",
-  "certifications",
-  "leadership_activities",
-  "other",
-];
-
 function lines(value: string) {
   return value.split("\n").map((line) => line.trim()).filter(Boolean);
 }
@@ -213,210 +195,267 @@ export function ResumeReview({
   result,
   classification,
   onChange,
-  onStartOver,
-  onConfirm,
-  confirming = false,
-  confirmError,
-  university,
-  onUniversityChange,
+  basics,
+  onBasicsChange,
+  graduationYears,
+  onBack,
+  onContinue,
+  error,
 }: ResumeReviewProps) {
+  const [editing, setEditing] = useState<Set<string>>(new Set());
+  const toggle = (key: string, on?: boolean) => setEditing((current) => {
+    const next = new Set(current);
+    if (on ?? !next.has(key)) next.add(key); else next.delete(key);
+    return next;
+  });
+  const isEditing = (key: string) => editing.has(key);
+
   const updatePersonal = (field: string, value: string | string[]) => {
     onChange({
       ...classification,
       personal_information: { ...classification.personal_information, [field]: value },
     });
   };
-
   const updateStringItem = (section: StringListKey, index: number, value: string) => {
-    const next = classification[section].map((item, itemIndex) =>
-      itemIndex === index ? value : item,
-    );
-    onChange({ ...classification, [section]: next });
+    onChange({ ...classification, [section]: classification[section].map((item, i) => (i === index ? value : item)) });
   };
-
-  const addStringItem = (section: StringListKey) => {
-    onChange({ ...classification, [section]: [...classification[section], ""] });
+  const addStringItem = (section: StringListKey, value = "") => {
+    onChange({ ...classification, [section]: [...classification[section], value] });
   };
-
   const removeStringItem = (section: StringListKey, index: number) => {
+    onChange({ ...classification, [section]: classification[section].filter((_, i) => i !== index) });
+  };
+  const updateRecord = (section: ObjectListKey, index: number, field: string, value: string | string[]) => {
     onChange({
       ...classification,
-      [section]: classification[section].filter((_, itemIndex) => itemIndex !== index),
+      [section]: classification[section].map((item, i) => (i === index ? { ...item, [field]: value } : item)),
     });
   };
-
-  const updateRecord = (
-    section: ObjectListKey,
-    index: number,
-    field: string,
-    value: string | string[],
-  ) => {
-    const next = classification[section].map((item, itemIndex) =>
-      itemIndex === index ? { ...item, [field]: value } : item,
-    );
-    onChange({ ...classification, [section]: next });
-  };
-
   const addRecord = (section: ObjectListKey) => {
-    onChange({
-      ...classification,
-      [section]: [...classification[section], blankRecord(section)],
-    });
+    onChange({ ...classification, [section]: [...classification[section], blankRecord(section)] });
   };
-
   const removeRecord = (section: ObjectListKey, index: number) => {
-    onChange({
-      ...classification,
-      [section]: classification[section].filter((_, itemIndex) => itemIndex !== index),
-    });
+    onChange({ ...classification, [section]: classification[section].filter((_, i) => i !== index) });
   };
+  const objectEditor = (section: ObjectListKey) => (
+    <ObjectListSection
+      key={section}
+      definition={OBJECT_SECTIONS[section]}
+      values={classification[section]}
+      onAdd={() => addRecord(section)}
+      onChange={(index, field, value) => updateRecord(section, index, field, value)}
+      onRemove={(index) => removeRecord(section, index)}
+    />
+  );
 
-  const emptySections = SECTION_ORDER.filter((section) => classification[section].length === 0);
+  const major = classification.education.map((entry) => text(entry.major) || text(entry.degree)).find(Boolean);
+  const experiences = [
+    ...classification.work_experience.map((r) => ({ title: r.title, org: r.company, record: r })),
+    ...classification.research_experience.map((r) => ({ title: r.title, org: r.organization, record: r })),
+    ...classification.leadership_activities.map((r) => ({ title: r.role, org: r.organization, record: r })),
+  ];
+  const coursework = classification.education.flatMap((entry) => list(entry.content));
+  const more = MORE_SECTIONS.filter((section) => classification[section].length > 0);
+  const missing = MORE_SECTIONS.filter((section) => classification[section].length === 0);
 
   return (
     <div className="grid gap-6">
       <div>
-        <h2 className="text-page-title tracking-[-0.02em]">Review the extracted résumé</h2>
-        <p className="mt-1.5 text-muted-foreground">
-          Check and edit the Agent&apos;s classification. Empty categories are hidden below. When you
-          continue, the result is saved to your account and shown on your profile.
+        <h1 className="text-page-title">Here’s what we found</h1>
+        <p className="mt-2 text-base/7 text-muted-foreground">
+          From {result.filename}. Fix anything we got wrong before you choose a target role.
         </p>
       </div>
 
-      <Field className="max-w-100">
-        <FieldLabel htmlFor="university">University</FieldLabel>
-        <Input
-          id="university"
-          value={university}
-          onChange={(event) => onUniversityChange(event.target.value)}
-          maxLength={150}
-          autoComplete="organization"
-          aria-describedby="university-hint"
-        />
-        <p id="university-hint" className="text-xs text-muted-foreground">
-          From your résumé. Change it if this isn&apos;t the school you attend now.
-        </p>
-      </Field>
-
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle>{result.filename}</CardTitle>
-          <CardDescription>
-            {result.extraction.parser} · {result.extraction.characters.toLocaleString()} characters ·
-            extraction {result.extraction.seconds.toFixed(4)}s · Agent {result.agent.seconds.toFixed(4)}s
-            {result.extraction.ocr_pages.length > 0 &&
-              ` · OCR page${result.extraction.ocr_pages.length === 1 ? "" : "s"} ${result.extraction.ocr_pages.join(", ")}`}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <details className="rounded-lg border border-border bg-background p-3">
-            <summary className="cursor-pointer text-control font-semibold">
-              View actual extracted text
-            </summary>
-            <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap font-mono text-xs leading-relaxed text-ink-2">
-              {result.extraction.text}
-            </pre>
-          </details>
-        </CardContent>
-      </Card>
-
-      <Card size="sm">
-        <CardHeader>
-          <CardTitle>Personal Information</CardTitle>
-          <CardDescription>Contact details explicitly found in the résumé</CardDescription>
-        </CardHeader>
-        <CardContent className="grid gap-4 sm:grid-cols-2">
-          {PERSONAL_FIELDS.map((field) => {
-            const value = classification.personal_information[field.key];
-            return field.type === "list" ? (
-              <PersonalListField
-                key={field.key}
-                label={field.label}
-                itemLabel={field.itemLabel ?? "item"}
-                values={Array.isArray(value) ? value : []}
-                onChange={(next) => updatePersonal(field.key, next)}
-              />
-            ) : field.type === "lines" ? (
-              <TextAreaField
-                key={field.key}
-                label={field.label}
-                value={Array.isArray(value) ? value.join("\n") : ""}
-                onChange={(next) => updatePersonal(field.key, lines(next))}
-              />
-            ) : (
-              <TextInputField
-                key={field.key}
-                label={field.label}
-                value={typeof value === "string" ? value : ""}
-                onChange={(next) => updatePersonal(field.key, next)}
-              />
-            );
-          })}
-        </CardContent>
-      </Card>
-
-      {SECTION_ORDER.map((section) => {
-        const values = classification[section];
-        if (values.length === 0) return null;
-        return isStringSection(section) ? (
-          <StringListSection
-            key={section}
-            label={STRING_SECTIONS[section]}
-            values={classification[section]}
-            onAdd={() => addStringItem(section)}
-            onChange={(index, value) => updateStringItem(section, index, value)}
-            onRemove={(index) => removeStringItem(section, index)}
-          />
+      <ReviewSection title="Basic information" action={<EditButton editing={isEditing("basics")} onClick={() => toggle("basics")} />}>
+        {isEditing("basics") ? (
+          <div className="grid gap-4 sm:grid-cols-2">
+            <TextInputField label="First name" value={basics.firstName} onChange={(firstName) => onBasicsChange({ ...basics, firstName })} />
+            <TextInputField label="Last name" value={basics.lastName} onChange={(lastName) => onBasicsChange({ ...basics, lastName })} />
+            <TextInputField label="School" value={basics.university} onChange={(university) => onBasicsChange({ ...basics, university })} />
+            <Field>
+              <FieldLabel htmlFor="graduation-year">Graduation year</FieldLabel>
+              <select id="graduation-year" value={basics.graduationYear}
+                onChange={(event) => onBasicsChange({ ...basics, graduationYear: event.target.value })}
+                className="h-12 w-full rounded-lg border border-input bg-card px-4 text-base outline-none focus-visible:border-foreground focus-visible:ring-3 focus-visible:ring-ring/15">
+                <option value="">Select a year</option>
+                {graduationYears.map((year) => <option key={year} value={year}>{year}</option>)}
+              </select>
+            </Field>
+            <div className="grid gap-4 border-t border-border pt-4 sm:col-span-2 sm:grid-cols-2">
+              <p className="eyebrow sm:col-span-2">Contact details on your résumé</p>
+              {PERSONAL_FIELDS.map((field) => {
+                const value = classification.personal_information[field.key];
+                return field.type === "list" ? (
+                  <PersonalListField key={field.key} label={field.label} itemLabel={field.itemLabel ?? "item"}
+                    values={Array.isArray(value) ? value : []} onChange={(next) => updatePersonal(field.key, next)} />
+                ) : (
+                  <TextInputField key={field.key} label={field.label} value={typeof value === "string" ? value : ""}
+                    onChange={(next) => updatePersonal(field.key, next)} />
+                );
+              })}
+            </div>
+          </div>
         ) : (
-          <ObjectListSection
-            key={section}
-            definition={OBJECT_SECTIONS[section]}
-            values={classification[section]}
-            onAdd={() => addRecord(section)}
-            onChange={(index, field, value) => updateRecord(section, index, field, value)}
-            onRemove={(index) => removeRecord(section, index)}
-          />
-        );
-      })}
+          <dl className="grid gap-x-6 gap-y-4 sm:grid-cols-3">
+            <Fact label="Name" value={`${basics.firstName} ${basics.lastName}`.trim()} />
+            <Fact label="School" value={basics.university} />
+            <Fact label="Major" value={major} />
+            <Fact label="Graduation" value={basics.graduationYear} />
+          </dl>
+        )}
+      </ReviewSection>
 
-      {emptySections.length > 0 && (
-        <details className="rounded-xl border border-dashed border-border bg-card p-4">
-          <summary className="cursor-pointer font-semibold">
-            Add missing information ({emptySections.length} empty categories)
-          </summary>
-          <div className="mt-4 flex flex-wrap gap-2">
-            {emptySections.map((section) => (
-              <Button
-                key={section}
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  isStringSection(section) ? addStringItem(section) : addRecord(section)
-                }
-              >
-                <Plus data-icon="inline-start" />
-                {isStringSection(section) ? STRING_SECTIONS[section] : OBJECT_SECTIONS[section].label}
-              </Button>
+      <ReviewSection title="Experience" action={<EditButton editing={isEditing("experience")} onClick={() => toggle("experience")} />}>
+        {isEditing("experience") ? (
+          <div className="grid gap-6">{EXPERIENCE_SECTIONS.map(objectEditor)}</div>
+        ) : experiences.length ? (
+          <ul className="divide-y divide-border">
+            {experiences.map(({ title, org, record }, index) => (
+              <li key={index} className="py-4 first:pt-0 last:pb-0">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <p className="font-bold">{[text(title), text(org)].filter(Boolean).join(" · ") || "Untitled"}</p>
+                  <p className="font-mono text-sm text-muted-foreground">{dateRange(record)}</p>
+                </div>
+                {list(record.content).length > 0 && (
+                  <ul className="mt-2 grid list-disc gap-1 pl-5 text-muted-foreground">
+                    {list(record.content).map((line, i) => <li key={i}>{line}</li>)}
+                  </ul>
+                )}
+              </li>
             ))}
+          </ul>
+        ) : <Empty>No experience found. Add jobs, research or leadership roles.</Empty>}
+      </ReviewSection>
+
+      <ReviewSection title="Skills" action={<EditButton editing={isEditing("skills")} onClick={() => toggle("skills")} />}>
+        <ul className="flex flex-wrap gap-2">
+          {classification.technical_skills.map((skill, index) => skill.trim() && (
+            <li key={index} className="inline-flex items-center gap-1 rounded-full bg-sunken py-1.5 pr-2 pl-3.5 font-semibold">
+              {skill}
+              <button type="button" aria-label={`Remove ${skill}`} onClick={() => removeStringItem("technical_skills", index)}
+                className="grid size-6 place-items-center rounded-full text-muted-foreground hover:bg-card hover:text-foreground">
+                <X aria-hidden className="size-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+        {!classification.technical_skills.some((skill) => skill.trim()) && !isEditing("skills") && <Empty>No skills listed.</Empty>}
+        {isEditing("skills") && <AddSkill onAdd={(value) => addStringItem("technical_skills", value)} />}
+      </ReviewSection>
+
+      <ReviewSection title="Projects and coursework" action={<EditButton editing={isEditing("projects")} onClick={() => toggle("projects")} />}>
+        {isEditing("projects") ? (
+          <div className="grid gap-6">{objectEditor("projects")}{objectEditor("education")}</div>
+        ) : classification.projects.length || coursework.length ? (
+          <ul className="grid gap-3">
+            {classification.projects.map((project, index) => (
+              <li key={`p${index}`} className="flex flex-wrap items-baseline justify-between gap-x-4">
+                <span className="font-bold">{text(project.name) || "Untitled project"}</span>
+                <span className="text-sm text-muted-foreground">{list(project.technologies).join(", ") || "Project"}</span>
+              </li>
+            ))}
+            {coursework.map((line, index) => (
+              <li key={`c${index}`} className="flex flex-wrap items-baseline justify-between gap-x-4">
+                <span className="font-bold">{line}</span>
+                <span className="text-sm text-muted-foreground">Listed under Education</span>
+              </li>
+            ))}
+          </ul>
+        ) : <Empty>No projects or coursework found.</Empty>}
+      </ReviewSection>
+
+      {(more.length > 0 || missing.length > 0) && (
+        <details className="rounded-2xl border border-border bg-card p-6 shadow-card sm:px-8">
+          <summary className="cursor-pointer text-title">More from your résumé</summary>
+          <div className="mt-5 grid gap-6">
+            {more.map((section) => isStringSection(section) ? (
+              <StringListSection key={section} label={STRING_SECTIONS[section]} values={classification[section]}
+                onAdd={() => addStringItem(section)} onChange={(index, value) => updateStringItem(section, index, value)}
+                onRemove={(index) => removeStringItem(section, index)} />
+            ) : objectEditor(section))}
+            {missing.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {missing.map((section) => (
+                  <Button key={section} type="button" variant="outline" size="sm"
+                    onClick={() => (isStringSection(section) ? addStringItem(section) : addRecord(section))}>
+                    <Plus data-icon="inline-start" />
+                    {isStringSection(section) ? STRING_SECTIONS[section] : OBJECT_SECTIONS[section].label}
+                  </Button>
+                ))}
+              </div>
+            )}
+            <details className="rounded-lg bg-sunken p-4">
+              <summary className="cursor-pointer text-sm font-bold">
+                The text we read ({result.extraction.characters.toLocaleString()} characters
+                {result.extraction.ocr_pages.length > 0 && `, OCR on page ${result.extraction.ocr_pages.join(", ")}`})
+              </summary>
+              <pre className="mt-3 max-h-72 overflow-auto font-mono text-xs/relaxed whitespace-pre-wrap text-muted-foreground">
+                {result.extraction.text}
+              </pre>
+            </details>
           </div>
         </details>
       )}
 
-      {confirmError && (
-        <p role="alert" className="text-control text-destructive">
-          {confirmError}
-        </p>
-      )}
-      <div className="grid gap-3 border-t border-border pt-5 sm:grid-cols-[auto_1fr]">
-        <Button type="button" variant="outline" size="lg" onClick={onStartOver}>
-          <RotateCcw data-icon="inline-start" /> Choose another résumé
-        </Button>
-        <Button type="button" size="lg" onClick={onConfirm} disabled={confirming}>
-          {confirming ? "Saving…" : "Looks right, continue"}
-        </Button>
+      {error && <p role="alert" className="text-destructive">{error}</p>}
+      <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+        <Button type="button" variant="ghost" size="lg" onClick={onBack}>Back</Button>
+        <Button type="button" size="lg" onClick={onContinue}>Looks right<ArrowRight data-icon="inline-end" /></Button>
       </div>
     </div>
+  );
+}
+
+const EXPERIENCE_SECTIONS: ObjectListKey[] = ["work_experience", "research_experience", "leadership_activities"];
+const MORE_SECTIONS: Array<StringListKey | ObjectListKey> = [
+  "certifications", "awards_honors", "publications", "languages", "research_interests", "other",
+];
+
+function ReviewSection({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="rounded-2xl border border-border bg-card p-6 shadow-card sm:px-8">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-xl">{title}</h2>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function EditButton({ editing, onClick }: { editing: boolean; onClick: () => void }) {
+  return (
+    <Button type="button" variant="ghost" size="sm" aria-expanded={editing} onClick={onClick}>
+      {editing ? "Done" : <><Pencil data-icon="inline-start" />Edit</>}
+    </Button>
+  );
+}
+
+function Fact({ label, value }: { label: string; value?: string }) {
+  return (
+    <div>
+      <dt className="eyebrow">{label}</dt>
+      <dd className={cn("mt-1 font-bold", !value && "font-normal text-muted-foreground")}>{value || "Not found"}</dd>
+    </div>
+  );
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return <p className="text-muted-foreground">{children}</p>;
+}
+
+function AddSkill({ onAdd }: { onAdd: (skill: string) => void }) {
+  const [value, setValue] = useState("");
+  return (
+    <form className="mt-4 flex gap-2" onSubmit={(event) => {
+      event.preventDefault();
+      if (value.trim()) onAdd(value.trim());
+      setValue("");
+    }}>
+      <Input value={value} onChange={(event) => setValue(event.target.value)} placeholder="Add a skill, e.g. Tableau" aria-label="New skill" />
+      <Button type="submit" variant="outline" size="lg">Add</Button>
+    </form>
   );
 }
 
@@ -434,12 +473,8 @@ function StringListSection({
   onRemove: (index: number) => void;
 }) {
   return (
-    <Card size="sm">
-      <CardHeader>
-        <CardTitle>{label}</CardTitle>
-        <CardDescription>{values.length} identified</CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-3">
+    <div className="grid gap-3">
+      <p className="eyebrow">{label}</p>
         {values.map((value, index) => (
           <div key={index} className="flex gap-2">
             <Input
@@ -461,8 +496,7 @@ function StringListSection({
         <Button type="button" variant="outline" size="sm" className="justify-self-start" onClick={onAdd}>
           <Plus data-icon="inline-start" /> Add item
         </Button>
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 
@@ -480,14 +514,10 @@ function ObjectListSection({
   onRemove: (index: number) => void;
 }) {
   return (
-    <Card size="sm">
-      <CardHeader>
-        <CardTitle>{definition.label}</CardTitle>
-        <CardDescription>{values.length} identified</CardDescription>
-      </CardHeader>
-      <CardContent className="grid gap-4">
+    <div className="grid gap-4">
+      <p className="eyebrow">{definition.label}</p>
         {values.map((record, index) => (
-          <div key={index} className="relative grid gap-4 rounded-lg border border-border p-4 pr-12 sm:grid-cols-2">
+          <div key={index} className="relative grid gap-4 rounded-xl bg-sunken p-4 pr-12 sm:grid-cols-2">
             {definition.fields.map((field) => {
               const value = record[field.key];
               return field.type === "month" ? (
@@ -529,8 +559,7 @@ function ObjectListSection({
         <Button type="button" variant="outline" size="sm" className="justify-self-start" onClick={onAdd}>
           <Plus data-icon="inline-start" /> Add {definition.itemLabel}
         </Button>
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 
@@ -676,7 +705,7 @@ function TextAreaField({
         value={value}
         rows={Math.max(3, value.split("\n").length + 1)}
         onChange={(event) => onChange(event.target.value)}
-        className="w-full resize-y rounded-lg border border-input bg-card px-3 py-2 text-sm outline-none focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-accent"
+        className="w-full resize-y rounded-lg border border-input bg-card px-4 py-2.5 text-base outline-none focus-visible:border-foreground focus-visible:ring-3 focus-visible:ring-ring/15"
       />
     </Field>
   );

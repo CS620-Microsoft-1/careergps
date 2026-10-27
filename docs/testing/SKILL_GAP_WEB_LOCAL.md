@@ -100,19 +100,24 @@ or multi-instance deployment requires shared job/result storage in a later PR.
 
 Dashboard, Career Analysis, Skill Gaps and Profile share the analysis. Existing
 Supabase login, account menu, onboarding guard and profile data remain intact.
-Overall career readiness, common responsibilities and action plans are not yet
-computed.
+Each run also returns `match`: résumé evidence weighted by the same demand weight
+as the gap priority (`app/services/skill_gaps/match.py`). It is an uncalibrated
+summary, not a hiring probability. Common responsibilities are not yet computed.
+
+Saved resources (the action plan) use the same local-JSON approach, one file per
+user under `local_results/plans`. The resource catalog is `data/resources.yaml`.
 
 ## Endpoints
 
-All `/skill-gaps/*` endpoints require a logged-in, onboarded user:
+All `/skill-gaps/*` endpoints require a logged-in, onboarded user, except
+`/skill-gaps/market/*`, which only needs a login so setup can show it:
 
 - `GET /skill-gaps/market/{job_family}`: frozen demand and provenance metadata.
 - `POST /skill-gaps/runs` with `{ "job_family": "software_engineer", "force": false }`:
-  load the user's active saved resume and enqueue/reuse one run. Omit `job_family`
+  load the resume that role's destination uses and enqueue/reuse one run. Omit `job_family`
   to use the account target role. The body does not accept resume JSON or owner IDs.
 - `GET /skill-gaps/runs/latest?job_family=software_engineer`: restore the current
-  user's active resume and current configuration, or return 404.
+  role's résumé and current configuration, or return 404.
 - `GET /skill-gaps/runs/{id}`: owner-only status/result polling; never calls the Agent.
 
 ## Offline tests

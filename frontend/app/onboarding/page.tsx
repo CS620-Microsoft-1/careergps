@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
-import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
-import { OnboardingForm } from "@/components/auth/onboarding-form";
-import { SignOutLink } from "@/components/auth/sign-out-link";
+import { SetupFlow } from "@/components/setup/setup-flow";
 import { getGraduationYears } from "@/lib/graduation-years";
 
-export const metadata: Metadata = { title: "Your career goal" };
+export const metadata: Metadata = { title: "Set up your route" };
 
 export default async function OnboardingPage() {
+  const graduationYears = await getGraduationYears();
+  // ?step= is read in the browser (useSearchParams), so the flow renders below a Suspense boundary.
   return (
-    <AuthShell
-      title="Where do you want your career to go?"
-      description="Tell us your goal. We'll compare your experience with real job-market data and map the clearest path forward."
-      contentClassName="max-w-3xl"
-    >
-      <AuthHeading title="Your career goal" subtitle="You can change this anytime." />
-      <OnboardingForm graduationYears={await getGraduationYears()} />
-      <SignOutLink />
-    </AuthShell>
+    <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
+      <SetupFlow graduationYears={graduationYears} />
+    </Suspense>
   );
 }

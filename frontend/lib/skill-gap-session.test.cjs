@@ -24,10 +24,10 @@ const run = (extra = {}) => ({ id: "run-a", user_id: profile.user_id, resume_id:
   elapsed_seconds: 60, model_calls: 1, report: null, error: null, reused: false, ...extra });
 
 function fixture(options = {}) {
-  const starts = [], latest = [], gets = [], timers = new Map();
+  const starts = [], latest = [], gets = [], loads = [], timers = new Map();
   let intent = Boolean(options.intent), consumed = 0;
   const deps = {
-    loadProfile: async () => profile,
+    loadProfile: async (family) => { loads.push(family); return family ? { ...profile, job_family: family } : profile; },
     consumeIntent: () => { consumed++; const value = intent; intent = false; return value; },
     getLatest: async (family) => { latest.push(family); if (options.latestError) throw options.latestError;
       return options.latestRun ?? run({ job_family: family }); },
@@ -43,7 +43,7 @@ function fixture(options = {}) {
   };
   const session = new SkillGapSession(deps);
   let disconnect = session.connect();
-  return { session, starts, latest, gets, timers, deps, consumed: () => consumed,
+  return { session, starts, latest, gets, loads, timers, deps, consumed: () => consumed,
     disconnect: () => disconnect(), reconnect: () => { disconnect = session.connect(); } };
 }
 
@@ -89,6 +89,8 @@ test("explicit Analyze again passes force once and locks while a run is active",
 test("switching direction restores via GET and requires an explicit analysis click", async () => {
   const f = fixture({ latestError: missing }); await f.session.initialize();
   f.session.changeFamily("ai_engineer"); await flush();
+  assert.deepEqual(f.loads, [undefined, "ai_engineer"]);
+  assert.equal(f.session.getSnapshot().snapshot.job_family, "ai_engineer");
   assert.deepEqual(f.latest, ["software_engineer", "ai_engineer"]);
   assert.equal(f.session.getSnapshot().family, "ai_engineer"); assert.equal(f.starts.length, 0); f.disconnect();
 });
@@ -108,12 +110,12 @@ test("disconnect while loading cannot submit; reconnect finishes the one-time re
   assert.equal(f.starts.length, 1); f.disconnect();
 });
 
-test("saved profile mapping checks active resume identity and uses the account's target role", () => {
+test("saved profile pairs the selected role (the target role by default) with its résumé", () => {
   const { profileForAnalysis } = load("skill-gap-profile.ts");
-  const user = { id: "u", active_resume_id: "r", target_role: "Data Analyst" };
+  const user = { id: "u", target_role: "Data Analyst" };
   const resume = { id: "r", original_filename: "Fictional.pdf", created_at: "now" };
   assert.equal(profileForAnalysis(user, resume).job_family, "data_analyst");
-  assert.throws(() => profileForAnalysis(user, { ...resume, id: "other" }), /active résumé changed/);
+  assert.equal(profileForAnalysis(user, resume, "ai_engineer").job_family, "ai_engineer");
   assert.throws(() => profileForAnalysis({ ...user, target_role: "unknown" }, resume), /supported target role/);
 });
 test("save intent stores only identifiers and cannot transfer across users or resumes", () => {

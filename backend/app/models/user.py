@@ -4,7 +4,6 @@ from datetime import datetime
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
-    ForeignKeyConstraint,
     SmallInteger,
     String,
     Text,
@@ -24,15 +23,6 @@ class User(Base):
     __table_args__ = (
         CheckConstraint("primary_email = lower(primary_email)", name="ck_users_primary_email_lowercase"),
         CheckConstraint("graduation_year BETWEEN 2000 AND 2100", name="ck_users_graduation_year_range"),
-        # The active résumé must belong to this user. Created after the resumes table (circular reference).
-        # Deleting that résumé clears only the pointer, never the user.
-        ForeignKeyConstraint(
-            ["active_resume_id", "id"],
-            ["resumes.id", "resumes.user_id"],
-            name="fk_users_active_resume",
-            ondelete="SET NULL (active_resume_id)",
-            use_alter=True,
-        ),
     )
 
     # Same id as the Supabase Auth account (auth.users.id), never generated here.
@@ -46,7 +36,8 @@ class User(Base):
     # From the confirmed résumé; may be missing or differ from first + last name.
     full_name: Mapped[str | None] = mapped_column(String(255))
 
-    # Career goals from onboarding. Allowed roles and levels are validated in the backend, not with a
+    # Career goals from onboarding. target_role is also the selected destination: the agents use
+    # the résumé linked to it (resumes.job_family). Allowed roles and levels are validated in the backend, not with a
     # CHECK, so the lists can change without a migration.
     target_role: Mapped[str] = mapped_column(String(30), nullable=False)
     experience_level: Mapped[str] = mapped_column(String(20), nullable=False)
@@ -66,8 +57,6 @@ class User(Base):
     github_url: Mapped[str | None] = mapped_column(String(2048))
     website_url: Mapped[str | None] = mapped_column(String(2048))
 
-    # The résumé the agents use: the newest confirmed one, unless the student picks an older one.
-    active_resume_id: Mapped[uuid.UUID | None] = mapped_column(index=True)
 
     # The terms checkbox is on the sign-up page; résumé text is processed by Azure.
     terms_accepted_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)

@@ -2,308 +2,283 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CircleCheck } from "lucide-react";
-import { ProfileSkillSection } from "@/components/profile/profile-skill-section";
+import { BookOpen, Briefcase, Check, FileText, GraduationCap, LoaderCircle, Plus, Upload, Users } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ROLE_NAMES, skillLabel } from "@/components/career/route-parts";
+import { useAccount } from "@/components/layout/account-provider";
+import { BackendStatus } from "@/components/layout/backend-status";
+import { usePlan } from "@/components/plan/plan-provider";
+import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { getMe, getSavedResume } from "@/lib/api/me";
-import { getSupabase } from "@/lib/supabase/client";
-import type { MeResponse, ResumeClassification, ResumeRecord, SavedResume } from "@/types/api";
+import { Input } from "@/components/ui/input";
+import { errorMessage } from "@/lib/api/client";
+import { getSavedResume, listResumes, setDestinationResume } from "@/lib/api/me";
+import { EVIDENCE_LABELS, evidenceLevel, rankGaps, rankStrengths } from "@/lib/career";
+import { EXPERIENCE_LEVELS } from "@/lib/options";
+import { dateRange, list, text } from "@/lib/resume-format";
+import type { ResumeClassification, ResumeSummary, SavedResume } from "@/types/api";
 
-type ProfileState = {
-  status: "loading" | "ready";
-  email: string | null;
-  me: MeResponse | null;
-  saved: SavedResume | null;
-};
+type Library = { status: "loading" | "ready" | "error"; versions: ResumeSummary[]; active: SavedResume | null };
 
 export function ProfileView() {
-  const [state, setState] = useState<ProfileState>({
-    status: "loading",
-    email: null,
-    me: null,
-    saved: null,
-  });
+  const { user, email, displayName, initials, status } = useAccount();
+  const [library, setLibrary] = useState<Library>({ status: "loading", versions: [], active: null });
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      let email: string | null = null;
-      let saved: SavedResume | null = null;
-      let me: MeResponse | null = null;
-      try {
-        const { data } = await getSupabase().auth.getUser();
-        if (data.user) {
-          email = data.user.email ?? null;
-          // The page still works from Supabase alone if the API is down.
-          [me, saved] = await Promise.all([
-            getMe().catch(() => null),
-            getSavedResume().catch(() => null),
-          ]);
-        }
-      } catch {
-        // No Supabase session or config: show the empty state.
-      }
-      if (!cancelled) setState({ status: "ready", email, me, saved });
-    })();
-    return () => {
-      cancelled = true;
-    };
+    Promise.all([listResumes(), getSavedResume()])
+      .then(([versions, active]) => !cancelled && setLibrary({ status: "ready", versions, active }))
+      .catch(() => !cancelled && setLibrary({ status: "error", versions: [], active: null }));
+    return () => { cancelled = true; };
   }, []);
 
-  const classification = state.saved?.classification;
+  const classification = library.active?.classification;
+  const major = classification?.education.map((e) => text(e.major)).find(Boolean);
 
-  return (
-    <>
-      <IdentityCard state={state} />
-
-      {state.status === "ready" && (
-        <>
-          <p className="mb-4 flex items-center gap-2.5 rounded-lg bg-accent px-3.5 py-2.5 text-control text-accent-foreground">
-            <CircleCheck aria-hidden className="size-4 shrink-0" />
-            Skills are rated by demonstrated evidence, not keywords.
-          </p>
-
-          <ProfileSkillSection />
-
-          {classification && <ResumeSections classification={classification} />}
-        </>
-      )}
-    </>
-  );
-}
-
-function IdentityCard({ state }: { state: ProfileState }) {
-  const { me, saved, email } = state;
-  const personal = saved?.classification.personal_information;
-
-  const resumeName = text(personal?.name);
-  const user = me?.user;
-  const accountName = user ? `${user.first_name} ${user.last_name}`.trim() : "";
-  const name =
-    accountName || user?.full_name?.trim() || resumeName || email?.split("@")[0] || (state.status === "loading" ? "" : "Student");
-  const initials = initialsOf(name || email || "S");
-
-  const targetRole = user?.target_role ?? null;
-  const experienceLevel = user?.experience_level ?? null;
-  const graduationYear = user?.graduation_year?.toString() ?? null;
-  const location = user?.preferred_location ?? text(personal?.location);
-  const university = user?.university ?? null;
-
-  const contacts = [
-    ...list(personal?.phones),
-    text(personal?.linkedin),
-    text(personal?.github),
-    text(personal?.website),
-  ].filter(Boolean);
-
-  return (
-    <Card className="mb-4">
-      <CardContent className="flex flex-wrap items-center gap-4">
-        <Avatar size="lg">
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div className="min-w-0 flex-1 basis-48">
-          <h2 className="text-base">{name || "Loading your profile…"}</h2>
-          {email && <p className="truncate text-control text-ink-2">{email}</p>}
-          {state.status === "ready" && (
-            <p className="text-muted-foreground">
-              {saved
-                ? `Résumé: ${saved.original_filename} · saved ${formatSavedAt(saved.created_at)}`
-                : "No résumé uploaded yet"}
-            </p>
-          )}
-          {state.status === "ready" && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              <Badge variant={targetRole ? "brand" : "default"}>{targetRole ?? "Target role not set"}</Badge>
-              {experienceLevel && <Badge>{experienceLevel}</Badge>}
-              <Badge>{graduationYear ? `Class of ${graduationYear}` : "Graduation year not set"}</Badge>
-              {university && <Badge>{university}</Badge>}
-              {location && <Badge>{location}</Badge>}
-            </div>
-          )}
-          {contacts.length > 0 && (
-            <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
-              {contacts.map((item) => (
-                <span key={item} className="break-all">
-                  {item}
-                </span>
-              ))}
-            </p>
-          )}
+  return <>
+    <div className="mb-8 flex flex-wrap items-center gap-5">
+      <span aria-hidden className="grid size-18 shrink-0 place-items-center rounded-full bg-tint-blue text-2xl font-extrabold">{initials}</span>
+      <div className="min-w-0">
+        <h1 className="text-page-title">{displayName || (status === "loading" ? "Loading…" : "Your profile")}</h1>
+        <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <span className="font-mono text-sm text-muted-foreground">
+            {[major, user && `Class of ${user.graduation_year}`].filter(Boolean).join(" · ")}
+          </span>
+          {user?.university && <span className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-0.5 text-sm font-bold">
+            <GraduationCap aria-hidden className="size-4" />{user.university}</span>}
         </div>
-        {state.status === "ready" && (
-          <Button asChild variant="outline">
-            <Link href="/onboarding">{saved ? "Upload a new résumé" : "Upload résumé"}</Link>
-          </Button>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
-
-type Entry = { key: string; title: string; subtitle?: string; meta?: string; details: string[] };
-
-function ResumeSections({ classification: c }: { classification: ResumeClassification }) {
-  const sections: { title: string; entries: Entry[] }[] = [
-    {
-      title: "Experience",
-      entries: [
-        ...c.work_experience.map((r, i) =>
-          entry(`work-${i}`, r.title, [r.company, r.location], dates(r), r.content),
-        ),
-        ...c.research_experience.map((r, i) =>
-          entry(`research-${i}`, r.title, ["Research", r.organization, r.location], dates(r), r.content),
-        ),
-      ],
-    },
-    {
-      title: "Education",
-      entries: c.education.map((r, i) =>
-        entry(
-          `edu-${i}`,
-          r.institution,
-          [[text(r.degree), text(r.major)].filter(Boolean).join(", "), text(r.gpa) && `GPA ${text(r.gpa)}`],
-          dates(r),
-          r.content,
-        ),
-      ),
-    },
-    {
-      title: "Projects",
-      entries: c.projects.map((r, i) =>
-        entry(`project-${i}`, r.name, [list(r.technologies).join(", ")], text(r.url), r.content),
-      ),
-    },
-    {
-      title: "Leadership and Activities",
-      entries: c.leadership_activities.map((r, i) =>
-        entry(`lead-${i}`, r.role, [r.organization, r.location], dates(r), r.content),
-      ),
-    },
-    {
-      title: "Certifications",
-      entries: c.certifications.map((r, i) => entry(`cert-${i}`, r.name, [r.issuer], text(r.date), r.content)),
-    },
-    {
-      title: "Awards and Honors",
-      entries: c.awards_honors.map((r, i) => entry(`award-${i}`, r.name, [r.issuer], text(r.date), r.content)),
-    },
-    {
-      title: "Publications",
-      entries: c.publications.map((r, i) =>
-        entry(`pub-${i}`, r.title, [r.authors, r.venue], text(r.date), r.content),
-      ),
-    },
-    {
-      title: "Languages",
-      entries: c.languages.map((r, i) => entry(`lang-${i}`, r.name, [r.proficiency], "", [])),
-    },
-    {
-      title: "Research Interests",
-      entries: c.research_interests.filter(Boolean).map((item, i) => entry(`interest-${i}`, item, [], "", [])),
-    },
-    {
-      // What the classifier couldn't place, e.g. a professional summary.
-      title: "More from your résumé",
-      entries: c.other.map((r, i) => {
-        const [first, ...rest] = text(r.content).split("\n");
-        return entry(`other-${i}`, sentenceCase(first), [], "", rest);
-      }),
-    },
-  ].filter((section) => section.entries.length > 0);
-
-  if (sections.length === 0) return null;
-
-  return (
-    <div className="mt-4 grid items-start gap-4 lg:grid-cols-2">
-      {sections.map((section) => (
-        <Card key={section.title} size="sm">
-          <CardHeader>
-            <CardTitle>{section.title}</CardTitle>
-            <CardDescription>From your résumé</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="grid gap-3">
-              {section.entries.map((item) => (
-                <li key={item.key} className="border-t border-line-soft pt-3 first:border-t-0 first:pt-0">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-                    <p className="text-control font-semibold">{item.title}</p>
-                    {item.meta && <p className="text-xs break-all text-muted-foreground">{item.meta}</p>}
-                  </div>
-                  {item.subtitle && <p className="text-control text-ink-2">{item.subtitle}</p>}
-                  {item.details.length > 0 && (
-                    <ul className="mt-1.5 grid list-disc gap-1 pl-4 text-control text-ink-2">
-                      {item.details.map((detail, i) => (
-                        <li key={i}>{detail}</li>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-      ))}
+      </div>
     </div>
+
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+      <div className="grid gap-6">
+        <ResumeLibrary library={library} />
+        <Skills classification={classification} />
+        {classification && <Experience classification={classification} />}
+      </div>
+      <aside className="grid gap-5">
+        <SchoolCard email={email} />
+        <GoalCard />
+        <section className="rounded-2xl bg-sunken p-6">
+          <h2 className="text-title">Your data</h2>
+          <p className="mt-2 text-sm/6 text-muted-foreground">Only you can see your résumés. We keep each version you confirm so you can go back to it.</p>
+          <BackendStatus className="mt-4" />
+        </section>
+      </aside>
+    </div>
+  </>;
+}
+
+function ResumeLibrary({ library }: { library: Library }) {
+  const { family } = useSkillGapAnalysis();
+  const [switching, setSwitching] = useState<string>();
+  const [error, setError] = useState<string>();
+  const role = ROLE_NAMES[family];
+  const use = async (id: string) => {
+    setSwitching(id);
+    setError(undefined);
+    try {
+      await setDestinationResume(family, id);
+      // The analysis, plan and nav bar all follow the selected destination's résumé: start them fresh.
+      window.location.reload();
+    } catch (failure) {
+      setError(errorMessage(failure, "Couldn’t switch résumés. Try again."));
+      setSwitching(undefined);
+    }
+  };
+  return (
+    <section aria-labelledby="resumes" className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
+      <h2 id="resumes" className="text-section">Résumé library</h2>
+      <p className="mt-1 text-sm/6 text-muted-foreground">Each destination is matched against one résumé, and roles can share one. Switching the résumé for {role.toLowerCase()} recalculates only that route.</p>
+      {library.status === "loading" ? <p className="mt-4 text-muted-foreground">Loading your résumés…</p>
+        : library.status === "error" ? <p role="alert" className="mt-4 text-destructive">Your résumés could not be loaded.</p>
+        : <ul className="mt-5 grid gap-3">
+          {library.versions.map((version) => {
+            const selected = version.destinations.includes(family);
+            return (
+              <li key={version.id} className="flex flex-wrap items-center gap-4 rounded-xl bg-sunken px-5 py-4">
+                <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-card"><FileText className="size-4.5" /></span>
+                <div className="min-w-0 flex-1 basis-48">
+                  <p className="truncate font-bold">{version.label ?? version.original_filename}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Confirmed {formatDate(version.created_at)} · {version.destinations.length
+                      ? `used for ${version.destinations.map((key) => ROLE_NAMES[key].toLowerCase()).join(", ")}` : "not in use"}
+                  </p>
+                </div>
+                {selected ? <Badge variant="brand">In use</Badge>
+                  : <Button variant="outline" disabled={Boolean(switching)} onClick={() => void use(version.id)}>
+                    {switching === version.id && <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />}Use for {role.toLowerCase()}
+                  </Button>}
+              </li>
+            );
+          })}
+        </ul>}
+      {error && <p role="alert" className="mt-3 text-sm text-destructive">{error}</p>}
+      <Link href="/onboarding" className="mt-4 flex h-14 items-center justify-center gap-2 rounded-xl border border-dashed border-line-strong font-bold hover:bg-background">
+        <Upload aria-hidden className="size-4.5" />Upload a résumé version
+      </Link>
+    </section>
   );
 }
 
-type Value = ResumeRecord[string] | undefined;
+function Skills({ classification }: { classification?: ResumeClassification }) {
+  const { run } = useSkillGapAnalysis();
+  const [all, setAll] = useState(false);
+  const report = run?.status === "completed" ? run.report : null;
+  const strengths = report ? rankStrengths(report) : [];
+  const building = report ? rankGaps(report).slice(0, 6) : [];
+  const listed = classification?.technical_skills.filter((skill) => skill.trim()) ?? [];
+  const shown = all ? strengths : strengths.slice(0, 6);
+  return (
+    <section aria-labelledby="skills" className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
+      <h2 id="skills" className="text-section">Skills</h2>
+      {report ? <>
+        <p className="eyebrow mt-5 mb-2">Strengths · {strengths.length}</p>
+        {strengths.length ? <ul className="flex flex-wrap gap-2">
+          {shown.map((skill) => <li key={skill.skill_id} className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-3 py-1 text-sm font-semibold">
+            <Check aria-hidden className="size-3.5" />{skillLabel(skill.skill_id)}</li>)}
+          {strengths.length > 6 && <li><button type="button" onClick={() => setAll(!all)} className="rounded-full bg-sunken px-3 py-1 text-sm font-semibold">
+            {all ? "Show fewer" : `+${strengths.length - 6} more`}</button></li>}
+        </ul> : <p className="text-sm text-muted-foreground">None yet for this destination.</p>}
+        <p className="eyebrow mt-5 mb-2">Building now</p>
+        <ul className="flex flex-wrap gap-2">
+          {building.map((skill) => <li key={skill.skill_id} className="rounded-full bg-sunken px-3 py-1 text-sm font-semibold">
+            {skillLabel(skill.skill_id)} · {EVIDENCE_LABELS[evidenceLevel(skill.resume_evidence_strength ?? 0)]}</li>)}
+        </ul>
+      </> : <p className="mt-2 text-sm text-muted-foreground">Strengths and gaps appear once your route is calculated.</p>}
+      {listed.length > 0 && <>
+        <p className="eyebrow mt-5 mb-2">On your résumé · {listed.length}</p>
+        <ul className="flex flex-wrap gap-2">
+          {listed.map((skill, index) => <li key={`${skill}-${index}`} className="rounded-full border border-border px-3 py-1 text-sm">{skill}</li>)}
+        </ul>
+      </>}
+      <Link href="/onboarding" className="mt-5 inline-block font-bold underline">Edit skills in a new résumé version</Link>
+    </section>
+  );
+}
 
-function entry(key: string, title: Value, subtitle: Value[], meta: string, details: Value): Entry {
-  return {
-    key,
-    title: text(title) || "Untitled",
-    subtitle: subtitle.map(text).filter(Boolean).join(" · ") || undefined,
-    meta: meta || undefined,
-    details: list(details),
+function Experience({ classification: c }: { classification: ResumeClassification }) {
+  const entries = [
+    ...c.work_experience.map((r) => ({ icon: Briefcase, title: r.title, org: r.company, record: r })),
+    ...c.research_experience.map((r) => ({ icon: BookOpen, title: r.title, org: r.organization, record: r })),
+    ...c.leadership_activities.map((r) => ({ icon: Users, title: r.role, org: r.organization, record: r })),
+  ];
+  return (
+    <section aria-labelledby="exp" className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
+      <h2 id="exp" className="text-section">Experience</h2>
+      {entries.length ? <ul className="mt-5 grid gap-5">
+        {entries.map(({ icon: Icon, title, org, record }, index) => (
+          <li key={index} className="flex gap-4">
+            <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-sunken"><Icon className="size-4.5" /></span>
+            <div className="min-w-0">
+              <p className="font-bold">{text(title) || text(org) || "Untitled"}</p>
+              <p className="text-sm text-muted-foreground">{[text(title) ? text(org) : "", dateRange(record)].filter(Boolean).join(" · ")}</p>
+              {list(record.content)[0] && <p className="mt-1 text-sm/6 text-muted-foreground">{list(record.content)[0]}</p>}
+            </div>
+          </li>
+        ))}
+      </ul> : <p className="mt-2 text-sm text-muted-foreground">No experience on this résumé yet.</p>}
+      <Link href="/onboarding" className="mt-5 inline-flex items-center gap-1.5 font-bold hover:underline"><Plus aria-hidden className="size-4.5" />Add experience</Link>
+    </section>
+  );
+}
+
+function SchoolCard({ email }: { email: string | null }) {
+  const { user, update } = useAccount();
+  const plan = usePlan();
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState("");
+  const [state, setState] = useState<{ saving: boolean; error?: string }>({ saving: false });
+  const campus = plan.resources.some((resource) => resource.school);
+  const save = async () => {
+    if (!value.trim()) return setState({ saving: false, error: "Enter your school." });
+    setState({ saving: true });
+    try {
+      await update({ university: value.trim() });
+      // Campus resources follow the school: reload them with the new one.
+      window.location.reload();
+    } catch (error) {
+      setState({ saving: false, error: errorMessage(error, "Couldn’t save your school.") });
+    }
   };
+  return (
+    <section aria-labelledby="school" className="rounded-2xl border border-border bg-card p-6 shadow-card">
+      <h2 id="school" className="text-title">School</h2>
+      <div className="mt-3 flex gap-3">
+        <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-success-soft"><GraduationCap className="size-4.5" /></span>
+        <div className="min-w-0">
+          <p className="font-bold">{user?.university ?? "—"}</p>
+          {email && <p className="text-sm break-all text-muted-foreground">Signed in as {email}</p>}
+        </div>
+      </div>
+      <p className="mt-3 text-sm/6 text-muted-foreground">{campus ? "Your resources include courses and student orgs on your campus."
+        : "We don’t have campus courses and clubs for this school yet."}</p>
+      {editing ? <form className="mt-3 grid gap-2" onSubmit={(event) => { event.preventDefault(); void save(); }}>
+        <label htmlFor="school-name" className="text-sm font-bold">School name</label>
+        <Input id="school-name" value={value} maxLength={150} onChange={(event) => setValue(event.target.value)} autoComplete="organization" />
+        {state.error && <p role="alert" className="text-sm text-destructive">{state.error}</p>}
+        <div className="flex gap-2">
+          <Button type="submit" size="sm" disabled={state.saving}>{state.saving ? "Saving…" : "Save"}</Button>
+          <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+        </div>
+      </form> : <div className="mt-3 flex justify-end">
+        <button type="button" onClick={() => { setValue(user?.university ?? ""); setEditing(true); }}
+          className="font-bold hover:underline">Change school</button>
+      </div>}
+    </section>
+  );
 }
 
-function dates(record: ResumeRecord) {
-  const start = formatMonth(text(record.start_date));
-  const end = formatMonth(text(record.end_date));
-  return start && end ? `${start} – ${end}` : start || end;
+function GoalCard() {
+  const { user, update } = useAccount();
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState({ location: "", level: "" });
+  const [state, setState] = useState<{ saving: boolean; error?: string }>({ saving: false });
+  if (!user) return null;
+  const save = async () => {
+    if (!draft.location.trim()) return setState({ saving: false, error: "Enter a location, or “Anywhere”." });
+    setState({ saving: true });
+    try {
+      await update({ preferred_location: draft.location.trim(), experience_level: draft.level });
+      setEditing(false);
+      setState({ saving: false });
+    } catch (error) {
+      setState({ saving: false, error: errorMessage(error, "Couldn’t save your goal.") });
+    }
+  };
+  return (
+    <section aria-labelledby="goal" className="rounded-2xl border border-border bg-card p-6 shadow-card">
+      <h2 id="goal" className="text-title">Looking for</h2>
+      {editing ? <form className="mt-3 grid gap-3" onSubmit={(event) => { event.preventDefault(); void save(); }}>
+        <div role="radiogroup" aria-label="Job type" className="flex rounded-full bg-sunken p-1">
+          {EXPERIENCE_LEVELS.map((level) => <button key={level} type="button" role="radio" aria-checked={draft.level === level}
+            onClick={() => setDraft({ ...draft, level })}
+            className={`h-9 flex-1 rounded-full text-sm font-bold ${draft.level === level ? "bg-card shadow-card" : "text-muted-foreground"}`}>{level}</button>)}
+        </div>
+        <label htmlFor="goal-location" className="text-sm font-bold">Location</label>
+        <Input id="goal-location" value={draft.location} maxLength={100} onChange={(event) => setDraft({ ...draft, location: event.target.value })} />
+        {state.error && <p role="alert" className="text-sm text-destructive">{state.error}</p>}
+        <div className="flex gap-2">
+          <Button type="submit" size="sm" disabled={state.saving}>{state.saving ? "Saving…" : "Save"}</Button>
+          <Button type="button" size="sm" variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
+        </div>
+      </form> : <>
+        <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm">
+          <dt className="text-muted-foreground">Type</dt><dd className="font-bold">{user.experience_level}</dd>
+          <dt className="text-muted-foreground">Where</dt><dd className="font-bold">{user.preferred_location}</dd>
+          <dt className="text-muted-foreground">Graduating</dt><dd className="font-bold">{user.graduation_year}</dd>
+        </dl>
+        <div className="mt-3 flex justify-end">
+          <button type="button" onClick={() => { setDraft({ location: user.preferred_location, level: user.experience_level }); setEditing(true); }}
+            className="font-bold hover:underline">Edit</button>
+        </div>
+      </>}
+    </section>
+  );
 }
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-/** "2022-03" → "Mar 2022"; "2022" and "Present" stay as they are. */
-function formatMonth(value: string) {
-  const match = /^(\d{4})-(\d{2})$/.exec(value);
-  const month = match ? MONTHS[Number(match[2]) - 1] : undefined;
-  return match && month ? `${month} ${match[1]}` : value;
-}
-
-function formatSavedAt(iso: string) {
+function formatDate(iso: string) {
   const date = new Date(iso);
-  return Number.isNaN(date.getTime())
-    ? "earlier"
-    : date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
-}
-
-/** "PROFESSIONAL SUMMARY" → "Professional summary". Mixed-case text (e.g. "iOS apps") is left alone. */
-function sentenceCase(value: string) {
-  if (value !== value.toUpperCase() || value === value.toLowerCase()) return value;
-  const lower = value.toLowerCase();
-  return lower.charAt(0).toUpperCase() + lower.slice(1);
-}
-
-function initialsOf(name: string) {
-  // Whitespace only, so an email-derived name like "avery.chen" gives "A", as in the user menu.
-  const parts = name.trim().split(/\s+/).filter(Boolean);
-  const letters = parts.length > 1 ? parts[0][0] + parts[parts.length - 1][0] : (parts[0] ?? "S")[0];
-  return letters.toUpperCase();
-}
-
-function text(value: Value) {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function list(value: Value) {
-  return Array.isArray(value) ? value.filter((item) => typeof item === "string" && item.trim()) : [];
+  return Number.isNaN(date.getTime()) ? "earlier" : date.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
 }

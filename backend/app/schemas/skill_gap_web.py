@@ -17,6 +17,14 @@ class SkillGapRunRequest(BaseModel):
     force: bool = False
 
 
+class SkillGapMatch(BaseModel):
+    """Demand-weighted résumé evidence (app/services/skill_gaps/match.py); uncalibrated."""
+
+    score: float = Field(ge=0, le=1)
+    scored_skill_count: int = Field(ge=0)
+    unscored_skill_count: int = Field(ge=0)
+
+
 class SkillGapRun(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -35,6 +43,7 @@ class SkillGapRun(BaseModel):
     report: dict[str, Any] | None
     error: str | None
     reused: bool = False
+    match: SkillGapMatch | None = None
 
 
 class MarketDemandSkill(BaseModel):

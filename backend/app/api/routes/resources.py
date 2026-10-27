@@ -1,15 +1,66 @@
-from fastapi import APIRouter, HTTPException
+"""Resources that close skill gaps, the student's saved plan for each role, and project
+recommendations from the resources agent."""
+import json
+import logging
+import re
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
-from app.services.resources_agent import recommend_projects
-from app.api.routes.skill_gaps import SavedResume, get_saved_resume
-from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
-from fastapi import Depends
-import json
+from app.api.deps import get_account_service, get_current_db_user
+from app.core.config import BACKEND_ROOT, get_settings
+from app.models import User
+from app.schemas.resources import Plan, PlanItem, PlanItemUpdate, ResourceList
+from app.schemas.skill_gap_web import JobFamily
+from app.services.accounts import AccountService
+from app.services.plans import LocalPlanStore, get_plan_store
+from app.services.resources import FAMILY_TO_CATALOG, resources_for
+from app.services.resources_agent import rank_projects, recommend_projects
 from app.services.skill_gaps.assets import ASSET_ROOT
+from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
+from app.services.skill_gaps.storage import load, save_json
+
+router = APIRouter(tags=["resources"])
+logger = logging.getLogger(__name__)
+
+# Agent picks per completed run, so a page visit doesn't pay for another model call.
+PROJECT_PICKS_DIR = BACKEND_ROOT / "local_results" / "project_recommendations"
+_RUN_ID = re.compile(r"[0-9a-f]{32}\Z")
 
 
-router = APIRouter(prefix="/resources", tags=["resources"])
+@router.get("/resources", response_model=ResourceList)
+def list_resources(job_family: JobFamily, user: User = Depends(get_current_db_user)) -> ResourceList:
+    return ResourceList(job_family=job_family, resources=resources_for(job_family, user.university))
+
+
+@router.get("/plan", response_model=Plan)
+def read_plan(job_family: JobFamily, user: User = Depends(get_current_db_user),
+              store: LocalPlanStore = Depends(get_plan_store)) -> Plan:
+    # Hide saves for resources that left the catalog or belong to another school.
+    available = {entry["id"] for entry in resources_for(job_family, user.university)}
+    items = [item for item in store.items(user.id, job_family) if item["resource_id"] in available]
+    return Plan(job_family=job_family, items=items)
+
+
+@router.put("/plan/items/{resource_id}", response_model=PlanItem)
+def save_plan_item(resource_id: str, data: PlanItemUpdate, user: User = Depends(get_current_db_user),
+                   store: LocalPlanStore = Depends(get_plan_store)) -> PlanItem:
+    """Save a resource to the plan, or mark it done ("done") or not done ("saved")."""
+    if resource_id not in {entry["id"] for entry in resources_for(data.job_family, user.university)}:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found for this role")
+    try:
+        return PlanItem.model_validate(store.set_status(user.id, data.job_family, resource_id, data.status))
+    except OSError:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Plan storage is unavailable") from None
+
+
+@router.delete("/plan/items/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)
+def remove_plan_item(resource_id: str, job_family: JobFamily, user: User = Depends(get_current_db_user),
+                     store: LocalPlanStore = Depends(get_plan_store)) -> None:
+    try:
+        store.remove(user.id, job_family, resource_id)
+    except OSError:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Plan storage is unavailable") from None
 
 
 class ResourceRequest(BaseModel):
@@ -24,11 +75,6 @@ class RunProjectRequest(BaseModel):
     available_hours: int | None = Field(default=None, gt=0)
 
 
-FAMILY_TO_CATALOG = {
-    "software_engineer": "Software Engineering",
-    "data_analyst": "Data Analyst",
-    "ai_engineer": "AI/ML Engineering",
-}
 
 
 def inputs_from_report(report: dict, family: str) -> dict:
@@ -56,20 +102,23 @@ def inputs_from_report(report: dict, family: str) -> dict:
     return {"career_path": FAMILY_TO_CATALOG[family], "existing_skills": [], "skill_gaps": gaps, "verified_skill_gaps": verified_skill_gaps}
 
 
-@router.post("/projects/from-skill-gap")
+@router.post("/resources/projects/from-skill-gap")
 def projects_from_skill_gap(
     request: RunProjectRequest,
-    saved: SavedResume = Depends(get_saved_resume),
+    user: User = Depends(get_current_db_user),
+    accounts: AccountService = Depends(get_account_service),
     manager: SkillGapRunManager = Depends(get_skill_gap_run_manager),
 ):
     try:
-        run = manager.get(request.run_id, user_id=saved.user_id)
+        run = manager.get(request.run_id, user_id=user.id)
     except KeyError:
         raise HTTPException(status_code=404, detail="Analysis run not found.") from None
     except (OSError, ValueError):
         raise HTTPException(status_code=503, detail="Analysis result is unavailable.") from None
-    if run.resume_id != saved.resume_id:
-        raise HTTPException(status_code=409, detail="Analysis is not for the active resume.")
+    # The run must be for the résumé its role uses now.
+    resume = accounts.get_resume(user, run.job_family)
+    if resume is None or run.resume_id != resume.id:
+        raise HTTPException(status_code=409, detail="Analysis is not for this role's current resume.")
     if run.status != "completed" or not isinstance(run.report, dict):
         raise HTTPException(status_code=409, detail="Skill-gap analysis is not complete.")
     try:
@@ -77,14 +126,25 @@ def projects_from_skill_gap(
     except (ValueError, KeyError, TypeError):
         raise HTTPException(status_code=422, detail="Skill-gap report cannot be used for recommendations.") from None
     if not inputs["skill_gaps"]:
-        return {"recommendations": [], "no_match_reason": "No scored skill gaps are available for this analysis."}
-    try:
-        return recommend_projects(**inputs, available_hours=request.available_hours)
-    except Exception:
-        raise HTTPException(status_code=500, detail="Could not generate project recommendations.") from None
+        return {"recommendations": [], "no_match_reason": "No scored skill gaps are available for this analysis.",
+                "source": "rules"}
+    # Only the default (no time budget) answer is cached; the rule fallback is free and never cached.
+    cache = PROJECT_PICKS_DIR / f"{run.id}.json" if request.available_hours is None and _RUN_ID.fullmatch(str(run.id)) else None
+    if cache is not None and cache.exists():
+        return load(cache)
+    if get_settings().resources_project_endpoint:
+        try:
+            result = {**recommend_projects(**inputs, available_hours=request.available_hours), "source": "agent"}
+        except Exception as error:
+            logger.warning("Resources agent failed (%s); using gap ranking", type(error).__name__)
+        else:
+            if cache is not None:
+                save_json(cache, result)
+            return result
+    return {**rank_projects(**inputs, available_hours=request.available_hours), "source": "rules"}
 
 
-@router.post("/projects")
+@router.post("/resources/projects")
 def get_project_recommendations(request: ResourceRequest):
     try:
         return recommend_projects(

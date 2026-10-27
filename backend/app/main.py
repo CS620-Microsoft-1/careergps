@@ -22,7 +22,6 @@ app.include_router(health.router)
 app.include_router(me.router)
 app.include_router(resumes.router)
 app.include_router(job_postings.router)
-
-app.include_router(resources.router)
 app.include_router(skill_gaps.router)
+app.include_router(resources.router)
 app.include_router(certifications.router)

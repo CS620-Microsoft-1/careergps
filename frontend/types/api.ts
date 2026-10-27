@@ -35,7 +35,6 @@ export type User = {
   linkedin_url: string | null;
   github_url: string | null;
   website_url: string | null;
-  active_resume_id: string | null;
   created_at: string;
 };
 
@@ -47,6 +46,9 @@ export type ResumeSubmitRequest = {
   agent_name: string;
   classification: ResumeClassification;
 };
+
+/** POST /me/resumes: a confirmed résumé for one destination (role). */
+export type ResumeAddRequest = ResumeSubmitRequest & { job_family: JobFamily };
 
 /** The career goal asked in onboarding. */
 export type Goals = {
@@ -96,6 +98,25 @@ export type ResumeClassification = {
   certifications: ResumeRecord[];
   leadership_activities: ResumeRecord[];
   other: ResumeRecord[];
+};
+
+/** GET /me/resumes: one saved version, newest first. */
+export type ResumeSummary = {
+  id: string;
+  label: string | null;
+  original_filename: string;
+  file_type: "pdf" | "docx";
+  created_at: string;
+  /** The roles matched against this résumé; empty for a version no destination uses. */
+  destinations: JobFamily[];
+};
+
+/** GET /me/destinations: a role the student added and the résumé it uses. */
+export type Destination = {
+  job_family: JobFamily;
+  resume_id: string;
+  original_filename: string;
+  created_at: string;
 };
 
 /** POST /resumes/analyze: transient result; onboarding saves the reviewed classification (POST /me or POST /me/resumes). */
@@ -205,6 +226,12 @@ export type CoreSkillGapReport = {
   resume_id?: string;
   limitations: string[];
 };
+/** Demand-weighted résumé evidence (backend: app/services/skill_gaps/match.py). Uncalibrated. */
+export type SkillGapMatch = {
+  score: number;
+  scored_skill_count: number;
+  unscored_skill_count: number;
+};
 export type SkillGapRun = {
   id: string;
   user_id: string;
@@ -221,7 +248,45 @@ export type SkillGapRun = {
   report: CoreSkillGapReport | null;
   error: string | null;
   reused: boolean;
+  match: SkillGapMatch | null;
 };
+
+/** GET /resources (backend: data/resources.yaml). skills holds only the requested role's skills. */
+export type ResourceType = "student_org" | "certification" | "online_course" | "school_course" | "project";
+export type Resource = {
+  id: string;
+  type: ResourceType;
+  title: string;
+  provider: string;
+  meta: string;
+  description: string;
+  skills: string[];
+  url: string | null;
+  school: string | null;
+  alongside: boolean;
+};
+export type ResourceList = { job_family: JobFamily; resources: Resource[] };
+
+/** POST /certifications/recommendations. reason is null when source is "rules". */
+export type CertificationRecommendations = {
+  job_family: JobFamily;
+  skill_gap_run_id: string;
+  source: "agent" | "rules";
+  generated_at: string;
+  recommendations: { certification_id: string; skill_ids: string[]; reason: string | null }[];
+};
+
+/** POST /resources/projects/from-skill-gap: up to three projects from data/projects.json. */
+export type ProjectRecommendations = {
+  source: "agent" | "rules";
+  recommendations: { project_id: string; addressed_skill_ids?: string[]; why_recommended: string }[];
+  no_match_reason: string | null;
+};
+
+/** GET /plan: saved resources for one role; the browser orders them from the gap ranking. */
+export type PlanStatus = "saved" | "done";
+export type PlanItem = { resource_id: string; status: PlanStatus; saved_at: string; done_at: string | null };
+export type Plan = { job_family: JobFamily; items: PlanItem[] };
 
 /** The stages POST /resumes/analyze/stream reports. "ocr" appears only when a PDF page is an image. */
 export type ResumeAnalysisStep = "upload" | "extract" | "ocr" | "classify";
@@ -255,33 +320,3 @@ export type ResumeAnalysisEvent =
   | ResumeStepEvent
   | { type: "result"; data: ResumeAnalysis }
   | { type: "error"; status: number; detail: string };
-
-/** One entry of GET /certifications/catalog/{family}. */
-export type Certification = {
-  id: string;
-  name: string;
-  provider: string;
-  url: string;
-  /** null when the price depends on a subscription or is not published. */
-  cost_usd: number | null;
-  cost_note: string;
-  level: "beginner" | "intermediate" | "advanced";
-  /** Core skill ids per job family. */
-  skills: Partial<Record<JobFamily, string[]>>;
-  last_verified: string;
-};
-
-export type CertificationCatalog = {
-  job_family: JobFamily;
-  version: string;
-  certifications: Certification[];
-};
-
-/** POST /certifications/recommendations. Reasons are null when source is "rules". */
-export type CertificationRecommendations = {
-  job_family: JobFamily;
-  skill_gap_run_id: string;
-  source: "agent" | "rules";
-  generated_at: string;
-  recommendations: { certification_id: string; skill_ids: string[]; reason: string | null }[];
-};

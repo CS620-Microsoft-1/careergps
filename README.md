@@ -13,12 +13,12 @@ and turns them into an action plan.
 | Sign-up / login with Supabase Auth (email confirmation), onboarding, profile | Working |
 | Résumé parsing: PDF/DOCX extraction, OCR fallback for scanned pages, classification by a Microsoft Foundry Agent, editable review, saved to the user's account | Working |
 | Job-market data: daily ingest of public Greenhouse, Ashby and Lever job postings; job-description field extraction by a Foundry Agent | Working |
-| Career Analysis: market demand for the selected job family | Working |
-| Skill gaps: résumé evidence scored against market demand by a Foundry Agent (runs stored as local JSON) | Working |
-| Resources: certification recommendations; portfolio projects from skill gaps (API only) | Working |
-| Resources: courses, clubs, events, free learning | Planned (empty tabs) |
-| Action Plan, Ask CareerGPS Copilot | Planned (UI placeholders) |
-| `destinations`, `plan_items` and `skill_gap_runs` tables | Migrated, not yet used by the API |
+| Skill-gap analysis: résumé evidence scored against market demand, with a demand-weighted match score | Working (runs are local JSON on the backend host) |
+| Destinations: compare one résumé against several target roles | Working |
+| Resources: courses, student orgs, certifications and projects matched to each gap | Working (static catalogs) |
+| Action plan: saved resources in order, biggest gap first | Working (plans are local JSON on the backend host) |
+| Ask CareerGPS Copilot | Planned |
+| `plan_items` and `skill_gap_runs` tables | Migrated, not yet used by the API |
 
 The analysis runs as four agents in order: **Student Profile → Market Intelligence → Gap Analysis → Action**.
 
@@ -56,14 +56,13 @@ Next.js frontend ──HTTP/JSON──▶ FastAPI backend ──▶ Supabase Pos
 careergps/
 ├── backend/               FastAPI service
 │   ├── app/               api/routes, core config, db, models, schemas, services
-│   ├── data/              company job-board lists, certification and project catalogs
+│   ├── data/              company job-board lists and the resource, certification and project catalogs
 │   ├── migrations/        Alembic migrations
 │   ├── scripts/           job-posting ingest, board probe, job-analysis worker, demand snapshot
 │   └── tests/             unittest suite (no DB or network needed)
 ├── frontend/              Next.js app
-│   ├── app/               routes: auth, onboarding, dashboard, market, gaps, opportunities, roadmap, profile
-│   ├── components/        UI primitives, layout, auth, onboarding, dashboard, market, skill gaps,
-│   │                      resources, Copilot panel
+│   ├── app/               routes: auth, onboarding (setup), dashboard (home), gaps, resources, plan, destinations, profile
+│   ├── components/        UI primitives, layout, auth, setup, one folder per page
 │   ├── lib/               API client, Supabase client, navigation, validation, skill-gap helpers
 │   └── types/             shared TypeScript types
 ├── docs/
@@ -107,7 +106,7 @@ cp .env.example .env.local        # NEXT_PUBLIC_API_URL, defaults to http://loca
 npm run dev                       # http://localhost:3000
 ```
 
-The **backend status badge** in the sidebar shows whether the app can reach the API and the database.
+The **backend status badge** in the profile menu and on the Profile page shows whether the app can reach the API and the database.
 
 Windows setup, Foundry access, and troubleshooting are covered in the [backend README](backend/README.md) and the
 [frontend README](frontend/README.md).

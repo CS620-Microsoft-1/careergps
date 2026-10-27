@@ -13,9 +13,9 @@ const SkillGapContext = createContext<SkillGapContextValue | null>(null);
 
 export function SkillGapProvider({ children }: { children: React.ReactNode }) {
   const [session] = useState(() => new SkillGapSession({
-    loadProfile: async () => {
-      const [{ user }, resume] = await Promise.all([getMe(), getSavedResume()]);
-      return user && resume ? profileForAnalysis(user, resume) : null;
+    loadProfile: async (family) => {
+      const [{ user }, resume] = await Promise.all([getMe(), getSavedResume(family)]);
+      return user && resume ? profileForAnalysis(user, resume, family) : null;
     },
     consumeIntent: consumeSkillGapIntent,
     getLatest: getLatestSkillGapRun,

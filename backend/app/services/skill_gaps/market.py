@@ -21,6 +21,6 @@ def get_market_demand(family: JobFamily, root: Path = SNAPSHOT_ROOT) -> dict:
             "source_analysis_version": market["source_analysis_version"],
             "snapshot_fingerprint": market["source_fingerprint"], "skills": skills,
             "responsibilities_available": False, "common_responsibilities": [], "database_used": False,
+            "company_coverage": provenance["company_coverage"].get(family),
             **{key: provenance[key] for key in (
-                "snapshot_generated_at", "source_description", "posting_window",
-                "company_coverage", "coverage_limitations")}}
+                "snapshot_generated_at", "source_description", "posting_window", "coverage_limitations")}}

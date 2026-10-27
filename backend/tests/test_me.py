@@ -20,7 +20,7 @@ from app.api import deps
 from app.core.config import Settings
 from app.core.security import AuthenticatedUser, SupabaseTokenVerifier
 from app.main import app
-from app.models import Resume, User
+from app.models import Destination, Resume, User
 from app.schemas.me import AccountCreate, ResumeSubmit
 from app.schemas.resume import ResumeClassification
 from app.services import accounts
@@ -74,6 +74,7 @@ class FakeAccountService(accounts.AccountService):
         super().__init__(db=None)  # type: ignore[arg-type]
         self.users: dict[uuid.UUID, User] = {}
         self.resumes: dict[uuid.UUID, Resume] = {}
+        self.destinations: dict[tuple[uuid.UUID, str], Destination] = {}
         self.confirmed = True
         self.signed_up_at = datetime(2026, 10, 1, 12, 0, tzinfo=UTC)
 
@@ -94,8 +95,9 @@ class FakeAccountService(accounts.AccountService):
         user = accounts.new_user(auth_user, data, signed_up_at=signup.created_at)
         user.created_at = datetime.now(UTC)
         self.users[user.id] = user
-        resume = self._store(accounts.new_resume(user.id, data.resume))
-        user.active_resume_id = resume.id
+        resume = accounts.new_resume(user.id, data.resume)
+        self._insert_resume(resume)
+        self._point(user, accounts.role_family(data.target_role), resume.id)
         return user
 
     def update_account(self, user, data):
@@ -103,22 +105,35 @@ class FakeAccountService(accounts.AccountService):
             setattr(user, field, value)
         return user
 
-    def add_resume(self, user, data):
-        resume = self._store(accounts.new_resume(user.id, data))
-        user.active_resume_id = resume.id
-        accounts.fill_empty_contacts(user, data.classification)
-        return resume
+    def get_resume(self, user, job_family):
+        destination = self.destinations.get((user.id, job_family))
+        return self.resumes.get(destination.resume_id) if destination else None
 
-    def get_active_resume(self, user):
-        return self.resumes.get(user.active_resume_id)
+    def get_owned_resume(self, user, resume_id):
+        resume = self.resumes.get(resume_id)
+        return resume if resume is not None and resume.user_id == user.id else None
+
+    def list_resumes(self, user):
+        owned = [resume for resume in self.resumes.values() if resume.user_id == user.id]
+        return sorted(owned, key=lambda resume: resume.created_at, reverse=True)
 
     def sync_email(self, user, email):
         user.primary_email = email.lower()
 
-    def _store(self, resume: Resume) -> Resume:
+    def list_destinations(self, user):
+        return [destination for (owner, _), destination in self.destinations.items() if owner == user.id]
+
+    def _insert_resume(self, resume: Resume) -> None:
         resume.created_at = datetime.now(UTC)
         self.resumes[resume.id] = resume
-        return resume
+
+    def _point(self, user, job_family, resume_id) -> None:
+        existing = self.destinations.get((user.id, job_family))
+        if existing is not None:
+            existing.resume_id = resume_id
+        else:
+            self.destinations[(user.id, job_family)] = Destination(
+                user_id=user.id, job_family=job_family, resume_id=resume_id, created_at=datetime.now(UTC))
 
 
 class NameAndContactRulesTests(unittest.TestCase):
@@ -215,12 +230,13 @@ class MeApiTests(unittest.TestCase):
         self.assertEqual(str(self.user_id), user["id"])
         self.assertEqual("ada@example.com", user["primary_email"])
         self.assertEqual("Data Analyst", user["target_role"])
-        self.assertIsNotNone(user["active_resume_id"])
 
         resume = self.client.get("/me/resume", headers=self.headers)
         self.assertEqual(200, resume.status_code)
         self.assertEqual("ada.pdf", resume.json()["original_filename"])
         self.assertEqual(EXAMPLE, resume.json()["classification"])
+        destinations = self.client.get("/me/destinations", headers=self.headers).json()
+        self.assertEqual([("data_analyst", resume.json()["id"])], [(d["job_family"], d["resume_id"]) for d in destinations])
 
     def test_me_is_empty_before_onboarding(self) -> None:
         response = self.client.get("/me", headers=self.headers)
@@ -302,15 +318,80 @@ class MeApiTests(unittest.TestCase):
                 self.assertEqual(422, response.status_code, response.text)
         self.assertEqual("Ada", self.client.get("/me", headers=self.headers).json()["user"]["first_name"])
 
-    def test_a_new_resume_becomes_active(self) -> None:
+    def test_a_new_resume_is_used_by_its_role(self) -> None:
         self.onboard()
 
-        added = self.client.post("/me/resumes", json=resume_body(original_filename="v2.docx"), headers=self.headers)
+        added = self.client.post("/me/resumes", headers=self.headers,
+                                 json=resume_body(original_filename="v2.docx", job_family="data_analyst"))
 
         self.assertEqual(201, added.status_code, added.text)
         self.assertEqual("docx", added.json()["file_type"])
         self.assertEqual("v2.docx", self.client.get("/me/resume", headers=self.headers).json()["original_filename"])
         self.assertEqual(2, len(self.accounts.resumes))
+
+    def test_each_destination_has_its_own_resume(self) -> None:
+        self.onboard()
+        self.client.post("/me/resumes", headers=self.headers,
+                         json=resume_body(original_filename="ai.docx", job_family="ai_engineer"))
+
+        self.assertEqual("ada.pdf", self.client.get("/me/resume", headers=self.headers).json()["original_filename"])
+        ai = self.client.get("/me/resume?job_family=ai_engineer", headers=self.headers)
+        self.assertEqual("ai.docx", ai.json()["original_filename"])
+        self.assertEqual(404, self.client.get("/me/resume?job_family=software_engineer", headers=self.headers).status_code)
+
+        self.client.patch("/me", json={"target_role": "AI Engineer"}, headers=self.headers)
+        self.assertEqual("ai.docx", self.client.get("/me/resume", headers=self.headers).json()["original_filename"])
+
+    def test_a_new_resume_needs_a_destination(self) -> None:
+        self.onboard()
+        response = self.client.post("/me/resumes", json=resume_body(), headers=self.headers)
+        self.assertEqual(422, response.status_code)
+
+    def test_resume_list_shows_which_roles_use_each_version(self) -> None:
+        self.onboard()
+        self.client.post("/me/resumes", headers=self.headers,
+                         json=resume_body(original_filename="v2.docx", job_family="data_analyst"))
+        self.client.post("/me/resumes", headers=self.headers,
+                         json=resume_body(original_filename="ai.pdf", job_family="ai_engineer"))
+
+        listed = self.client.get("/me/resumes", headers=self.headers).json()
+        self.assertEqual(["ai.pdf", "v2.docx", "ada.pdf"], [item["original_filename"] for item in listed])
+        self.assertEqual([["ai_engineer"], ["data_analyst"], []], [item["destinations"] for item in listed])
+
+    def test_several_roles_can_use_the_same_resume(self) -> None:
+        self.onboard()
+        first = self.client.get("/me/resume", headers=self.headers).json()["id"]
+
+        added = self.client.put("/me/destinations/ai_engineer", json={"resume_id": first}, headers=self.headers)
+
+        self.assertEqual(200, added.status_code, added.text)
+        self.assertEqual(first, self.client.get("/me/resume?job_family=ai_engineer", headers=self.headers).json()["id"])
+        self.assertEqual(1, len(self.accounts.resumes))
+        listed = self.client.get("/me/resumes", headers=self.headers).json()
+        self.assertEqual(["data_analyst", "ai_engineer"], listed[0]["destinations"])
+        destinations = self.client.get("/me/destinations", headers=self.headers).json()
+        self.assertEqual({"data_analyst", "ai_engineer"}, {d["job_family"] for d in destinations})
+
+    def test_a_role_can_switch_back_to_an_earlier_resume(self) -> None:
+        self.onboard()
+        first = self.client.get("/me/resume", headers=self.headers).json()["id"]
+        self.client.post("/me/resumes", headers=self.headers,
+                         json=resume_body(original_filename="v2.docx", job_family="data_analyst"))
+
+        self.client.put("/me/destinations/data_analyst", json={"resume_id": first}, headers=self.headers)
+
+        self.assertEqual("ada.pdf", self.client.get("/me/resume", headers=self.headers).json()["original_filename"])
+
+    def test_cannot_use_another_students_resume(self) -> None:
+        self.onboard()
+        other = self.auth_headers(uuid.uuid4(), "grace@example.com")
+        self.onboard(headers=other, resume=resume_body(original_filename="grace.pdf"))
+        theirs = self.client.get("/me/resume", headers=other).json()["id"]
+
+        response = self.client.put("/me/destinations/ai_engineer", json={"resume_id": theirs}, headers=self.headers)
+
+        self.assertEqual(404, response.status_code)
+        self.assertEqual(404, self.client.get("/me/resume?job_family=ai_engineer", headers=self.headers).status_code)
 
     def test_only_the_owner_sees_their_resume(self) -> None:
         self.onboard()
@@ -331,7 +412,7 @@ class MeApiTests(unittest.TestCase):
         for method, path, body in (
             ("patch", "/me", {"target_role": "AI Engineer"}),
             ("get", "/me/resume", None),
-            ("post", "/me/resumes", resume_body()),
+            ("post", "/me/resumes", resume_body(job_family="data_analyst")),
         ):
             with self.subTest(path=path):
                 response = self.client.request(method, path, json=body, headers=self.headers)

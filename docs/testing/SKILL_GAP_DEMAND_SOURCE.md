@@ -34,6 +34,12 @@ duplicate postings. All supplied seniorities are included. Postings are deduplic
 by their supplied `job_posting_id`; distinct IDs are not assumed to be distinct
 real-world vacancies.
 
+The company counts shown on Destinations (45 Software Engineer, 37 Data Analyst,
+43 AI Engineer) therefore come from a separate read-only query on 2026-10-27:
+distinct `(source, company_slug)` among each family's `job_postings_analyses` rows
+joined to `job_postings`. That database held 2,844 / 174 / 565 analyzed postings,
+so it is close to, but not the same set as, this export.
+
 ## Inputs and counting rules
 
 Only two of the six tables affect the calculation:

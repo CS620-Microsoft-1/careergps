@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
-import { AuthHeading } from "@/components/auth/auth-shell";
+import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 
-export const metadata: Metadata = { title: "Sign in" };
+export const metadata: Metadata = { title: "Log in" };
 
 export default function LoginPage() {
   return (
-    <>
-      <AuthHeading title="Welcome back" subtitle="Sign in to continue your career journey." />
+    <AuthShell footer={<p>New to CareerGPS? <Link href="/signup" className="font-bold underline">Create an account</Link></p>}>
+      <AuthHeading title="Log in" />
       <LoginForm />
-    </>
+    </AuthShell>
   );
 }
