@@ -13,8 +13,10 @@ export function SkillEvidence({ skill, report }: { skill: CoreSkillResult; repor
     .filter((v): v is string => typeof v === "string" && Boolean(v)).join(" · ");
   const validation = assessment.validation;
   return (
-    <div className="grid gap-5 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-      <div className="grid content-start gap-4">
+    // Side by side only when the card itself is wide; in the narrow review column it stacks.
+    <div className="@container">
+    <div className="grid gap-5 @xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+      <div className="grid min-w-0 content-start gap-4">
         {activity && <p className="text-sm"><span className="eyebrow mr-2">From</span>{activity}</p>}
         {pending && <div className="rounded-lg bg-warning-soft p-3 text-sm">
           <p className="font-bold">Needs your review: no score yet</p>
@@ -36,13 +38,14 @@ export function SkillEvidence({ skill, report }: { skill: CoreSkillResult; repor
           <blockquote className="mt-2 text-sm/6 whitespace-pre-wrap text-muted-foreground">{source.text}</blockquote>
         </details>}
       </div>
-      <dl className="grid h-fit grid-cols-[1fr_auto] gap-x-3 gap-y-1.5 rounded-lg bg-sunken p-4 text-sm">
+      <dl className="grid h-fit min-w-0 grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1.5 rounded-lg bg-sunken p-4 text-sm [&_dd]:text-right [&_dd]:font-mono [&_dd]:whitespace-nowrap">
         <dt className="text-muted-foreground">Required in</dt><dd>{percent(skill.demand.required_ratio)} · {skill.demand.required_job_count}</dd>
         <dt className="text-muted-foreground">Preferred in</dt><dd>{percent(skill.demand.preferred_only_ratio)} · {skill.demand.preferred_only_job_count}</dd>
         <dt className="text-muted-foreground">Postings</dt><dd>{skill.demand.N.toLocaleString()}</dd>
         <dt className="text-muted-foreground">Evidence</dt><dd>{skill.resume_evidence_strength === null ? "—" : percent(skill.resume_evidence_strength)}</dd>
         <dt className="text-muted-foreground">Gap grade</dt><dd>{skill.skill_gap_grade ?? "—"}</dd>
       </dl>
+    </div>
     </div>
   );
 }
