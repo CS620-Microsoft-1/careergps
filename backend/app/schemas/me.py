@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from app.core.options import GRADUATION_YEARS_AHEAD, ExperienceLevel, TargetRole
+from app.core.options import GRADUATION_YEARS_AHEAD, ExperienceLevel, JobFamily, TargetRole
 from app.schemas.resume import ResumeClassification
 
 # Requests: strip whitespace, reject unknown fields. Mirrors frontend/lib/validation/auth.ts,
@@ -30,6 +30,21 @@ class ResumeSubmit(BaseModel):
     ocr_pages: list[int] = Field(default_factory=list)
     agent_name: str = Field(min_length=1, max_length=255)
     classification: ResumeClassification
+
+
+class ResumeAdd(ResumeSubmit):
+    """POST /me/resumes: a confirmed résumé, used from now on by this destination (added if new).
+    The résumé it used before is kept."""
+
+    job_family: JobFamily
+
+
+class DestinationUpdate(BaseModel):
+    """PUT /me/destinations/{job_family}: match the role against one of the student's résumés."""
+
+    model_config = REQUEST_CONFIG
+
+    resume_id: uuid.UUID
 
 
 class AccountCreate(BaseModel):
@@ -104,7 +119,6 @@ class UserRead(BaseModel):
     linkedin_url: str | None
     github_url: str | None
     website_url: str | None
-    active_resume_id: uuid.UUID | None
     created_at: datetime
 
 
@@ -112,6 +126,29 @@ class MeRead(BaseModel):
     """user is null until onboarding is finished (POST /me); the frontend uses that to send people there."""
 
     user: UserRead | None
+
+
+class ResumeSummary(BaseModel):
+    """GET /me/resumes: one saved version, without its contents."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    label: str | None
+    original_filename: str
+    file_type: str
+    created_at: datetime
+    # The roles matched against this résumé; empty for a version no destination uses.
+    destinations: list[JobFamily]
+
+
+class DestinationRead(BaseModel):
+    """GET /me/destinations: one role the student added and the résumé it uses."""
+
+    job_family: JobFamily
+    resume_id: uuid.UUID
+    original_filename: str
+    created_at: datetime
 
 
 class ResumeRead(BaseModel):

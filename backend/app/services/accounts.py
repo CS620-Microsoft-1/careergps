@@ -8,12 +8,13 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime
 
-from sqlalchemy import text
+from sqlalchemy import select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
+from app.core.options import JOB_FAMILY_BY_ROLE, JobFamily
 from app.core.security import AuthenticatedUser
-from app.models import Resume, User
+from app.models import Destination, Resume, User
 from app.schemas.me import AccountCreate, AccountUpdate, ResumeSubmit
 from app.schemas.resume import ResumeClassification
 
@@ -98,6 +99,11 @@ def new_user(auth_user: AuthenticatedUser, data: AccountCreate, signed_up_at: da
     return user
 
 
+def role_family(target_role: str) -> JobFamily | None:
+    """The destination (job family) a target role stands for, or None for an unsupported role."""
+    return JOB_FAMILY_BY_ROLE.get(target_role)
+
+
 def new_resume(user_id: uuid.UUID, data: ResumeSubmit) -> Resume:
     return Resume(
         id=uuid.uuid4(),
@@ -128,7 +134,7 @@ class AccountService:
         return SignupRecord(row.created_at, row.email_confirmed_at) if row else None
 
     def create_account(self, auth_user: AuthenticatedUser, data: AccountCreate) -> User:
-        """Create the users row and its first résumé in one transaction; the résumé becomes active."""
+        """Create the users row, its first résumé and the destination for the chosen role in one transaction."""
         if self.get_user(auth_user.id) is not None:
             raise AccountAlreadyExistsError
         signup = self.signup_record(auth_user.id)
@@ -136,12 +142,14 @@ class AccountService:
             raise EmailNotConfirmedError
         user = new_user(auth_user, data, signed_up_at=signup.created_at)
         resume = new_resume(user.id, data.resume)
+        family = role_family(data.target_role)
         try:
             self.db.add(user)
             self.db.flush()  # users first: resumes.user_id references it
             self.db.add(resume)
-            self.db.flush()
-            user.active_resume_id = resume.id
+            self.db.flush()  # then the résumé the destination points at
+            if family is not None:
+                self.db.add(Destination(user_id=user.id, job_family=family, resume_id=resume.id))
             self.db.commit()
         except IntegrityError as error:
             # Two requests raced, or the email belongs to another users row.
@@ -157,19 +165,53 @@ class AccountService:
         self.db.refresh(user)
         return user
 
-    def add_resume(self, user: User, data: ResumeSubmit) -> Resume:
-        """Save a newer confirmed résumé, make it the active one, and fill empty contact fields."""
-        resume = new_resume(user.id, data)
-        self.db.add(resume)
-        self.db.flush()
-        user.active_resume_id = resume.id
+    def add_resume(self, user: User, data: ResumeSubmit, job_family: JobFamily) -> Resume:
+        """Save a confirmed résumé, use it for this destination, and fill empty contact fields."""
         fill_empty_contacts(user, data.classification)
-        self.db.commit()
-        self.db.refresh(resume)
+        resume = new_resume(user.id, data)
+        self._insert_resume(resume)
+        self._point(user, job_family, resume.id)
         return resume
 
-    def get_active_resume(self, user: User) -> Resume | None:
-        return self.db.get(Resume, user.active_resume_id) if user.active_resume_id else None
+    def use_resume(self, user: User, job_family: JobFamily, resume_id: uuid.UUID) -> Resume | None:
+        """Match a destination (new or existing) against one of the student's résumés. None if it isn't theirs."""
+        resume = self.get_owned_resume(user, resume_id)
+        if resume is not None:
+            self._point(user, job_family, resume.id)
+        return resume
+
+    def get_resume(self, user: User, job_family: JobFamily | None) -> Resume | None:
+        """The résumé a destination uses, or None if the student hasn't added that role."""
+        if job_family is None:
+            return None
+        destination = self.db.get(Destination, (user.id, job_family))
+        return self.db.get(Resume, destination.resume_id) if destination else None
+
+    def get_owned_resume(self, user: User, resume_id: uuid.UUID) -> Resume | None:
+        resume = self.db.get(Resume, resume_id)
+        return resume if resume is not None and resume.user_id == user.id else None
+
+    def list_resumes(self, user: User) -> list[Resume]:
+        """Every confirmed version, newest first."""
+        query = select(Resume).where(Resume.user_id == user.id).order_by(Resume.created_at.desc())
+        return list(self.db.scalars(query))
+
+    def list_destinations(self, user: User) -> list[Destination]:
+        """The roles the student has added, oldest first."""
+        query = select(Destination).where(Destination.user_id == user.id).order_by(Destination.created_at)
+        return list(self.db.scalars(query))
+
+    def _insert_resume(self, resume: Resume) -> None:
+        self.db.add(resume)
+        self.db.flush()
+
+    def _point(self, user: User, job_family: JobFamily, resume_id: uuid.UUID) -> None:
+        destination = self.db.get(Destination, (user.id, job_family))
+        if destination is None:
+            self.db.add(Destination(user_id=user.id, job_family=job_family, resume_id=resume_id))
+        else:
+            destination.resume_id = resume_id
+        self.db.commit()
 
     def sync_email(self, user: User, email: str) -> None:
         """Keep primary_email equal to the Supabase login email (it can change in Supabase)."""
