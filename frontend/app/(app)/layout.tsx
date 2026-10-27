@@ -1,33 +1,25 @@
-import { AskButton } from "@/components/layout/ask-button";
+import { AccountProvider } from "@/components/layout/account-provider";
 import { BackendStatusProvider } from "@/components/layout/backend-status-provider";
+import { Navbar } from "@/components/layout/navbar";
 import { OnboardingGuard } from "@/components/layout/onboarding-guard";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Topbar } from "@/components/layout/topbar";
-import { CopilotProvider } from "@/components/panels/copilot-provider";
+import { PlanProvider } from "@/components/plan/plan-provider";
 import { SkillGapProvider } from "@/components/skill-gaps/skill-gap-provider";
 
-/**
- * Signed-in app shell: sidebar (lg+), sticky top bar with mobile nav (<lg),
- * centered page content, and the floating Ask CareerGPS button + Copilot panel.
- */
+/** Signed-in app shell: sticky nav bar over centered page content. */
 export default function AppLayout({ children }: LayoutProps<"/">) {
   return (
-    <CopilotProvider>
-      <BackendStatusProvider>
-        <OnboardingGuard />
+    <BackendStatusProvider>
+      <OnboardingGuard />
+      <AccountProvider>
         <SkillGapProvider>
-          <div className="min-h-dvh lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)]">
-            <Sidebar />
-            <div className="flex min-w-0 flex-col">
-              <Topbar />
-              <main className="mx-auto w-full max-w-290 px-4 pt-6 pb-24 sm:px-8 sm:pt-8">
-                {children}
-              </main>
+          <PlanProvider>
+            <div className="min-h-dvh">
+              <Navbar />
+              <main className="mx-auto w-full max-w-300 px-4 pt-8 pb-24 sm:px-6 sm:pt-10">{children}</main>
             </div>
-            <AskButton />
-          </div>
+          </PlanProvider>
         </SkillGapProvider>
-      </BackendStatusProvider>
-    </CopilotProvider>
+      </AccountProvider>
+    </BackendStatusProvider>
   );
 }
