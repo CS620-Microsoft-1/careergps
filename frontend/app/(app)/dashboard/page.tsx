@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-import { DashboardWorkspace } from "@/components/dashboard/dashboard-workspace";
+import { HomeView } from "@/components/home/home-view";
 
-export const metadata: Metadata = { title: "Dashboard" };
+export const metadata: Metadata = { title: "Home" };
 
-export default function DashboardPage() {
-  return <DashboardWorkspace />;
+export default function HomePage() {
+  return <HomeView />;
 }

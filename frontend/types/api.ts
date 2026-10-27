@@ -35,7 +35,6 @@ export type User = {
   linkedin_url: string | null;
   github_url: string | null;
   website_url: string | null;
-  active_resume_id: string | null;
   created_at: string;
 };
 
@@ -47,6 +46,9 @@ export type ResumeSubmitRequest = {
   agent_name: string;
   classification: ResumeClassification;
 };
+
+/** POST /me/resumes: a confirmed résumé for one destination (role). */
+export type ResumeAddRequest = ResumeSubmitRequest & { job_family: JobFamily };
 
 /** The career goal asked in onboarding. */
 export type Goals = {
@@ -96,6 +98,25 @@ export type ResumeClassification = {
   certifications: ResumeRecord[];
   leadership_activities: ResumeRecord[];
   other: ResumeRecord[];
+};
+
+/** GET /me/resumes: one saved version, newest first. */
+export type ResumeSummary = {
+  id: string;
+  label: string | null;
+  original_filename: string;
+  file_type: "pdf" | "docx";
+  created_at: string;
+  /** The roles matched against this résumé; empty for a version no destination uses. */
+  destinations: JobFamily[];
+};
+
+/** GET /me/destinations: a role the student added and the résumé it uses. */
+export type Destination = {
+  job_family: JobFamily;
+  resume_id: string;
+  original_filename: string;
+  created_at: string;
 };
 
 /** POST /resumes/analyze: transient result; onboarding saves the reviewed classification (POST /me or POST /me/resumes). */
@@ -205,6 +226,12 @@ export type CoreSkillGapReport = {
   resume_id?: string;
   limitations: string[];
 };
+/** Demand-weighted résumé evidence (backend: app/services/skill_gaps/match.py). Uncalibrated. */
+export type SkillGapMatch = {
+  score: number;
+  scored_skill_count: number;
+  unscored_skill_count: number;
+};
 export type SkillGapRun = {
   id: string;
   user_id: string;
@@ -221,7 +248,29 @@ export type SkillGapRun = {
   report: CoreSkillGapReport | null;
   error: string | null;
   reused: boolean;
+  match: SkillGapMatch | null;
 };
+
+/** GET /resources (backend: data/resources.yaml). skills holds only the requested role's skills. */
+export type ResourceType = "student_org" | "certification" | "online_course" | "school_course" | "project";
+export type Resource = {
+  id: string;
+  type: ResourceType;
+  title: string;
+  provider: string;
+  meta: string;
+  description: string;
+  skills: string[];
+  url: string | null;
+  school: string | null;
+  alongside: boolean;
+};
+export type ResourceList = { job_family: JobFamily; resources: Resource[] };
+
+/** GET /plan: saved resources for one role; the browser orders them from the gap ranking. */
+export type PlanStatus = "saved" | "done";
+export type PlanItem = { resource_id: string; status: PlanStatus; saved_at: string; done_at: string | null };
+export type Plan = { job_family: JobFamily; items: PlanItem[] };
 
 /** The stages POST /resumes/analyze/stream reports. "ocr" appears only when a PDF page is an image. */
 export type ResumeAnalysisStep = "upload" | "extract" | "ocr" | "classify";

@@ -1,10 +1,13 @@
-import { ApiError, apiGet, apiPatch, apiPost } from "@/lib/api/client";
+import { ApiError, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api/client";
 import type {
   AccountCreateRequest,
+  Destination,
   Goals,
+  JobFamily,
   MeResponse,
   PersonalDetails,
-  ResumeSubmitRequest,
+  ResumeAddRequest,
+  ResumeSummary,
   SavedResume,
   User,
 } from "@/types/api";
@@ -26,17 +29,32 @@ export function updateAccount(body: Partial<Goals & PersonalDetails>) {
   return apiPatch<User>("/me", { json: body });
 }
 
-/** Save a newer confirmed résumé; it becomes the active one. */
-export function addResume(body: ResumeSubmitRequest) {
+/** Save a confirmed résumé; the destination for job_family uses it from now on (added if new). */
+export function addResume(body: ResumeAddRequest) {
   return apiPost<SavedResume>("/me/resumes", { json: body });
 }
 
-/** The active résumé, or null if there is none yet. */
-export async function getSavedResume(): Promise<SavedResume | null> {
+/** Add a destination, or change the résumé it uses. Several roles can use the same résumé. */
+export function setDestinationResume(jobFamily: JobFamily, resumeId: string) {
+  return apiPut<SavedResume>(`/me/destinations/${jobFamily}`, { json: { resume_id: resumeId } });
+}
+
+/** The roles the student added, oldest first, with each one's résumé. */
+export function listDestinations() {
+  return apiGet<Destination[]>("/me/destinations");
+}
+
+/** A destination's résumé (the selected target role's by default), or null if it has none. */
+export async function getSavedResume(jobFamily?: JobFamily): Promise<SavedResume | null> {
   try {
-    return await apiGet<SavedResume>("/me/resume");
+    return await apiGet<SavedResume>(jobFamily ? `/me/resume?job_family=${jobFamily}` : "/me/resume");
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) return null;
     throw error;
   }
+}
+
+/** Every confirmed résumé version, newest first, with the roles that use each one. */
+export function listResumes() {
+  return apiGet<ResumeSummary[]>("/me/resumes");
 }
