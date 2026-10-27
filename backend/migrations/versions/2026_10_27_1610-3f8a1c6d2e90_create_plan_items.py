@@ -1,7 +1,7 @@
 """Create plan_items: resources a student saved to their action plan, per destination.
 
 Revision ID: 3f8a1c6d2e90
-Revises: 5b1e9c3f7a2d
+Revises: 1a7c4e9b2d60
 
 Replaces the per-user JSON files under backend/local_results/plans (app/services/plans.py).
 resource_id is an id from data/resources.yaml, not a foreign key: the catalog is a file.
@@ -12,7 +12,7 @@ from alembic import op
 import sqlalchemy as sa
 
 revision = "3f8a1c6d2e90"
-down_revision = "5b1e9c3f7a2d"
+down_revision = "1a7c4e9b2d60"
 branch_labels = None
 depends_on = None
 

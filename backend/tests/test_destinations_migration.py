@@ -1,4 +1,4 @@
-"""The résumé-per-destination migration, rendered as offline SQL (no database)."""
+"""The destinations migrations, rendered as offline SQL (no database)."""
 import io
 import sys
 import unittest
@@ -13,11 +13,11 @@ from alembic.script import ScriptDirectory
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
-REVISION = "5b1e9c3f7a2d"
+REVISION = "1a7c4e9b2d60"
 PARENT_REVISION = "7d2c91a4e8b6"
 
 
-class ResumeDestinationMigrationTests(unittest.TestCase):
+class DestinationsMigrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.script = ScriptDirectory.from_config(Config(str(BACKEND_ROOT / "alembic.ini")))
@@ -33,17 +33,25 @@ class ResumeDestinationMigrationTests(unittest.TestCase):
             getattr(module, direction)()
         return output.getvalue()
 
-    def test_link_follows_the_job_analysis_migration(self) -> None:
-        self.assertEqual(1, len(self.script.get_heads()))
+    def test_follows_the_job_analysis_migration(self) -> None:
         self.assertEqual(PARENT_REVISION, self.script.get_revision(REVISION).down_revision)
 
-    def test_link_adds_the_column_and_backfills_without_touching_the_pointer(self) -> None:
+    def test_one_row_per_user_and_role_pointing_at_the_users_own_resume(self) -> None:
         sql = self.render(REVISION, "upgrade")
-        self.assertIn("ALTER TABLE resumes ADD COLUMN job_family TEXT", sql)
-        self.assertIn("ck_resumes_job_family", sql)
-        self.assertIn("WHERE u.active_resume_id = r.id", sql)
+        self.assertIn("CREATE TABLE destinations", sql)
+        self.assertIn("PRIMARY KEY (user_id, job_family)", sql)
+        self.assertIn("FOREIGN KEY(resume_id, user_id) REFERENCES resumes (id, user_id)", sql)
+        self.assertIn("ALTER TABLE destinations ENABLE ROW LEVEL SECURITY", sql)
         self.assertNotIn("DROP COLUMN", sql)
-        self.assertIn("DROP COLUMN job_family", self.render(REVISION, "downgrade"))
+
+    def test_backfills_the_target_role_with_the_active_resume(self) -> None:
+        sql = self.render(REVISION, "upgrade")
+        self.assertIn("INSERT INTO destinations (user_id, job_family, resume_id)", sql)
+        self.assertIn("u.active_resume_id IS NOT NULL", sql)
+        self.assertIn("DROP TABLE destinations", self.render(REVISION, "downgrade"))
+
+    def test_chain_has_a_single_head(self) -> None:
+        self.assertEqual(1, len(self.script.get_heads()))
 
 
 if __name__ == "__main__":

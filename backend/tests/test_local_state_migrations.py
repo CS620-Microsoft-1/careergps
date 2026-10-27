@@ -33,8 +33,8 @@ class LocalStateMigrationTests(unittest.TestCase):
             getattr(module, direction)()
         return output.getvalue()
 
-    def test_chain_follows_the_resume_job_family_migration(self) -> None:
-        self.assertEqual("5b1e9c3f7a2d", self.script.get_revision(PLAN_ITEMS).down_revision)
+    def test_chain_follows_the_destinations_migration(self) -> None:
+        self.assertEqual("1a7c4e9b2d60", self.script.get_revision(PLAN_ITEMS).down_revision)
         self.assertEqual(PLAN_ITEMS, self.script.get_revision(SKILL_GAP_RUNS).down_revision)
 
     def test_plan_items_one_row_per_user_role_and_resource(self) -> None:
