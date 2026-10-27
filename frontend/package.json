@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node --test \"lib/**/*.test.mts\""
+    "test": "node --test \"lib/**/*.test.mts\" \"lib/skill-gap-*.test.cjs\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",

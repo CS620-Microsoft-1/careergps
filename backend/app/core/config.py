@@ -43,3 +43,12 @@ class Settings(BaseSettings):
 @lru_cache
 def get_settings() -> Settings:
     return Settings()
+
+
+class SkillGapSettings(BaseSettings):
+    """Skill Gap Agent settings; analysis results stay in backend-local JSON."""
+
+    model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
+
+    skill_gap_foundry_project_endpoint: str | None = None
+    skill_gap_foundry_agent_name: str | None = None

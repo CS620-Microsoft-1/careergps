@@ -5,7 +5,7 @@ import tempfile
 import threading
 import unittest
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -176,7 +176,7 @@ class LocalJobAnalysisRecoveryTests(unittest.TestCase):
         return self.store.claim(id)
 
     def state(self, id=FIRST_ID):
-        with sqlite3.connect(self.store.database_path) as connection:
+        with closing(sqlite3.connect(self.store.database_path)) as connection:
             connection.row_factory = sqlite3.Row
             return dict(connection.execute(
                 "SELECT * FROM local_job_analyses WHERE job_posting_id = ?", (id,)
@@ -316,7 +316,7 @@ class LocalJobAnalysisRecoveryTests(unittest.TestCase):
         legacy_directory = Path(self.temporary.name) / "legacy"
         legacy_directory.mkdir()
         database = legacy_directory / "queue.sqlite3"
-        with sqlite3.connect(database) as connection:
+        with closing(sqlite3.connect(database)) as connection, connection:
             connection.execute("""CREATE TABLE local_job_analyses (
                 job_posting_id TEXT PRIMARY KEY, status TEXT NOT NULL,
                 result_json TEXT, error_message TEXT, attempt TEXT

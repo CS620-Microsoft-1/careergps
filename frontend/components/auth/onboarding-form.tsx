@@ -18,10 +18,11 @@ import { Field, FieldError, FieldGroup, FieldTitle } from "@/components/ui/field
 import { DEFAULT_UNIVERSITY, EXPERIENCE_LEVELS, TARGET_ROLES } from "@/lib/options";
 import { streamResumeAnalysis } from "@/lib/api/resumes";
 import { ApiError, errorMessage } from "@/lib/api/client";
-import { addResume, createAccount, getMe, updateAccount } from "@/lib/api/me";
+import { addResume, createAccount, getMe, getSavedResume, updateAccount } from "@/lib/api/me";
 import { acceptedTerms } from "@/lib/auth/account";
 import { getSupabase } from "@/lib/supabase/client";
 import { onboardingSchema, type OnboardingValues } from "@/lib/validation/auth";
+import { profileForAnalysis, queueSkillGapAnalysis } from "@/lib/skill-gap-profile";
 import type { ResumeAnalysis, ResumeClassification } from "@/types/api";
 
 /** How long the "Found …" summary stays on the progress card before the review opens. */
@@ -200,6 +201,11 @@ export function OnboardingForm({ graduationYears }: { graduationYears: string[] 
             setConfirming(false);
             return;
           }
+          // Persist first; the dashboard can then analyze the saved résumé by ID.
+          try {
+            const [{ user }, savedResume] = await Promise.all([getMe(), getSavedResume()]);
+            if (user && savedResume) queueSkillGapAnalysis(profileForAnalysis(user, savedResume));
+          } catch { /* Saving succeeded; analysis remains available explicitly if reload fails. */ }
           router.push("/dashboard");
         }}
       />

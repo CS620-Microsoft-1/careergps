@@ -410,7 +410,7 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
         self.agent.behavior = lambda _posting: deepcopy(new)
         self.assertEqual(new, self.pipeline.analyze(self.job_id, force=True)["structured_data"])
         self.assertEqual(2, len(self.agent.calls))
-        self.assertEqual(new, json.loads(self.exported().read_text()))
+        self.assertEqual(new, json.loads(self.exported().read_text(encoding="utf-8")))
 
     def test_failed_force_refresh_preserves_previous_successful_result_file(self) -> None:
         old = self.pipeline.analyze(self.job_id)["structured_data"]
@@ -497,7 +497,7 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
         self.assertIn("evidence_quote_not_in_source", result["error_message"])
         self.assertEqual(previous, result["structured_data"])
         self.assertEqual(previous_file, self.exported().read_bytes())
-        self.assertEqual(previous, json.loads(self.exported().read_text()))
+        self.assertEqual(previous, json.loads(self.exported().read_text(encoding="utf-8")))
 
     def test_invalid_content_does_not_block_next_queued_job(self) -> None:
         next_id = self.add_posting("valid-after-content-failure")
@@ -561,9 +561,9 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
         self.assertEqual("succeeded", result["status"])
         self.assertEqual(28, len(result["structured_data"]))
         self.assertEqual(expected, result["structured_data"])
-        self.assertEqual(expected, json.loads(self.exported().read_text()))
-        self.assertIn("$100,000", self.exported().read_text())
-        self.assertNotIn(chr(92) + "$", self.exported().read_text())
+        self.assertEqual(expected, json.loads(self.exported().read_text(encoding="utf-8")))
+        self.assertIn("$100,000", self.exported().read_text(encoding="utf-8"))
+        self.assertNotIn(chr(92) + "$", self.exported().read_text(encoding="utf-8"))
 
     def test_deleted_queued_source_fails_without_blocking_other_work(self) -> None:
         self.pipeline.enqueue(self.job_id)
@@ -666,7 +666,7 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
         self.assertEqual(previous_file, self.exported().read_bytes())
         new = analysis_fixture(self.job_id, posting=self.source.get_posting(self.job_id), include_overview=True)
         self.assertEqual("succeeded", store.finish(str(self.job_id), successor[0], data=new)["status"])
-        self.assertEqual(new, json.loads(self.exported().read_text()))
+        self.assertEqual(new, json.loads(self.exported().read_text(encoding="utf-8")))
 
     def test_live_heartbeat_protects_a_long_agent_call_from_recovery(self) -> None:
         clock = [1000.0]
@@ -733,7 +733,7 @@ JobPostingAnalysisPipeline(Source(), store, Agent()).analyze({str(self.job_id)!r
         self.assertEqual(1, restarted.recover_interrupted())
         self.assertEqual("succeeded", restarted.process_next()["status"])
         self.assertEqual(1, len(self.agent.calls))
-        self.assertEqual(28, len(json.loads(self.exported().read_text())))
+        self.assertEqual(28, len(json.loads(self.exported().read_text(encoding="utf-8"))))
 
 
 # Source restrictions remain covered independently of Agent behavior.

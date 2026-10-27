@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-skill-gap-local/
 /out/
 
 # production

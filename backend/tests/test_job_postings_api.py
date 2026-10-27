@@ -98,7 +98,7 @@ class JobPostingsApiTests(unittest.TestCase):
         self.assertEqual(str(self.job_id), result["job_posting_id"])
         self.assertEqual(28, len(result["structured_data"]))
         self.assertEqual(analysis_fixture(self.job_id, posting=source_before), result["structured_data"])
-        self.assertEqual(result["structured_data"], json.loads(self.exported().read_text()))
+        self.assertEqual(result["structured_data"], json.loads(self.exported().read_text(encoding="utf-8")))
         self.assertEqual(result, self.store.get(str(self.job_id)))
         self.assertEqual([source_before], self.agent.calls)
         self.assertEqual(source_before, self.source.get_posting(self.job_id))
@@ -119,7 +119,7 @@ class JobPostingsApiTests(unittest.TestCase):
         self.assertEqual(str(self.job_id), data["id"])
         self.assertEqual("Example", data["company_name"])
         self.assertEqual("Medical coverage.\n\nPaid leave if eligible.", data["benefits"])
-        self.assertEqual(data, json.loads(self.exported().read_text()))
+        self.assertEqual(data, json.loads(self.exported().read_text(encoding="utf-8")))
         self.assertEqual(28, len(data))
 
     def test_http_rejects_old_benefits_array_without_export(self) -> None:
@@ -208,7 +208,7 @@ class JobPostingsApiTests(unittest.TestCase):
         response = self.client.post(self.path, headers=ADMIN_HEADERS, json={"force": True})
         self.assertEqual(200, response.status_code)
         self.assertEqual(updated, response.json()["structured_data"])
-        self.assertEqual(updated, json.loads(self.exported().read_text()))
+        self.assertEqual(updated, json.loads(self.exported().read_text(encoding="utf-8")))
         self.assertEqual(2, len(self.agent.calls))
         self.assertEqual(["job_postings"], inspect(self.engine).get_table_names())
 
