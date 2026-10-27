@@ -1,5 +1,7 @@
 import unittest
 import os
+import json
+from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import uuid4
@@ -16,7 +18,12 @@ class HandoffTest(unittest.TestCase):
             {"skill_id": "sql", "skill_name": "SQL", "skill_gap": 0.5, "calculation_state": "scored"},
             {"skill_id": "uncertain", "skill_name": "Python", "skill_gap": None, "calculation_state": "needs_confirmation"},
         ]}
-        self.assertEqual(inputs_from_report(report, "data_analyst"), {"career_path": "Data Science", "existing_skills": [], "skill_gaps": ["SQL"]})
+        inputs = inputs_from_report(report, "data_analyst")
+        self.assertEqual(inputs, {"career_path": "Data Analyst", "existing_skills": [], "skill_gaps": ["SQL"]})
+        catalog = json.loads((Path(__file__).resolve().parents[1] / "data" / "projects.json").read_text())
+        matched = [p for p in catalog if p["career_path"] == inputs["career_path"]]
+        self.assertEqual(len(matched), 3)
+        self.assertIn("Sales Performance Dashboard", [p["title"] for p in matched])
 
     def test_owner_resume_and_completed_state(self):
         uid, rid = uuid4(), uuid4()

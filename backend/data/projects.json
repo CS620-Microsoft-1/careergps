@@ -34,7 +34,7 @@
     },
     {
       "id": "data_01",
-      "career_path": "Data Science",
+      "career_path": "Data Analyst",
       "title": "Public Transit Reliability Analysis",
       "description": "Analyze a public transit dataset to identify routes and time periods with frequent delays, documenting missing data and limitations.",
       "skills_practiced": ["Python", "pandas", "data cleaning", "exploratory data analysis", "data visualization"],
@@ -45,18 +45,18 @@
     },
     {
       "id": "data_02",
-      "career_path": "Data Science",
-      "title": "Customer Churn Prediction",
-      "description": "Use a public customer dataset to predict churn, compare a baseline with classification models, and evaluate performance on held-out data without data leakage.",
-      "skills_practiced": ["Python", "pandas", "scikit-learn", "classification", "feature engineering", "cross-validation", "model evaluation"],
-      "prerequisites": ["Python basics", "pandas basics", "Basic statistics"],
+      "career_path": "Data Analyst",
+      "title": "Sales Performance Dashboard",
+      "description": "Analyze public or synthetic sales data to identify trends by product, region, and time; build an interactive dashboard and explain actionable findings and data limitations.",
+      "skills_practiced": ["SQL", "data cleaning", "data analysis", "data visualization", "dashboard design", "business communication"],
+      "prerequisites": ["SQL basics", "Basic descriptive statistics"],
       "difficulty": "intermediate",
       "estimated_hours": 25,
-      "deliverables": ["Reproducible preprocessing pipeline", "Baseline and model comparison", "Held-out evaluation", "Error analysis", "GitHub repository", "README"]
+      "deliverables": ["Data cleaning and analysis queries", "Interactive dashboard", "Findings and limitations report", "GitHub repository", "README"]
     },
     {
       "id": "data_03",
-      "career_path": "Data Science",
+      "career_path": "Data Analyst",
       "title": "E-Commerce Experiment Analysis",
       "description": "Analyze a public or synthetic A/B test dataset to estimate a checkout change's effect on conversion, check experiment assumptions, and explain uncertainty.",
       "skills_practiced": ["SQL", "Python", "data cleaning", "hypothesis testing", "confidence intervals", "data visualization", "statistical communication"],

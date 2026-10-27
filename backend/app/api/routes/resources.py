@@ -24,7 +24,7 @@ class RunProjectRequest(BaseModel):
 
 FAMILY_TO_CATALOG = {
     "software_engineer": "Software Engineering",
-    "data_analyst": "Data Science",
+    "data_analyst": "Data Analyst",
     "ai_engineer": "AI/ML Engineering",
 }
 
