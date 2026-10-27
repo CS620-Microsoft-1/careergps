@@ -154,6 +154,68 @@ Database ownership checks and arithmetic cannot be established by JSON Schema
 alone. The database owner will review columns, JSONB, indexes and policies in the
 follow-up PR.
 
+## Offline reference-alignment replay
+
+The local response-processing step can recover a uniquely identifiable original
+quotation when the model adds an exterior ellipsis, changes only the initial case
+of a prose sentence, or supplies a known wrong unit ID within the same activity.
+The calculation copy uses the exact recovered original text and records each
+change. Unknown IDs, cross-activity matches, ambiguous matches, changed words or
+values, and other failed prerequisites remain pending. A whole row must pass the
+unchanged validation gates; partial repairs are rolled back.
+
+This does not change Agent Instructions, the response Schema, semantic labels,
+scoring points/caps/grade boundaries, or demand counts/ratios. It does not fill
+missing methods or decide whether a quoted operation demonstrates the right
+capability. Source integrity is not semantic verification.
+
+To compare a completed saved response without calling the Agent, run from
+`backend/` with its virtual environment active:
+
+```sh
+python -m scripts.replay_skill_gap_response --run-dir "local_results/web_skill_gaps/RUN_ID" --output "local_results/reference-replay"
+```
+
+Replace `RUN_ID` with the saved run directory name and choose a new output path.
+The command has no database or network access. It reads the original input,
+Agent response and report, verifies unchanged demand, and writes a separate
+before/after report, reference checks, adjustment audit and comparison README.
+All original run files are hashed before and after; existing output paths are
+refused. The web cache and original result are not replaced by this command.
+The comparison reports zero new model calls and separates offline computation
+time from the original inference time. Private results remain ignored by Git.
+
+### Saved-response comparison on 2026-10-26
+
+The user's saved AI Engineer response was recalculated with local alignment v3.
+The original run and raw files stayed byte-identical. The replay made **zero new
+model calls**, used no database, and took **0.034 seconds** of offline calculation;
+the original model-backed run took 50.426 seconds. These are different stages,
+not a measurement of faster model inference.
+
+| Skill | Before | Evidence strength after | Evidence gap after | Grade after |
+| --- | --- | ---: | ---: | --- |
+| Data preparation | Pending | 0.65 | 0.35 | B |
+| Model deployment and serving | Pending | 0.60 | 0.40 | B |
+| Generative AI | Pending | 0.45 | 0.55 | C |
+
+All 23 skills now pass mechanical reference checks, compared with 20 previously.
+The existing 20 scored skills retain exactly the same strength, gap, grade and
+priority. The new distribution is 12 B, 7 C and 4 D, with no pending references.
+Forty synthetic alignment tests and five portable replay tests pass. They cover
+ambiguity, same-activity boundaries, numeric and identifier preservation, atomic
+rollback, audit-schema compatibility, no-network execution, raw-file preservation,
+identity metadata, incompatible demand/policy rejection and output overwrite
+guards. The final clean-copy backend suite passed 367 tests with eight opt-in
+PostgreSQL tests skipped; no private fixtures or old experiment outputs were used.
+
+This resolves the three quotation failures, while retaining the original Agent
+categories. The previously noted method omission and broad infrastructure
+judgment remain model limitations. The model-deployment grade still needs
+semantic review; recovering its quotation does not prove serving experience.
+The replay is a separate saved comparison, and the original web result remains
+unchanged until an explicit result-update step is requested.
+
 
 ## Local verification on 2026-10-26
 
@@ -172,6 +234,22 @@ follow-up PR.
   protection were verified. The login page loaded and protected pages redirected
   to login.
 - Saved Azure Agent version 28 matched the local Instructions and response schema.
-  This was a configuration check, not an inference call. A complete real-user
-  sign-in, Review confirmation and paid Agent run still requires interactive
-  testing; the automated pipeline uses synthetic accounts and a mocked Agent.
+  The initial preflight made no inference call; automated tests use synthetic
+  accounts and a mocked Agent.
+- The user subsequently completed a real AI Engineer flow: confirmed email,
+  resume parsing, Review save, automatic analysis and result restoration. The
+  analysis took 50.426 seconds (48.231 seconds of inference), with one Skill Gap
+  model call and no repair or summary calls. This count excludes the separate
+  resume-parsing Agent stage.
+- The saved database resume, active resume pointer, owner, content hash and
+  report IDs matched in a read-only audit. Logs contained one analysis POST and
+  successful polling/latest restoration, with no duplicate Skill Gap submission.
+- Twenty of 23 skills were scored (10 B, 6 C, 4 D). Data preparation, model
+  deployment and generative AI remained null/pending because of an added
+  ellipsis, changed capitalization and a wrong source ID respectively. Replaying
+  the saved response reproduced all scores and checks; independent arithmetic
+  checks found no discrepancy. No second Agent call was made during the audit.
+- Known model limitations remain: a model-evaluation method was omitted, and
+  AI-infrastructure evidence may be too broad. Exact-reference validation does
+  not establish semantic relevance. This verifies one real AI Engineer flow,
+  not live runs for all families or the PostgreSQL RLS policy matrix.

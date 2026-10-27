@@ -1,15 +1,17 @@
 """Narrow response cleanup before the preserved v12 proof gates and arithmetic.
 
-Discard a duplicate non-result reference, or restore uniquely located omitted
-commas from the original source. No semantic evidence, tier or points are added.
+Discard a duplicate non-result reference or align an unambiguous original quote.
+Only bounded formatting or exact same-activity ID repairs are accepted. No
+semantic evidence, category, tier or points are invented.
 """
 from copy import deepcopy
 
 from .scoring import calculate as calculate_baseline
 from .sources import build_index
 from .validation import validate_response
+from .reference_alignment import alignment_candidates
 
-RESPONSE_PROCESSING_VERSION = "v12-reference-cleanup.v2"
+RESPONSE_PROCESSING_VERSION = "v12-reference-cleanup.v3"
 _NON_RESULT_TIERS = {"check_only", "workflow_only", "unclear"}
 
 
@@ -133,16 +135,65 @@ def _restore_comma_quotes(family, normalized, catalog, sources):
     return accepted
 
 
+def _align_original_quotes(family, normalized, catalog, sources):
+    checks = validate_response(normalized, family, sources, catalog)
+    if checks["global_errors"]:
+        return []
+    index = build_index(sources)
+    body, accepted = normalized["result"], []
+    for skill_id, check in checks["skills"].items():
+        errors, activity_id = check["errors"], check["derived_activity_id"]
+        if (not errors or activity_id is None
+                or any(error["code"] != "quote_not_in_original" for error in errors)):
+            continue
+        original = deepcopy(body[skill_id])
+        prefix = "/result/" + skill_id
+        targets, changes = _quote_targets(body[skill_id], prefix), []
+        for error in errors:
+            target = targets.get(error["field"])
+            if target is None:
+                break
+            proof, unit_id = target
+            candidates = alignment_candidates(index, unit_id, activity_id, proof["quote"],
+                                               restore_omitted_comma_quote)
+            if len(candidates) != 1 or not candidates[0].get("bounded", True):
+                break
+            selected = candidates[0]
+            span = {key: selected[key] for key in ("unit_id", "start", "end")}
+            common = {"skill_id": skill_id, "source_span": span,
+                      "original_errors": [deepcopy(error)]}
+            if selected["unit_id"] != unit_id:
+                is_operation = error["field"] == prefix + "/capability/quote"
+                owner, key = (body[skill_id], "operation_id") if is_operation else (proof, "unit_id")
+                field = prefix + "/operation_id" if is_operation else error["field"].removesuffix("quote") + "unit_id"
+                changes.append({**common, "field": field, "code": "same_activity_reference_rebound",
+                                "before": unit_id, "after": selected["unit_id"]})
+                owner[key] = selected["unit_id"]
+            if selected["quote"] != proof["quote"]:
+                changes.append({**common, "field": error["field"], "code": "bounded_quote_alignment",
+                                "rules": selected["rules"], "before": proof["quote"], "after": selected["quote"]})
+                proof["quote"] = selected["quote"]
+        else:
+            # A correct literal match does not waive any conditional, ownership
+            # or source-integrity prerequisite. Accept the whole row or nothing.
+            verified = validate_response(normalized, family, sources, catalog)
+            if not verified["global_errors"] and verified["skills"][skill_id]["status"] == "passed":
+                accepted.extend(changes)
+                continue
+        body[skill_id] = original
+    return accepted
+
+
 def normalize_response(family, agent_output, catalog, sources):
     """Return a separate calculation copy and an explicit field-change audit.
 
-    Each cleanup must pass every other v12 prerequisite. Comma restoration
-    additionally needs an unambiguous original span within the referenced unit.
-    Other contradictory fields remain pending for review; they are not guessed.
+    Every cleanup must pass all original v12 prerequisites. Formatting repairs
+    stay within the referenced unit; ID repair requires unchanged exact text
+    unique within the already-known activity. Ambiguity stays pending.
     """
     normalized = deepcopy(agent_output)
     audit = {"version": RESPONSE_PROCESSING_VERSION,
-             "scope": "duplicate_nonresult_reference_and_unique_omitted_prose_commas",
+             "scope": "bounded_original_reference_alignment_not_semantic_verification",
              "adjustments": [], "count": 0}
     original_checks = validate_response(agent_output, family, sources, catalog)
     body = normalized.get("result") if isinstance(normalized, dict) else None
@@ -180,6 +231,7 @@ def normalize_response(family, agent_output, catalog, sources):
                 # Never use a cleanup if the original gates still reject it.
                 body[skill_id] = deepcopy(agent_output["result"][skill_id])
     audit["adjustments"].extend(_restore_comma_quotes(family, normalized, catalog, sources))
+    audit["adjustments"].extend(_align_original_quotes(family, normalized, catalog, sources))
     audit["count"] = len(audit["adjustments"])
     return normalized, audit
 

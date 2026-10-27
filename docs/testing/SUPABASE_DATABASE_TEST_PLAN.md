@@ -177,3 +177,12 @@ When a database-related PR changes the schema or security model:
 - The running main API returned HTTP 200 for `/health` and `/health/db`; authenticated Skill Gaps endpoints rejected missing login with HTTP 401.
 - No user records or resume contents were read, no migrations were applied, and no shared data was modified.
 - User ownership, saved-resume selection and result isolation were tested with synthetic accounts and a mocked Agent. These are application tests, not a live PostgreSQL RLS-policy verification; the RLS matrix remains unchanged.
+
+
+### 2026-10-26 — Real user Skill Gaps ownership and snapshot audit
+
+- The user completed a real AI Engineer analysis after email confirmation and Review save. The API returned 201 for account/resume creation and 202 for one Skill Gaps submission, followed by successful status/latest reads.
+- A read-only audit restricted to that run's user and resume verified email confirmation, the active resume pointer, resume ownership, identical database/input snapshots, content hash and report identifiers. No personal information or credentials are recorded here.
+- Skill Gaps made one model call in 50.426 seconds; no automatic repair or summary call occurred. The audit did not invoke the Agent or modify shared data.
+- The report scored 20/23 skills; three invalid references remained null/pending, with no arithmetic or saved-response replay discrepancies. Results remain local JSON rather than database records.
+- This checks application ownership for the tested account. Cross-account and RLS-policy checks against the real shared database were not performed; their matrix statuses remain unchanged.

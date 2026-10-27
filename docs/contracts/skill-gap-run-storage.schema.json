@@ -591,11 +591,24 @@
         "code": {
           "enum": [
             "omitted_comma_restored",
-            "duplicate_nonresult_reference_removed"
+            "duplicate_nonresult_reference_removed",
+            "bounded_quote_alignment",
+            "same_activity_reference_rebound"
           ]
         },
         "before": {},
         "after": {},
+        "rules": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "exterior_ellipsis_removed",
+              "sentence_initial_case_restored",
+              "omitted_comma_restored"
+            ]
+          }
+        },
         "original_errors": {
           "type": "array",
           "items": {
