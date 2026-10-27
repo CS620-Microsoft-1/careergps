@@ -1,0 +1,884 @@
+{
+  "version": "2026-10-26",
+  "certifications": [
+    {
+      "id": "aws-cloud-practitioner",
+      "name": "AWS Certified Cloud Practitioner",
+      "provider": "Amazon Web Services",
+      "url": "https://aws.amazon.com/certification/certified-cloud-practitioner/",
+      "cost_usd": 100,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "cloud"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "aws-developer-associate",
+      "name": "AWS Certified Developer - Associate",
+      "provider": "Amazon Web Services",
+      "url": "https://aws.amazon.com/certification/certified-developer-associate/",
+      "cost_usd": 150,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "cloud",
+          "backend_apis",
+          "nosql_search",
+          "testing",
+          "debugging",
+          "observability_operations",
+          "performance",
+          "security",
+          "delivery_automation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "aws-solutions-architect-associate",
+      "name": "AWS Certified Solutions Architect - Associate",
+      "provider": "Amazon Web Services",
+      "url": "https://aws.amazon.com/certification/certified-solutions-architect-associate/",
+      "cost_usd": 150,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "cloud",
+          "system_design",
+          "distributed_systems",
+          "reliability",
+          "performance",
+          "security"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "aws-ai-practitioner",
+      "name": "AWS Certified AI Practitioner",
+      "provider": "Amazon Web Services",
+      "url": "https://aws.amazon.com/certification/certified-ai-practitioner/",
+      "cost_usd": 100,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "ai_engineer": [
+          "machine_learning",
+          "generative_ai",
+          "llm",
+          "rag",
+          "prompt_engineering",
+          "model_evaluation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "aws-machine-learning-engineer-associate",
+      "name": "AWS Certified Machine Learning Engineer - Associate",
+      "provider": "Amazon Web Services",
+      "url": "https://aws.amazon.com/certification/certified-machine-learning-engineer-associate/",
+      "cost_usd": 75,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "ai_engineer": [
+          "machine_learning",
+          "data_preparation",
+          "feature_engineering",
+          "model_training",
+          "model_evaluation",
+          "model_deployment",
+          "mlops",
+          "ai_infrastructure",
+          "generative_ai"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "aws-data-engineer-associate",
+      "name": "AWS Certified Data Engineer - Associate",
+      "provider": "Amazon Web Services",
+      "url": "https://aws.amazon.com/certification/certified-data-engineer-associate/",
+      "cost_usd": 150,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "sql",
+          "data_pipelines",
+          "data_modeling",
+          "data_quality",
+          "warehousing",
+          "workflow_automation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-azure-fundamentals",
+      "name": "Microsoft Certified: Azure Fundamentals",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-fundamentals/",
+      "cost_usd": 99,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "cloud"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-azure-data-fundamentals",
+      "name": "Microsoft Certified: Azure Data Fundamentals",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-data-fundamentals/",
+      "cost_usd": 99,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "relational_sql",
+          "nosql_search"
+        ],
+        "data_analyst": [
+          "sql",
+          "warehousing"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-azure-ai-fundamentals",
+      "name": "Microsoft Certified: Azure AI Fundamentals",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-fundamentals/",
+      "cost_usd": 99,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "ai_engineer": [
+          "generative_ai",
+          "prompt_engineering",
+          "ai_agents"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-azure-ai-apps-agents-developer",
+      "name": "Microsoft Certified: Azure AI Apps and Agents Developer Associate",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-apps-and-agents-developer-associate/",
+      "cost_usd": 165,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "ai_engineer": [
+          "generative_ai",
+          "llm",
+          "rag",
+          "ai_agents",
+          "prompt_engineering",
+          "model_evaluation",
+          "model_deployment",
+          "vector_retrieval"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-azure-ai-cloud-developer",
+      "name": "Microsoft Certified: Azure AI Cloud Developer Associate",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-cloud-developer-associate/",
+      "cost_usd": 165,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "cloud",
+          "containers",
+          "backend_apis",
+          "nosql_search",
+          "relational_sql",
+          "security",
+          "observability_operations"
+        ],
+        "ai_engineer": [
+          "sql",
+          "vector_retrieval",
+          "rag"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-mlops-engineer-associate",
+      "name": "Microsoft Certified: Machine Learning Operations Engineer Associate",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/operationalizing-machine-learning-and-generative-ai-solutions/",
+      "cost_usd": 165,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "ai_engineer": [
+          "mlops",
+          "model_training",
+          "model_evaluation",
+          "model_deployment",
+          "experimentation",
+          "fine_tuning",
+          "rag",
+          "generative_ai",
+          "prompt_engineering",
+          "ai_infrastructure"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-power-bi-data-analyst",
+      "name": "Microsoft Certified: Power BI Data Analyst Associate",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/data-analyst-associate/",
+      "cost_usd": 165,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "bi_tools",
+          "dashboarding",
+          "data_visualization",
+          "data_modeling",
+          "data_quality",
+          "data_analysis"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-fabric-analytics-engineer",
+      "name": "Microsoft Certified: Fabric Analytics Engineer Associate",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/fabric-analytics-engineer-associate/",
+      "cost_usd": 165,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "sql",
+          "data_modeling",
+          "warehousing",
+          "bi_tools"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-fabric-data-engineer",
+      "name": "Microsoft Certified: Fabric Data Engineer Associate",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/fabric-data-engineer-associate/",
+      "cost_usd": 165,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "sql",
+          "data_pipelines",
+          "large_scale_processing",
+          "warehousing",
+          "workflow_automation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "microsoft-office-specialist-excel-associate",
+      "name": "Microsoft Office Specialist: Excel Associate (Microsoft 365 Apps)",
+      "provider": "Microsoft",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/mos-excel-associate-m365-apps/",
+      "cost_usd": 100,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "data_analyst": [
+          "spreadsheets",
+          "data_visualization"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "github-foundations",
+      "name": "GitHub Foundations",
+      "provider": "GitHub",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/github-foundations/",
+      "cost_usd": 99,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "version_control"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "github-actions",
+      "name": "GitHub Actions",
+      "provider": "GitHub",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/github-actions/",
+      "cost_usd": 99,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "delivery_automation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "github-copilot",
+      "name": "GitHub Copilot",
+      "provider": "GitHub",
+      "url": "https://learn.microsoft.com/en-us/credentials/certifications/github-copilot/",
+      "cost_usd": 99,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "ai_assisted_development"
+        ],
+        "ai_engineer": [
+          "prompt_engineering"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "google-cloud-associate-cloud-engineer",
+      "name": "Associate Cloud Engineer",
+      "provider": "Google Cloud",
+      "url": "https://cloud.google.com/learn/certification/cloud-engineer",
+      "cost_usd": 125,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "cloud",
+          "security"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "google-cloud-associate-data-practitioner",
+      "name": "Associate Data Practitioner",
+      "provider": "Google Cloud",
+      "url": "https://cloud.google.com/learn/certification/data-practitioner",
+      "cost_usd": 125,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "data_analyst": [
+          "data_pipelines",
+          "data_analysis",
+          "data_visualization",
+          "workflow_automation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "google-cloud-professional-ml-engineer",
+      "name": "Professional Machine Learning Engineer",
+      "provider": "Google Cloud",
+      "url": "https://cloud.google.com/learn/certification/machine-learning-engineer",
+      "cost_usd": 200,
+      "cost_note": "Exam fee",
+      "level": "advanced",
+      "skills": {
+        "ai_engineer": [
+          "machine_learning",
+          "model_training",
+          "model_deployment",
+          "mlops"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "google-cloud-generative-ai-leader",
+      "name": "Generative AI Leader",
+      "provider": "Google Cloud",
+      "url": "https://cloud.google.com/learn/certification/generative-ai-leader",
+      "cost_usd": 99,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "ai_engineer": [
+          "generative_ai"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "google-data-analytics-certificate",
+      "name": "Google Data Analytics Certificate",
+      "provider": "Google",
+      "url": "https://grow.google/certificates/data-analytics/",
+      "cost_usd": 59,
+      "cost_note": "Coursera Plus subscription, per month",
+      "level": "beginner",
+      "skills": {
+        "data_analyst": [
+          "spreadsheets",
+          "sql",
+          "data_analysis",
+          "data_visualization",
+          "analytical_scripting",
+          "bi_tools"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "google-advanced-data-analytics-certificate",
+      "name": "Google Advanced Data Analytics Certificate",
+      "provider": "Google",
+      "url": "https://grow.google/certificates/advanced-data-analytics/",
+      "cost_usd": 59,
+      "cost_note": "Coursera Plus subscription, per month",
+      "level": "advanced",
+      "skills": {
+        "data_analyst": [
+          "analytical_scripting",
+          "statistics",
+          "experimentation",
+          "data_analysis",
+          "data_visualization"
+        ],
+        "ai_engineer": [
+          "python",
+          "machine_learning",
+          "math_statistics"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "databricks-data-engineer-associate",
+      "name": "Databricks Certified Data Engineer Associate",
+      "provider": "Databricks",
+      "url": "https://www.databricks.com/learn/certification/data-engineer-associate",
+      "cost_usd": 200,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "data_pipelines",
+          "large_scale_processing",
+          "data_modeling",
+          "workflow_automation"
+        ],
+        "ai_engineer": [
+          "data_pipelines"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "databricks-data-analyst-associate",
+      "name": "Databricks Certified Data Analyst Associate",
+      "provider": "Databricks",
+      "url": "https://www.databricks.com/learn/certification/data-analyst-associate",
+      "cost_usd": 200,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "sql",
+          "dashboarding",
+          "data_visualization",
+          "data_modeling"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "databricks-machine-learning-associate",
+      "name": "Databricks Certified Machine Learning Associate",
+      "provider": "Databricks",
+      "url": "https://www.databricks.com/learn/certification/machine-learning-associate",
+      "cost_usd": 200,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "ai_engineer": [
+          "machine_learning",
+          "model_training",
+          "model_deployment",
+          "mlops"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "databricks-generative-ai-engineer-associate",
+      "name": "Databricks Certified Generative AI Engineer Associate",
+      "provider": "Databricks",
+      "url": "https://www.databricks.com/learn/certification/genai-engineer-associate",
+      "cost_usd": 200,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "ai_engineer": [
+          "generative_ai",
+          "llm",
+          "rag",
+          "data_preparation",
+          "model_deployment",
+          "model_evaluation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "snowflake-snowpro-core",
+      "name": "SnowPro Core Certification",
+      "provider": "Snowflake",
+      "url": "https://learn.snowflake.com/en/certifications/snowpro-core-c03/",
+      "cost_usd": 175,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "warehousing",
+          "data_pipelines"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "snowflake-snowpro-associate-platform",
+      "name": "SnowPro Associate: Platform Certification",
+      "provider": "Snowflake",
+      "url": "https://learn.snowflake.com/en/pages/snowpro-platform-announcementFAQs",
+      "cost_usd": 100,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "data_analyst": [
+          "warehousing"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "tableau-certified-data-analyst",
+      "name": "Salesforce Certified Tableau Data Analyst",
+      "provider": "Salesforce (Tableau)",
+      "url": "https://trailhead.salesforce.com/content/learn/modules/cert-prep-tableau-data-analyst/get-started-with-tableau-data-analyst-certification-prep",
+      "cost_usd": 200,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "bi_tools",
+          "data_visualization",
+          "dashboarding",
+          "data_analysis"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "cncf-ckad",
+      "name": "Certified Kubernetes Application Developer (CKAD)",
+      "provider": "The Linux Foundation / CNCF",
+      "url": "https://training.linuxfoundation.org/certification/certified-kubernetes-application-developer-ckad/",
+      "cost_usd": 445,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "containers",
+          "delivery_automation",
+          "observability_operations",
+          "security"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "cncf-kcna",
+      "name": "Kubernetes and Cloud Native Associate (KCNA)",
+      "provider": "The Linux Foundation / CNCF",
+      "url": "https://training.linuxfoundation.org/certification/kubernetes-cloud-native-associate/",
+      "cost_usd": 250,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "containers",
+          "delivery_automation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "hashicorp-terraform-associate",
+      "name": "Terraform Associate (004)",
+      "provider": "HashiCorp",
+      "url": "https://developer.hashicorp.com/certifications/terraform-associate",
+      "cost_usd": 70.5,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "cloud",
+          "delivery_automation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "comptia-security-plus",
+      "name": "CompTIA Security+",
+      "provider": "CompTIA",
+      "url": "https://www.comptia.org/en-us/certifications/security/",
+      "cost_usd": 404,
+      "cost_note": "Exam voucher",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "security"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "nvidia-generative-ai-llm-associate",
+      "name": "NVIDIA-Certified Associate: Generative AI LLMs (NCA-GENL)",
+      "provider": "NVIDIA",
+      "url": "https://www.nvidia.com/en-us/learn/certification/generative-ai-llm-associate/",
+      "cost_usd": 125,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "ai_engineer": [
+          "llm",
+          "generative_ai",
+          "machine_learning",
+          "experimentation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "hugging-face-agents-course",
+      "name": "Hugging Face AI Agents Course Certificate",
+      "provider": "Hugging Face",
+      "url": "https://huggingface.co/learn/agents-course/unit0/introduction",
+      "cost_usd": 0,
+      "cost_note": "Free",
+      "level": "beginner",
+      "skills": {
+        "ai_engineer": [
+          "ai_agents",
+          "llm"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "python-institute-pcep",
+      "name": "PCEP – Certified Entry-Level Python Programmer",
+      "provider": "OpenEDG Python Institute",
+      "url": "https://pythoninstitute.org/pcep",
+      "cost_usd": 69,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "programming"
+        ],
+        "ai_engineer": [
+          "python",
+          "general_programming"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "python-institute-pcap",
+      "name": "PCAP – Certified Associate Python Programmer",
+      "provider": "OpenEDG Python Institute",
+      "url": "https://pythoninstitute.org/pcap",
+      "cost_usd": 295,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "software_engineer": [
+          "programming",
+          "object_oriented_design"
+        ],
+        "ai_engineer": [
+          "python",
+          "general_programming"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "istqb-ctfl",
+      "name": "ISTQB Certified Tester Foundation Level (CTFL)",
+      "provider": "ISTQB (via ASTQB / AT*SQA)",
+      "url": "https://astqb.org/certifications/foundation-level-certification/",
+      "cost_usd": 229,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "testing",
+          "code_review",
+          "code_quality"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "meta-front-end-developer",
+      "name": "Meta Front-End Developer Professional Certificate",
+      "provider": "Meta (Coursera)",
+      "url": "https://www.coursera.org/professional-certificates/meta-front-end-developer",
+      "cost_usd": 59,
+      "cost_note": "Coursera Plus subscription, per month",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "frontend",
+          "programming",
+          "version_control"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "ieee-cs-software-professional-level-1",
+      "name": "IEEE CS Certified Software Professional, Level 1",
+      "provider": "IEEE Computer Society",
+      "url": "https://www.computer.org/product/education/software-professional-certification-level-1",
+      "cost_usd": 395,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "software_engineer": [
+          "algorithms",
+          "code_quality",
+          "code_review",
+          "testing"
+        ],
+        "ai_engineer": [
+          "software_engineering"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "iiba-ecba",
+      "name": "Entry Certificate in Business Analysis (ECBA)",
+      "provider": "IIBA",
+      "url": "https://www.iiba.org/business-analysis-certifications/ecba/",
+      "cost_usd": 395,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "data_analyst": [
+          "requirements_analysis"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "iiba-cbda",
+      "name": "Certification in Business Data Analytics (CBDA)",
+      "provider": "IIBA",
+      "url": "https://www.iiba.org/business-analysis-certifications/business-data-analytics-certification/",
+      "cost_usd": 405,
+      "cost_note": "Exam fee",
+      "level": "intermediate",
+      "skills": {
+        "data_analyst": [
+          "business_analytics",
+          "data_analysis"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "informs-cap-essentials",
+      "name": "CAP-Essentials (Certified Analytics Professional)",
+      "provider": "INFORMS",
+      "url": "https://certifiedanalytics.org/cap-essentials",
+      "cost_usd": 275,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "data_analyst": [
+          "business_analytics",
+          "data_analysis"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "pytorch-certified-associate",
+      "name": "PyTorch Certified Associate (PTCA)",
+      "provider": "The Linux Foundation / PyTorch Foundation",
+      "url": "https://training.linuxfoundation.org/certification/pytorch-certified-associate-ptca/",
+      "cost_usd": 250,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "ai_engineer": [
+          "deep_learning",
+          "model_training",
+          "data_preparation",
+          "python"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    },
+    {
+      "id": "nvidia-generative-ai-multimodal-associate",
+      "name": "NVIDIA-Certified Associate: Generative AI Multimodal (NCA-GENM)",
+      "provider": "NVIDIA",
+      "url": "https://www.nvidia.com/en-us/learn/certification/generative-ai-multimodal-associate/",
+      "cost_usd": 125,
+      "cost_note": "Exam fee",
+      "level": "beginner",
+      "skills": {
+        "ai_engineer": [
+          "deep_learning",
+          "generative_ai",
+          "model_training",
+          "experimentation"
+        ]
+      },
+      "last_verified": "2026-10-26"
+    }
+  ]
+}
