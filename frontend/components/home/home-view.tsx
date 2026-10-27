@@ -47,7 +47,7 @@ function HomeReady() {
   return (
     <div className="grid gap-6">
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-        <section aria-labelledby="where" className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
+        <section aria-labelledby="where" className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-6">
             <div className="min-w-0 flex-1 basis-72">
               <h1 id="where" className="text-page-title">
@@ -60,16 +60,18 @@ function HomeReady() {
             <MatchRing value={match} size={120} stroke={12} />
           </div>
           <RouteTrack value={match ?? 0} start={`Résumé confirmed ${shortDate(snapshot!.confirmed_at)}`} goal={role} />
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {/* Pinned to the bottom when the side column makes the row taller. */}
+          <div className="mt-auto grid gap-3 pt-6 sm:grid-cols-3">
             <Tile value={String(gaps.length)} label={gaps.length === 1 ? "gap left" : "gaps left"} />
             <Tile value={`${ordered.done.length} of ${total}`} label="plan steps done" />
             <Tile value={String(strengths.length)} label={strengths.length === 1 ? "strength" : "strengths"} />
           </div>
         </section>
 
-        <div className="grid content-start gap-6">
+        {/* Side column fills the row: Next turn takes its height, the plan card takes the rest. */}
+        <div className="flex flex-col gap-6">
           <NextTurn next={ordered.ahead[0] ?? ordered.alongside[0] ?? null} topGap={gaps[0]?.skill_id ?? null} />
-          <section aria-labelledby="then" className="rounded-2xl border border-border bg-card p-6 shadow-card">
+          <section aria-labelledby="then" className="flex flex-1 flex-col rounded-2xl border border-border bg-card p-6 shadow-card">
             <h2 id="then" className="text-title">Then on your plan</h2>
             {plan.status === "loading" ? <p className="mt-3 text-muted-foreground">Loading your plan…</p>
               : total === 0 ? <p className="mt-3 text-muted-foreground">Save resources and they’ll appear here in the order to do them.</p>
@@ -77,7 +79,7 @@ function HomeReady() {
                 {ordered.ahead.slice(1, 3).map((step) => <PlanLine key={step.resource.id} step={step} />)}
                 {ordered.alongside.slice(0, 2).map((step) => <PlanLine key={step.resource.id} step={step} alongside />)}
               </ul>}
-            {total > 0 && <p className="mt-4 text-sm text-muted-foreground">{ordered.done.length} of {total} steps done</p>}
+            {total > 0 && <p className="mt-auto pt-4 text-sm text-muted-foreground">{ordered.done.length} of {total} steps done</p>}
           </section>
         </div>
       </div>
