@@ -1,22 +1,12 @@
 import type { Metadata } from "next";
 
-import { AuthHeading, AuthShell } from "@/components/auth/auth-shell";
-import { OnboardingForm } from "@/components/auth/onboarding-form";
-import { SignOutLink } from "@/components/auth/sign-out-link";
+import { SetupFlow } from "@/components/setup/setup-flow";
 import { getGraduationYears } from "@/lib/graduation-years";
 
-export const metadata: Metadata = { title: "Your career goal" };
+export const metadata: Metadata = { title: "Set up your route" };
 
-export default async function OnboardingPage() {
-  return (
-    <AuthShell
-      title="Where do you want your career to go?"
-      description="Tell us your goal. We'll compare your experience with real job-market data and map the clearest path forward."
-      contentClassName="max-w-3xl"
-    >
-      <AuthHeading title="Your career goal" subtitle="You can change this anytime." />
-      <OnboardingForm graduationYears={await getGraduationYears()} />
-      <SignOutLink />
-    </AuthShell>
-  );
+/** ?step=role: only choose another target role for the saved résumé (Add a destination). */
+export default async function OnboardingPage({ searchParams }: PageProps<"/onboarding">) {
+  const { step } = await searchParams;
+  return <SetupFlow graduationYears={await getGraduationYears()} addRole={step === "role"} />;
 }
