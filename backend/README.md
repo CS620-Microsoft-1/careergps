@@ -27,7 +27,9 @@ python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 ```
 
-Paste the shared `DATABASE_URL` into `.env` (ask Abanish for it privately). `CORS_ORIGINS` can stay
+Paste the shared `DATABASE_URL` into `.env` (ask Abanish for it privately). It must use the transaction
+pooler (port 6543): the session pooler (port 5432) allows only 15 connections for the whole team, and every
+running backend holds some of them even when idle. `CORS_ORIGINS` can stay
 as `http://localhost:3000`. Set `SUPABASE_URL` to `https://<project-ref>.supabase.co` (the project ref
 is the part after `postgres.` in `DATABASE_URL`); without it, endpoints that need login return 503.
 Then check:
@@ -200,7 +202,8 @@ Copy `.env.example` to `.env` and replace every placeholder locally:
 
 | Variable | Used by | Required value |
 |---|---|---|
-| `DATABASE_URL` | Existing CareerGPS database features | Shared Supabase PostgreSQL connection string |
+| `DATABASE_URL` | Existing CareerGPS database features | Shared Supabase connection string, transaction pooler (port 6543) |
+| `MIGRATION_DATABASE_URL` | Alembic, database owner only | Same database through the session pooler (port 5432) |
 | `CORS_ORIGINS` | Browser access to FastAPI | Frontend origins, normally `http://localhost:3000` |
 | `FOUNDRY_PROJECT_ENDPOINT` | Résumé classification | The existing Foundry Project endpoint |
 | `FOUNDRY_AGENT_NAME` | Résumé classification | The existing résumé Agent name |
@@ -851,7 +854,7 @@ The unrelated existing résumé tests are unchanged.
 3. **Review the generated file.** Autogenerate treats a rename as drop + add (data loss) and ignores RLS, triggers and functions; add those by hand.
 4. Preview the SQL without touching the database: `alembic upgrade head --sql`
 5. Open a PR. The migration is reviewed like any other code.
-6. **After the PR is merged into `dev`**, the database owner (currently Abanish) runs `alembic upgrade head` from an up-to-date `dev`, then `alembic current` to confirm. Nobody else applies migrations to the shared database.
+6. **After the PR is merged into `dev`**, the database owner (currently Abanish) runs `alembic upgrade head` from an up-to-date `dev`, then `alembic current` to confirm. Nobody else applies migrations to the shared database. Alembic connects with `MIGRATION_DATABASE_URL` (session pooler, port 5432) and falls back to `DATABASE_URL` when it is unset; DDL should not go through the transaction pooler.
 
 ## Shared database rules
 
