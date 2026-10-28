@@ -168,8 +168,10 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
     try {
       const { user } = await getMe();
       if (user) {
-        // A new résumé for this role (adding the destination if new), now the selected role.
-        await Promise.all([updateAccount({ ...details, ...goals }), addResume({ ...resume, job_family: goal.family })]);
+        // A new résumé for this role (adding the destination if new), then select the role: one after
+        // the other, so a failed upload leaves the account on its old role.
+        await addResume({ ...resume, job_family: goal.family });
+        await updateAccount({ ...details, ...goals });
       } else {
         // First time: this creates the account, with the terms consent given at sign-up.
         const { data } = await getSupabase().auth.getUser();
