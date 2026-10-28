@@ -202,6 +202,12 @@ class AccountService:
         query = select(Destination).where(Destination.user_id == user.id).order_by(Destination.created_at)
         return list(self.db.scalars(query))
 
+    def end_reads(self) -> None:
+        """End the request's read transaction before slow work (Agent calls) so it doesn't hold a
+        transaction-pooler connection. Commit, not rollback: loaded objects stay usable
+        (expire_on_commit=False), and a later query starts a new transaction."""
+        self.db.commit()
+
     def _insert_resume(self, resume: Resume) -> None:
         self.db.add(resume)
         self.db.flush()
