@@ -2,6 +2,8 @@ import tempfile
 import unittest
 import os
 import json
+import threading
+import time
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -109,6 +111,24 @@ class ProjectPicksTest(unittest.TestCase):
                 self.assertEqual("agent", self.call()["source"])
                 self.assertEqual("agent", self.call()["source"])
             agent.assert_called_once()
+
+    def test_concurrent_requests_for_one_run_share_one_agent_call(self):
+        calls = []
+        def slow_agent(**inputs):
+            calls.append(inputs)
+            time.sleep(0.2)
+            return {"recommendations": [], "no_match_reason": "None fit."}
+        configured = SimpleNamespace(resources_project_endpoint="https://example.test")
+        results = []
+        with patch.object(routes, "get_settings", return_value=configured), \
+             patch.object(routes, "recommend_projects", side_effect=slow_agent):
+            threads = [threading.Thread(target=lambda: results.append(self.call())) for _ in range(2)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+        self.assertEqual(1, len(calls))
+        self.assertEqual(["agent", "agent"], [result["source"] for result in results])
 
 
 if __name__ == "__main__":

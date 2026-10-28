@@ -1,8 +1,10 @@
 """Resources that close skill gaps, the student's saved plan for each role, and project
 recommendations from the resources agent."""
+from collections import defaultdict
 import json
 import logging
 import re
+from threading import Lock
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -26,6 +28,8 @@ logger = logging.getLogger(__name__)
 # Agent picks per completed run, so a page visit doesn't pay for another model call.
 PROJECT_PICKS_DIR = BACKEND_ROOT / "local_results" / "project_recommendations"
 _RUN_ID = re.compile(r"[0-9a-f]{32}\Z")
+_picks_locks: defaultdict[str, Lock] = defaultdict(Lock)
+_picks_locks_guard = Lock()
 
 
 @router.get("/resources", response_model=ResourceList)
@@ -130,18 +134,22 @@ def projects_from_skill_gap(
                 "source": "rules"}
     # Only the default (no time budget) answer is cached; the rule fallback is free and never cached.
     cache = PROJECT_PICKS_DIR / f"{run.id}.json" if request.available_hours is None and _RUN_ID.fullmatch(str(run.id)) else None
-    if cache is not None and cache.exists():
-        return load(cache)
-    if get_settings().resources_project_endpoint:
-        try:
-            result = {**recommend_projects(**inputs, available_hours=request.available_hours), "source": "agent"}
-        except Exception as error:
-            logger.warning("Resources agent failed (%s); using gap ranking", type(error).__name__)
-        else:
-            if cache is not None:
-                save_json(cache, result)
-            return result
-    return {**rank_projects(**inputs, available_hours=request.available_hours), "source": "rules"}
+    with _picks_locks_guard:
+        lock = _picks_locks[str(run.id)]
+    # One agent call per run, even when the page asks twice at once.
+    with lock:
+        if cache is not None and cache.exists():
+            return load(cache)
+        if get_settings().resources_project_endpoint:
+            try:
+                result = {**recommend_projects(**inputs, available_hours=request.available_hours), "source": "agent"}
+            except Exception as error:
+                logger.warning("Resources agent failed (%s); using gap ranking", type(error).__name__)
+            else:
+                if cache is not None:
+                    save_json(cache, result)
+                return result
+        return {**rank_projects(**inputs, available_hours=request.available_hours), "source": "rules"}
 
 
 @router.post("/resources/projects")
