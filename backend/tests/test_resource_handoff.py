@@ -16,6 +16,21 @@ from app.services.resources_agent import rank_projects
 
 
 class HandoffTest(unittest.TestCase):
+    def test_free_form_project_recommendations_require_login(self):
+        from fastapi.testclient import TestClient
+        from app.api import deps
+        from app.main import app
+
+        app.dependency_overrides[deps.get_token_verifier] = lambda: None
+        try:
+            with patch("app.api.routes.resources.recommend_projects") as recommend:
+                response = TestClient(app).post("/resources/projects", json={
+                    "career_path": "Software Engineering", "existing_skills": [], "skill_gaps": ["SQL"]})
+        finally:
+            app.dependency_overrides.clear()
+        self.assertEqual(response.status_code, 401)
+        recommend.assert_not_called()
+
     def test_ranked_scored_gaps_only_and_family_mapping(self):
         report = {"job_family": "data_analyst", "priority_order": ["sql", "unknown", "uncertain"], "skills": [
             {"skill_id": "sql", "skill_name": "SQL", "skill_gap": 0.5, "calculation_state": "scored"},
