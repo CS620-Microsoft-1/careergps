@@ -118,7 +118,8 @@ export function SignupForm() {
               </Button>
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <Button type="button" variant="ghost" onClick={() => setStep(0)}>Back</Button>
-                <button type="button" className="text-sm font-bold underline"
+                <button type="button" className="text-sm font-bold underline disabled:opacity-60"
+                  disabled={form.formState.isSubmitting}
                   onClick={() => { form.setValue("university", ""); void form.handleSubmit(onSubmit)(); }}>
                   I’m not a student right now
                 </button>
