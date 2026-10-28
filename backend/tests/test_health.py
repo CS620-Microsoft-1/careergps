@@ -24,10 +24,13 @@ FRONTEND_ORIGIN = "http://localhost:3000"
 
 
 class FakeSession:
-    def __init__(self, fail: bool = False) -> None:
+    def __init__(self, fail: bool = False, crash: bool = False) -> None:
         self.fail = fail
+        self.crash = crash
 
     def execute(self, statement):
+        if self.crash:
+            raise RuntimeError(f"unexpected failure for tester:{FAKE_PASSWORD}")
         if self.fail:
             raise OperationalError(
                 "SELECT 1", {}, Exception(f"connection to tester:{FAKE_PASSWORD}@localhost failed")
@@ -89,6 +92,19 @@ class CorsTests(unittest.TestCase):
 
         self.assertEqual(200, response.status_code)
         self.assertEqual(FRONTEND_ORIGIN, response.headers.get("access-control-allow-origin"))
+
+    def test_unhandled_error_is_a_500_with_cors_headers(self) -> None:
+        app.dependency_overrides[get_db] = use_session(FakeSession(crash=True))
+        try:
+            with self.assertLogs("app.main", level="ERROR"):
+                response = self.client.get("/health/db", headers={"Origin": FRONTEND_ORIGIN})
+        finally:
+            app.dependency_overrides.clear()
+
+        self.assertEqual(500, response.status_code)
+        self.assertEqual({"detail": "Internal server error"}, response.json())
+        self.assertEqual(FRONTEND_ORIGIN, response.headers.get("access-control-allow-origin"))
+        self.assertNotIn(FAKE_PASSWORD, response.text)
 
     def test_unknown_origin_is_rejected(self) -> None:
         response = self.preflight("http://evil.example")

@@ -12,7 +12,10 @@ class Settings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
 
+    # Transaction pooler (port 6543): the app holds a pooler connection only while a transaction runs.
     database_url: str
+    # Session pooler (port 5432), for Alembic only. Falls back to database_url when unset.
+    migration_database_url: str | None = None
     # Comma-separated list of frontend origins allowed to call the API from a browser.
     cors_origins: str = "http://localhost:3000"
     # Supabase project URL (https://<project-ref>.supabase.co). Needed to verify login tokens.

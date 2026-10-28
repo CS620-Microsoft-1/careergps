@@ -13,7 +13,9 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Read the URL from settings (.env) rather than alembic.ini so credentials are never committed.
-DATABASE_URL = get_settings().database_url
+# Migrations use the session pooler: DDL and Alembic's version check need one connection throughout.
+settings = get_settings()
+DATABASE_URL = settings.migration_database_url or settings.database_url
 
 target_metadata = Base.metadata
 
