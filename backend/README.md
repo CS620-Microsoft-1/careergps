@@ -839,7 +839,8 @@ The unrelated existing résumé tests are unchanged.
   `resume_id` that role is matched against; several roles can use the same résumé, and a résumé in
   use can't be deleted. `users.target_role` selects the destination the app shows.
 - The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
-  autogenerate from proposing to drop it.
+  autogenerate from proposing to drop it. It also never proposes dropping a table that has no model
+  (`plan_items` and `skill_gap_runs` exist only in migrations): write table drops by hand.
 - `POST /me` reads `auth.users` (`email_confirmed_at` and `created_at`, the terms consent time)
   directly. That works with the `postgres` role used now; a limited database role for the backend
   will need `SELECT` on `auth.users`, or those two columns.
