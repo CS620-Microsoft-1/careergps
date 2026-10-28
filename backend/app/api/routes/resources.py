@@ -123,6 +123,8 @@ def projects_from_skill_gap(
     resume = accounts.get_resume(user, run.job_family)
     if resume is None or run.resume_id != resume.id:
         raise HTTPException(status_code=409, detail="Analysis is not for this role's current resume.")
+    if run.status == "failed":
+        raise HTTPException(status_code=409, detail="Skill-gap analysis failed. Run it again.")
     if run.status != "completed" or not isinstance(run.report, dict):
         raise HTTPException(status_code=409, detail="Skill-gap analysis is not complete.")
     try:

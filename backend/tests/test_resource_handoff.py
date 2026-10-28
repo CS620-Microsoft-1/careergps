@@ -59,6 +59,12 @@ class HandoffTest(unittest.TestCase):
         with self.assertRaises(HTTPException) as error:
             projects_from_skill_gap(RunProjectRequest(run_id="one"), user, accounts, Manager())
         self.assertEqual(error.exception.status_code, 409)
+        self.assertNotIn("failed", error.exception.detail)
+        run.status = "failed"
+        with self.assertRaises(HTTPException) as error:
+            projects_from_skill_gap(RunProjectRequest(run_id="one"), user, accounts, Manager())
+        self.assertEqual(error.exception.status_code, 409)
+        self.assertIn("failed", error.exception.detail)
 
 
     def test_rules_cover_the_highest_priority_gaps_first(self):
