@@ -20,7 +20,7 @@ import { orderPlan, rankGaps, type OrderedPlan, type PlanStep } from "@/lib/care
 import { cn } from "@/lib/utils";
 
 export function PlanView() {
-  const { family, run, snapshot, loaded } = useSkillGapAnalysis();
+  const { family, run, snapshot, loaded, error } = useSkillGapAnalysis();
   const plan = usePlan();
   const [view, setView] = useState<"flowchart" | "list">("flowchart");
   const report = run?.status === "completed" ? run.report : null;
@@ -46,6 +46,8 @@ export function PlanView() {
       </div>} />
 
     {!loaded || plan.status === "loading" ? <p role="status" className="flex items-center gap-2 text-muted-foreground"><LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Loading your plan…</p>
+      // No snapshot because the profile couldn't be loaded, not because there's no résumé.
+      : !snapshot && error ? <p role="alert" className="rounded-2xl bg-danger-soft p-6">{error}</p>
       : !snapshot ? <p className="rounded-2xl border border-border bg-card p-6">Upload your résumé first. <Link href="/onboarding" className="font-bold underline">Upload résumé</Link></p>
       : plan.status === "error" ? <p role="alert" className="rounded-2xl bg-danger-soft p-6">{plan.error}</p>
       : total === 0 ? <div className="grid justify-items-center gap-3 rounded-2xl border border-border bg-card px-6 py-14 text-center">
