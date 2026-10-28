@@ -12,7 +12,7 @@ os.environ.setdefault(
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
-from sqlalchemy import create_engine, select
+from sqlalchemy import create_engine, select, text
 from sqlalchemy.orm import Session
 
 from app.db.base import Base
@@ -155,6 +155,26 @@ class IngestTests(unittest.TestCase):
         runs = self.session.scalars(select(IngestRun).order_by(IngestRun.started_at)).all()
         self.assertEqual(["success", "failed", "success"], [run.status for run in runs])
         self.assertEqual([1.0], self.sleeps)
+
+    def test_database_error_fails_only_that_board(self) -> None:
+        # Stands in for Postgres rejecting a row, e.g. a salary out of INTEGER range.
+        self.session.execute(text(
+            "CREATE TRIGGER reject_broken BEFORE INSERT ON job_postings WHEN NEW.company_slug = 'broken' "
+            "BEGIN SELECT RAISE(ABORT, 'value out of range'); END"
+        ))
+        self.session.commit()
+        broken = Company(name="Broken", tier="other", boards=[Board(source="greenhouse", slug="broken")])
+        self.adapter.boards["broken"] = [posting("9")]
+        self.adapter.boards["example"] = [posting("1")]
+
+        failed, succeeded = self.run_ingest([broken, self.company])
+
+        self.assertEqual("failed", failed.status)
+        self.assertIn("value out of range", failed.error)
+        self.assertEqual(("success", 1), (succeeded.status, succeeded.inserted))
+        self.assertEqual({"1"}, set(self.postings()))
+        runs = self.session.scalars(select(IngestRun).order_by(IngestRun.company_slug)).all()
+        self.assertEqual([("broken", "failed"), ("example", "success")], [(r.company_slug, r.status) for r in runs])
 
     def test_long_values_and_nul_characters_are_cleaned(self) -> None:
         self.adapter.boards["example"] = [posting("1", title="T" * 600, description="a\x00b")]
