@@ -39,8 +39,16 @@ type Goal = { family: JobFamily | null; level: ExperienceLevel | null; location:
  * step 3) or a new one (all three steps).
  */
 export function SetupFlow({ graduationYears }: { graduationYears: string[] }) {
-  const router = useRouter();
   const addRole = useSearchParams().get("step") === "role";
+  const [visit, setVisit] = useState(0);
+  // The router keeps this page mounted but hidden after leaving it, and runs effect cleanups when it
+  // hides it: start over (step, "Saving…", the picked résumé) each time setup is opened again.
+  useEffect(() => () => setVisit((count) => count + 1), []);
+  return <Steps key={`${visit}:${addRole}`} addRole={addRole} graduationYears={graduationYears} />;
+}
+
+function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears: string[] }) {
+  const router = useRouter();
   const [step, setStep] = useState<0 | 1 | 2>(0);
   const [file, setFile] = useState<File>();
   const [fileError, setFileError] = useState<string>();
