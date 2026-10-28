@@ -98,9 +98,12 @@ def recommend_projects(
             credential=credential,
             allow_preview=True,
         ) as project_client,
+        # No SDK retries (it defaults to 2): a retry after a 120 s timeout runs after the browser has
+        # given up and usually times out again. The route falls back to the rule ranking instead.
         project_client.get_openai_client(
             agent_name=settings.resources_agent_name,
             timeout=120,
+            max_retries=0,
         ) as client,
     ):
         conversation = client.conversations.create()
