@@ -201,6 +201,30 @@ class NameAndContactRulesTests(unittest.TestCase):
         self.assertEqual(EXAMPLE, resume.confirmed_data)
 
 
+class DestinationUpsertTests(unittest.TestCase):
+    """Pointing a role at a résumé is one upsert, so two requests adding the same new role can't both insert."""
+
+    def test_point_upserts_on_the_primary_key_and_commits(self) -> None:
+        from sqlalchemy.dialects import postgresql
+        from sqlalchemy.orm import Session
+
+        db = mock.MagicMock(spec=Session)
+        user, resume_id = User(id=uuid.uuid4()), uuid.uuid4()
+
+        accounts.AccountService(db)._point(user, "ai_engineer", resume_id)
+
+        db.get.assert_not_called()
+        db.add.assert_not_called()
+        statement = db.scalars.call_args.args[0]
+        sql = str(statement.compile(dialect=postgresql.dialect()))
+        self.assertIn("INSERT INTO destinations (user_id, job_family, resume_id)", sql)
+        self.assertIn(
+            "ON CONFLICT (user_id, job_family) DO UPDATE SET resume_id = excluded.resume_id, updated_at = now()", sql)
+        self.assertEqual({"user_id": user.id, "job_family": "ai_engineer", "resume_id": resume_id},
+                         {k: v for k, v in statement.compile().params.items() if k in ("user_id", "job_family", "resume_id")})
+        db.commit.assert_called_once_with()
+
+
 class MeApiTests(unittest.TestCase):
     def setUp(self) -> None:
         self.key = new_signing_key()

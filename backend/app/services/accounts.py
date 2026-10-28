@@ -8,7 +8,8 @@ import uuid
 from dataclasses import dataclass
 from datetime import datetime
 
-from sqlalchemy import select, text
+from sqlalchemy import func, select, text
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -206,11 +207,15 @@ class AccountService:
         self.db.flush()
 
     def _point(self, user: User, job_family: JobFamily, resume_id: uuid.UUID) -> None:
-        destination = self.db.get(Destination, (user.id, job_family))
-        if destination is None:
-            self.db.add(Destination(user_id=user.id, job_family=job_family, resume_id=resume_id))
-        else:
-            destination.resume_id = resume_id
+        """Add the destination or switch its résumé in one upsert. A get-then-insert let two requests
+        adding the same new role (double click, or POST /me/resumes + PUT /me/destinations) both insert."""
+        statement = insert(Destination).values(user_id=user.id, job_family=job_family, resume_id=resume_id)
+        statement = statement.on_conflict_do_update(
+            index_elements=[Destination.user_id, Destination.job_family],
+            set_={"resume_id": statement.excluded.resume_id, "updated_at": func.now()},
+        )
+        # RETURNING + populate_existing refreshes a Destination this session already loaded.
+        self.db.scalars(statement.returning(Destination).execution_options(populate_existing=True)).one()
         self.db.commit()
 
     def sync_email(self, user: User, email: str) -> None:
