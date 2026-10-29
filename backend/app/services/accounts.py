@@ -17,6 +17,7 @@ from app.core.security import AuthenticatedUser
 from app.models import Destination, Resume, User
 from app.schemas.me import AccountCreate, AccountUpdate, ResumeSubmit
 from app.schemas.resume import ResumeClassification
+from app.services.resume_children import rebuild_children
 
 logger = logging.getLogger(__name__)
 
@@ -146,8 +147,7 @@ class AccountService:
         try:
             self.db.add(user)
             self.db.flush()  # users first: resumes.user_id references it
-            self.db.add(resume)
-            self.db.flush()  # then the résumé the destination points at
+            self._insert_resume(resume)  # then the résumé the destination points at
             if family is not None:
                 self.db.add(Destination(user_id=user.id, job_family=family, resume_id=resume.id))
             self.db.commit()
@@ -202,8 +202,10 @@ class AccountService:
         return list(self.db.scalars(query))
 
     def _insert_resume(self, resume: Resume) -> None:
+        """Add the résumé and its child rows; the caller commits them together."""
         self.db.add(resume)
         self.db.flush()
+        rebuild_children(self.db, resume)
 
     def _point(self, user: User, job_family: JobFamily, resume_id: uuid.UUID) -> None:
         destination = self.db.get(Destination, (user.id, job_family))
