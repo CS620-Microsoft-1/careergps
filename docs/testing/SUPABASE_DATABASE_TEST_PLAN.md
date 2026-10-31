@@ -55,8 +55,9 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-018 | Delete a user's active résumé | `users.active_resume_id` becomes NULL; the user row remains | NOT RUN |
 | DB-019 | Set `users.active_resume_id` to another user's résumé | Rejected by `fk_users_active_resume` | NOT RUN |
 | DB-020 | Insert a child row whose `user_id` differs from its résumé's owner | Rejected by the `(resume_id, user_id)` foreign key | NOT RUN |
-| DB-021 | Insert the same skill twice from the same source (e.g. listed) | Second insert rejected by `uq_resume_skills_evidence` (NULLs count as equal) | NOT RUN |
-| DB-022 | Insert a skill whose source link doesn't match `source` (e.g. `project` without `source_project_id`) | Rejected by `ck_resume_skills_source_link` | NOT RUN |
+| DB-021 | Insert the same skill twice from the same source (e.g. listed) | Second insert rejected by `uq_resume_skills_evidence` (NULLs count as equal) | NOT RUN — runnable now that résumés have skill rows |
+| DB-022 | Insert a skill whose source link doesn't match `source` (e.g. `project` without `source_project_id`) | Rejected by `ck_resume_skills_source_link` | NOT RUN — runnable now that résumés have skill rows |
+| DB-023 | Run `python -m scripts.backfill_resume_children`, then compare each résumé's child rows with its `confirmed_data` | Every résumé reports `ok`; `listed` skills = Technical Skills without duplicates; one project/experience/education/achievement row per non-blank entry | NOT RUN — dry run passed for 6/6 résumés (2026-10-29) |
 
 ## Baseline automation
 
@@ -186,3 +187,11 @@ When a database-related PR changes the schema or security model:
 - Skill Gaps made one model call in 50.426 seconds; no automatic repair or summary call occurred. The audit did not invoke the Agent or modify shared data.
 - The report scored 20/23 skills; three invalid references remained null/pending, with no arithmetic or saved-response replay discrepancies. Results remain local JSON rather than database records.
 - This checks application ownership for the tested account. Cross-account and RLS-policy checks against the real shared database were not performed; their matrix statuses remain unchanged.
+
+### 2026-10-29 — Résumé child rows (dry run)
+
+- Branch `feat/resume-child-rows` from `dev` (`9e5f82c`). Confirmed résumés now fill the five child tables from `confirmed_data`; `scripts/backfill_resume_children.py` rebuilds stored résumés.
+- `alembic current` on the shared database: `9c4d2a7f1b3e`. Before the change: 6 résumés, 0 child rows.
+- `--dry-run` sent every row to the shared database and rolled back: 6/6 résumés passed all constraints (264 skills, 11 projects, 23 experiences, 7 educations, 3 achievements). The tables still had 0 rows afterwards.
+- `tests/test_accounts_postgres.py` passed 12/12 against a throwaway Postgres 17 container with every migration applied.
+- Only ids and counts were printed; no résumé content was read into logs. Added DB-023.

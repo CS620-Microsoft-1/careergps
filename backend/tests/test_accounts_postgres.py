@@ -26,9 +26,18 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import sessionmaker
 
 from app.core.security import AuthenticatedUser
-from app.models import Resume, User
+from app.models import (
+    Resume,
+    ResumeAchievement,
+    ResumeEducation,
+    ResumeExperience,
+    ResumeProject,
+    ResumeSkill,
+    User,
+)
 from app.schemas.me import AccountCreate, ResumeSubmit
 from app.services import accounts
+from app.services.resume_children import CHILD_MODELS, rebuild_children
 from tests.test_me import classification, onboarding_body, resume_body
 
 
@@ -143,6 +152,65 @@ class AccountServicePostgresTests(unittest.TestCase):
         self.service.sync_email(ada, "Grace@example.com")
 
         self.assertEqual("ada@example.com", self.service.get_user(ada.id).primary_email)
+
+    def child_counts(self, resume_id) -> dict[str, int]:
+        return {
+            model.__tablename__: self.db.query(model).filter_by(resume_id=resume_id).count()
+            for model in CHILD_MODELS
+        }
+
+    def test_a_confirmed_resume_gets_its_child_rows(self) -> None:
+        user = self.onboard(self.auth_user())
+        resume = self.service.get_resume(user, "data_analyst")
+        example = classification()
+
+        self.assertEqual(
+            {
+                "resume_skills": len(example["technical_skills"])
+                + sum(len(p["technologies"]) for p in example["projects"]),
+                "resume_projects": len(example["projects"]),
+                "resume_experiences": len(example["work_experience"]),
+                "resume_educations": len(example["education"]),
+                "resume_achievements": 0,
+            },
+            self.child_counts(resume.id),
+        )
+        skill = self.db.query(ResumeSkill).filter_by(resume_id=resume.id, source="project").first()
+        self.assertEqual(self.db.query(ResumeProject).filter_by(resume_id=resume.id).one().id, skill.source_project_id)
+        self.assertEqual({user.id}, {row.user_id for row in self.db.query(ResumeExperience).all()})
+
+    def test_an_added_resume_gets_its_own_child_rows(self) -> None:
+        user = self.onboard(self.auth_user())
+        first = self.service.get_resume(user, "data_analyst")
+
+        newer = self.service.add_resume(user, ResumeSubmit.model_validate(resume_body()), "data_analyst")
+
+        self.assertEqual(self.child_counts(first.id), self.child_counts(newer.id))
+        self.assertEqual(1, self.db.query(ResumeEducation).filter_by(resume_id=newer.id).count())
+
+    def test_rebuilding_twice_gives_the_same_rows(self) -> None:
+        user = self.onboard(self.auth_user())
+        resume = self.service.get_resume(user, "data_analyst")
+        before = self.child_counts(resume.id)
+
+        rebuild_children(self.db, resume)
+        self.db.commit()
+        rebuild_children(self.db, resume)
+        self.db.commit()
+
+        self.assertEqual(before, self.child_counts(resume.id))
+
+    def test_deleting_a_resume_deletes_its_child_rows(self) -> None:
+        user = self.onboard(self.auth_user())
+        old = self.service.get_resume(user, "data_analyst")
+        self.service.add_resume(user, ResumeSubmit.model_validate(resume_body()), "data_analyst")
+
+        # The destination now uses the newer résumé, so the old one can be deleted.
+        self.db.delete(old)
+        self.db.commit()
+
+        self.assertEqual({name: 0 for name in self.child_counts(old.id)}, self.child_counts(old.id))
+        self.assertEqual(0, self.db.query(ResumeAchievement).filter_by(resume_id=old.id).count())
 
     def test_the_database_rejects_a_user_without_a_supabase_account(self) -> None:
         user = accounts.new_user(
