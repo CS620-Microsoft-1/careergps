@@ -36,7 +36,7 @@ class HandoffTest(unittest.TestCase):
         uid, rid = uuid4(), uuid4()
         user = SimpleNamespace(id=uid)
         # The role's destination uses résumé rid.
-        accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=rid))
+        accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=rid), end_reads=lambda: None)
         run = SimpleNamespace(id=uuid4().hex, resume_id=rid, status="completed", job_family="software_engineer", report={"job_family": "software_engineer", "priority_order": ["frontend"], "skills": [{"skill_id": "frontend", "skill_name": "Frontend development", "skill_gap": 0.5, "calculation_state": "scored"}]})
         class Manager:
             def get(self, identifier, *, user_id):
@@ -85,7 +85,8 @@ class ProjectPicksTest(unittest.TestCase):
     def setUp(self):
         self.rid, self.uid = uuid4(), uuid4()
         self.user = SimpleNamespace(id=self.uid)
-        self.accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=self.rid))
+        self.accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=self.rid),
+                                        end_reads=lambda: None)
         run = SimpleNamespace(id=uuid4().hex, resume_id=self.rid, status="completed", job_family="ai_engineer", report={
             "job_family": "ai_engineer", "priority_order": ["rag"],
             "skills": [{"skill_id": "rag", "skill_name": "Retrieval-augmented generation", "skill_gap": 0.5, "calculation_state": "scored"}]})

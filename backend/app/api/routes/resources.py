@@ -127,6 +127,7 @@ def projects_from_skill_gap(
         raise HTTPException(status_code=409, detail="Skill-gap analysis failed. Run it again.")
     if run.status != "completed" or not isinstance(run.report, dict):
         raise HTTPException(status_code=409, detail="Skill-gap analysis is not complete.")
+    accounts.end_reads()  # the resources Agent can take tens of seconds; don't hold a transaction
     try:
         inputs = inputs_from_report(run.report, run.job_family)
     except (ValueError, KeyError, TypeError):
