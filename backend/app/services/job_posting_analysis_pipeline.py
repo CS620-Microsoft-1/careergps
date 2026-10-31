@@ -313,7 +313,14 @@ class JobPostingAnalysisPipeline:
             return self.store.finish(
                 job_id, attempt, error_message="The source job posting was not found."
             )
-        except (SQLAlchemyError, JobPostingSourceReadOnlyError):
+        except SQLAlchemyError:
+            # Nothing was analyzed and outages are often brief (e.g. a pooler
+            # refusal). A failed row is never requeued, so keep this one queued.
+            ensure_owned()
+            self.store.release(job_id, attempt)
+            raise
+        except JobPostingSourceReadOnlyError:
+            # A rejected non-SELECT is a code defect that repeats on every retry.
             ensure_owned()
             self.store.finish(
                 job_id, attempt, error_message="The source job posting could not be read."

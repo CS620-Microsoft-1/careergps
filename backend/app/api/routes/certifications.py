@@ -38,6 +38,8 @@ def recommendations(request: CertificationRecommendationRequest,
         raise HTTPException(status_code=404, detail="Run a skill gap analysis for this direction first") from None
     except (OSError, ValueError):
         raise HTTPException(status_code=503, detail="Analysis result is unavailable") from None
+    if run.status == "failed":
+        raise HTTPException(status_code=409, detail="The latest skill gap analysis failed. Run it again")
     if run.status != "completed":
         raise HTTPException(status_code=409, detail="The skill gap analysis has not finished yet")
     try:

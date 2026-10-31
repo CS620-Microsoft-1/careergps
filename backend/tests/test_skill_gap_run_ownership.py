@@ -166,6 +166,32 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
         self.assertEqual((result.status, result.model_calls), ("failed", 0))
         self.assertEqual(len(self.calls), 1)
 
+    def test_failed_submit_persist_leaves_no_stuck_run(self):
+        manager = self.manager()
+        first = wait_for(manager, self.submit(manager))
+        with patch.object(manager, "_persist", side_effect=OSError("disk")), self.assertRaises(OSError):
+            self.submit(manager, force=True)
+        latest = manager.latest(user_id=USER_ID, resume_id=RESUME_ID,
+            reviewed_resume=reviewed_resume(), job_family="software_engineer")
+        self.assertEqual(latest.id, first.id)
+        self.assertEqual(["completed"], [state["status"] for state in manager._states.values()])
+        other = dict(reviewed_resume(), technical_skills=["Rust"])
+        with patch.object(manager, "_persist", side_effect=OSError("disk")), self.assertRaises(OSError):
+            self.submit(manager, reviewed_resume=other)
+        self.assertEqual(wait_for(manager, self.submit(manager, reviewed_resume=other)).status, "completed")
+
+    def test_failed_running_persist_ends_the_run_as_failed(self):
+        manager = self.manager()
+        persist = manager._persist
+        def flaky(state):
+            if state["phase"] == "preparing":
+                raise OSError("disk")
+            persist(state)
+        with patch.object(manager, "_persist", side_effect=flaky):
+            result = wait_for(manager, self.submit(manager))
+        self.assertEqual((result.status, result.model_calls), ("failed", 0))
+        self.assertEqual(self.calls, [])
+
     def test_concurrent_first_requests_construct_one_shared_manager(self):
         barrier = Barrier(6)
         sentinel = object()

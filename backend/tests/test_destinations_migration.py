@@ -56,7 +56,10 @@ class DestinationsMigrationTests(unittest.TestCase):
     def test_drop_is_the_single_head_and_syncs_the_pointer_first(self) -> None:
         self.assertEqual([DROP_REVISION], self.script.get_heads())
         sql = self.render(DROP_REVISION, "upgrade")
-        self.assertIn("ON CONFLICT (user_id, job_family) DO UPDATE", sql)
+        # Never overwrite a destination: the code that ships with this migration no longer
+        # updates active_resume_id, so an existing destination can be newer than the pointer.
+        self.assertIn("ON CONFLICT (user_id, job_family) DO NOTHING", sql)
+        self.assertNotIn("DO UPDATE", sql)
         self.assertLess(sql.index("INSERT INTO destinations"), sql.index("DROP COLUMN active_resume_id"))
         self.assertIn("ADD COLUMN active_resume_id UUID", self.render(DROP_REVISION, "downgrade"))
 
