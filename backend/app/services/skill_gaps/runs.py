@@ -178,8 +178,17 @@ class SkillGapRunManager:
                 "resume_hash": resume_hash, "job_family": job_family, "reviewed_resume": reviewed})
             self._states[identifier] = state
             self._keys[cache_key] = identifier
-            self._persist(state)
-            self._executor.submit(self._work, identifier, reviewed)
+            try:
+                self._persist(state)
+                self._executor.submit(self._work, identifier, reviewed)
+            except BaseException:
+                # Without a worker the run would stay queued and be reused forever.
+                del self._states[identifier]
+                if prior_id is None:
+                    del self._keys[cache_key]
+                else:
+                    self._keys[cache_key] = prior_id
+                raise
             return self._view(state)
 
     def get(self, identifier: str, *, user_id: UUID) -> SkillGapRun:
@@ -203,8 +212,6 @@ class SkillGapRunManager:
         started = time.perf_counter()
         with self._lock:
             state = self._states[identifier]
-            state.update(status="running", phase="preparing")
-            self._persist(state)
         folder = self._folder(identifier)
 
         def save(name: str, value: object) -> None:
@@ -221,6 +228,9 @@ class SkillGapRunManager:
 
         timings: dict = {}
         try:
+            with self._lock:
+                state.update(status="running", phase="preparing")
+                self._persist(state)
             payload = prepare(state["job_family"], reviewed, state["resume_id"], self.catalog)
             save("input.json", payload)
             if hashlib.sha256(ACTIVE_INSTRUCTIONS_PATH.read_bytes()).hexdigest() != self.instructions_sha256:
