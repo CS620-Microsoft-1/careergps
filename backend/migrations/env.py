@@ -13,18 +13,24 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Read the URL from settings (.env) rather than alembic.ini so credentials are never committed.
-DATABASE_URL = get_settings().database_url
+# Migrations use the session pooler: DDL and Alembic's version check need one connection throughout.
+settings = get_settings()
+DATABASE_URL = settings.migration_database_url or settings.database_url
 
 target_metadata = Base.metadata
 
 
 def include_object(obj, name, type_, reflected, compare_to) -> bool:
-    """Keep autogenerate away from Supabase's auth schema.
+    """Keep autogenerate away from Supabase's auth schema and from tables it doesn't model.
 
     users.id -> auth.users.id is added by hand in a migration; without this filter, autogenerate
     would see it in the database but not in the models and propose dropping it.
     """
     if type_ == "foreign_key_constraint" and obj.referred_table.schema == "auth":
+        return False
+    # Some tables (plan_items, skill_gap_runs) exist only in migrations. Never propose dropping a
+    # table just because it has no model; write table drops by hand.
+    if type_ == "table" and reflected and compare_to is None:
         return False
     return True
 

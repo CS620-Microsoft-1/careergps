@@ -115,7 +115,8 @@ Windows setup, Foundry access, and troubleshooting are covered in the [backend R
 
 | File | Variable | Purpose |
 | --- | --- | --- |
-| `backend/.env` | `DATABASE_URL` | Supabase PostgreSQL connection (session pooler) |
+| `backend/.env` | `DATABASE_URL` | Supabase PostgreSQL connection (transaction pooler, port 6543) |
+| | `MIGRATION_DATABASE_URL` | Session pooler (port 5432) for Alembic; database owner only |
 | | `CORS_ORIGINS` | Frontend origins allowed to call the API (never `*`) |
 | | `SUPABASE_URL` | Supabase project, used to verify login tokens |
 | | `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME` | Résumé classification Agent |

@@ -3,8 +3,10 @@
 Revision ID: 9c4d2a7f1b3e
 Revises: 6d7e2b9a4c15
 
-Code before this point still moved the active résumé, so the selected role's destination is
-pointed at it first, while the pointer still exists. The database owner applies this after merge.
+Code before this point still moved the active résumé, so the selected role gets a destination from
+it first, while the pointer still exists. An existing destination is kept: code from this point on
+writes only destinations, so after it ships the pointer can be older than the destination.
+The database owner applies this after merge.
 """
 from alembic import op
 import sqlalchemy as sa
@@ -26,7 +28,7 @@ def upgrade() -> None:
         f"""INSERT INTO destinations (user_id, job_family, resume_id)
         SELECT u.id, {_FAMILY_OF_ROLE}, u.active_resume_id FROM users AS u
         WHERE u.active_resume_id IS NOT NULL AND {_FAMILY_OF_ROLE} IS NOT NULL
-        ON CONFLICT (user_id, job_family) DO UPDATE SET resume_id = EXCLUDED.resume_id, updated_at = now()"""
+        ON CONFLICT (user_id, job_family) DO NOTHING"""
     )
     op.drop_constraint('fk_users_active_resume', 'users', type_='foreignkey')
     op.drop_index(op.f('ix_users_active_resume_id'), table_name='users')

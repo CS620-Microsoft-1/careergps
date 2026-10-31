@@ -2,6 +2,8 @@ import tempfile
 import unittest
 import os
 import json
+import threading
+import time
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -49,7 +51,7 @@ class HandoffTest(unittest.TestCase):
         uid, rid = uuid4(), uuid4()
         user = SimpleNamespace(id=uid)
         # The role's destination uses résumé rid.
-        accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=rid))
+        accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=rid), end_reads=lambda: None)
         run = SimpleNamespace(id=uuid4().hex, resume_id=rid, status="completed", job_family="software_engineer", report={"job_family": "software_engineer", "priority_order": ["frontend"], "skills": [{"skill_id": "frontend", "skill_name": "Frontend development", "skill_gap": 0.5, "calculation_state": "scored"}]})
         class Manager:
             def get(self, identifier, *, user_id):
@@ -72,6 +74,12 @@ class HandoffTest(unittest.TestCase):
         with self.assertRaises(HTTPException) as error:
             projects_from_skill_gap(RunProjectRequest(run_id="one"), user, accounts, Manager())
         self.assertEqual(error.exception.status_code, 409)
+        self.assertNotIn("failed", error.exception.detail)
+        run.status = "failed"
+        with self.assertRaises(HTTPException) as error:
+            projects_from_skill_gap(RunProjectRequest(run_id="one"), user, accounts, Manager())
+        self.assertEqual(error.exception.status_code, 409)
+        self.assertIn("failed", error.exception.detail)
 
 
     def test_rules_cover_the_highest_priority_gaps_first(self):
@@ -92,7 +100,8 @@ class ProjectPicksTest(unittest.TestCase):
     def setUp(self):
         self.rid, self.uid = uuid4(), uuid4()
         self.user = SimpleNamespace(id=self.uid)
-        self.accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=self.rid))
+        self.accounts = SimpleNamespace(get_resume=lambda owner, family: SimpleNamespace(id=self.rid),
+                                        end_reads=lambda: None)
         run = SimpleNamespace(id=uuid4().hex, resume_id=self.rid, status="completed", job_family="ai_engineer", report={
             "job_family": "ai_engineer", "priority_order": ["rag"],
             "skills": [{"skill_id": "rag", "skill_name": "Retrieval-augmented generation", "skill_gap": 0.5, "calculation_state": "scored"}]})
@@ -124,6 +133,24 @@ class ProjectPicksTest(unittest.TestCase):
                 self.assertEqual("agent", self.call()["source"])
                 self.assertEqual("agent", self.call()["source"])
             agent.assert_called_once()
+
+    def test_concurrent_requests_for_one_run_share_one_agent_call(self):
+        calls = []
+        def slow_agent(**inputs):
+            calls.append(inputs)
+            time.sleep(0.2)
+            return {"recommendations": [], "no_match_reason": "None fit."}
+        configured = SimpleNamespace(resources_project_endpoint="https://example.test")
+        results = []
+        with patch.object(routes, "get_settings", return_value=configured), \
+             patch.object(routes, "recommend_projects", side_effect=slow_agent):
+            threads = [threading.Thread(target=lambda: results.append(self.call())) for _ in range(2)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+        self.assertEqual(1, len(calls))
+        self.assertEqual(["agent", "agent"], [result["source"] for result in results])
 
 
 if __name__ == "__main__":
