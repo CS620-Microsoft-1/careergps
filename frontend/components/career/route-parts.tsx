@@ -180,9 +180,14 @@ export function AnalysisGate({ children }: { children?: React.ReactNode }) {
   if (!loaded || restoring) {
     title = "Loading your route…";
     detail = "Your confirmed résumé and saved analysis will appear in a moment.";
+  } else if (!snapshot && error) {
+    // No snapshot because the profile couldn't be loaded, not because there's no résumé.
+    title = "Couldn’t load your route";
+    detail = error;
+    action = <Button size="lg" onClick={() => window.location.reload()}><RotateCcw data-icon="inline-start" />Try again</Button>;
   } else if (!snapshot) {
     title = "Upload your résumé to start";
-    detail = error ?? "We compare your confirmed résumé with real job postings, then show your gaps and a plan.";
+    detail = "We compare your confirmed résumé with real job postings, then show your gaps and a plan.";
     action = <Button asChild size="lg"><Link href="/onboarding">Upload résumé</Link></Button>;
   } else if (busy) {
     title = calculating ? "Calculating your gaps" : run?.phase === "queued" ? "Your analysis is in the queue"
