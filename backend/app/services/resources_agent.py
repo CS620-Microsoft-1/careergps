@@ -179,6 +179,9 @@ def recommend_projects(
             item["prerequisites_to_check"] = [p for p in item["prerequisites_to_check"] if p in project.get("prerequisites", [])]
             item["why_recommended"] = "This project provides practice in: " + ", ".join(matched) + "."
         recommendations.append({**item, "project": project})
+    if not recommendations and validated.recommendations:
+        # Picks that all claim unsupported gaps are a failed answer, not "nothing fits".
+        raise ValueError("No agent pick practices a verified skill gap.")
 
     return {
         "recommendations": recommendations,
