@@ -134,6 +134,9 @@ def ingest(
             try:
                 postings = adapters[board.source].fetch(board.slug)
                 sync_board(session, company, board, postings, started_at, result)
+                # Send the writes now, so a database error (e.g. a salary too big for INTEGER) fails
+                # only this board. Autoflush is off, so without this they would first run at commit.
+                session.flush()
             except Exception as error:
                 session.rollback()
                 result = BoardResult(company=company.name, source=board.source, slug=board.slug)
