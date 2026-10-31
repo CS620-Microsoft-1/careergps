@@ -56,6 +56,14 @@ def probe(candidates: list[Candidate]) -> list[dict]:
                     except BoardFetchError as error:
                         print(f"  ! {candidate.name} {adapter.source}/{slug}: {error}", file=sys.stderr)
                         continue
+                    except Exception as error:
+                        # One malformed posting must not abort the probe and lose --write.
+                        print(
+                            f"  ! {candidate.name} {adapter.source}/{slug}: "
+                            f"Unexpected {type(error).__name__}: {error}",
+                            file=sys.stderr,
+                        )
+                        continue
                     if not postings:
                         continue
                     us = sum(posting.country == "US" for posting in postings)
