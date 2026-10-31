@@ -58,9 +58,21 @@ export class ApiError extends Error {
   }
 }
 
-/** GET a JSON endpoint, e.g. apiGet<DatabaseHealthResponse>("/health/db"). */
+/** GETs in flight by path. Several providers (and StrictMode's second effect run) ask for the same data at once. */
+const pendingGets = new Map<string, Promise<unknown>>();
+
+/**
+ * GET a JSON endpoint, e.g. apiGet<DatabaseHealthResponse>("/health/db"). Identical GETs that overlap
+ * share one request; each caller gets its own copy. A caller with its own signal or timeout is never shared.
+ */
 export function apiGet<T>(path: string, options?: RequestOptions): Promise<T> {
-  return apiRequest<T>("GET", path, options);
+  if (options?.signal || options?.timeoutMs !== undefined) return apiRequest<T>("GET", path, options);
+  let pending = pendingGets.get(path);
+  if (!pending) {
+    pending = apiRequest<T>("GET", path).finally(() => pendingGets.delete(path));
+    pendingGets.set(path, pending);
+  }
+  return pending.then((value) => structuredClone(value) as T);
 }
 
 export function apiPost<T>(path: string, options?: RequestOptions): Promise<T> {
