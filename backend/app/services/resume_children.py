@@ -63,7 +63,9 @@ _DEGREE_WORDS = (
 
 # Numeric(5, 2) holds values below 1000.
 _GPA_LIMIT = Decimal("1000")
-_GPA = re.compile(r"(\d+(?:\.\d+)?)\s*(?:/\s*(\d+(?:\.\d+)?))?")
+# The whole string must be "3.8" or "3.8/4.0" (spaces around "/" allowed), with an optional "GPA" or "GPA:" label.
+# Anything else ("3,8/4,0", "-3.8/4.0", "3.8 (Dean's list)") parses to nothing rather than to a wrong number.
+_GPA = re.compile(r"(?:GPA\s*:?\s*)?(\d+(?:\.\d+)?)(?:\s*/\s*(\d+(?:\.\d+)?))?", re.ASCII | re.IGNORECASE)
 
 
 def _column_length(model: type[Base], column: str) -> int:
@@ -127,8 +129,11 @@ def parse_degree_level(degree: str | None) -> str | None:
 
 
 def parse_gpa(gpa: str | None) -> tuple[Decimal | None, Decimal | None]:
-    """(value, scale) from "3.8/4.0" or "3.8"; the scale is None when it isn't given or isn't positive."""
-    match = _GPA.search(gpa or "")
+    """(value, scale) from "3.8/4.0" or "3.8"; the scale is None when it isn't given or isn't positive.
+
+    Other formats give (None, None); the raw text is still kept in the `gpa` column.
+    """
+    match = _GPA.fullmatch((gpa or "").strip())
     if match is None:
         return None, None
     try:

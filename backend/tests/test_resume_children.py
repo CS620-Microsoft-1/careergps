@@ -149,6 +149,26 @@ class SmallParserTests(unittest.TestCase):
         self.assertEqual((None, None), parse_gpa("N/A"))
         self.assertEqual((None, None), parse_gpa(None))
         self.assertEqual((None, None), parse_gpa("12345"))
+        self.assertEqual((Decimal("3.80"), Decimal("4.00")), parse_gpa("  gpa 3.8/4.0  "))
+
+    def test_gpa_unsupported_formats_are_null(self) -> None:
+        # Regression: an unanchored search used to read "3,8/4,0" as 3.00 and "-3.8/4.0" as 3.80.
+        for text in (
+            "3,8/4,0",
+            "-3.8/4.0",
+            "3.8 out of 4.0",
+            "3.8 (Dean's list)",
+            "Dean's list, 3.8",
+            "3.8/4.0/5",
+            "3.8/",
+            ".8",
+            "3.",
+            "+3.8",
+            "",
+            "   ",
+        ):
+            with self.subTest(text=text):
+                self.assertEqual((None, None), parse_gpa(text))
 
     def test_normalize_skill(self) -> None:
         self.assertEqual("postgresql", normalize_skill("  PostgreSQL "))
