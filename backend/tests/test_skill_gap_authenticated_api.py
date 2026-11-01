@@ -35,6 +35,9 @@ class FakeAccounts:
     def get_resume(self, user, job_family):
         return self.resumes.get(self.links.get((user.id, job_family)))
 
+    def end_reads(self):
+        pass
+
 
 class FakeVerifier:
     def verify(self, token):
@@ -141,6 +144,54 @@ class AuthenticatedSkillGapApiTests(unittest.TestCase):
         self.assertEqual(self.client.get("/skill-gaps/runs/" + run.id, headers=headers).status_code, 404)
         self.assertEqual(self.client.get("/skill-gaps/runs/latest", headers=headers).status_code, 404)
         self.assertEqual(len(self.calls), 1)
+
+
+
+class ReadTransactionTests(unittest.TestCase):
+    """The résumé read ends its transaction, so a long Agent call after it doesn't pin a pooled connection."""
+
+    def setUp(self):
+        from sqlalchemy import create_engine, text
+        from sqlalchemy.orm import Session
+        from app.services.accounts import AccountService
+
+        fake = FakeAccounts()
+
+        class SqliteAccounts(AccountService):
+            def get_resume(self, user, job_family):
+                self.db.execute(text("SELECT 1"))  # autobegins, like the real query
+                return fake.resume
+
+        engine = create_engine("sqlite://")
+        self.addCleanup(engine.dispose)
+        self.db = Session(engine)
+        self.addCleanup(self.db.close)
+        self.accounts, self.user = SqliteAccounts(self.db), fake.user
+
+    def test_saved_resume_leaves_no_open_transaction(self):
+        from app.api.routes.skill_gaps import _saved_resume
+
+        saved = _saved_resume(self.user, self.accounts, "software_engineer")
+
+        self.assertEqual(saved.resume_id, RESUME_ID)
+        self.assertFalse(self.db.in_transaction())
+
+    def test_project_agent_runs_outside_a_transaction(self):
+        from unittest.mock import patch
+        from app.api.routes import resources as routes
+
+        run = SimpleNamespace(id="x", resume_id=RESUME_ID, status="completed", job_family="ai_engineer", report={
+            "job_family": "ai_engineer", "priority_order": ["rag"], "skills": [{"skill_id": "rag",
+            "skill_name": "Retrieval-augmented generation", "skill_gap": 0.5, "calculation_state": "scored"}]})
+        in_transaction = []
+        def agent(**inputs):
+            in_transaction.append(self.db.in_transaction())
+            return {"recommendations": []}
+        with patch.object(routes, "get_settings", return_value=SimpleNamespace(resources_project_endpoint="x")), \
+             patch.object(routes, "recommend_projects", side_effect=agent):
+            routes.projects_from_skill_gap(routes.RunProjectRequest(run_id="x"), self.user, self.accounts,
+                                           SimpleNamespace(get=lambda identifier, user_id: run))
+        self.assertEqual([False], in_transaction)
 
 
 if __name__ == "__main__":

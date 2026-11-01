@@ -110,6 +110,69 @@ test("disconnect while loading cannot submit; reconnect finishes the one-time re
   assert.equal(f.starts.length, 1); f.disconnect();
 });
 
+/** The profile on the server can change while the app is hidden (a new résumé or destination in setup). */
+function changing(first = profile, options = {}) {
+  const server = { profile: first, failLoad: options.failLoad ?? 0, intent: null };
+  const forProfile = (extra) => run({ user_id: server.profile.user_id, resume_id: server.profile.resume_id,
+    job_family: server.profile.job_family, ...extra });
+  const f = fixture({ deps: {
+    loadProfile: async () => { if (server.failLoad-- > 0) throw new Error("offline"); return server.profile; },
+    consumeIntent: (p) => { const queued = server.intent; server.intent = null;
+      return Boolean(queued && queued.resume_id === p.resume_id && queued.job_family === p.job_family); },
+    getLatest: async (family) => { f.latest.push(family); if (options.missing?.(server.profile)) throw missing;
+      return forProfile({ id: `run-${server.profile.resume_id}` }); },
+    startRun: async (family, force) => { f.starts.push({ family, force });
+      return forProfile({ id: "run-new", status: "queued", phase: "queued", completed_at: null }); },
+    getRun: async () => forProfile({ id: "run-new" }),
+  } });
+  const remount = async () => { f.disconnect(); f.reconnect(); await f.session.initialize(); };
+  return { ...f, server, remount };
+}
+
+test("showing the app again with an unchanged profile keeps its run without another restore", async () => {
+  const f = changing(); await f.session.initialize();
+  await f.remount(); await f.remount();
+  assert.equal(f.latest.length, 1); assert.equal(f.starts.length, 0);
+  assert.equal(f.session.getSnapshot().run.id, "run-resume-a"); f.disconnect();
+});
+test("a new résumé saved while hidden is restored on reconnect and can be analyzed again", async () => {
+  const f = changing(); await f.session.initialize();
+  f.server.profile = { ...profile, resume_id: "resume-b" };
+  await f.remount();
+  const state = f.session.getSnapshot();
+  assert.equal(state.snapshot.resume_id, "resume-b"); assert.equal(state.run.id, "run-resume-b");
+  assert.equal(state.error, undefined);
+  await f.session.analyze(true);
+  assert.deepEqual(f.starts, [{ family: "software_engineer", force: true }]);
+  assert.equal(f.session.getSnapshot().error, undefined); f.disconnect();
+});
+test("a destination queued while hidden starts its analysis once after reconnect", async () => {
+  const f = changing(profile, { missing: (p) => p.job_family === "data_analyst" }); await f.session.initialize();
+  f.server.profile = { ...profile, job_family: "data_analyst" };
+  f.server.intent = f.server.profile;
+  await f.remount();
+  assert.equal(f.session.getSnapshot().family, "data_analyst");
+  assert.deepEqual(f.starts, [{ family: "data_analyst", force: false }]);
+  await f.remount();
+  assert.equal(f.starts.length, 1); assert.equal(f.session.getSnapshot().run.id, "run-new"); f.disconnect();
+});
+test("a failed first profile load recovers on reconnect", async () => {
+  const f = changing(profile, { failLoad: 1 }); await f.session.initialize();
+  assert.equal(f.session.getSnapshot().error, "offline"); assert.equal(f.session.getSnapshot().snapshot, null);
+  await f.remount();
+  const state = f.session.getSnapshot();
+  assert.equal(state.error, undefined); assert.equal(state.snapshot.resume_id, "resume-a");
+  assert.equal(state.run.id, "run-resume-a"); assert.equal(f.latest.length, 1); f.disconnect();
+});
+test("a failed reload keeps the profile and run already shown", async () => {
+  const f = changing(); await f.session.initialize();
+  f.server.failLoad = 1; f.server.profile = { ...profile, resume_id: "resume-b" };
+  await f.remount();
+  const state = f.session.getSnapshot();
+  assert.equal(state.snapshot.resume_id, "resume-a"); assert.equal(state.run.id, "run-resume-a");
+  assert.equal(state.error, undefined); assert.equal(f.latest.length, 1); f.disconnect();
+});
+
 test("saved profile pairs the selected role (the target role by default) with its résumé", () => {
   const { profileForAnalysis } = load("skill-gap-profile.ts");
   const user = { id: "u", target_role: "Data Analyst" };

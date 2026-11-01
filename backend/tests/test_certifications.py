@@ -137,7 +137,7 @@ class RecommenderTests(unittest.TestCase):
 class CertificationApiTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
-        root = Path(self.temp.name)
+        self.root = root = Path(self.temp.name)
         self.runs = SkillGapRunManager(root / "runs", invoker=lambda payload, save, on_request, timings:
                                        (on_request(), absent_response(payload))[1])
         self.recommender = CertificationRecommender(root / "certs", catalog=validate_catalog(RAW, CORE),
@@ -177,6 +177,18 @@ class CertificationApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200, response.text)
         body = response.json()
         self.assertEqual((body["skill_gap_run_id"], body["source"]), (started["id"], "rules"))
+
+    def test_failed_run_asks_for_a_new_analysis(self):
+        def fail(payload, save, on_request, timings):
+            raise RuntimeError("down")
+        self.runs.close()
+        self.runs = SkillGapRunManager(self.root / "failed", invoker=fail)
+        started = self.client.post("/skill-gaps/runs", json={}, headers=self.headers).json()
+        wait_for(self.runs, self.runs.get(started["id"], user_id=USER_ID))
+        response = self.client.post("/certifications/recommendations",
+                                    json={"job_family": "software_engineer"}, headers=self.headers)
+        self.assertEqual(response.status_code, 409, response.text)
+        self.assertIn("failed", response.json()["detail"])
 
 
 if __name__ == "__main__":

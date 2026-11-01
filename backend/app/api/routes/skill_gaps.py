@@ -42,6 +42,7 @@ def _saved_resume(user: User, accounts: AccountService, selected: JobFamily | No
         reviewed = ResumeClassification.model_validate(deepcopy(resume.confirmed_data)).model_dump(mode="json")
     except (ValidationError, TypeError, ValueError):
         raise HTTPException(status_code=409, detail="The saved resume needs to be reviewed and saved again") from None
+    accounts.end_reads()  # the callers' Agent work runs without an open transaction
     return SavedResume(user.id, resume.id, resume.original_filename, resume.created_at, reviewed, family)
 
 

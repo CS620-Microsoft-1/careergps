@@ -16,6 +16,7 @@ from uuid import UUID, uuid4
 from unittest.mock import Mock, patch
 
 from sqlalchemy import create_engine, event, inspect, select, text
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session, sessionmaker
 
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
@@ -579,6 +580,28 @@ class JobPostingAnalysisPipelineTests(unittest.TestCase):
         self.assertEqual(str(next_id), succeeded["job_posting_id"])
         self.assertEqual("succeeded", succeeded["status"])
         self.assertEqual(1, len(self.agent.calls))
+
+    def test_transient_source_error_requeues_and_later_attempt_succeeds(self) -> None:
+        self.pipeline.enqueue(self.job_id)
+        outage = OperationalError("SELECT", {}, Exception("pooler refused connection"))
+        with patch.object(self.source, "get_posting", side_effect=outage):
+            with self.assertRaises(OperationalError):
+                self.pipeline.process_next()
+        saved = self.store.get(str(self.job_id))
+        self.assertEqual("queued", saved["status"])
+        self.assertEqual([], self.agent.calls)
+        self.assertEqual("succeeded", self.pipeline.process_next()["status"])
+        self.assertEqual(1, len(self.agent.calls))
+
+    def test_source_read_only_violation_remains_a_terminal_failure(self) -> None:
+        self.pipeline.enqueue(self.job_id)
+        violation = JobPostingSourceReadOnlyError("non-SELECT")
+        with patch.object(self.source, "get_posting", side_effect=violation):
+            with self.assertRaises(JobPostingSourceReadOnlyError):
+                self.pipeline.process_next()
+        self.assertEqual("failed", self.store.get(str(self.job_id))["status"])
+        self.assertIsNone(self.pipeline.process_next())
+        self.assertEqual([], self.agent.calls)
 
     def test_failed_local_export_propagates_and_preserves_previous_success(self) -> None:
         previous = self.pipeline.analyze(self.job_id)["structured_data"]

@@ -30,6 +30,8 @@ const INITIAL_STATE: SkillGapSessionState = {
 };
 export const isActiveSkillGapRun = (run: SkillGapRun | null) =>
   run?.status === "queued" || run?.status === "running";
+const sameProfile = (a: SkillGapProfile | null, b: SkillGapProfile | null) => a === b
+  || (a !== null && b !== null && a.user_id === b.user_id && a.resume_id === b.resume_id && a.job_family === b.job_family);
 
 /** Shared authenticated state. Restoring/polling only GET; POST needs a save intent or a click. */
 export class SkillGapSession {
@@ -37,6 +39,9 @@ export class SkillGapSession {
   private listeners = new Set<() => void>();
   private initialization: Promise<void> | null = null;
   private initialRestoration: Promise<void> | null = null;
+  private reloading: Promise<void> | null = null;
+  private loadFailed = false;
+  private switches = 0;
   private connected = false;
   private generation = 0;
   private pollInFlight = false;
@@ -51,6 +56,11 @@ export class SkillGapSession {
   };
   connect = () => {
     this.connected = true;
+    // Shown again after the first load (the router hides the app while /onboarding is open): pick up a
+    // new résumé or role, or recover from a failed load. An unchanged profile keeps its run.
+    if (this.state.loaded && !this.reloading) {
+      this.initialization = this.reloading = this.reloadProfile().finally(() => { this.reloading = null; });
+    }
     void this.initialize();
     this.scheduleTimers();
     return () => { this.connected = false; this.stopTimers(); };
@@ -73,8 +83,24 @@ export class SkillGapSession {
       const snapshot = await this.deps.loadProfile();
       this.update({ snapshot, ...(snapshot ? { family: snapshot.job_family } : {}), loaded: true });
     } catch (error) {
+      this.loadFailed = true;
       this.update({ loaded: true, restoring: false, error: this.deps.errorMessage(error) });
     }
+  }
+  /** Replaces the destination only when it changed; a failed reload keeps what is shown. */
+  private async reloadProfile() {
+    const switches = this.switches;
+    let snapshot: SkillGapProfile | null;
+    try { snapshot = await this.deps.loadProfile(); } catch { return; }
+    // The student switched destination meanwhile: that choice wins.
+    if (switches !== this.switches || (!this.loadFailed && sameProfile(snapshot, this.state.snapshot))) return;
+    this.generation++;
+    this.loadFailed = false;
+    this.stopTimers();
+    // initialize() then restores the new destination's run, starting a queued analysis.
+    this.initialRestoration = null;
+    this.update({ snapshot, ...(snapshot ? { family: snapshot.job_family } : {}), run: null, error: undefined,
+      elapsed: 0, submitting: false, restoring: false });
   }
   private accept(run: SkillGapRun, snapshot: SkillGapProfile, family: JobFamily, expectedId?: string) {
     if (run.user_id !== snapshot.user_id || run.resume_id !== snapshot.resume_id || run.job_family !== family
@@ -126,6 +152,7 @@ export class SkillGapSession {
     this.stopTimers();
     const selected = value as JobFamily;
     const generation = ++this.generation;
+    this.switches++;
     this.update({ family: selected, run: null, error: undefined, elapsed: 0, restoring: true });
     // Each destination has its own résumé, so load it before restoring that role's analysis.
     void this.deps.loadProfile(selected).then((next) => {

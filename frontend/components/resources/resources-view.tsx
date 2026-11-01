@@ -27,7 +27,7 @@ export function ResourcesView() {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
-  const { run, snapshot, loaded, family } = useSkillGapAnalysis();
+  const { run, snapshot, loaded, family, error } = useSkillGapAnalysis();
   const { user } = useAccount();
   const plan = usePlan();
   const [type, setType] = useState<ResourceType | "all">("all");
@@ -63,6 +63,8 @@ export function ResourcesView() {
       </div>} />
 
     {!loaded || plan.status === "loading" ? <p role="status" className="flex items-center gap-2 text-muted-foreground"><LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Loading resources…</p>
+      // No snapshot because the profile couldn't be loaded, not because there's no résumé.
+      : !snapshot && error ? <p role="alert" className="rounded-2xl bg-danger-soft p-6">{error}</p>
       : !snapshot ? <p className="rounded-2xl border border-border bg-card p-6">Upload your résumé first, then we’ll match resources to your gaps. <Link href="/onboarding" className="font-bold underline">Upload résumé</Link></p>
       : plan.status === "error" ? <p role="alert" className="rounded-2xl bg-danger-soft p-6">{plan.error}</p>
       : <>

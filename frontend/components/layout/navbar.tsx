@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Check, ChevronDown, LogOut, Menu, Plus, User } from "lucide-react";
 
 import { ROLE_NAMES } from "@/components/career/route-parts";
@@ -89,13 +89,12 @@ function RouteSwitcher() {
 }
 
 function ProfileMenu({ active }: { active: boolean }) {
-  const router = useRouter();
   const { initials, email, displayName } = useAccount();
   async function signOut() {
     // Local scope: sign out this browser only, not the user's other devices.
     await getSupabase().auth.signOut({ scope: "local" });
-    router.replace("/login");
-    router.refresh();
+    // A full page load: the router keeps hidden pages mounted, which would show this user's state to the next one.
+    window.location.replace("/login");
   }
   const avatar = (size: string) => (
     <span aria-hidden className={cn("grid shrink-0 place-items-center rounded-full bg-tint-blue text-sm font-bold text-foreground", size)}>{initials}</span>

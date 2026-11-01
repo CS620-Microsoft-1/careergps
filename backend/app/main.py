@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.routes import certifications, health, job_postings, me, resources, resumes, skill_gaps
+from app.core.body_limit import BodyLimitMiddleware
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,13 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 app = FastAPI(title="CareerGPS API", version="0.1.0")
+
+# The largest request body accepted: a 10 MB résumé plus room for the multipart wrapping.
+MAX_REQUEST_BYTES = resumes.MAX_UPLOAD_BYTES + 1024 * 1024
+
+# FastAPI reads a multipart form before login runs, so oversized bodies are refused here first.
+# Registered before CORSMiddleware so it runs inside it and its 413s carry CORS headers.
+app.add_middleware(BodyLimitMiddleware, max_bytes=MAX_REQUEST_BYTES)
 
 
 # Registered before CORSMiddleware so it runs inside it. Otherwise an unhandled error leaves as a 500
