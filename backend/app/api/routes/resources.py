@@ -9,7 +9,7 @@ from threading import Lock
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
-from app.api.deps import get_account_service, get_current_db_user
+from app.api.deps import get_account_service, get_current_db_user, get_current_user
 from app.core.config import BACKEND_ROOT, get_settings
 from app.models import User
 from app.schemas.resources import Plan, PlanItem, PlanItemUpdate, ResourceList
@@ -155,7 +155,8 @@ def projects_from_skill_gap(
         return {**rank_projects(**inputs, available_hours=request.available_hours), "source": "rules"}
 
 
-@router.post("/resources/projects")
+# Login required: every call is a paid Foundry Agent request.
+@router.post("/resources/projects", dependencies=[Depends(get_current_user)])
 def get_project_recommendations(request: ResourceRequest):
     try:
         return recommend_projects(
