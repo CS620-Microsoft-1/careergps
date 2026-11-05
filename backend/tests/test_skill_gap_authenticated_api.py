@@ -15,7 +15,7 @@ from app.api import deps
 from app.core.security import AuthenticatedUser, AuthError
 from app.main import app
 from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
-from tests.skill_gap_fixtures import CONFIRMED_AT, RESUME_ID, USER_ID, absent_response, reviewed_resume
+from tests.skill_gap_fixtures import CONFIRMED_AT, RESUME_ID, USER_ID, absent_response, group_manager, reviewed_resume
 from tests.test_skill_gap_run_ownership import wait_for
 
 
@@ -58,7 +58,7 @@ class AuthenticatedSkillGapApiTests(unittest.TestCase):
             self.calls.append(deepcopy(payload))
             on_request()
             return absent_response(payload)
-        self.manager = SkillGapRunManager(Path(self.temp.name), invoker=invoke)
+        self.manager = group_manager(Path(self.temp.name), invoker=invoke)
         self.accounts = FakeAccounts()
         self.other = uuid4()
         verifier = FakeVerifier({"owner-token": USER_ID, "other-token": self.other})
@@ -95,7 +95,7 @@ class AuthenticatedSkillGapApiTests(unittest.TestCase):
         self.assertEqual(str(result.user_id), str(USER_ID))
         self.assertEqual(self.calls[0]["resume_id"], str(RESUME_ID))
         self.assertEqual(result.filename, "saved-example.pdf")
-        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(len(self.calls), 3)
 
     def test_browser_cannot_override_resume_owner_confirmation_or_scores(self):
         for field in ("reviewed_resume", "confirmed", "user_id", "resume_id", "demand", "score"):
@@ -143,7 +143,7 @@ class AuthenticatedSkillGapApiTests(unittest.TestCase):
         headers = {"Authorization": "Bearer other-token"}
         self.assertEqual(self.client.get("/skill-gaps/runs/" + run.id, headers=headers).status_code, 404)
         self.assertEqual(self.client.get("/skill-gaps/runs/latest", headers=headers).status_code, 404)
-        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(len(self.calls), 3)
 
 
 

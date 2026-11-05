@@ -15,6 +15,7 @@ from app.schemas.skill_gap_web import JobFamily, MarketDemandSnapshot, SkillGapR
 from app.services.accounts import AccountService, role_family
 from app.services.skill_gaps.market import get_market_demand
 from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
+from app.services.skill_gaps.transport import SkillGapConfigurationError
 
 router = APIRouter(prefix="/skill-gaps", tags=["skill-gaps"])
 
@@ -65,6 +66,8 @@ def start_run(request: SkillGapRunRequest,
         return manager.submit(user_id=saved.user_id, resume_id=saved.resume_id,
             reviewed_resume=saved.reviewed_resume, filename=saved.filename, confirmed_at=saved.confirmed_at,
             job_family=saved.job_family, force=request.force)
+    except SkillGapConfigurationError as error:
+        raise HTTPException(status_code=503, detail=error.public_message) from None
     except (OSError, RuntimeError):
         raise HTTPException(status_code=503, detail="Analysis storage or queue is unavailable") from None
 
@@ -80,6 +83,8 @@ def latest_run(job_family: JobFamily | None = None,
             reviewed_resume=saved.reviewed_resume, job_family=saved.job_family)
     except KeyError:
         raise HTTPException(status_code=404, detail="No analysis for this role's résumé") from None
+    except SkillGapConfigurationError as error:
+        raise HTTPException(status_code=503, detail=error.public_message) from None
     except (OSError, ValueError):
         raise HTTPException(status_code=503, detail="Analysis result is unavailable") from None
 

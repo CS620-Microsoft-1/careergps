@@ -57,7 +57,15 @@ class SkillGapSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
 
     skill_gap_foundry_project_endpoint: str | None = None
+    # Legacy binding is accepted for env compatibility, but extraction always
+    # uses the three named skill groups below; there is no single-Agent fallback.
     skill_gap_foundry_agent_name: str | None = None
+    skill_gap_foundation_agent_name: str | None = None
+    skill_gap_foundation_agent_version: str | None = None
+    skill_gap_lifecycle_agent_name: str | None = None
+    skill_gap_lifecycle_agent_version: str | None = None
+    skill_gap_systems_agent_name: str | None = None
+    skill_gap_systems_agent_version: str | None = None
 
 
 class CertificationSettings(BaseSettings):

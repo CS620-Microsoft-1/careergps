@@ -16,8 +16,8 @@ from app.services.certifications.catalog import CATALOG_PATH, load_catalog, vali
 from app.services.certifications.ranking import rank, top_gaps
 from app.services.certifications.recommender import CertificationRecommender, get_certification_recommender
 from app.services.skill_gaps.assets import ASSET_ROOT
-from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
-from tests.skill_gap_fixtures import USER_ID, absent_response
+from app.services.skill_gaps.runs import get_skill_gap_run_manager
+from tests.skill_gap_fixtures import USER_ID, absent_response, group_manager
 from tests.test_skill_gap_authenticated_api import FakeAccounts, FakeVerifier
 from tests.test_skill_gap_run_ownership import wait_for
 
@@ -138,8 +138,8 @@ class CertificationApiTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = root = Path(self.temp.name)
-        self.runs = SkillGapRunManager(root / "runs", invoker=lambda payload, save, on_request, timings:
-                                       (on_request(), absent_response(payload))[1])
+        self.runs = group_manager(root / "runs", invoker=lambda payload, save, on_request, timings:
+                                  (on_request(), absent_response(payload))[1])
         self.recommender = CertificationRecommender(root / "certs", catalog=validate_catalog(RAW, CORE),
                                                     invoker=lambda payload: {"recommendations": []},
                                                     configured=lambda: False)
@@ -182,7 +182,7 @@ class CertificationApiTests(unittest.TestCase):
         def fail(payload, save, on_request, timings):
             raise RuntimeError("down")
         self.runs.close()
-        self.runs = SkillGapRunManager(self.root / "failed", invoker=fail)
+        self.runs = group_manager(self.root / "failed", invoker=fail)
         started = self.client.post("/skill-gaps/runs", json={}, headers=self.headers).json()
         wait_for(self.runs, self.runs.get(started["id"], user_id=USER_ID))
         response = self.client.post("/certifications/recommendations",
