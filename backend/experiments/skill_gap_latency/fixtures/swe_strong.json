@@ -1,0 +1,160 @@
+{
+  "personal_information": {
+    "name": "Riley Sample",
+    "emails": [
+      "riley.sample@example.test"
+    ],
+    "phones": [
+      "(555) 010-1001"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/riley.sample",
+    "github": "github.example/riley.sample",
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Computer Sciences",
+      "start_date": "Sep 2023",
+      "end_date": "May 2027",
+      "gpa": "3.8/4.0",
+      "content": [
+        "Relevant coursework: Data Structures (CS 400), Algorithms (CS 577), Operating Systems (CS 537), Database Management Systems (CS 564), Distributed Systems (CS 739)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Lakeshore Payments (fictional)",
+      "title": "Software Engineering Intern",
+      "start_date": "May 2026",
+      "end_date": "Aug 2026",
+      "location": "Chicago, IL",
+      "content": [
+        "Designed and implemented a REST API in Go for refund status lookups, serving about 2,000 requests per minute in staging.",
+        "Wrote table-driven unit tests and integration tests against a PostgreSQL container, raising package coverage from 54% to 81%.",
+        "Added an index and rewrote a slow SQL join in the refunds query, cutting p95 latency from 420 ms to 95 ms.",
+        "Packaged the service in Docker and added a GitHub Actions pipeline that ran tests, linting and image builds on every pull request.",
+        "Added structured logs and Prometheus metrics, then built a Grafana dashboard the on-call team used to spot error spikes.",
+        "Reviewed teammates' pull requests weekly and addressed review comments on my own changes before merge."
+      ]
+    },
+    {
+      "company": "Badger Robotics Lab (fictional)",
+      "title": "Undergraduate Software Developer",
+      "start_date": "Jan 2025",
+      "end_date": "May 2026",
+      "location": "Madison, WI",
+      "content": [
+        "Refactored a 3,000-line C++ sensor module into separate classes behind an interface, which let two teammates add new sensors without touching the core loop.",
+        "Debugged an intermittent crash with gdb and AddressSanitizer, traced it to a use-after-free in a callback, and fixed it.",
+        "Kept the codebase in Git with feature branches and wrote the lab's contribution guide for branching and commit messages."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Distributed Key-Value Store",
+      "url": null,
+      "technologies": [
+        "Go",
+        "gRPC",
+        "Raft"
+      ],
+      "content": [
+        "Implemented a replicated key-value store in Go using the Raft consensus algorithm for CS 739.",
+        "Tested leader failover by killing nodes during writes; the cluster kept serving reads and no acknowledged writes were lost in 50 trials.",
+        "Profiled the write path with pprof and batched log appends, raising throughput from 1,800 to 4,600 writes per second."
+      ]
+    },
+    {
+      "name": "Course Planner Web App",
+      "url": null,
+      "technologies": [
+        "TypeScript",
+        "React",
+        "Node.js",
+        "PostgreSQL",
+        "AWS"
+      ],
+      "content": [
+        "Built a React front end and a Node.js/Express back end that lets students plan four-year course schedules.",
+        "Designed the PostgreSQL schema for courses, prerequisites and plans, and wrote the prerequisite check as a recursive SQL query.",
+        "Deployed the API on AWS Elastic Beanstalk with an RDS database; about 300 students used it during spring enrollment.",
+        "Added password hashing with bcrypt, parameterized queries and rate limiting on the login route after reading the OWASP Top 10."
+      ]
+    },
+    {
+      "name": "Search Autocomplete",
+      "url": null,
+      "technologies": [
+        "Java",
+        "Redis"
+      ],
+      "content": [
+        "Implemented a trie-based autocomplete in Java with top-k suggestions per prefix and cached hot prefixes in Redis.",
+        "Compared trie and sorted-array approaches on 1 million queries and documented the time and memory trade-offs."
+      ]
+    },
+    {
+      "name": "AI Pair-Programming Study",
+      "url": null,
+      "technologies": [
+        "Python",
+        "GitHub Copilot"
+      ],
+      "content": [
+        "Used GitHub Copilot to draft test cases for a Python parsing library, then reviewed and corrected each suggestion before committing.",
+        "Measured that Copilot-drafted tests caught 3 of 5 seeded bugs, and wrote up where its suggestions were wrong."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Go",
+    "Java",
+    "Python",
+    "C++",
+    "TypeScript",
+    "SQL",
+    "React",
+    "Node.js",
+    "PostgreSQL",
+    "Redis",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "GitHub Actions",
+    "Prometheus",
+    "Grafana",
+    "Git",
+    "Linux"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [
+    {
+      "name": "Dean's List",
+      "issuer": "University of Wisconsin–Madison",
+      "date": "2024–2026",
+      "content": []
+    }
+  ],
+  "certifications": [],
+  "leadership_activities": [
+    {
+      "organization": "UW Hack Club (fictional)",
+      "role": "Workshop Lead",
+      "start_date": "Sep 2025",
+      "end_date": "Present",
+      "location": "Madison, WI",
+      "content": [
+        "Taught three workshops on Git and code review to about 40 first-year students."
+      ]
+    }
+  ],
+  "other": []
+}

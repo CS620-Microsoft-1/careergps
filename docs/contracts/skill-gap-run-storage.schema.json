@@ -1,12 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:careergps:skill-gap-run-storage:v1",
-  "title": "Proposed Skill Gap run storage record",
-  "description": "Database-owner review contract only. No table, migration, API change or Agent response format is created by this file.",
+  "$id": "urn:careergps:skill-gap-run-storage:v2",
+  "title": "Proposed Skill Gap run storage record, with historical v1 compatibility",
+  "description": "Database-owner review contract only. Historical v1 records retain the single-Agent bound; v2 describes the three skill-group extractor. This file does not create tables, change the public v12 Agent response, or implement PostgreSQL result persistence.",
   "type": "object",
   "properties": {
     "storage_schema_version": {
-      "const": "careergps.skill_gap_run_storage.v1"
+      "enum": [
+        "careergps.skill_gap_run_storage.v1",
+        "careergps.skill_gap_run_storage.v2"
+      ]
     },
     "id": {
       "type": "string",
@@ -133,7 +136,7 @@
     "model_calls": {
       "type": "integer",
       "minimum": 0,
-      "maximum": 1
+      "maximum": 3
     },
     "error": {
       "anyOf": [
@@ -167,7 +170,30 @@
         }
       ]
     },
-    "raw_agent_output": {}
+    "raw_agent_output": {},
+    "partition_policy_version": {
+      "const": "core-skill-partitions.v1"
+    },
+    "branches": {
+      "type": "object",
+      "properties": {
+        "foundation": {
+          "$ref": "#/$defs/AgentBranch"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/AgentBranch"
+        },
+        "systems": {
+          "$ref": "#/$defs/AgentBranch"
+        }
+      },
+      "required": [
+        "foundation",
+        "lifecycle",
+        "systems"
+      ],
+      "additionalProperties": false
+    }
   },
   "required": [
     "storage_schema_version",
@@ -1821,6 +1847,78 @@
       ],
       "title": "ResumeClassification",
       "type": "object"
+    },
+    "AgentBranch": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "pending",
+            "ready",
+            "running",
+            "completed",
+            "failed",
+            "skipped_empty",
+            "not_started"
+          ]
+        },
+        "agent_name": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "agent_version": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "model_calls": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "elapsed_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "reused": {
+          "type": "boolean"
+        },
+        "error_code": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "agent_name",
+        "agent_version",
+        "model_calls",
+        "elapsed_seconds",
+        "reused",
+        "error_code"
+      ],
+      "additionalProperties": true,
+      "description": "One assigned group. A new model request is counted at most once. Optional private cache/configuration audit fields may be retained; no numerical evidence is reconstructed from them."
     }
   },
   "allOf": [
@@ -1945,6 +2043,59 @@
               "agent",
               "checking"
             ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "storage_schema_version": {
+            "const": "careergps.skill_gap_run_storage.v1"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "model_calls": {
+            "maximum": 1
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "branches"
+              ]
+            },
+            {
+              "required": [
+                "partition_policy_version"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "storage_schema_version": {
+            "const": "careergps.skill_gap_run_storage.v2"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "branches",
+          "partition_policy_version"
+        ],
+        "properties": {
+          "agent_name": {
+            "type": "null"
+          },
+          "agent_version": {
+            "type": "null"
           }
         }
       }
