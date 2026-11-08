@@ -1,0 +1,90 @@
+{
+  "personal_information": {
+    "name": "Morgan Example",
+    "emails": [
+      "morgan.example@example.test"
+    ],
+    "phones": [
+      "(555) 010-1002"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/morgan.example",
+    "github": "github.example/morgan.example",
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Computer Sciences",
+      "start_date": "Sep 2023",
+      "end_date": "May 2027",
+      "gpa": "3.4/4.0",
+      "content": [
+        "Relevant coursework: Programming III (CS 400), Algorithms (CS 577), Database Management Systems (CS 564), Software Engineering (CS 506)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Capitol Insurance Group (fictional)",
+      "title": "IT Intern",
+      "start_date": "Jun 2026",
+      "end_date": "Aug 2026",
+      "location": "Madison, WI",
+      "content": [
+        "Wrote Python scripts that pulled ticket data from an internal REST API and generated a weekly summary for the help desk.",
+        "Fixed bugs in an internal Java web form after reproducing them from user reports.",
+        "Used Git and pull requests for all changes, with a senior developer reviewing each one."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Recipe Sharing App",
+      "url": null,
+      "technologies": [
+        "Java",
+        "Spring Boot",
+        "MySQL",
+        "React"
+      ],
+      "content": [
+        "Built a recipe sharing site with a team of four for CS 506, using Spring Boot for the back end and React for the front end.",
+        "Wrote the MySQL schema and the endpoints for creating and searching recipes.",
+        "Wrote JUnit tests for the search endpoint."
+      ]
+    },
+    {
+      "name": "Campus Bus Tracker",
+      "url": null,
+      "technologies": [
+        "Python",
+        "Flask"
+      ],
+      "content": [
+        "Made a Flask app that shows the next arrival times for campus buses using the city's public transit feed."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Java",
+    "Python",
+    "JavaScript",
+    "SQL",
+    "Spring Boot",
+    "React",
+    "Flask",
+    "MySQL",
+    "Git",
+    "Docker"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": []
+}

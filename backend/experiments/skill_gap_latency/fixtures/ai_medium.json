@@ -1,0 +1,86 @@
+{
+  "personal_information": {
+    "name": "Skyler Demo",
+    "emails": [
+      "skyler.demo@example.test"
+    ],
+    "phones": [
+      "(555) 010-3002"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/skyler.demo",
+    "github": "github.example/skyler.demo",
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Data Science",
+      "start_date": "Sep 2023",
+      "end_date": "May 2027",
+      "gpa": "3.5/4.0",
+      "content": [
+        "Relevant coursework: Machine Learning (CS 540), Linear Algebra (MATH 340), Introductory Statistics (STAT 340)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Badger Analytics Club Consulting (fictional)",
+      "title": "Data Science Intern",
+      "start_date": "Jun 2026",
+      "end_date": "Aug 2026",
+      "location": "Madison, WI",
+      "content": [
+        "Trained a logistic regression and a random forest in scikit-learn to predict late deliveries for a local bakery, and compared them on accuracy.",
+        "Cleaned order data in pandas, filled missing values and encoded categorical columns before training."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Study Notes Chatbot",
+      "url": null,
+      "technologies": [
+        "Python",
+        "OpenAI API",
+        "Streamlit"
+      ],
+      "content": [
+        "Built a Streamlit chatbot that answers questions about my lecture notes by sending them to the OpenAI API with a custom prompt.",
+        "Tried several prompt wordings to make answers cite the lecture number."
+      ]
+    },
+    {
+      "name": "Digit Recognition",
+      "url": null,
+      "technologies": [
+        "Python",
+        "TensorFlow",
+        "Keras"
+      ],
+      "content": [
+        "Trained a small convolutional neural network in Keras on MNIST for CS 540 and reached 98% test accuracy."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Python",
+    "SQL",
+    "pandas",
+    "scikit-learn",
+    "TensorFlow",
+    "Keras",
+    "OpenAI API",
+    "Git"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": []
+}

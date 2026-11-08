@@ -1,0 +1,71 @@
+{
+  "personal_information": {
+    "name": "Rowan Notreal",
+    "emails": [
+      "rowan.notreal@example.test"
+    ],
+    "phones": [
+      "(555) 010-3003"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/rowan.notreal",
+    "github": null,
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Computer Sciences",
+      "start_date": "Sep 2024",
+      "end_date": "May 2028",
+      "gpa": "3.0/4.0",
+      "content": [
+        "Relevant coursework: Programming II (CS 300), Introduction to Artificial Intelligence (CS 540)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "College Library (fictional)",
+      "title": "Student Library Assistant",
+      "start_date": "Sep 2024",
+      "end_date": "Present",
+      "location": "Madison, WI",
+      "content": [
+        "Checked out materials and reshelved books for 10 hours per week."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "CS 540 Homework: Iris Classifier",
+      "url": null,
+      "technologies": [
+        "Python",
+        "scikit-learn"
+      ],
+      "content": [
+        "Followed a course notebook to train a k-nearest neighbors classifier on the Iris dataset."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Python",
+    "Java",
+    "Machine Learning",
+    "ChatGPT"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": [
+    {
+      "content": "OBJECTIVE\nComputer science student interested in AI and machine learning internships."
+    }
+  ]
+}

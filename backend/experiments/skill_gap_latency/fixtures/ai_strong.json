@@ -1,0 +1,135 @@
+{
+  "personal_information": {
+    "name": "Quinn Sampleton",
+    "emails": [
+      "quinn.sampleton@example.test"
+    ],
+    "phones": [
+      "(555) 010-3001"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/quinn.sampleton",
+    "github": "github.example/quinn.sampleton",
+    "website": null
+  },
+  "research_interests": [
+    "Retrieval-augmented generation",
+    "Efficient fine-tuning of language models"
+  ],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Computer Sciences and Data Science",
+      "start_date": "Sep 2023",
+      "end_date": "May 2027",
+      "gpa": "3.9/4.0",
+      "content": [
+        "Relevant coursework: Machine Learning (CS 540/760), Deep Learning (CS 762), Linear Algebra (MATH 340), Probability (MATH 431), Natural Language Processing (CS 769)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Prairie Health Analytics (fictional)",
+      "title": "Machine Learning Engineering Intern",
+      "start_date": "May 2026",
+      "end_date": "Aug 2026",
+      "location": "Madison, WI",
+      "content": [
+        "Built a retrieval-augmented question-answering service over 40,000 clinical policy documents using Python, LangChain and pgvector.",
+        "Split documents into 500-token chunks, embedded them with an open-source embedding model, and tuned top-k retrieval on a 200-question labeled set, raising answer accuracy from 61% to 78%.",
+        "Wrote and versioned the system prompts and few-shot examples, and added a check that refused answers when no retrieved passage supported them.",
+        "Served the model behind a FastAPI endpoint in Docker on Azure Container Apps, with request logging and latency alerts.",
+        "Tracked every evaluation run in MLflow with the prompt version, retriever settings and scores."
+      ]
+    },
+    {
+      "company": "Language Systems Lab (fictional)",
+      "title": "Undergraduate Research Assistant",
+      "start_date": "Sep 2024",
+      "end_date": "May 2026",
+      "location": "Madison, WI",
+      "content": [
+        "Fine-tuned a 7B open-source language model with LoRA on 12,000 labeled support tickets using PyTorch and Hugging Face PEFT on two A100 GPUs.",
+        "Built the train, validation and test splits by customer to avoid leakage, and compared the fine-tuned model with a zero-shot baseline on macro F1 (0.71 vs 0.52).",
+        "Wrote an Airflow pipeline that pulled new tickets nightly, removed duplicates and personal data, and rebuilt the training set."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Course-Help Agent",
+      "url": null,
+      "technologies": [
+        "Python",
+        "OpenAI API",
+        "LangGraph"
+      ],
+      "content": [
+        "Built a tool-using agent that answers course logistics questions by calling a calendar API and a syllabus search tool.",
+        "Logged each tool call and wrote 50 test conversations to catch wrong tool choices before each change."
+      ]
+    },
+    {
+      "name": "Image Classifier from Scratch",
+      "url": null,
+      "technologies": [
+        "Python",
+        "NumPy",
+        "PyTorch"
+      ],
+      "content": [
+        "Implemented a two-layer neural network with backpropagation in NumPy, then a ResNet-18 in PyTorch on CIFAR-10 reaching 92% test accuracy.",
+        "Ran a learning-rate and weight-decay sweep and used early stopping on validation loss."
+      ]
+    },
+    {
+      "name": "Churn Prediction Features",
+      "url": null,
+      "technologies": [
+        "Python",
+        "scikit-learn",
+        "SQL"
+      ],
+      "content": [
+        "Engineered rolling-window usage features in SQL and pandas for a public telecom dataset, and trained gradient-boosted trees in scikit-learn.",
+        "Used 5-fold cross-validation and reported ROC AUC of 0.86 with a calibration plot."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Python",
+    "SQL",
+    "Java",
+    "PyTorch",
+    "scikit-learn",
+    "Hugging Face Transformers",
+    "LangChain",
+    "pgvector",
+    "FastAPI",
+    "Docker",
+    "Azure",
+    "MLflow",
+    "Airflow",
+    "Git",
+    "Linear Algebra",
+    "Probability"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [
+    {
+      "name": "Undergraduate Research Fellowship (fictional)",
+      "issuer": "University of Wisconsin–Madison",
+      "date": "2025",
+      "content": [
+        "Funded the language-model fine-tuning project."
+      ]
+    }
+  ],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": []
+}
