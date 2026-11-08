@@ -1,9 +1,9 @@
 # SPEC: Skill Gap baseline latency test (single Agent)
 
-> **Status:** Draft, not started · **Branch:** `test/skill-gap-latency-experiments` (from `dev` @ `77d5ad8`)
-> **Owner:** Abanish · **Last updated:** 2026-11-03
-> Temporary file in the repo root, used to continue on another device. Later it moves to
-> `docs/experiments/SKILL_GAP_LATENCY_PLAN.md`.
+> **Status:** Done. This is the original plan, kept for reference. Results, the gpt-6 configs (A6, C6) and later
+> decisions are in [`backend/experiments/skill_gap_latency/REPORT.md`](../../backend/experiments/skill_gap_latency/REPORT.md).
+> **Owner:** Abanish · **Written:** 2026-11-03 · The experiment folder was later named `skill_gap_latency`
+> (paths below are updated), and the summary lives in `REPORT.md` rather than `results.md`.
 
 ---
 
@@ -103,7 +103,7 @@ Expected duration: about **30–40 min**. Expected cost: about **$0.50–0.60** 
 
 ### 3.3 Recorded per run
 
-Saved to `backend/local_results/experiments/skill_gap_baseline/<timestamp>_<resume>_r<round>/` (gitignored):
+Saved to `backend/local_results/experiments/skill_gap_latency/<timestamp>_<resume>_r<round>/` (gitignored):
 `input.json`, `agent.raw.json`, `agent.response.json`, `skill_gaps.json` (report), `metrics.json`.
 
 `metrics.json` holds:
@@ -126,12 +126,12 @@ Per résumé and per role:
 
 ## 4. Work plan (in order)
 
-1. **Résumés:** write `backend/experiments/skill_gap_baseline/fixtures/{swe,da,ai}_{strong,medium,weak}.json`. Abanish reviews them.
-2. **Runner:** `backend/experiments/skill_gap_baseline/run.py`, for example
-   `python -m experiments.skill_gap_baseline.run --repeats 3` (also `--resume swe_strong`, `--dry-run`, `--max-calls N`).
+1. **Résumés:** write `backend/experiments/skill_gap_latency/fixtures/{swe,da,ai}_{strong,medium,weak}.json`. Abanish reviews them.
+2. **Runner:** `backend/experiments/skill_gap_latency/run.py`, for example
+   `python -m experiments.skill_gap_latency.run --repeats 3` (also `--resume swe_strong`, `--dry-run`, `--max-calls N`).
    It reuses `prepare`, `invoke`, `calculate_web_report`, `load`, `ASSET_ROOT`. App code stays unchanged.
-3. **Summary:** `backend/experiments/skill_gap_baseline/summarize.py` → `results.md`.
-4. **Unit tests** (no network, run in CI): `backend/tests/test_skill_gap_baseline_experiment.py`
+3. **Summary:** `backend/experiments/skill_gap_latency/summarize.py` → `REPORT.md`.
+4. **Unit tests** (no network, run in CI): `backend/tests/test_skill_gap_latency_experiment.py`
    - the fixtures validate
    - the runner with a mocked `invoke` writes the expected files and `metrics.json`
    - interleaved order
