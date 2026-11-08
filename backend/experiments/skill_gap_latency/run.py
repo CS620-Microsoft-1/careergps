@@ -5,6 +5,7 @@ repeats instantly). App code is unchanged. Rounds are interleaved: round 1 runs 
 résumé, then round 2, and so on. There are no retries; a failed run is recorded as failed.
 
     python -m experiments.skill_gap_latency.run --config A --repeats 3
+    python -m experiments.skill_gap_latency.run --config C6 --repeats 1
     python -m experiments.skill_gap_latency.run --config A --resume swe_strong --results <local csv>
     python -m experiments.skill_gap_latency.run --dry-run
 """
@@ -16,12 +17,15 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import sys
+import threading
 import time
 
 from app.services.skill_gaps.assets import ASSET_ROOT
 from app.services.skill_gaps.input import prepare
 from app.services.skill_gaps.response import calculate_web_report
 from app.services.skill_gaps.storage import load, save_json
+
+from .agents import group_summary, review_blocked
 
 HERE = Path(__file__).resolve().parent
 FIXTURES = HERE / "fixtures"
@@ -32,9 +36,11 @@ FAMILIES = {"swe": "software_engineer", "da": "data_analyst", "ai": "ai_engineer
 LEVELS = ("strong", "medium", "weak")
 RESUMES = tuple(f"{role}_{level}" for role in FAMILIES for level in LEVELS)
 
-# One entry per tested setup. B, C and D are added once their Agents exist.
+# One entry per tested setup. B and D are added once their Agents exist.
 CONFIGS = {
-    "A": "Current single Agent, unchanged (gpt-5-mini, medium reasoning, 1 call)",
+    "A": "Single Agent v30 (gpt-5-mini, medium, app Instructions.md, 1 call)",
+    "A6": "Single Agent v31 (gpt-6-luna, medium, its own rewritten prompt, 1 call)",
+    "C6": "3 skill-group Agents v1 (gpt-6-luna, medium, group prompt, 3 parallel calls)",
 }
 
 COLUMNS = (
@@ -44,24 +50,32 @@ COLUMNS = (
     "input_tokens", "cached_tokens", "output_tokens", "reasoning_tokens",
     "practice", "limited_practice", "knowledge", "absent", "uncertain", "reference_errors",
     "verdicts", "run_dir",
+    "group_inference_s", "group_output_tokens", "slowest_group", "review_blocked",
 )
 VERDICTS = ("practice", "limited_practice", "knowledge", "absent", "uncertain")
+TOKEN_FIELDS = ("input_tokens", "cached_tokens", "output_tokens", "reasoning_tokens")
 
 
 class AgentVersionChanged(RuntimeError):
     pass
 
 
-def schedule(resumes, repeats):
-    """Interleaved order: every résumé in round 1, then round 2, ..."""
-    return [(name, round_) for round_ in range(1, repeats + 1) for name in resumes]
+def schedule(resumes, repeats, start_round=1):
+    """Interleaved order: every résumé in the first round, then the next, ..."""
+    return [(name, round_) for round_ in range(start_round, start_round + repeats) for name in resumes]
 
 
 def default_invoke(config):
-    if config != "A":
-        raise SystemExit(f"Config {config} is not set up yet.")
-    from app.services.skill_gaps.transport import invoke
-    return invoke
+    if config == "A":
+        from app.services.skill_gaps.transport import invoke
+        return invoke
+    if config == "A6":
+        from .agents import invoke_single_pinned
+        return invoke_single_pinned
+    if config == "C6":
+        from .agents import invoke_groups
+        return invoke_groups
+    raise SystemExit(f"Config {config} is not set up yet.")
 
 
 def usage_fields(raw):
@@ -92,7 +106,7 @@ def run_one(config, name, round_, *, invoke, catalog, market, runs_root=RUNS, sc
     family = FAMILIES[role]
     started_at = datetime.now(timezone.utc)
     folder = runs_root / config / f"{started_at:%Y%m%dT%H%M%SZ}_{name}_r{round_}"
-    saved = {}
+    saved, lock = {}, threading.Lock()
 
     def save(file_name, value):
         saved[file_name] = value
@@ -109,8 +123,9 @@ def run_one(config, name, round_, *, invoke, catalog, market, runs_root=RUNS, sc
         row["prepare_s"] = round(time.perf_counter() - step, 3)
         save("input.json", payload)
 
-        def on_request():
-            row["calls"] += 1
+        def on_request():  # C6 calls this from three threads
+            with lock:
+                row["calls"] += 1
 
         output = invoke(payload, save, on_request, timings)
         save("agent.response.json", output)
@@ -125,6 +140,7 @@ def run_one(config, name, round_, *, invoke, catalog, market, runs_root=RUNS, sc
     agent = saved.get("observed_agent.json") or {}
     definition = agent.get("definition") or {}
     raw = saved.get("agent.raw.json")
+    usage = saved.get("usage.json")
     row.update(
         agent_name=agent.get("name"), agent_version=agent.get("version"),
         model=(raw or {}).get("model") or definition.get("model"),
@@ -132,7 +148,9 @@ def run_one(config, name, round_, *, invoke, catalog, market, runs_root=RUNS, sc
         setup_s=timings.get("sdk_auth_configuration_seconds"),
         conversation_s=_sum(timings.get("conversation_create_seconds"), timings.get("conversation_delete_seconds")),
         inference_s=timings.get("inference_seconds"),
-        **usage_fields(raw), **verdict_fields(output, report),
+        **({field: usage.get(field) for field in TOKEN_FIELDS} if usage else usage_fields(raw)),
+        **verdict_fields(output, report), **group_summary(timings, usage),
+        review_blocked=review_blocked(saved["group_merge_audit.json"]) if "group_merge_audit.json" in saved else None,
     )
     save("metrics.json", {**row, "timings": timings, "verdicts": json.loads(row["verdicts"])})
     return row
@@ -143,9 +161,24 @@ def _sum(*values):
     return round(sum(present), 3) if present else None
 
 
+def upgrade_header(path):
+    """Rewrite an older CSV with the current columns; old rows get blanks in new ones."""
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        if tuple(reader.fieldnames or ()) == COLUMNS:
+            return
+        rows = list(reader)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=COLUMNS, extrasaction="ignore")
+        writer.writeheader()
+        writer.writerows(rows)
+
+
 def append_row(path, row):
     path.parent.mkdir(parents=True, exist_ok=True)
     new = not path.exists() or path.stat().st_size == 0
+    if not new:
+        upgrade_header(path)
     with path.open("a", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=COLUMNS, extrasaction="ignore")
         if new:
@@ -154,10 +187,10 @@ def append_row(path, row):
 
 
 def run(config, resumes, repeats, *, invoke, results=RESULTS, runs_root=RUNS, max_calls=None,
-        score=calculate_web_report, log=print):
+        score=calculate_web_report, log=print, start_round=1):
     catalog = load(ASSET_ROOT / "core_catalog.json")
     market = load(ASSET_ROOT / "market_snapshot.json")
-    plan = schedule(resumes, repeats)
+    plan = schedule(resumes, repeats, start_round)
     if max_calls is not None:
         plan = plan[:max_calls]
     version, rows = None, []
@@ -180,8 +213,9 @@ def run(config, resumes, repeats, *, invoke, results=RESULTS, runs_root=RUNS, ma
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--config", default="A", choices=sorted(CONFIGS))
+    parser.add_argument("--config", default="A", choices=list(CONFIGS))
     parser.add_argument("--repeats", type=int, default=3)
+    parser.add_argument("--start-round", type=int, default=1, help="Number of the first round, to add rounds later.")
     parser.add_argument("--resume", action="append", choices=RESUMES, help="Repeatable. Default: all 9.")
     parser.add_argument("--max-calls", type=int)
     parser.add_argument("--results", type=Path, default=RESULTS, help="CSV to append to.")
@@ -194,12 +228,12 @@ def main(argv=None):
         for name in resumes:
             payload = prepare(FAMILIES[name.split("_")[0]], load(FIXTURES / f"{name}.json"), name, catalog)
             print(f"{name:11} skills={len(payload['core_skills'])} chars={len(json.dumps(payload))}")
-        print(f"{len(schedule(resumes, args.repeats))} runs planned; nothing was sent.")
+        print(f"{len(schedule(resumes, args.repeats, args.start_round))} runs planned; nothing was sent.")
         return 0
 
     try:
         rows = run(args.config, resumes, args.repeats, invoke=default_invoke(args.config),
-                   results=args.results, max_calls=args.max_calls)
+                   results=args.results, max_calls=args.max_calls, start_round=args.start_round)
     except AgentVersionChanged as error:
         print(error, file=sys.stderr)
         return 2
