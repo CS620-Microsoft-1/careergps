@@ -1,6 +1,7 @@
 # Skill Gap latency experiments
 
-> **Status:** Config A done (27/27 runs, 2026-11-03) · B, C, D not started · **Branch:** `test/skill-gap-latency-experiments`
+> **Status:** A done (27 runs, 2026-11-03) · A6 and C6 done (27 runs each, 3 rounds, 2026-11-08) · B, D not started ·
+> **Branch:** `test/skill-gap-latency-experiments`
 > Raw numbers: [`results.csv`](results.csv) (one row per run). The tables below are generated from it by
 > `python -m experiments.skill_gap_latency.summarize`. Do not edit between the RESULTS markers.
 
@@ -10,25 +11,47 @@ A Skill Gap run takes 60–80 s while the student watches a progress screen. Abo
 and its length follows the number of **output** tokens, most of which are hidden reasoning. These tests measure
 today's setup and three faster options on the same synthetic résumés, so the choice is made on numbers.
 
-## The four configurations
+## The configurations
 
-| Config | Calls | Model | Reasoning | What changes | Status |
-|---|---|---|---|---|---|
-| **A** | 1 | gpt-5-mini | medium | Nothing: today's Agent, pinned version | done |
-| **B** | 1 | gpt-5-mini | low | Lower thinking level | needs a way to set `low` |
-| **C** | 3 in parallel | smaller Agents, one per skill group | default | Split the skills across Agents | needs a teammate's endpoint and Agent names |
-| **D** | 3 in parallel | smaller Agents | low | C plus lower thinking level | after B and C |
+| Config | Calls | Agent and version | Model | Reasoning | Prompt | Runs | Status |
+|---|---|---|---|---|---|---|---|
+| **A** | 1 | `olive-agent-nybsd72mqb` v30 | gpt-5-mini | medium | app `Instructions.md` (3.1k chars) | 27 (3 rounds) | done |
+| **A6** | 1 | `olive-agent-nybsd72mqb` v31 | gpt-6-luna | medium | v31's own rewrite, copied to `prompts/olive_v31.md` (6.4k chars) | 27 (3 rounds) | done |
+| **C6** | 3 in parallel | `skill-gap-foundation` / `-lifecycle` / `-systems` v1 | gpt-6-luna | medium | group prompts in `app/prompts/skill_gaps/skill_groups/` (8.4k chars each) | 27 (3 rounds) | done |
+| **B** | 1 | – | gpt-5-mini | low | – | – | not started |
+| **D** | 3 in parallel | – | – | low | – | – | not started |
+
+C6 splits each role's skills across the three groups (AI 8/8/7, SWE 7/7/8, DA 6/6/6). Each group reads the whole
+résumé and returns only its own skills; Python merges them into the same v12 result and scores it unchanged.
+
+**Read the gpt-6 comparison with these caveats:**
+- **A6 vs C6** keeps the model and reasoning the same but **not the prompt**: v31's rewrite vs the group prompts.
+  It compares the two setups as they would ship, not the effect of splitting alone.
+- **A vs A6/C6** also changes the model (gpt-5-mini → gpt-6-luna).
+- During these runs every Agent had the `web_search` tool attached (their prompts say not to browse). None of the
+  140 saved responses contains a search call. On 2026-11-08 the group Agents were re-saved as **v2 without tools**
+  (otherwise identical; the app preflight passes) and `.env` pins v2. C6 was measured on v1; since no search ever
+  ran, the results are expected to carry over.
+- A6 and C6 ran after the 3-skill-group merge, whose `prepare()` puts the skill cards before the résumé (same
+  content). A ran on the earlier layout.
+- C6's merge turns a skill into *uncertain* when its group's evidence fails the quote checks, so C6's
+  "invalid quotes" stay near zero by design. The C6 section reports those skills separately.
 
 ## Method (same for every config)
 
 - **Résumés:** 9 synthetic confirmed résumés in `fixtures/`: Software Engineer, Data Analyst and AI Engineer at three
   levels (strong, medium, weak). Clearly fake people and companies; no PDFs, so résumé parsing time is excluded.
-- **Runs:** 3 rounds × 9 résumés = 27 runs per config. Rounds are interleaved (all 9, then all 9 again) to spread
+- **Runs:** 3 rounds × 9 résumés = 27 runs per config. For A6 and C6 the rounds alternate between the two configs
+  (A6 r1, C6 r1, A6 r2, ...), so an Azure slowdown hits both equally. Within a config, rounds are interleaved (all 9, then all 9 again) to spread
   Azure slowdowns. One run at a time. No retries: a failure is recorded as a failure.
-- **Path:** `prepare()` → `transport.invoke()` → `calculate_web_report()`, called directly by `run.py`, so the app's
-  run cache never answers a repeat. App code is unchanged.
+- **Path:** `prepare()` → Agent call(s) → `calculate_web_report()`, called directly by `run.py`, so the app's run cache
+  never answers a repeat. App code is unchanged. A uses `transport.invoke()`; A6 uses a pinned call in `agents.py`
+  checked against `prompts/olive_v31.md`; C6 uses the app's own group preflight, `invoke_prepared()` (3 threads) and
+  `merge_group_outputs()`, without the group cache.
 - **Timing:** wall clock per phase. *Auth + Agent check* includes the Azure sign-in, the Agent version lookup and the
-  check of its saved Instructions and schema. *Model call* is the single `responses.create`. Token counts come from
+  check of its saved Instructions and schema (for C6, all three groups). *Model call* is the single
+  `responses.create`; for C6 it is the wall time until the slowest of the three groups finishes, including each
+  group's own sign-in and conversation setup. Tokens for C6 are summed over the three groups. Token counts come from
   the response's `usage`.
 - **Agreement:** for each résumé, the share of skills where all repeats gave the same verdict (and the same verdict
   plus the same activity). It is the noise floor for comparing configs.
@@ -42,14 +65,15 @@ today's setup and three faster options on the same synthetic résumés, so the c
 
 ### Comparison
 
-| Config | Setup | Runs OK | Mean total (s) | Median (s) | Fastest (s) | Slowest (s) | Mean output tok | Same verdict | Change vs A |
-|---|---|---|---|---|---|---|---|---|---|
-| A | Current single Agent, unchanged (gpt-5-mini, medium reasoning, 1 call) | 27/27 | 47.8 | 39.5 | 21.0 | 86.5 | 6,190 | 89% | baseline |
-| B | Single Agent, low reasoning (1 call) | not run yet | – | – | – | – | – | – | – |
-| C | 3 smaller Agents in parallel (one per skill group), default reasoning | not run yet | – | – | – | – | – | – | – |
-| D | 3 smaller Agents in parallel, low reasoning | not run yet | – | – | – | – | – | – | – |
+| Config | Setup | Runs OK | Mean total (s) | Median (s) | Fastest (s) | Slowest (s) | Mean output tok | Same verdict | Change vs A | Change vs A6 |
+|---|---|---|---|---|---|---|---|---|---|---|
+| A | Single Agent v30 (gpt-5-mini, medium, app Instructions.md, 1 call) | 27/27 | 47.8 | 39.5 | 21.0 | 86.5 | 6,190 | 89% | baseline | – |
+| A6 | Single Agent v31 (gpt-6-luna, medium, its own rewritten prompt, 1 call) | 27/27 | 25.1 | 18.9 | 8.7 | 53.3 | 3,315 | 95% | -47% | – |
+| C6 | 3 skill-group Agents v1 (gpt-6-luna, medium, group prompt, 3 parallel calls) | 27/27 | 20.7 | 18.1 | 7.6 | 46.1 | 5,796 | 92% | -57% | -18% |
+| B | Single Agent, low reasoning (1 call) | not run yet | – | – | – | – | – | – | – | – |
+| D | 3 smaller Agents in parallel, low reasoning | not run yet | – | – | – | – | – | – | – | – |
 
-### Config A: Current single Agent, unchanged (gpt-5-mini, medium reasoning, 1 call)
+### Config A: Single Agent v30 (gpt-5-mini, medium, app Instructions.md, 1 call)
 
 - Agent: olive-agent-nybsd72mqb, version 30; model / reasoning: gpt-5-mini / medium
 - Runs: 27 (0 failed), 2026-11-03 17:32 to 2026-11-03 17:53 UTC
@@ -96,10 +120,164 @@ today's setup and three faster options on the same synthetic résumés, so the c
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
 | A | 27/27 | 47.8 | 21.0 | 86.5 | 45.6 | 9,538 | 7,666 | 6,190 | 4,243 | 89% | 81% | 1.2 |
 
+### Config A6: Single Agent v31 (gpt-6-luna, medium, its own rewritten prompt, 1 call)
+
+- Agent: olive-agent-nybsd72mqb, version 31; model / reasoning: gpt-6-luna / medium
+- Runs: 27 (0 failed), 2026-11-08 19:19 to 2026-11-08 19:44 UTC
+
+**Where the time goes (mean seconds per run, successful runs)**
+
+| Prepare input | Auth + Agent check | Conversation create/delete | Model call | Scoring | Total |
+|---|---|---|---|---|---|
+| 0.00 | 1.10 | 1.02 | 22.86 | 0.02 | 25.08 |
+
+**By résumé**
+
+| Résumé | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| swe_strong | 3/3 | 44.9 | 40.8 | 49.4 | 41.8 | 11,670 | 11,667 | 6,370 | 3,975 | 95% | 86% | 0.0 |
+| swe_medium | 3/3 | 16.7 | 13.3 | 18.8 | 14.8 | 10,148 | 9,020 | 1,936 | 1,314 | 91% | 91% | 0.0 |
+| swe_weak | 3/3 | 9.9 | 8.7 | 10.6 | 8.0 | 9,616 | 8,666 | 924 | 614 | 95% | 95% | 0.0 |
+| da_strong | 3/3 | 31.5 | 28.8 | 33.6 | 29.7 | 10,454 | 9,224 | 4,705 | 2,684 | 100% | 89% | 0.0 |
+| da_medium | 3/3 | 16.0 | 12.8 | 18.9 | 14.0 | 9,400 | 8,522 | 1,895 | 1,169 | 89% | 78% | 0.0 |
+| da_weak | 3/3 | 14.0 | 13.4 | 14.7 | 12.0 | 9,041 | 8,282 | 1,430 | 1,004 | 94% | 94% | 0.0 |
+| ai_strong | 3/3 | 48.6 | 43.8 | 53.3 | 46.6 | 11,348 | 9,820 | 7,163 | 4,409 | 100% | 91% | 0.0 |
+| ai_medium | 3/3 | 29.7 | 28.7 | 31.3 | 27.3 | 10,144 | 9,018 | 4,010 | 2,708 | 96% | 96% | 0.0 |
+| ai_weak | 3/3 | 14.3 | 10.1 | 18.9 | 11.7 | 9,746 | 8,752 | 1,397 | 997 | 96% | 96% | 0.0 |
+
+**By role**
+
+| Role | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Software Engineer | 9/9 | 23.9 | 8.7 | 49.4 | 21.5 | 10,478 | 9,784 | 3,077 | 1,968 | 94% | 91% | 0.0 |
+| Data Analyst | 9/9 | 20.5 | 12.8 | 33.6 | 18.5 | 9,632 | 8,676 | 2,677 | 1,619 | 94% | 87% | 0.0 |
+| AI Engineer | 9/9 | 30.9 | 10.1 | 53.3 | 28.5 | 10,413 | 9,197 | 4,190 | 2,705 | 97% | 94% | 0.0 |
+
+**By résumé level**
+
+| Level | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| strong | 9/9 | 41.7 | 28.8 | 53.3 | 39.3 | 11,157 | 10,237 | 6,079 | 3,689 | 98% | 89% | 0.0 |
+| medium | 9/9 | 20.8 | 12.8 | 31.3 | 18.7 | 9,897 | 8,853 | 2,614 | 1,730 | 92% | 88% | 0.0 |
+| weak | 9/9 | 12.8 | 8.7 | 18.9 | 10.6 | 9,468 | 8,567 | 1,251 | 872 | 95% | 95% | 0.0 |
+
+**All runs**
+
+| Config | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A6 | 27/27 | 25.1 | 8.7 | 53.3 | 22.9 | 10,174 | 9,219 | 3,315 | 2,097 | 95% | 91% | 0.0 |
+
+### Config C6: 3 skill-group Agents v1 (gpt-6-luna, medium, group prompt, 3 parallel calls)
+
+- Agent: skill-gap-foundation+skill-gap-lifecycle+skill-gap-systems, version 1/1/1; model / reasoning: gpt-6-luna / medium
+- Runs: 27 (0 failed), 2026-11-08 19:23 to 2026-11-08 19:47 UTC
+
+**Where the time goes (mean seconds per run, successful runs)**
+
+| Prepare input | Auth + Agent check | Conversation create/delete | Model call | Scoring | Total |
+|---|---|---|---|---|---|
+| 0.00 | 1.42 | – | 19.19 | 0.01 | 20.66 |
+
+**By résumé**
+
+| Résumé | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| swe_strong | 3/3 | 32.1 | 31.7 | 32.3 | 30.0 | 30,349 | 30,340 | 10,516 | 8,018 | 86% | 73% | 0.0 |
+| swe_medium | 3/3 | 16.9 | 15.1 | 18.7 | 15.3 | 25,723 | 23,698 | 3,697 | 2,838 | 95% | 95% | 0.0 |
+| swe_weak | 3/3 | 9.5 | 7.6 | 11.2 | 8.2 | 24,127 | 22,634 | 1,322 | 935 | 86% | 86% | 0.0 |
+| da_strong | 3/3 | 21.9 | 18.1 | 26.5 | 20.7 | 27,744 | 25,045 | 7,234 | 5,312 | 100% | 89% | 0.0 |
+| da_medium | 3/3 | 17.4 | 15.1 | 19.6 | 16.2 | 24,546 | 22,913 | 4,016 | 3,135 | 89% | 78% | 0.0 |
+| da_weak | 3/3 | 13.4 | 11.5 | 16.1 | 11.9 | 23,469 | 22,195 | 1,995 | 1,504 | 94% | 94% | 0.0 |
+| ai_strong | 3/3 | 39.4 | 31.0 | 46.1 | 38.1 | 29,119 | 25,962 | 13,905 | 11,017 | 100% | 70% | 0.0 |
+| ai_medium | 3/3 | 24.0 | 22.5 | 26.1 | 22.5 | 25,459 | 23,522 | 6,953 | 5,485 | 91% | 87% | 0.0 |
+| ai_weak | 3/3 | 11.4 | 9.7 | 12.8 | 10.0 | 24,265 | 22,726 | 2,526 | 2,016 | 87% | 87% | 0.0 |
+
+**By role**
+
+| Role | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| Software Engineer | 9/9 | 19.5 | 7.6 | 32.3 | 17.8 | 26,733 | 25,557 | 5,178 | 3,930 | 89% | 85% | 0.0 |
+| Data Analyst | 9/9 | 17.6 | 11.5 | 26.5 | 16.3 | 25,253 | 23,385 | 4,415 | 3,317 | 94% | 87% | 0.0 |
+| AI Engineer | 9/9 | 24.9 | 9.7 | 46.1 | 23.5 | 26,281 | 24,070 | 7,795 | 6,173 | 93% | 81% | 0.0 |
+
+**By résumé level**
+
+| Level | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| strong | 9/9 | 31.1 | 18.1 | 46.1 | 29.6 | 29,071 | 27,116 | 10,552 | 8,115 | 95% | 77% | 0.0 |
+| medium | 9/9 | 19.4 | 15.1 | 26.1 | 18.0 | 25,243 | 23,378 | 4,889 | 3,819 | 92% | 87% | 0.0 |
+| weak | 9/9 | 11.4 | 7.6 | 16.1 | 10.0 | 23,954 | 22,518 | 1,948 | 1,485 | 89% | 89% | 0.0 |
+
+**All runs**
+
+| Config | Runs OK | Mean total (s) | Fastest (s) | Slowest (s) | Mean model call (s) | Input tok | Cached tok | Output tok | Reasoning tok | Same verdict | Same verdict + activity | Invalid quotes / run |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| C6 | 27/27 | 20.7 | 7.6 | 46.1 | 19.2 | 26,089 | 24,337 | 5,796 | 4,473 | 92% | 84% | 0.0 |
+
+**By skill-group Agent (3 parallel calls; the run waits for the slowest)**
+
+| Group | Mean model call (s) | Fastest (s) | Slowest (s) | Mean output tok | Slowest in run |
+|---|---|---|---|---|---|
+| foundation | 16.9 | 5.3 | 38.9 | 2,277 | 17/27 |
+| lifecycle | 14.8 | 2.6 | 43.7 | 1,997 | 6/27 |
+| systems | 11.9 | 2.2 | 34.2 | 1,522 | 4/27 |
+
+Skills the merge set to *uncertain* because the owning group's evidence failed the quote checks: 0.1 per run on average (these count as uncertain, not as invalid quotes).
+
 <!-- RESULTS:END -->
+
+## Findings: gpt-6 single Agent (A6) vs 3 skill-group Agents (C6), 2026-11-08
+
+Same 9 résumés, 3 rounds each (27 runs per config), gpt-6-luna at medium reasoning for both. Times are means over
+the 3 rounds; A is gpt-5-mini for reference. "Repeat agreement" is how often a config gave the same verdict for a
+skill in all 3 of its rounds; "A6 vs C6" compares each config's most common verdict per skill.
+
+| Résumé | A (s) | A6 (s) | C6 (s) | C6 vs A6 | A6 range (s) | C6 range (s) | Repeat agreement A6 / C6 | Same verdict A6 vs C6 |
+|---|---|---|---|---|---|---|---|---|
+| swe_strong | 69.1 | 44.9 | 32.1 | −29% | 40.8–49.4 | 31.7–32.3 | 95% / 86% | 95% |
+| swe_medium | 37.3 | 16.7 | 16.9 | +1% | 13.3–18.8 | 15.1–18.7 | 91% / 95% | 95% |
+| swe_weak | 23.6 | 9.9 | 9.5 | −4% | 8.7–10.6 | 7.6–11.2 | 95% / 86% | 95% |
+| da_strong | 63.9 | 31.5 | 21.9 | −31% | 28.8–33.6 | 18.1–26.5 | 100% / 100% | 100% |
+| da_medium | 37.6 | 16.0 | 17.4 | +9% | 12.8–18.9 | 15.1–19.6 | 89% / 89% | 94% |
+| da_weak | 28.4 | 14.0 | 13.4 | −4% | 13.4–14.7 | 11.5–16.1 | 94% / 94% | 89% |
+| ai_strong | 80.2 | 48.6 | 39.4 | −19% | 43.8–53.3 | 31.0–46.1 | 100% / 100% | 96% |
+| ai_medium | 56.4 | 29.7 | 24.0 | −19% | 28.7–31.3 | 22.5–26.1 | 96% / 91% | 100% |
+| ai_weak | 33.4 | 14.3 | 11.4 | −21% | 10.1–18.9 | 9.7–12.8 | 96% / 87% | 91% |
+| **All** | **47.8** | **25.1** | **20.7** | **−18%** | 8.7–53.3 | 7.6–46.1 | **95% / 92%** | **95%** |
+
+| By résumé level | A6 (s) | C6 (s) | C6 vs A6 |
+|---|---|---|---|
+| strong | 41.7 | 31.1 | −25% |
+| medium | 20.8 | 19.4 | −6% |
+| weak | 12.8 | 11.4 | −10% |
+
+1. **Moving to gpt-6 is the biggest gain.** A6 is 47% faster than A (25.1 s vs 47.8 s), mostly because gpt-6
+   writes about half as many output tokens (3.3k vs 6.2k per run).
+2. **Splitting saves another 18% on average, and the gain is concentrated on strong résumés.** C6 vs A6:
+   strong −25% (41.7 → 31.1 s), weak −10%, medium −6%. C6 was faster in 19 of 27 paired runs (same résumé, same
+   round). The worst case drops from 53.3 s to 46.1 s. On medium résumés the two are effectively tied: their
+   3-round ranges overlap almost completely (for example swe_medium 13.3–18.8 s vs 15.1–18.7 s).
+3. **The single-round estimate was a little optimistic.** After one round C6 looked 23% faster; with 3 rounds it is
+   18%. The two Data Analyst exceptions from round 1 partly persist: da_medium stays slower with C6 (+9%), while
+   da_weak is now slightly faster (−4%).
+4. **Verdicts barely change, but C6 is slightly less consistent.** The two configs' usual verdicts match for 95% of
+   skills. Run to run, C6 repeats its own verdict a little less often (92% vs 95%; same verdict and same evidence
+   84% vs 91%), most visibly on swe_strong, swe_weak and ai_weak. Both are at or above A's 89%. No run had invalid
+   quotes; the C6 merge set 3 skills to *uncertain* across 27 runs because the owning group's quote failed its check.
+5. **The split costs more tokens.** C6 uses about 1.7× the output tokens (5.8k vs 3.3k) and 2.6× the input tokens
+   (26k vs 10k; each group re-reads the whole résumé, though most of that input is cached).
+6. **The foundation group is the bottleneck.** It finished last in 17 of 27 runs (mean 16.9 s vs 14.8 s lifecycle and
+   11.9 s systems). Moving one or two skills out of foundation is the most direct way to shorten C6 further.
+
+**Limits:** A6 and C6 use different prompts, so part of the difference may come from the prompt rather than the
+split. A fair "split only" test would run a single gpt-6 Agent with the group prompt for all skills. Three rounds
+per résumé is still a small sample; differences under about 10% on a single résumé are within run-to-run variation.
 
 ## Notes
 
 - Agent version must stay the same for all runs of a config; `run.py` stops if it changes.
-- Known issue, not fixed here: the app's run-cache fingerprint (`services/skill_gaps/runs.py`) doesn't include the
-  model or reasoning effort, so switching B in the app would need that fixed first.
+- Config A cannot be re-run as it is: `transport.invoke()` always uses the single Agent's latest version, which is
+  now v31 and no longer matches `Instructions.md`, so its check stops before any call. Re-running A would need the
+  runner to pin v30.
+- The app's run cache now keys on each group Agent's resolved definition (including model and reasoning), so a
+  config change such as B or D cannot be answered from an older cached run.
