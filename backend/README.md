@@ -253,7 +253,8 @@ app/
 │   └── routes/
 │       ├── health.py        # GET /health, GET /health/db
 │       ├── me.py            # POST /me, GET /me, PATCH /me, GET /me/resume, POST /me/resumes
-│       └── resumes.py       # POST /resumes/analyze, /analyze/stream (no persistence)
+│       ├── resumes.py       # POST /resumes/analyze, /analyze/stream (no persistence)
+│       └── student_courses.py  # /me/courses: courses the student has taken, résumé suggestions
 ├── db/
 │   ├── base.py              # SQLAlchemy Base; every model inherits from it
 │   ├── session.py           # engine + SessionLocal, built from settings
@@ -263,6 +264,7 @@ app/
 │   ├── catalog.py           # certifications, school_courses, student_orgs, catalog_versions
 │   ├── job_posting.py       # job_postings + ingest_runs
 │   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
+│   ├── student_course.py    # student_courses (school courses a student has taken)
 │   └── user.py              # users (id = the Supabase Auth account id)
 ├── schemas/
 │   ├── me.py                # /me requests and responses
@@ -272,6 +274,7 @@ app/
     ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
     ├── catalog_writes.py    # writes them: seed script and catalog refresh
     ├── course_listing.py    # hides school courses not taught in the last four semesters
+    ├── student_courses.py   # taken courses + finding course codes in a résumé
     ├── uw_courses.py        # UW–Madison course guide data (data/uw_courses) as catalog entries
     ├── resume_children.py   # builds the résumé child table rows from confirmed_data
     └── postings/            # job board adapters (Greenhouse, Ashby, Lever) and daily ingest
@@ -358,7 +361,7 @@ the API on another port, update it there and restart `npm run dev`.
 python -m unittest discover -s tests -v
 ```
 
-The catalog tests in `tests/test_catalog_postgres.py` run only when `CGPS_TEST_DATABASE_URL` points at a
+The database tests (`tests/test_*_postgres.py`, e.g. `test_catalog_postgres.py`) run only when `CGPS_TEST_DATABASE_URL` points at a
 throwaway local Postgres (they drop and recreate the `public` and `auth` schemas); CI skips them.
 Never point it at the shared database.
 
@@ -939,6 +942,21 @@ The tagger only accepts skill ids from the core catalog and checks that each quo
 description. Tags follow the description only, so a course gets no skill that its description
 doesn't name. Exception: COMP SCI 412, 513, 514, 525 and 526 (numerical methods and optimization)
 were tagged `math_statistics` by hand; `tag_uw_courses --all` would overwrite that.
+
+## Taken courses
+
+`student_courses` records the school courses a student has taken: one row per student and course,
+for every role. `source` says how it was added: the Taken button on a course card (`manual`), a
+confirmed résumé match (`resume`), or a plan item marked done (`plan`; one way: un-marking it keeps
+the row). The course stays in `/resources` and `/plan`; the browser hides taken courses from the
+Resources lists and the gap cards, and the gap card says "You took X, which covers this". Skill-gap
+scores don't change.
+
+- `GET /me/courses`, `PUT /me/courses/{course_id}` (`{"source": "manual" | "resume"}`, optional),
+  `DELETE /me/courses/{course_id}`.
+- `GET /me/courses/resume-matches?job_family=…`: listed courses whose code appears in that role's
+  résumé ("CS 400", "COMP SCI 400", "Comp. Sci. 400, 540"), not taken yet. A regex, no model call;
+  nothing is saved until the student confirms.
 
 ## Changing the schema
 

@@ -77,7 +77,7 @@ class CatalogPostgresTests(unittest.TestCase):
 
     def setUp(self) -> None:
         with self.engine.begin() as connection:
-            connection.execute(text("TRUNCATE certifications, school_courses, student_orgs, catalog_versions"))
+            connection.execute(text("TRUNCATE student_courses, certifications, school_courses, student_orgs, catalog_versions"))
         catalog_store.use_source(DatabaseCatalogSource(self.Session))
 
     def tearDown(self) -> None:

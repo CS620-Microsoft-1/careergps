@@ -8,8 +8,9 @@ from threading import Lock
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
+from sqlalchemy.orm import Session
 
-from app.api.deps import get_account_service, get_current_db_user, get_current_user
+from app.api.deps import get_account_service, get_current_db_user, get_current_user, get_db
 from app.core.config import BACKEND_ROOT, get_settings
 from app.models import User
 from app.schemas.resources import Plan, PlanItem, PlanItemUpdate, ResourceList
@@ -17,6 +18,7 @@ from app.schemas.skill_gap_web import JobFamily
 from app.services.accounts import AccountService
 from app.services.plans import LocalPlanStore, get_plan_store
 from app.services.resources import FAMILY_TO_CATALOG, resources_for
+from app.services.student_courses import record_done_course
 from app.services.resources_agent import rank_projects, recommend_projects
 from app.services.skill_gaps.assets import ASSET_ROOT
 from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
@@ -48,14 +50,19 @@ def read_plan(job_family: JobFamily, user: User = Depends(get_current_db_user),
 
 @router.put("/plan/items/{resource_id}", response_model=PlanItem)
 def save_plan_item(resource_id: str, data: PlanItemUpdate, user: User = Depends(get_current_db_user),
-                   store: LocalPlanStore = Depends(get_plan_store)) -> PlanItem:
-    """Save a resource to the plan, or mark it done ("done") or not done ("saved")."""
-    if resource_id not in {entry["id"] for entry in resources_for(data.job_family, user.university)}:
+                   store: LocalPlanStore = Depends(get_plan_store), db: Session = Depends(get_db)) -> PlanItem:
+    """Save a resource to the plan, or mark it done ("done") or not done ("saved").
+    A school course marked done is also recorded as taken (one way: undoing it keeps the record)."""
+    entry = next((entry for entry in resources_for(data.job_family, user.university) if entry["id"] == resource_id), None)
+    if entry is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found for this role")
     try:
-        return PlanItem.model_validate(store.set_status(user.id, data.job_family, resource_id, data.status))
+        item = PlanItem.model_validate(store.set_status(user.id, data.job_family, resource_id, data.status))
     except OSError:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Plan storage is unavailable") from None
+    if data.status == "done" and entry["type"] == "school_course":
+        record_done_course(db, user.id, resource_id)
+    return item
 
 
 @router.delete("/plan/items/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)

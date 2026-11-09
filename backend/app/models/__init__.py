@@ -18,6 +18,7 @@ from app.models.resume import (
     ResumeProject,
     ResumeSkill,
 )
+from app.models.student_course import StudentCourse
 from app.models.user import User
 
 __all__ = [
@@ -39,6 +40,7 @@ __all__ = [
     "ResumeProject",
     "ResumeSkill",
     "SchoolCourse",
+    "StudentCourse",
     "StudentOrg",
     "User",
 ]
