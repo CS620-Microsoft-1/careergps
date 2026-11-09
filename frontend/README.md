@@ -54,6 +54,25 @@ to the existing placeholder dashboard. Refreshing during Review also discards th
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Generate route types and run the TypeScript compiler |
 
+## End-to-end tests
+
+Playwright drives the real pages in a headless browser against a mocked API, so the tests need no
+backend, no Supabase account and no Agent call. `playwright.config.ts` starts `next dev` on port
+3102 with the Supabase variables empty (the pages then skip login) and `NEXT_PUBLIC_API_URL`
+pointing at `/api-mock` on the same origin, which `e2e/mock-api.ts` answers from fixed data through
+`page.route()`. The specs in `e2e/` cover the flows that cross pages: marking a UW course taken on
+Resources, and the "You took …" reminder on a Gaps card.
+
+```bash
+npx playwright install chromium   # once; downloads the browser (about 100 MB)
+npm run test:e2e                  # starts and stops its own dev server on port 3102
+npx playwright test --headed      # watch it run
+npx playwright show-report        # after a failure: the trace and screenshot are kept
+```
+
+Stop any dev server on port 3102 first; the run refuses to reuse one it didn't start. These tests
+run on your machine only and are not part of CI, which runs the unit tests (`npm test`).
+
 ## Structure
 
 ```text

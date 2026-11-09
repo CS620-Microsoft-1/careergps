@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "next typegen && tsc --noEmit",
-    "test": "node --test \"lib/**/*.test.mts\" \"lib/skill-gap-*.test.cjs\""
+    "test": "node --test \"lib/**/*.test.mts\" \"lib/skill-gap-*.test.cjs\"",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
@@ -27,6 +28,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "1.65.0",
     "@tailwindcss/turbopack": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

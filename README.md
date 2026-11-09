@@ -135,6 +135,7 @@ Never commit `.env` or `.env.local`.
 ```bash
 cd backend && python -m unittest discover -s tests -v   # also runs in CI
 cd frontend && npm test && npm run lint && npm run typecheck && npm run build
+cd frontend && npm run test:e2e   # browser tests against a mocked API; local only, see frontend/README.md
 ```
 
 `backend/tests/manual_resume_smoke.py` runs a live test against the Foundry Agent. It is not part of CI.
