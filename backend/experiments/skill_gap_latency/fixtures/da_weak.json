@@ -1,0 +1,70 @@
+{
+  "personal_information": {
+    "name": "Avery Fictional",
+    "emails": [
+      "avery.fictional@example.test"
+    ],
+    "phones": [
+      "(555) 010-2003"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/avery.fictional",
+    "github": null,
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Economics",
+      "start_date": "Sep 2024",
+      "end_date": "May 2028",
+      "gpa": "3.2/4.0",
+      "content": [
+        "Relevant coursework: Introductory Statistics (STAT 301), Intermediate Microeconomics (ECON 301)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Student Union Front Desk (fictional)",
+      "title": "Student Receptionist",
+      "start_date": "Sep 2024",
+      "end_date": "Present",
+      "location": "Madison, WI",
+      "content": [
+        "Answered visitor questions and kept the daily room booking log in a shared spreadsheet."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "STAT 301 Group Project",
+      "url": null,
+      "technologies": [
+        "Excel"
+      ],
+      "content": [
+        "Calculated averages and made bar charts in Excel for a group project on student commute times."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Excel",
+    "SQL",
+    "Tableau",
+    "Python"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": [
+    {
+      "content": "OBJECTIVE\nEconomics student interested in a data analyst internship."
+    }
+  ]
+}

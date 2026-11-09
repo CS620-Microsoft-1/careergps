@@ -1,0 +1,84 @@
+{
+  "personal_information": {
+    "name": "Taylor Mockwell",
+    "emails": [
+      "taylor.mockwell@example.test"
+    ],
+    "phones": [
+      "(555) 010-2002"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/taylor.mockwell",
+    "github": "github.example/taylor.mockwell",
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Economics",
+      "start_date": "Sep 2023",
+      "end_date": "May 2027",
+      "gpa": "3.5/4.0",
+      "content": [
+        "Relevant coursework: Introductory Statistics (STAT 301), Regression Analysis (STAT 333), Database Management Systems (CS 564)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Dane County Food Bank (fictional)",
+      "title": "Operations Analyst Intern",
+      "start_date": "Jun 2026",
+      "end_date": "Aug 2026",
+      "location": "Madison, WI",
+      "content": [
+        "Wrote SQL queries to pull monthly donation and distribution totals from the inventory database.",
+        "Built Excel reports with pivot tables and charts comparing donations across pantry sites.",
+        "Made a Power BI dashboard of weekly distribution by site that the operations manager reviewed each Friday."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Madison Housing Prices",
+      "url": null,
+      "technologies": [
+        "Python",
+        "pandas",
+        "seaborn"
+      ],
+      "content": [
+        "Cleaned a public housing sales dataset in pandas and fit a linear regression of price on size, age and neighborhood.",
+        "Made scatter plots and a correlation heatmap with seaborn."
+      ]
+    },
+    {
+      "name": "Course Survey Analysis",
+      "url": null,
+      "technologies": [
+        "R"
+      ],
+      "content": [
+        "Summarized a class survey in R and compared two sections with a t-test for STAT 301."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "SQL",
+    "Excel",
+    "Python",
+    "pandas",
+    "R",
+    "Power BI",
+    "Tableau"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": []
+}

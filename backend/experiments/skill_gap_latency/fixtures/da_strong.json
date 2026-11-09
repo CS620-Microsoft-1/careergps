@@ -1,0 +1,129 @@
+{
+  "personal_information": {
+    "name": "Jordan Testcase",
+    "emails": [
+      "jordan.testcase@example.test"
+    ],
+    "phones": [
+      "(555) 010-2001"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/jordan.testcase",
+    "github": "github.example/jordan.testcase",
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Statistics and Economics",
+      "start_date": "Sep 2023",
+      "end_date": "May 2027",
+      "gpa": "3.7/4.0",
+      "content": [
+        "Relevant coursework: Regression Analysis (STAT 333), Experimental Design (STAT 424), Econometrics (ECON 410), Database Management Systems (CS 564), Data Visualization (STAT 436)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Northwoods Outfitters (fictional)",
+      "title": "Data Analyst Intern",
+      "start_date": "May 2026",
+      "end_date": "Aug 2026",
+      "location": "Minneapolis, MN",
+      "content": [
+        "Wrote SQL with CTEs and window functions in Snowflake to build a weekly cohort retention table for 1.2 million customers.",
+        "Met with the marketing team to turn their questions about repeat purchases into a written list of metrics and definitions before building anything.",
+        "Analyzed an email A/B test with 80,000 recipients in Python, checked sample ratio mismatch, and reported a 2.1-point lift in click rate with a 95% confidence interval.",
+        "Built a Tableau dashboard for weekly revenue and retention that the marketing director used in Monday meetings.",
+        "Added dbt tests for null keys, duplicate orders and accepted values, which caught a duplicated order feed before it reached reports.",
+        "Scheduled the cohort model as a daily Airflow job and documented its inputs and owners."
+      ]
+    },
+    {
+      "company": "Campus Financial Aid Office (fictional)",
+      "title": "Student Data Assistant",
+      "start_date": "Sep 2024",
+      "end_date": "May 2026",
+      "location": "Madison, WI",
+      "content": [
+        "Cleaned and merged award spreadsheets in Excel with XLOOKUP and pivot tables, reducing the monthly reconciliation from two days to half a day.",
+        "Automated the monthly report with a Python script using pandas that produced the same tables as the manual Excel process."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Effect of Bike Lanes on Crash Rates",
+      "url": null,
+      "technologies": [
+        "R",
+        "fixest"
+      ],
+      "content": [
+        "Estimated the effect of new bike lanes on crash rates in Madison with a difference-in-differences model using city crash data from 2015 to 2024.",
+        "Checked parallel pre-trends with an event-study plot and ran a placebo test on streets without new lanes.",
+        "Found a 14% drop in crashes (95% CI 4% to 23%) and wrote a two-page summary for a city council member's office."
+      ]
+    },
+    {
+      "name": "Spotify Listening Analysis",
+      "url": null,
+      "technologies": [
+        "Python",
+        "pandas",
+        "matplotlib",
+        "PySpark"
+      ],
+      "content": [
+        "Processed 30 million rows of public listening data with PySpark on a university cluster to find weekly genre trends.",
+        "Made line and small-multiple charts in matplotlib and chose colorblind-safe palettes."
+      ]
+    },
+    {
+      "name": "Retail Star Schema",
+      "url": null,
+      "technologies": [
+        "PostgreSQL",
+        "dbt"
+      ],
+      "content": [
+        "Designed a star schema with order, customer, product and date tables for a sample retail dataset, and built it with dbt models.",
+        "Wrote a data dictionary and grain statement for each table."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "SQL",
+    "Python",
+    "pandas",
+    "R",
+    "Excel",
+    "Tableau",
+    "Power BI",
+    "Snowflake",
+    "BigQuery",
+    "dbt",
+    "Airflow",
+    "PySpark",
+    "Statistics",
+    "A/B testing"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [
+    {
+      "name": "Tableau Desktop Specialist",
+      "issuer": "Tableau",
+      "date": "2025",
+      "url": null,
+      "content": []
+    }
+  ],
+  "leadership_activities": [],
+  "other": []
+}

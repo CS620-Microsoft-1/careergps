@@ -13,7 +13,12 @@ from uuid import uuid4
 from app.services.skill_gaps import runs
 from app.services.skill_gaps.runs import SkillGapRunManager
 from app.services.skill_gaps.storage import save_json
-from tests.skill_gap_fixtures import CONFIRMED_AT, RESUME_ID, USER_ID, absent_response, reviewed_resume
+from tests.skill_gap_fixtures import (
+    CONFIRMED_AT, RESUME_ID, USER_ID, absent_response, reviewed_resume,
+    group_manager, group_settings,
+)
+from app.services.skill_gaps.skill_groups import GROUPS
+from app.services.skill_gaps.transport import SkillGapConfigurationError
 
 
 def wait_for(manager, run):
@@ -42,7 +47,7 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
             self.calls.append(deepcopy(payload))
             on_request()
             return absent_response(payload)
-        manager = SkillGapRunManager(self.directory, invoker=invoker or invoke)
+        manager = group_manager(self.directory, invoker=invoker or invoke)
         self.managers.append(manager)
         return manager
 
@@ -56,7 +61,7 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
         manager = self.manager()
         first = wait_for(manager, self.submit(manager))
         self.assertEqual(first.status, "completed")
-        self.assertEqual(first.model_calls, 1)
+        self.assertEqual(first.model_calls, 3)
         self.assertEqual(self.submit(manager).id, first.id)
         self.assertTrue(self.submit(manager).reused)
         for _ in range(3):
@@ -64,7 +69,7 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
             latest = manager.latest(user_id=USER_ID, resume_id=RESUME_ID,
                 reviewed_resume=reviewed_resume(), job_family="software_engineer")
             self.assertEqual(latest.id, first.id)
-        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(len(self.calls), 3)
         self.assertEqual(self.calls[0]["resume_id"], str(RESUME_ID))
         self.assertEqual(first.report["resume_id"], str(RESUME_ID))
         self.assertEqual(first.report["user_id"], str(USER_ID))
@@ -85,14 +90,15 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
             first = self.submit(manager)
             self.assertTrue(started.wait(2))
             self.assertEqual(self.submit(manager, force=True).id, first.id)
-            self.assertEqual(len(self.calls), 1)
+            self.assertGreaterEqual(len(self.calls), 1)
+            self.assertLessEqual(len(self.calls), 3)
         finally:
             release.set()
         wait_for(manager, first)
         second = wait_for(manager, self.submit(manager, force=True))
         self.assertNotEqual(second.id, first.id)
-        self.assertEqual(len(self.calls), 2)
-        self.assertEqual(second.model_calls, 1)
+        self.assertEqual(len(self.calls), 6)
+        self.assertEqual(second.model_calls, 3)
 
     def test_owner_and_resume_and_configuration_isolate_reuse_and_lookup(self):
         manager = self.manager()
@@ -127,8 +133,8 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
         recovered = self.manager()
         result = recovered.get(first.id, user_id=USER_ID)
         self.assertEqual(result.status, "failed")
-        self.assertEqual(result.model_calls, 1)
-        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(result.model_calls, 3)
+        self.assertEqual(len(self.calls), 3)
         with self.assertRaises(KeyError):
             recovered.get(legacy_id, user_id=USER_ID)
         self.assertTrue((self.directory / legacy_id / "status.json").exists())
@@ -164,7 +170,7 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
         recovered = self.manager()
         result = recovered.get(first.id, user_id=USER_ID)
         self.assertEqual((result.status, result.model_calls), ("failed", 0))
-        self.assertEqual(len(self.calls), 1)
+        self.assertEqual(len(self.calls), 3)
 
     def test_failed_submit_persist_leaves_no_stuck_run(self):
         manager = self.manager()
@@ -191,6 +197,33 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
             result = wait_for(manager, self.submit(manager))
         self.assertEqual((result.status, result.model_calls), ("failed", 0))
         self.assertEqual(self.calls, [])
+
+    def test_executor_submission_failure_rolls_back_resolved_snapshot_and_queue_identity(self):
+        manager = group_manager(self.directory, settings=group_settings(
+            **{f"skill_gap_{group}_agent_version": "latest" for group in GROUPS}))
+        self.managers.append(manager)
+        first = wait_for(manager, self.submit(manager))
+        with patch.object(manager._executor, "submit", side_effect=RuntimeError("executor unavailable")):
+            with self.assertRaises(RuntimeError):
+                self.submit(manager, force=True)
+        self.assertEqual(manager._prepared_runs, {})
+        self.assertEqual(list(manager._states), [first.id])
+        restored = manager.latest(user_id=USER_ID, resume_id=RESUME_ID,
+            reviewed_resume=reviewed_resume(), job_family="software_engineer")
+        self.assertEqual(restored.id, first.id)
+
+    def test_legacy_agent_binding_does_not_create_a_single_agent_fallback(self):
+        called = []
+        configured = group_settings(skill_gap_foundry_agent_name="legacy-agent",
+            **{f"skill_gap_{group}_agent_name": None for group in GROUPS},
+            **{f"skill_gap_{group}_agent_version": "latest" for group in GROUPS})
+        manager = SkillGapRunManager(self.directory, settings=configured,
+            invoker=lambda *args: called.append(1))
+        self.managers.append(manager)
+        with self.assertRaises(SkillGapConfigurationError) as error:
+            self.submit(manager)
+        self.assertEqual(error.exception.code, "foundation_agent_not_configured")
+        self.assertEqual((called, manager._states), ([], {}))
 
     def test_concurrent_first_requests_construct_one_shared_manager(self):
         barrier = Barrier(6)

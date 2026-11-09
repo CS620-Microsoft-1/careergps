@@ -1,0 +1,71 @@
+{
+  "personal_information": {
+    "name": "Casey Placeholder",
+    "emails": [
+      "casey.placeholder@example.test"
+    ],
+    "phones": [
+      "(555) 010-1003"
+    ],
+    "location": "Madison, WI",
+    "linkedin": "linkedin.example/in/casey.placeholder",
+    "github": null,
+    "website": null
+  },
+  "research_interests": [],
+  "education": [
+    {
+      "institution": "University of Wisconsin–Madison",
+      "degree": "B.S.",
+      "major": "Computer Sciences",
+      "start_date": "Sep 2024",
+      "end_date": "May 2028",
+      "gpa": "3.1/4.0",
+      "content": [
+        "Relevant coursework: Programming II (CS 300), Programming III (CS 400), Introduction to Algorithms (CS 577)"
+      ]
+    }
+  ],
+  "work_experience": [
+    {
+      "company": "Campus Dining Services (fictional)",
+      "title": "Student Dining Worker",
+      "start_date": "Sep 2024",
+      "end_date": "Present",
+      "location": "Madison, WI",
+      "content": [
+        "Worked 12 hours per week serving and restocking stations during peak meal times."
+      ]
+    }
+  ],
+  "research_experience": [],
+  "projects": [
+    {
+      "name": "Hash Table Course Project",
+      "url": null,
+      "technologies": [
+        "Java"
+      ],
+      "content": [
+        "Implemented a hash table with separate chaining in Java for CS 400, following the course starter code."
+      ]
+    }
+  ],
+  "technical_skills": [
+    "Java",
+    "Python",
+    "HTML",
+    "CSS",
+    "Git"
+  ],
+  "languages": [],
+  "publications": [],
+  "awards_honors": [],
+  "certifications": [],
+  "leadership_activities": [],
+  "other": [
+    {
+      "content": "OBJECTIVE\nSecond-year computer science student looking for a software engineering internship."
+    }
+  ]
+}

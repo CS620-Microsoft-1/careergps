@@ -4,7 +4,8 @@ Skill Gaps runs in the normal CareerGPS application. Sign in, confirm the review
 resume, and open Dashboard. The backend loads the authenticated user's active
 `resumes.confirmed_data`; browser storage is not a second resume source.
 
-One Agent call extracts evidence for one resume and one job family. Python checks
+Three parallel Agents extract disjoint skill groups from the complete confirmed
+resume for the selected job family (AI 8/8/7, SWE 7/7/8, DA 6/6/6). Python checks
 references and calculates evidence strength, gap grades and demand-weighted
 priority using the unchanged rubric. Grades describe resume evidence, not ability
 or hiring probability; the rubric has not been empirically calibrated.
@@ -42,7 +43,12 @@ CORS_ORIGINS=http://localhost:3000
 FOUNDRY_PROJECT_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/<project>
 FOUNDRY_AGENT_NAME=<resume-agent>
 SKILL_GAP_FOUNDRY_PROJECT_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/<project>
-SKILL_GAP_FOUNDRY_AGENT_NAME=<skill-gap-agent>
+SKILL_GAP_FOUNDATION_AGENT_NAME=skill-gap-foundation
+SKILL_GAP_FOUNDATION_AGENT_VERSION=latest
+SKILL_GAP_LIFECYCLE_AGENT_NAME=skill-gap-lifecycle
+SKILL_GAP_LIFECYCLE_AGENT_VERSION=latest
+SKILL_GAP_SYSTEMS_AGENT_NAME=skill-gap-systems
+SKILL_GAP_SYSTEMS_AGENT_VERSION=latest
 ```
 
 ```dotenv
@@ -58,11 +64,15 @@ keys do not need a legacy JWT secret. Do not commit real environment files.
 The existing database schema must already be available; follow the team's
 migration ownership rules instead of applying shared migrations yourself.
 
-For real Agent calls, authenticate with `az login`. The latest non-draft Agent
-version must match the checked-in
-[Instructions](../../backend/app/prompts/skill_gaps/Instructions.md) and
-[response Schema](../../backend/app/services/skill_gaps/data/response-format.json).
-The checked version is pinned for inference. No repair or explanation call is made.
+For real calls, authenticate with `az login`. Each saved group Agent must use
+medium reasoning and match its Instructions and internal Schema under
+`backend/app/prompts/skill_gaps/skill_groups/<group>/`. `latest` resolves saved
+non-draft versions before cache lookup and pins them for the run; use `1` to
+reproduce the tested v1 definitions. No mode flag or single-Agent fallback exists.
+There is at most one model request per group, three per uncached run, with no
+automatic repair or explanation call. The final public v12 format and scoring
+remain unchanged. Historical reads by run ID stay local; latest lookup checks
+current cloud versions and may return 503 if they cannot be validated.
 
 ## Run locally
 
@@ -149,10 +159,25 @@ routes, user isolation, reuse/force/restart and portable demand reproduction.
 
 ## Proposed result storage contract
 
-The [storage JSON Schema](../contracts/skill-gap-run-storage.schema.json) and
-[fictional example](../contracts/skill-gap-run-storage.example.json) remain a
-proposal for a later `skill_gap_runs` migration. They do not create tables or
-implement result persistence in PostgreSQL. Runtime results still use local files.
+The [storage JSON Schema](../contracts/skill-gap-run-storage.schema.json) remains
+a proposed mapping for database-owner review. Runtime results still use local
+files; an existing table migration does not make the run manager persist to
+PostgreSQL. This contract does not modify the public v12 Agent response or scores.
+
+The current review contract accepts historical `careergps.skill_gap_run_storage.v1`
+records with at most one new model request and `careergps.skill_gap_run_storage.v2`
+records with at most three. The original [v1 fictional example](../contracts/skill-gap-run-storage.example.json)
+remains valid. The [v2 fictional example](../contracts/skill-gap-run-storage-v2.example.json)
+shows the three assigned groups, their saved Agent references, per-group request
+counts and `core-skill-partitions.v1` policy. Its request counts are illustrative;
+generating this example did not call Foundry.
+
+For v2, the legacy top-level `agent_name` and `agent_version` are null: each
+group's actual reference is stored in `branches`. Each group can make at most one
+new request; cache reuse can reduce the total to zero, one or two. Any eventual
+database adapter must also verify that the aggregate request count equals the
+sum of the groups; JSON Schema does not perform that arithmetic. These changes
+do not rewrite existing v1 records or require a larger SQL request-count column.
 
 The proposed record links the authenticated user, real resume ID, immutable
 13-section input snapshot, demand snapshot and configuration fingerprint. Report
