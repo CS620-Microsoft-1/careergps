@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { evidenceLevel, orderPlan, rankGaps, rankStrengths, resourcesForSkill } from "./career.ts";
+import {
+  courseCode, evidenceLevel, orderPlan, rankGaps, rankStrengths, resourcesForSkill, takenCoursesFor, withoutTaken,
+} from "./career.ts";
 
 const skill = (skill_id: string, strength: number | null, priority: number | null, required = 10) => ({
   skill_id, skill_name: skill_id, module_id: "m", module_name: "M",
@@ -64,5 +66,30 @@ describe("orderPlan", () => {
 
   it("finds resources for a skill, most direct first", () => {
     assert.deepEqual(resourcesForSkill(resources, "sql").map((r) => r.id), ["done", "sql-project"]);
+  });
+});
+
+describe("taken courses", () => {
+  const course = (id: string, skills: string[], extra = {}) => ({ ...resource(id, "school_course", skills), ...extra });
+  const resources = [
+    course("uw-cs-564", ["sql"], { title: "COMP SCI 564: Database Management Systems", course_code: "COMP SCI 564" }),
+    course("uw-stat-240", ["statistics"], { title: "STAT 240: Data Science Modeling I" }),
+    resource("uw-cs-564-project", "project", ["sql"]),
+  ];
+
+  it("hides only taken school courses", () => {
+    const taken = new Set(["uw-cs-564", "uw-cs-564-project"]);
+    assert.deepEqual(withoutTaken(resources, taken).map((r) => r.id), ["uw-stat-240", "uw-cs-564-project"]);
+  });
+
+  it("lists taken courses that cover a skill", () => {
+    const taken = new Set(["uw-cs-564", "uw-stat-240"]);
+    assert.deepEqual(takenCoursesFor(resources, taken, "sql").map((r) => r.id), ["uw-cs-564"]);
+    assert.deepEqual(takenCoursesFor(resources, new Set(), "sql"), []);
+  });
+
+  it("names a course by its code", () => {
+    assert.equal(courseCode(resources[0]), "COMP SCI 564");
+    assert.equal(courseCode(resources[1]), "STAT 240");
   });
 });

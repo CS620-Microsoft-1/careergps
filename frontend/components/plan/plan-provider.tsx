@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
+import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { errorMessage } from "@/lib/api/client";
 import { getPlan, getResources, removePlanItem, setPlanItem } from "@/lib/api/resources";
@@ -34,6 +35,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<PlanState>({ family: null, status: "idle", resources: [], items: [] });
   const [pending, setPending] = useState<Set<string>>(new Set());
   const [actionError, setActionError] = useState<string>();
+  const { noteTaken } = useTakenCourses();
 
   useEffect(() => {
     if (!activeFamily) return;
@@ -73,7 +75,11 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     const item = await setPlanItem(state.family, resourceId, status);
     setState((current) => current.family !== state.family ? current
       : { ...current, items: [...current.items.filter((i) => i.resource_id !== resourceId), item] });
-  }), [state.family, track]);
+    // The backend records a school course marked done as taken.
+    if (status === "done" && state.resources.some((r) => r.id === resourceId && r.type === "school_course")) {
+      noteTaken(resourceId);
+    }
+  }), [noteTaken, state.family, state.resources, track]);
 
   const remove = useCallback((resourceId: string) => track(resourceId, async () => {
     if (!state.family) return;
