@@ -12,6 +12,7 @@ from app.services.accounts import AccountService
 from app.services.certifications.catalog import for_family
 from app.services.certifications.recommender import CertificationRecommender, get_certification_recommender
 from app.services.skill_gaps.runs import SkillGapRunManager, get_skill_gap_run_manager
+from app.services.skill_gaps.transport import SkillGapConfigurationError
 
 router = APIRouter(prefix="/certifications", tags=["certifications"])
 
@@ -36,6 +37,8 @@ def recommendations(request: CertificationRecommendationRequest,
                           reviewed_resume=saved.reviewed_resume, job_family=saved.job_family)
     except KeyError:
         raise HTTPException(status_code=404, detail="Run a skill gap analysis for this direction first") from None
+    except SkillGapConfigurationError as error:
+        raise HTTPException(status_code=503, detail=error.public_message) from None
     except (OSError, ValueError):
         raise HTTPException(status_code=503, detail="Analysis result is unavailable") from None
     if run.status == "failed":
