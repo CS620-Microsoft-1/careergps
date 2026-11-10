@@ -253,7 +253,8 @@ function AnalysisSteps({ calculating }: { calculating: boolean }) {
           className={cn("flex items-center gap-2", !step.done && !step.active && "text-muted-foreground")}>
           <span className={cn("grid size-6 place-items-center rounded-full text-xs font-bold",
             step.done ? "bg-foreground text-background" : step.active ? "bg-accent" : "bg-sunken")}>
-            {step.done ? <Check aria-hidden className="size-3.5" /> : index + 1}
+            {/* The first step is already done on arrival, so it has no change to show. */}
+            {step.done ? <Check aria-hidden className={cn("size-3.5", index > 0 && "entrance-pop")} /> : index + 1}
           </span>
           {step.label}
           <span className="sr-only">{step.done ? ": done" : step.active ? ": in progress" : ": waiting"}</span>
