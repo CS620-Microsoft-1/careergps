@@ -18,10 +18,32 @@ export type CopilotState = {
 type Dependencies = {
   read: () => string | null;
   write: (value: string) => void;
+  clear: () => void;
   respond?: CopilotResponder;
   id?: () => string;
   now?: () => string;
 };
+/** Scope all reads, writes and explicit deletion to one account's storage key. */
+export function createCopilotStorage(owner: string | null, getStorage: () => Pick<Storage, "getItem" | "setItem" | "removeItem"> = () => localStorage) {
+  const key = owner ? copilotStorageKey(owner) : null;
+  let lastSaved: string | null = null;
+  return {
+    read: () => { lastSaved = key ? getStorage().getItem(key) : null; return lastSaved; },
+    write: (value: string) => {
+      if (!key) return;
+      const storage = getStorage();
+      // A stale tab must not restore history after another tab has cleared it.
+      if (storage.getItem(key) !== lastSaved) throw new Error("History changed in another tab");
+      storage.setItem(key, value);
+      lastSaved = value;
+    },
+    clear: () => {
+      // Explicitly confirmed deletion can also recover from corrupt saved history.
+      if (key) getStorage().removeItem(key);
+      lastSaved = null;
+    },
+  };
+}
 const INITIAL: CopilotState = {
   loaded: false, open: false, conversationId: null, createdAt: null, draft: "", messages: [],
   pendingId: null, error: null, storageWarning: null,
@@ -88,6 +110,21 @@ export class CopilotSession {
   }
   setOpen = (open: boolean) => this.update({ open });
   setDraft = (draft: string) => this.update({ draft: draft.slice(0, MAX_COPILOT_INPUT), error: null });
+  /** Called only after UI confirmation. Fail without claiming that saved history was deleted. */
+  clear = () => {
+    if (!this.state.loaded) return false;
+    try {
+      this.deps.clear();
+    } catch {
+      this.update({ error: "Couldn’t clear saved history. Nothing was cleared. Please try again." }, false);
+      return false;
+    }
+    this.controller?.abort();
+    this.controller = null;
+    this.update({ conversationId: this.id(), createdAt: this.now(), messages: [], draft: "",
+      pendingId: null, error: null, storageWarning: null }, false);
+    return true;
+  };
   send = async (question?: string) => {
     const text = (question ?? this.state.draft).trim();
     if (!this.state.loaded || !text || this.state.pendingId) return;

@@ -183,6 +183,11 @@ Enter sends; Shift+Enter inserts a line break; composing IME text does not send.
 stop a pending reply, retry a failed/interrupted reply, and write a draft while waiting.
 Refreshing during a reply preserves the question and offers retry, rather than auto-running it.
 
+The panel's **Clear and restart** button asks for confirmation before removing this account's
+browser history and draft. Confirmation stops a pending reply and starts with empty context;
+Cancel leaves everything intact. Other accounts and site storage are untouched. If browser
+storage cannot be cleared, an error is shown and the current conversation is retained.
+
 `lib/copilot-session.ts` owns persistence and request lifecycle; `lib/copilot-mock.ts` is the
 injected async responder. Only the last 20 messages go to that mock; full history stays saved.
 A future backend should replace browser persistence with authenticated conversation/message

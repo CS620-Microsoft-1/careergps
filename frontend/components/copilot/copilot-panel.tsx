@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowUp, FileText, LoaderCircle, Sparkles, Square, X } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, FileText, LoaderCircle, RotateCcw, Sparkles, Square, X } from "lucide-react";
 import { useCopilot } from "@/components/copilot/copilot-provider";
 import { Button } from "@/components/ui/button";
 import { MAX_COPILOT_INPUT, type CopilotMessage } from "@/lib/copilot-session";
@@ -14,6 +14,28 @@ export function CopilotPanel() {
   const { session, state, sessionOnly } = useCopilot();
   const viewport = useRef<HTMLDivElement>(null);
   const followLatest = useRef(true);
+  const clearButton = useRef<HTMLButtonElement>(null);
+  const cancelClearButton = useRef<HTMLButtonElement>(null);
+  const [confirmClear, setConfirmClear] = useState(false);
+  useEffect(() => {
+    if (confirmClear) cancelClearButton.current?.focus();
+  }, [confirmClear]);
+  function cancelClear() {
+    setConfirmClear(false);
+    requestAnimationFrame(() => clearButton.current?.focus());
+  }
+  function clearConversation() {
+    const cleared = session.clear();
+    setConfirmClear(false);
+    if (cleared) {
+      setFirstVisible(0);
+      followLatest.current = true;
+      setShowLatest(false);
+      requestAnimationFrame(() => document.getElementById("copilot-input")?.focus());
+    } else {
+      requestAnimationFrame(() => clearButton.current?.focus());
+    }
+  }
   const [showLatest, setShowLatest] = useState(false);
   const [firstVisible, setFirstVisible] = useState(() => Math.max(0, state.messages.length - 40));
   const last = state.messages.at(-1);
@@ -108,6 +130,22 @@ export function CopilotPanel() {
         </div>
       </form>
       <p className="mt-2 text-center text-[0.6875rem] text-muted-foreground">{state.storageWarning || sessionOnly ? "History is not being saved" : "History saved in this browser"} · Scripted replies</p>
+      <div className="mt-2 flex justify-center">
+        <Button ref={clearButton} type="button" variant="ghost" size="sm"
+          disabled={!state.loaded || confirmClear || (!state.messages.length && !state.draft && !state.storageWarning)}
+          onClick={() => setConfirmClear(true)}><RotateCcw aria-hidden />Clear and restart</Button>
+      </div>
+      {confirmClear && <div role="alertdialog" aria-labelledby="copilot-clear-title" aria-describedby="copilot-clear-description"
+        className="mt-2 rounded-xl border bg-background p-3" onKeyDown={event => {
+          if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); cancelClear(); }
+        }}>
+        <h3 id="copilot-clear-title" className="text-sm font-bold">Clear this conversation?</h3>
+        <p id="copilot-clear-description" className="mt-1 text-xs/5 text-muted-foreground">This will permanently delete this account’s messages and draft from this browser and stop any pending reply.</p>
+        <div className="mt-3 flex justify-end gap-2">
+          <Button ref={cancelClearButton} type="button" variant="outline" size="sm" onClick={cancelClear}>Cancel</Button>
+          <Button type="button" variant="destructive" size="sm" onClick={clearConversation}>Confirm clear</Button>
+        </div>
+      </div>}
     </footer>
   </aside>;
 }

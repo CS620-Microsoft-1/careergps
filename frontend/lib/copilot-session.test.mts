@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { CopilotSession, copilotStorageKey, SAMPLE_ANALYSIS_ID } from "./copilot-session.ts";
+import { CopilotSession, copilotStorageKey, createCopilotStorage, SAMPLE_ANALYSIS_ID } from "./copilot-session.ts";
 import { sampleCopilotReply, respondToMockCopilot, type CopilotReply, type CopilotRequest, type CopilotResponder } from "./copilot-mock.ts";
 
 const answer = { text: "Sample response", sources: [] };
@@ -12,7 +12,7 @@ function deferred() {
 function setup(respond: CopilotResponder = async () => answer) {
   let saved: string | null = null;
   let nextId = 0;
-  const deps = { read: () => saved, write: (value: string) => { saved = value; }, respond,
+  const deps = { read: () => saved, write: (value: string) => { saved = value; }, clear: () => { saved = null; }, respond,
     id: () => `id-${nextId++}`, now: () => "2026-11-10T12:00:00.000Z" };
   const session = new CopilotSession(deps);
   session.initialize();
@@ -87,7 +87,7 @@ test("malformed replies fail safely and retry does not duplicate the question", 
 });
 
 test("storage failure keeps live messages usable", async () => {
-  const session = new CopilotSession({ read: () => null, write: () => { throw new Error("Quota"); }, respond: async () => answer });
+  const session = new CopilotSession({ read: () => null, write: () => { throw new Error("Quota"); }, clear: () => {}, respond: async () => answer });
   session.initialize(); await session.send("Question");
   assert.equal(session.getSnapshot().messages.length, 2);
   assert.match(session.getSnapshot().storageWarning!, /could not be saved/);
@@ -95,7 +95,7 @@ test("storage failure keeps live messages usable", async () => {
 
 test("corrupt stored history is not overwritten", async () => {
   let writes = 0;
-  const session = new CopilotSession({ read: () => '{"version":1}', write: () => { writes++; }, respond: async () => answer });
+  const session = new CopilotSession({ read: () => '{"version":1}', write: () => { writes++; }, clear: () => {}, respond: async () => answer });
   session.initialize(); await session.send("Question");
   assert.equal(writes, 0);
   assert.match(session.getSnapshot().storageWarning!, /could not be loaded/);
@@ -136,4 +136,101 @@ test("mock adapter honors abort", async () => {
   const pending = respondToMockCopilot({ question: "Why SQL?", history: [] }, controller.signal);
   controller.abort();
   await assert.rejects(pending, { name: "AbortError" });
+});
+
+test("clear removes messages and draft across refresh and starts with empty responder context", async () => {
+  let request: CopilotRequest | undefined;
+  const { session, restore } = setup(async r => { request = r; return answer; });
+  session.setOpen(true);
+  await session.send("Old question");
+  session.setDraft("Old draft");
+  const previousId = session.getSnapshot().conversationId;
+  assert.equal(session.clear(), true);
+  assert.notEqual(session.getSnapshot().conversationId, previousId);
+  assert.equal(session.getSnapshot().open, true);
+  assert.deepEqual(restore().getSnapshot().messages, []);
+  assert.equal(restore().getSnapshot().draft, "");
+  await session.send("New question");
+  assert.deepEqual(request!.history, []);
+  assert.deepEqual(restore().getSnapshot().messages.map(m => m.text), ["New question", answer.text]);
+});
+
+test("clear aborts a pending reply and discards late results after a new question", async () => {
+  const d = deferred();
+  let calls = 0;
+  let signal: AbortSignal | undefined;
+  const { session, restore } = setup(async (_, s) => { signal ??= s; return ++calls === 1 ? d.promise : answer; });
+  const pending = session.send("Old pending question");
+  session.setDraft("Old draft");
+  assert.equal(session.clear(), true);
+  assert.equal(signal!.aborted, true);
+  assert.equal(session.getSnapshot().pendingId, null);
+  await session.send("New question");
+  d.resolve({ text: "Stale response", sources: [] });
+  await pending;
+  assert.deepEqual(restore().getSnapshot().messages.map(m => m.text), ["New question", answer.text]);
+});
+
+function memoryStorage() {
+  const values = new Map<string, string>();
+  return { values, getItem: (key: string) => values.get(key) ?? null,
+    setItem: (key: string, value: string) => { values.set(key, value); },
+    removeItem: (key: string) => { values.delete(key); } };
+}
+
+test("browser adapter clears only the selected account, preserving other accounts and site data", async () => {
+  const storage = memoryStorage();
+  storage.setItem("unrelated-setting", "keep");
+  const alice = new CopilotSession({ ...createCopilotStorage("user:alice", () => storage), respond: async () => answer });
+  const bob = new CopilotSession({ ...createCopilotStorage("user:bob", () => storage), respond: async () => answer });
+  alice.initialize(); bob.initialize();
+  await alice.send("Alice question"); await bob.send("Bob question");
+  alice.setDraft("Alice draft"); bob.setDraft("Bob draft");
+  const beforeBob = storage.getItem(copilotStorageKey("user:bob"));
+  assert.equal(alice.clear(), true);
+  assert.equal(storage.getItem(copilotStorageKey("user:alice")), null);
+  assert.equal(storage.getItem(copilotStorageKey("user:bob")), beforeBob);
+  assert.equal(storage.getItem("unrelated-setting"), "keep");
+});
+
+test("a stale browser tab cannot write deleted history back to storage", () => {
+  const storage = memoryStorage();
+  const active = createCopilotStorage("user:alice", () => storage);
+  const stale = createCopilotStorage("user:alice", () => storage);
+  active.read(); active.write("old history"); stale.read();
+  active.clear();
+  assert.throws(() => stale.write("resurrected history"), /changed in another tab/);
+  assert.equal(storage.getItem(copilotStorageKey("user:alice")), null);
+  active.write("new history");
+  assert.equal(storage.getItem(copilotStorageKey("user:alice")), "new history");
+});
+
+test("failed deletion retains the conversation and draft and reports failure", async () => {
+  const storage = memoryStorage();
+  const session = new CopilotSession({ ...createCopilotStorage("user:alice", () => ({ ...storage,
+    removeItem: () => { throw new Error("Storage blocked"); } })), respond: async () => answer });
+  session.initialize(); await session.send("Keep this question"); session.setDraft("Keep this draft");
+  const before = session.getSnapshot();
+  const saved = storage.getItem(copilotStorageKey("user:alice"));
+  assert.equal(session.clear(), false);
+  assert.deepEqual(session.getSnapshot().messages, before.messages);
+  assert.equal(session.getSnapshot().draft, before.draft);
+  assert.equal(session.getSnapshot().conversationId, before.conversationId);
+  assert.equal(storage.getItem(copilotStorageKey("user:alice")), saved);
+  assert.match(session.getSnapshot().error!, /Nothing was cleared/);
+});
+
+test("confirmed clear can recover from corrupt saved history", async () => {
+  const storage = memoryStorage();
+  storage.setItem(copilotStorageKey("user:alice"), "corrupt");
+  const deps = { ...createCopilotStorage("user:alice", () => storage), respond: async () => answer };
+  const session = new CopilotSession(deps);
+  session.initialize();
+  assert.ok(session.getSnapshot().storageWarning);
+  assert.equal(session.clear(), true);
+  assert.equal(session.getSnapshot().storageWarning, null);
+  await session.send("Fresh question");
+  const restored = new CopilotSession({ ...createCopilotStorage("user:alice", () => storage), respond: async () => answer });
+  restored.initialize();
+  assert.deepEqual(restored.getSnapshot().messages.map(m => m.text), ["Fresh question", answer.text]);
 });
