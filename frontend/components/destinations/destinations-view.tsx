@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { FileText, LoaderCircle, Plus, RotateCcw, TrendingUp, Upload } from "lucide-react";
 
-import { AnalysisGate, ROLE_NAMES, RoutePageHeader, SourceNote, skillLabel } from "@/components/career/route-parts";
+import { AnalysisGate, ROLE_NAMES, RevealPercent, RoutePageHeader, SourceNote, skillLabel } from "@/components/career/route-parts";
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
 import { useAccount } from "@/components/layout/account-provider";
 import { useSwitchRoute } from "@/components/layout/use-switch-route";
@@ -32,9 +32,16 @@ export function DestinationsView() {
   const market = useMarketDemand(snapshot ? family : null);
   const report = run?.status === "completed" ? run.report : null;
   const role = ROLE_NAMES[family];
-
   /** Set by picking a role, so the market fades in after a switch but not on arrival. */
   const [switched, setSwitched] = useState(false);
+  /** Roles seen mid-analysis on this visit: their score counts up when it lands, not when the page loads. */
+  const [waited, setWaited] = useState<ReadonlySet<JobFamily>>(new Set());
+  const analyzing = explored.filter((key) => {
+    const latest = runs[key].run;
+    return latest && latest.status !== "completed" && latest.status !== "failed";
+  });
+  if (analyzing.some((key) => !waited.has(key))) setWaited(new Set([...waited, ...analyzing]));
+
   return <>
     <RoutePageHeader title="Your destinations"
       description="Focus on a few. Pick one to see what its job market is asking for right now." />
@@ -46,6 +53,7 @@ export function DestinationsView() {
         const value = done ? latest.match?.score ?? null : null;
         const gaps = done ? rankGaps(latest.report!).length : null;
         const selected = key === family;
+        const arrived = value !== null && waited.has(key);
         return (
           <button key={key} type="button" aria-pressed={selected} disabled={locked && !selected}
             onClick={() => { setSwitched(true); void switchTo(key); }}
@@ -53,13 +61,15 @@ export function DestinationsView() {
               selected && "border-2 border-foreground")}>
             <span className="flex items-baseline justify-between gap-3">
               <span className="text-title">{ROLE_NAMES[key]}</span>
-              <span className="font-mono text-xl">{value === null ? "—" : percent(value)}</span>
+              <span className="font-mono text-xl">{value === null ? "—" : arrived ? <RevealPercent value={value} /> : percent(value)}</span>
             </span>
             <span className="-mt-3 truncate text-sm text-muted-foreground">
               {resumes[key]?.original_filename ?? (selected ? snapshot?.filename : undefined) ?? "Your résumé"}{user?.preferred_location ? ` · ${user.preferred_location}` : ""}
             </span>
-            <span aria-hidden className="h-2 rounded-full bg-sunken">
-              <span className="block h-full rounded-full bg-foreground" style={{ width: `${(value ?? 0) * 100}%` }} />
+            {/* Slid by transform, not sized by width, so it fills in step with the count-up. */}
+            <span aria-hidden className="h-2 overflow-hidden rounded-full bg-sunken">
+              <span className={cn("block h-full rounded-full bg-foreground", arrived && "transition-transform duration-[600ms] ease-out")}
+                style={{ transform: `translateX(-${(1 - (value ?? 0)) * 100}%)` }} />
             </span>
             <span className="flex justify-between gap-3 text-sm">
               <span className="text-muted-foreground">
