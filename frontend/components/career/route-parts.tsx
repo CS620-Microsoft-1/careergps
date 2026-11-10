@@ -142,7 +142,7 @@ export function GapLegend() {
 export function SaveButton({ resourceId, tone = "card", className }: {
   resourceId: string; tone?: "card" | "tile"; className?: string;
 }) {
-  const { saved, pending, toggleSaved } = usePlan();
+  const { saved, pending, justSaved, toggleSaved } = usePlan();
   const item = saved.get(resourceId);
   const busy = pending.has(resourceId);
   if (item?.status === "done") {
@@ -153,7 +153,8 @@ export function SaveButton({ resourceId, tone = "card", className }: {
     <Button type="button" size="sm" variant={item ? "accent" : tone === "tile" ? "raised" : "secondary"}
       aria-pressed={Boolean(item)} disabled={busy} onClick={() => void toggleSaved(resourceId)} className={className}>
       {busy ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />
-        : item ? <BookmarkCheck data-icon="inline-start" /> : <Bookmark data-icon="inline-start" />}
+        : item ? <BookmarkCheck data-icon="inline-start" className={cn(justSaved === resourceId && "entrance-pop")} />
+        : <Bookmark data-icon="inline-start" />}
       {item ? "Saved to plan" : "Save to plan"}
     </Button>
   );

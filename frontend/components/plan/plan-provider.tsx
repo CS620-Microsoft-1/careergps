@@ -21,6 +21,8 @@ type PlanContextValue = PlanState & {
   pending: Set<string>;
   /** The step marked done a moment ago, so only its check animates and not every done step on load. */
   justCompleted: string | null;
+  /** The resource saved a moment ago, so only its save button confirms it. */
+  justSaved: string | null;
   setStatus: (resourceId: string, status: PlanStatus) => Promise<void>;
   remove: (resourceId: string) => Promise<void>;
   toggleSaved: (resourceId: string) => Promise<void>;
@@ -40,6 +42,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [pending, setPending] = useState<Set<string>>(new Set());
   const [actionError, setActionError] = useState<string>();
   const [justCompleted, setJustCompleted] = useState<string | null>(null);
+  const [justSaved, setJustSaved] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeFamily) return;
@@ -79,11 +82,10 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     const item = await setPlanItem(state.family, resourceId, status);
     setState((current) => current.family !== state.family ? current
       : { ...current, items: [...current.items.filter((i) => i.resource_id !== resourceId), item] });
-    if (status === "done") {
-      setJustCompleted(resourceId);
-      // Cleared so coming back to the plan later doesn't replay it.
-      setTimeout(() => setJustCompleted((current) => current === resourceId ? null : current), JUST_CHANGED_MS);
-    }
+    const flag = status === "done" ? setJustCompleted : setJustSaved;
+    flag(resourceId);
+    // Cleared so coming back to the page later doesn't replay it.
+    setTimeout(() => flag((current) => current === resourceId ? null : current), JUST_CHANGED_MS);
   }), [state.family, track]);
 
   const remove = useCallback((resourceId: string) => track(resourceId, async () => {
@@ -102,7 +104,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const current = state.family === activeFamily ? state
     : { family: activeFamily, status: activeFamily ? "loading" as const : "idle" as const, resources: [], items: [] };
   return (
-    <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, justCompleted, setStatus, remove,
+    <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, justCompleted, justSaved, setStatus, remove,
       toggleSaved, actionError }}>
       {children}
     </PlanContext>
