@@ -31,6 +31,7 @@ const FAMILIES: JobFamily[] = ["data_analyst", "software_engineer", "ai_engineer
 
 type AnalysisRun = { file: File; events: TimedStepEvent[]; result?: ResumeAnalysis; error?: string };
 type Goal = { family: JobFamily | null; level: ExperienceLevel | null; location: string };
+type Direction = "forward" | "back";
 
 /**
  * Setup: 1 upload a résumé, 2 check what was read, 3 choose a target role. The account (or, for a
@@ -66,6 +67,8 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
   const [saveError, setSaveError] = useState<string>();
   /** addRole: which résumé the new destination uses; null until the student picks. */
   const [resumeChoice, setResumeChoice] = useState<"current" | "new" | null>(null);
+  /** Which way the last move went; unset until the first one, so the opening screen doesn't animate. */
+  const [direction, setDirection] = useState<Direction>();
   /** addRole: the selected destination's résumé, offered for the new one. */
   const [current, setCurrent] = useState<SavedResume>();
   /** addRole: roles already among the destinations, which can't be added again. */
@@ -104,6 +107,15 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
 
   useEffect(() => { window.scrollTo({ top: 0 }); }, [step]);
 
+  const goToStep = (next: 0 | 1 | 2) => {
+    setDirection(next < step ? "back" : "forward");
+    setStep(next);
+  };
+  const chooseResume = (choice: "current" | "new" | null) => {
+    setDirection(choice === null ? "back" : "forward");
+    setResumeChoice(choice);
+  };
+
   const stopRun = () => {
     runController.current?.abort();
     runController.current = null;
@@ -136,7 +148,7 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
         setClassification(result.classification);
         setBasics(prefillBasics(result.classification, account, signup, graduationYears));
         setRun(undefined);
-        setStep(1);
+        goToStep(1);
       }, AUTO_ADVANCE_MS);
     } catch (error) {
       if (controller.signal.aborted) return;
@@ -149,7 +161,7 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
       : !basics.university.trim() ? "Add your school under Basic information."
       : !basics.graduationYear ? "Choose your graduation year under Basic information." : undefined;
     setReviewError(problem);
-    if (!problem) setStep(2);
+    if (!problem) goToStep(2);
   };
 
   const save = async () => {
@@ -214,44 +226,44 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
   };
 
   if (addRole && resumeChoice === null) {
-    return <Frame>
+    return <Frame screen="choice" direction={direction}>
       <h1 className="text-page-title">Add a destination</h1>
       <p className="mt-2 text-base/7 text-muted-foreground">Which résumé should we compare with the new role?</p>
       <div className="mt-8 grid gap-3">
         <ChoiceCard icon={FileText} title="Use my current résumé" detail={current?.original_filename ?? "Loading…"} disabled={!current}
-          onClick={() => setResumeChoice("current")} />
+          onClick={() => chooseResume("current")} />
         <ChoiceCard icon={Upload} title="Upload a new résumé" detail="Used only for the role you choose next"
-          onClick={() => setResumeChoice("new")} />
+          onClick={() => chooseResume("new")} />
       </div>
       <div className="mt-8"><Button type="button" variant="ghost" size="lg" onClick={() => router.push("/destinations")}>Back</Button></div>
     </Frame>;
   }
 
   if (addRole && resumeChoice === "current") {
-    return <Frame wide>
+    return <Frame screen="current-role" direction={direction} wide>
       <RoleStep goal={goal} onChange={setGoal} saving={saving} error={saveError} explored={explored}
         title="Add a destination" description="We’ll compare your current résumé with real job postings for this role. Location is optional."
-        onBack={() => setResumeChoice(null)} onSubmit={() => void save()} />
+        onBack={() => chooseResume(null)} onSubmit={() => void save()} />
     </Frame>;
   }
 
   if (step === 1 && analysis && classification) {
-    return <Frame step={1} wide>
+    return <Frame screen="review" direction={direction} step={1} wide>
       <ResumeReview result={analysis} classification={classification} onChange={setClassification}
         basics={basics} onBasicsChange={setBasics} graduationYears={graduationYears} error={reviewError}
-        onBack={() => setStep(0)} onContinue={continueFromReview} />
+        onBack={() => goToStep(0)} onContinue={continueFromReview} />
     </Frame>;
   }
 
   if (step === 2) {
-    return <Frame step={2} wide>
+    return <Frame screen="role" direction={direction} step={2} wide>
       <RoleStep goal={goal} onChange={setGoal} saving={saving} error={saveError} explored={addRole ? explored : []}
-        onBack={() => setStep(1)} onSubmit={() => void save()} />
+        onBack={() => goToStep(1)} onSubmit={() => void save()} />
     </Frame>;
   }
 
   return (
-    <Frame step={0}>
+    <Frame screen="upload" direction={direction} step={0}>
       <div className="text-center">
         <h1 className="text-page-title">Upload your résumé</h1>
         <p className="mx-auto mt-3 max-w-xl text-lg/8 text-muted-foreground">
@@ -269,7 +281,7 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
         <Dropzone onFile={chooseFile} />
         {fileError && <p role="alert" className="mt-3 text-center text-destructive">{fileError}</p>}
         {file && (
-          <div className="mt-6 flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-4">
+          <div className="entrance-rise mt-6 flex items-center gap-4 rounded-xl border border-border bg-card px-5 py-4 [--enter-ms:200ms]">
             <FileText aria-hidden className="size-5 shrink-0" />
             <div className="min-w-0 flex-1">
               <p className="truncate font-bold">{file.name}</p>
@@ -281,24 +293,29 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
         )}
         {analysis && classification && !file && (
           <p className="mt-6 text-center text-muted-foreground">
-            Or <button type="button" className="font-bold text-foreground underline" onClick={() => setStep(1)}>go back to {analysis.filename}</button>
+            Or <button type="button" className="font-bold text-foreground underline" onClick={() => goToStep(1)}>go back to {analysis.filename}</button>
           </p>
         )}
         <div className="mt-10 grid justify-items-center gap-3">
           <Button size="lg" disabled={!file} onClick={() => file && void startAnalysis(file)}>Continue<ArrowRight data-icon="inline-end" /></Button>
           <p className="text-sm text-muted-foreground">Only you can see your résumé.</p>
-          {addRole && <Button type="button" variant="ghost" onClick={() => { setFile(undefined); setResumeChoice(null); }}>Back</Button>}
+          {addRole && <Button type="button" variant="ghost" onClick={() => { setFile(undefined); chooseResume(null); }}>Back</Button>}
         </div>
       </>}
     </Frame>
   );
 }
 
-function Frame({ step, wide = false, children }: { step?: 0 | 1 | 2; wide?: boolean; children: React.ReactNode }) {
+function Frame({ screen, direction, step, wide = false, children }: {
+  screen: string; direction?: Direction; step?: 0 | 1 | 2; wide?: boolean; children: React.ReactNode;
+}) {
   return (
     <div className={cn("mx-auto w-full px-4 pt-10 pb-20 sm:px-6", wide ? "max-w-232" : "max-w-166")}>
       {step !== undefined && <SetupStepper current={step} className="mb-10" />}
-      {children}
+      {/* Keyed so each screen enters on its own while the stepper stays put. */}
+      <div key={screen} className={direction === "forward" ? "entrance-step" : direction === "back" ? "entrance-step-back" : undefined}>
+        {children}
+      </div>
     </div>
   );
 }
