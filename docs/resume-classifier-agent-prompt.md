@@ -23,8 +23,14 @@ Extract and classify the supplied resume text. This is extraction, not evaluatio
 - This required repetition across records is contextual preservation, not prohibited duplication.
 - Shared context ends at the next professor, advisor, supervisor, mentor, laboratory, organization, peer-level heading, or section heading.
 - Do not carry shared context beyond its explicit group boundary. If the source does not clearly establish that the shared context applies to an entry, do not add it.
+- Set a research entry's `organization` only from an explicitly stated host institution or laboratory for the candidate's research, including a standalone institution/laboratory heading that governs the entry. An institution mentioned only as a professor's, advisor's, supervisor's, or mentor's affiliation does not establish the research entry's organization.
+- If only a mentor's affiliation is stated, return `organization: null` and preserve the complete original mentor/advisor statement in `content`. For example, "Mentored by Prof. X, University Y" alone does not justify `organization: "University Y"`.
 - Before returning JSON, verify that every `research_experience` record created from a shared group contains the applicable shared professor, advisor, supervisor, or mentor information in its own `content` array.
 - Use `research_interests` only for explicitly stated interests. Use `technical_skills` for technical skills and `languages` only for human languages.
+- Return `technical_skills` as a flat string array with one explicitly listed skill, tool, technology, or technical method per item. Split skill lists at commas, semicolons, and vertical bars (`|`); never keep a whole skill list in one item. Remove grouping labels such as "Programming / ML:", "AI / Data Systems:", and "Tools:" rather than returning them as skills.
+- Preserve multiword names and meaningful punctuation within names. Do not mechanically split slashes, hyphens, plus signs, or periods, and do not expand aliases or version shorthand: keep names such as "LoRA/PEFT", "YOLOv8/11", "Qwen2.5/3-VL", and "Linux/Bash" as written.
+- Preserve skill spelling and first-appearance order. Deduplicate repeated skill names case-insensitively. Do not add inferred skills, category labels, or human languages to `technical_skills`.
+- Example: "Programming / ML: Python, Java | PyTorch, Transformers" becomes `"technical_skills": ["Python", "Java", "PyTorch", "Transformers"]`.
 - Put explicit research interests exclusively in `research_interests`, never in `other`.
 - Use `other` only for standalone information that cannot fit any defined category, such as a general summary, profile, or career objective.
 - Do not place section headings, duplicate information, or details belonging to an existing entry in `other`.
@@ -36,7 +42,11 @@ Extract and classify the supplied resume text. This is extraction, not evaluatio
 
 Return month dates as `YYYY-MM`, year-only dates as `YYYY`, and current end dates as `Present`. Split every explicit range into `start_date` and `end_date`; apply a year printed once at the end to both endpoints. Ignore day precision because the product stores month and year only.
 
-For an education entry with one explicit term or completion date instead of a range, use `start_date: null` and preserve the printed value in `end_date`. Otherwise never invent a missing endpoint.
+For an education entry with one explicit term or completion date instead of a range, use `start_date: null` and put the normalized printed date in `end_date`. Otherwise never invent a missing endpoint.
+
+When an education date explicitly includes a qualifier such as "Expected", "Anticipated", or "Estimated", preserve the complete original qualifier-and-date phrase as a separate string in that education entry's `content`, in addition to the normalized date field. Normalize only extraction-related whitespace in this phrase. For example, "Expected Dec 2026" must produce `end_date: "2026-12"` and retain the exact string "Expected Dec 2026" in `content`.
+
+Do not remove this phrase as redundant with `end_date`: it preserves the distinction between a projected completion and a completed credential. Before returning JSON, verify that each explicitly qualified education date is retained exactly once in its associated `content`. Never infer or add an expected/completed status from the date alone when the resume does not state it.
 
 ## Exact Output Contract
 
