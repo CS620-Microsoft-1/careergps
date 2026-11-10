@@ -144,7 +144,7 @@ function Market({ data, report, family }: { data: MarketDemandSnapshot; report: 
           })}
         </ul>
         <p className="mt-5 text-sm text-muted-foreground">Bars show the share of postings that require or prefer each skill.</p>
-        <details className="mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
+        <details className="details-smooth mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
           <summary className="cursor-pointer font-bold text-foreground">About this data</summary>
           <p className="mt-2">{data.source_description}</p>
           {data.coverage_limitations.length > 0 && <ul className="mt-2 list-disc pl-5">{data.coverage_limitations.map((item) => <li key={item}>{item}</li>)}</ul>}
