@@ -30,11 +30,16 @@ class CertificationRecommender:
                  configured: Callable[[], bool] | None = None) -> None:
         self.directory = (directory or BACKEND_ROOT / "local_results" / "certifications").resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
-        self.catalog = catalog or get_catalog()
+        # None: read the current catalog on every call, so database changes show up without a restart.
+        self._catalog = catalog
         self._invoke = invoker or agent.invoke
         self._configured = configured or agent.is_configured
         self._locks: defaultdict[str, Lock] = defaultdict(Lock)
         self._locks_guard = Lock()
+
+    @property
+    def catalog(self) -> dict:
+        return self._catalog if self._catalog is not None else get_catalog()
 
     def _cache_path(self, run_id: str) -> Path:
         if not _RUN_ID.fullmatch(run_id):
@@ -45,22 +50,23 @@ class CertificationRecommender:
         if run.status != "completed" or run.report is None:
             raise ValueError("The skill gap analysis has not completed")
         path = self._cache_path(run.id)
+        catalog = self.catalog
         with self._locks_guard:
             lock = self._locks[run.id]
         # One Agent call per run, even when the page asks twice at once.
         with lock:
             if path.exists():
                 cached = _Stored.model_validate(load(path))
-                if cached.catalog_version == self.catalog["version"]:
+                if cached.catalog_version == catalog["version"]:
                     return cached.public()
-            result = self._generate(run)
+            result = self._generate(run, catalog)
             if result.source == "agent":
                 save_json(path, result.model_dump(mode="json"))
             return result.public()
 
-    def _generate(self, run: SkillGapRun) -> "_Stored":
+    def _generate(self, run: SkillGapRun, catalog: dict) -> "_Stored":
         family = run.job_family
-        certifications = for_family(self.catalog, family)
+        certifications = for_family(catalog, family)
         gaps = top_gaps(run.report)
         picks, source = None, "rules"
         if gaps and certifications and self._configured():
@@ -78,7 +84,7 @@ class CertificationRecommender:
             picks = rank(certifications, family, gaps)
         return _Stored(job_family=family, skill_gap_run_id=run.id, source=source,
                        generated_at=datetime.now(timezone.utc).isoformat(), recommendations=picks,
-                       catalog_version=self.catalog["version"])
+                       catalog_version=catalog["version"])
 
     @staticmethod
     def _checked(output: dict, certifications: list, family: str, gaps: list[dict]) -> list[CertificationRecommendation]:

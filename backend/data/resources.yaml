@@ -4,6 +4,9 @@
 #   role whose catalog contains one of its skills, and "closes" only those skills there.
 # type: student_org | online_course | school_course. Certifications come from data/certifications.json
 #   and projects from data/projects.json (app/services/resources.py).
+# student_org and school_course entries are the seed for the student_orgs and school_courses tables
+#   (python -m scripts.seed_catalog); the app reads them from the database once it is seeded. Editing
+#   them here changes the database only through `seed_catalog --update`.
 # school: only shown to students whose account lists this university.
 # alongside: true for ongoing commitments (clubs, meetups) that run next to the main plan.
 #
