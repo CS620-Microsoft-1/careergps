@@ -86,7 +86,7 @@ export function GapsView() {
           <p className="mt-1 text-sm">We couldn’t read the evidence for these clearly, so they don’t count either way yet.</p>
           <ul className="mt-3 grid gap-3">
             {review.map((skill) => <li key={skill.skill_id}>
-              <details>
+              <details className="details-smooth">
                 <summary className="cursor-pointer font-bold">{skillLabel(skill.skill_id)}</summary>
                 <div className="mt-3 rounded-lg bg-card p-3"><SkillEvidence skill={skill} report={report} /></div>
               </details>
@@ -127,7 +127,8 @@ function GapCard({ gap, rank, report, defaultOpen }: {
       <GapBar skill={gap} className="mt-5" />
       <div className="mt-3"><GapMeta skill={gap} /></div>
 
-      {open ? <div id={panel}>
+      {/* Stays mounted so it can animate; inert keeps it out of tab order and from screen readers while closed. */}
+      <div id={panel} className="collapse-panel" data-open={open} inert={!open}><div>
         <p className="eyebrow mt-6 mb-3">Ways to close it</p>
         {plan.status === "loading" ? <p className="text-muted-foreground">Loading resources…</p>
           : shown.length === 0 ? <p className="text-muted-foreground">No resources for this skill yet.</p>
@@ -145,18 +146,19 @@ function GapCard({ gap, rank, report, defaultOpen }: {
             Browse all {ways.length} resources for this skill<ChevronRight aria-hidden className="size-4" />
           </Link>
         </div>
-        <details className="group mt-4 border-t border-border pt-4">
+        <details className="details-smooth group mt-4 border-t border-border pt-4">
           <summary className="flex cursor-pointer list-none items-center gap-1 text-sm font-bold [&::-webkit-details-marker]:hidden">
             Why this rating<ChevronDown aria-hidden className="size-4 transition-transform group-open:rotate-180" />
           </summary>
           <div className="mt-4"><SkillEvidence skill={gap} report={report} /></div>
         </details>
-      </div> : (
+      </div></div>
+      <div className="collapse-panel" data-open={!open} inert={open}><div>
         <button type="button" aria-expanded={false} aria-controls={panel} onClick={() => setOpen(true)}
           className="mt-4 inline-flex items-center gap-1 text-sm font-bold hover:underline">
           Show {ways.length} ways to close it<ChevronDown aria-hidden className="size-4" />
         </button>
-      )}
+      </div></div>
     </section>
   );
 }
