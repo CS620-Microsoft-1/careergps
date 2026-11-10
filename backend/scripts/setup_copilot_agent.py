@@ -1,7 +1,8 @@
 """Explicitly create or reuse a Copilot version; never run provisioning from a chat request.
 
 Run from backend: python -m scripts.setup_copilot_agent --model YOUR_MODEL_DEPLOYMENT
-Requires your own COPILOT_FOUNDRY_PROJECT_ENDPOINT; never uses another Agent's project.
+Registers only get_skill_gap_analysis in this phase.
+Requires your own ORCHESTRATOR_FOUNDRY_PROJECT_ENDPOINT; never uses another Agent's project.
 """
 import argparse
 
@@ -18,27 +19,27 @@ def main():
     parser.add_argument("--model", required=True, help="Existing Foundry model deployment name")
     args = parser.parse_args()
     settings = CopilotSettings()
-    endpoint = settings.copilot_foundry_project_endpoint
+    endpoint = settings.orchestrator_foundry_project_endpoint
     if not endpoint:
-        parser.error("Set COPILOT_FOUNDRY_PROJECT_ENDPOINT first.")
+        parser.error("Set ORCHESTRATOR_FOUNDRY_PROJECT_ENDPOINT first.")
     definition = agent_definition(args.model)
     with DefaultAzureCredential(process_timeout=10) as credential, AIProjectClient(
         endpoint=endpoint, credential=credential, retry_total=0, connection_timeout=10, read_timeout=30
     ) as project:
         from azure.core.exceptions import ResourceNotFoundError
         try:
-            versions = list(project.agents.list_versions(settings.copilot_foundry_agent_name, limit=100))
+            versions = list(project.agents.list_versions(settings.orchestrator_foundry_agent_name, limit=100))
         except ResourceNotFoundError:
             versions = []
         existing = next((version for version in versions if all(
             version.definition.as_dict().get(key) == value for key, value in definition.items())), None)
         version = existing or project.agents.create_version(
-            agent_name=settings.copilot_foundry_agent_name,
+            agent_name=settings.orchestrator_foundry_agent_name,
             definition=PromptAgentDefinition(definition),
-            description="CareerGPS Copilot with read-only fictional skill-gap and learning tools.",
+            description="CareerGPS Copilot with one read-only fictional skill-gap query tool.",
         )
-        print(f"COPILOT_FOUNDRY_AGENT_NAME={version.name}")
-        print(f"COPILOT_FOUNDRY_AGENT_VERSION={version.version}")
+        print(f"ORCHESTRATOR_FOUNDRY_AGENT_NAME={version.name}")
+        print(f"ORCHESTRATOR_FOUNDRY_AGENT_VERSION={version.version}")
 
 
 if __name__ == "__main__":

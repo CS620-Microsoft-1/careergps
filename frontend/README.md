@@ -168,7 +168,9 @@ without a conversation list or a new-chat action.
 The default responder calls the authenticated backend **Foundry orchestrator with mock tools**.
 It uses a fictional SWE profile (SQL, deployment and testing), never reads the actual résumé
 or report, and never starts analysis or saves a plan. Ask “Why is SQL a gap?”, then
-“Which project should I build first?”; sample evidence can be expanded under replies.
+“What evidence is missing for that?”; sample evidence can be expanded under replies.
+Foundry mode currently enables only the skill-gap query. Learning/project requests report
+that recommendations are not enabled yet; the explicit offline demo still has scripted suggestions.
 The backend must be configured with your own Foundry project and a pinned Copilot Agent
 version; see [backend setup](../backend/README.md#copilot-orchestrator-with-mock-tools).
 

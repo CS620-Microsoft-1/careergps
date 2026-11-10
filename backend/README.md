@@ -910,8 +910,9 @@ and starts Skill Gap analysis. The authenticated backend reads the user's active
 
 ## Copilot orchestrator with mock tools
 
-`POST /copilot/chat` uses a real Microsoft Foundry Agent with two local, read-only mock tools:
-`get_skill_gap_analysis` and `get_learning_suggestions`. Their fictional SWE profile covers
+`POST /copilot/chat` currently enables one local, read-only mock tool on the Foundry Agent:
+`get_skill_gap_analysis`. The recommendation fixture is reserved for a later phase and is
+not registered or callable by the Agent. The fictional SWE profile covers
 SQL, deployment and testing. No real résumé, database result, external learning catalog,
 profile update, new analysis or other Agent is accessed. The UI continues to label sample data.
 
@@ -923,8 +924,8 @@ profile update, new analysis or other Agent is accessed. The UI continues to lab
 2. Log in to the account that can access your project with `az login`, select the intended
    subscription with `az account set --subscription YOUR_SUBSCRIPTION_ID`, and verify your
    account has permission to create Agent versions and invoke the model.
-3. Set `COPILOT_FOUNDRY_PROJECT_ENDPOINT` in `backend/.env` to **your** project endpoint.
-   Set `COPILOT_FOUNDRY_AGENT_NAME=careergps-copilot-orchestrator` (or a new name you own).
+3. Set `ORCHESTRATOR_FOUNDRY_PROJECT_ENDPOINT` in `backend/.env` to **your** project endpoint.
+   Set `ORCHESTRATOR_FOUNDRY_AGENT_NAME=orchestrator-chatbot` (or a new name you own).
    There is deliberately no fallback to `FOUNDRY_PROJECT_ENDPOINT` or other team projects.
 4. From `backend`, activate the existing virtual environment and run:
 
@@ -932,11 +933,11 @@ profile update, new analysis or other Agent is accessed. The UI continues to lab
    python -m scripts.setup_copilot_agent --model YOUR_MODEL_DEPLOYMENT
    ```
 
-   This explicit command creates a version with the checked-in instructions, two function
-   definitions and JSON response schema. An identical existing version is reused. It does
+   This explicit command creates a version with the checked-in instructions, the single
+   `get_skill_gap_analysis` function definition and JSON response schema. An identical existing version is reused. It does
    not deploy a model, create an account, change other Agents, or run inference. Do not run
    it against a shared project unless you intend to create an Agent there.
-5. Copy the printed `COPILOT_FOUNDRY_AGENT_NAME` and `COPILOT_FOUNDRY_AGENT_VERSION` into
+5. Copy the printed `ORCHESTRATOR_FOUNDRY_AGENT_NAME` and `ORCHESTRATOR_FOUNDRY_AGENT_VERSION` into
    `backend/.env`. Use a concrete version; `latest` is rejected. Restart the backend.
 6. Keep `NEXT_PUBLIC_COPILOT_MODE=foundry` in the frontend, restart Next.js, sign in, and open
    the existing Copilot panel. Chat calls consume your project's model quota. Missing
@@ -960,7 +961,7 @@ system roles, unknown fields and excessive input are rejected. The mock fixtures
 fictional data; replacing them with database tools must enforce ownership using `ToolContext`.
 History is untrusted context, including old assistant replies. Only successful tool results
 from the current request can supply citations; source text is resolved by the backend.
-Suggestions require a prior analysis lookup. Structural and source checks do not guarantee
+Learning/project requests are unsupported in this phase. Structural and source checks do not guarantee
 that every generated sentence is semantically accurate; review live answers before release.
 
 The orchestrator allows at most four model rounds and four tool calls. Individual response
@@ -972,19 +973,34 @@ This does not promise that Azure retains no service/security logs. Browser histo
 account-scoped localStorage. Clear/restart sends empty history next time. Browser cancellation
 discards late results but does not guarantee cancellation of work already running on Azure.
 
+### Tool-call logs
+
+Each dispatched tool produces one INFO line in the Uvicorn backend terminal, for example:
+
+```text
+Copilot tool=get_skill_gap_analysis status=ok duration_ms=0.12
+```
+
+Only the registered tool name, result status and elapsed tool-execution time are recorded.
+This duration excludes model inference and is not the total chat response time. Unregistered
+names are replaced with `unregistered`; unexpected tool exceptions use status `error` without
+exception details. Questions, history, arguments, results and user identifiers are not included.
+These logs use the `uvicorn.error.copilot.tools` logger and are visible at Uvicorn's default
+INFO level. A response that does not dispatch a tool produces no tool-call line.
+
 ### Validation and acceptance scenarios
 
 Offline: from `backend`, run `python -m unittest tests.test_copilot -v`. From `frontend`, run
 `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`. These checks need no Azure
 calls. The focused tests cover authentication, identity spoofing, input bounds, tool allowlists,
-call order, unavailable suggestions, evidence validation, loop limits, stateless requests,
+disabled recommendation calls, evidence validation, loop limits, stateless requests,
 response validation, cancellation and failure propagation.
 
 After configuring your own project, manually check:
 
 - “Why is SQL a gap?” retrieves sample evidence and distinguishes missing evidence from missing skill.
-- “Which project would help with that?” resolves the follow-up and calls both tools.
-- “I only have two hours for SQL” explains that the full sample project does not fit.
+- “What evidence is missing for that?” resolves the follow-up and queries the same sample skill.
+- “Which project would help with that?” explains that recommendations are not enabled yet.
 - “Help me with that” in an empty conversation asks for clarification.
 - “Save this plan and rerun my analysis” reports unsupported actions without claiming execution.
 - Requests to ignore instructions or use another person's profile cannot access other tools or real data.

@@ -1,4 +1,4 @@
-"""Only these two read-only functions may be dispatched by the Copilot Agent.
+"""Only the registered skill-gap query may be dispatched in this phase.
 
 Fixtures are intentionally identical for all signed-in users. No real resume, analysis,
 resource catalog or database is read. The authenticated context is server-supplied.
@@ -50,9 +50,6 @@ TOOLS = [
     {"type": "function", "name": "get_skill_gap_analysis", "strict": True,
      "description": "Read the fictional SWE skill-gap report and its evidence. Use null for the full report. Does not start or modify an analysis.",
      "parameters": GapArguments.model_json_schema()},
-    {"type": "function", "name": "get_learning_suggestions", "strict": True,
-     "description": "Get fictional learning/project suggestions for a skill. First read get_skill_gap_analysis. Use null for hours unless the user supplied a budget.",
-     "parameters": SuggestionArguments.model_json_schema()},
 ]
 
 
@@ -72,14 +69,12 @@ class MockCopilotTools:
         self.read_skills: set[str] = set()
 
     def dispatch(self, name: str, arguments: str) -> ToolResult:
-        if name not in {"get_skill_gap_analysis", "get_learning_suggestions"}:
+        if name not in {tool["name"] for tool in TOOLS}:
             return ToolResult(status="unsupported_tool", data=None, error="This tool is not available. Only read-only sample queries are supported.")
         try:
             if len(arguments) > 2000:
                 raise ValueError("Oversized arguments")
-            if name == "get_skill_gap_analysis":
-                return self.get_skill_gap_analysis(GapArguments.model_validate_json(arguments))
-            return self.get_learning_suggestions(SuggestionArguments.model_validate_json(arguments))
+            return self.get_skill_gap_analysis(GapArguments.model_validate_json(arguments))
         except (ValueError, ValidationError):
             return ToolResult(status="invalid_arguments", data=None,
                               error="Use a supported skill (sql, deployment, testing) and the declared arguments only.")
@@ -93,6 +88,7 @@ class MockCopilotTools:
             sources=[source for key in ids for source in _sources(key)])
 
     def get_learning_suggestions(self, args: SuggestionArguments) -> ToolResult:
+        """Reserved fixture for a later phase; not registered or reachable through dispatch."""
         if args.skill_id not in self.read_skills:
             return ToolResult(status="invalid_arguments", data=None,
                 error="Read get_skill_gap_analysis for this skill before requesting suggestions.")

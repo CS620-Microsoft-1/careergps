@@ -4,7 +4,7 @@ import os
 import unittest
 from time import monotonic
 from types import SimpleNamespace
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from uuid import UUID
 
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://tester:fake@localhost:5432/test")
@@ -17,7 +17,7 @@ from app.api.deps import get_token_verifier
 from app.api.routes.copilot import get_copilot_service, router
 from app.core.config import CopilotSettings
 from app.core.security import AuthenticatedUser, AuthError
-from app.schemas.copilot import CopilotReply, CopilotRequest
+from app.schemas.copilot import CopilotReply, CopilotRequest, SuggestionArguments
 from app.services.copilot.agent import (
     CopilotError, FoundryCopilotService, agent_definition, matches_contract, run_orchestrator,
 )
@@ -58,11 +58,57 @@ class CopilotTests(unittest.TestCase):
             self.assertNotIn("conversation", invocation.kwargs)
             self.assertNotIn("previous_response_id", invocation.kwargs)
 
-    def test_learning_requires_analysis_then_suggestions(self):
-        reply = self.run_chat(response(call()), response(call("get_learning_suggestions",
-            {"skill_id": "sql", "available_hours": 8}, "call-2")),
-            response(intent="learning_advice", sources=["sample-report-sql", "sample-suggestion-sql"]))
-        self.assertEqual(len(reply.sources), 2)
+    def test_tool_log_contains_only_name_status_and_elapsed_time(self):
+        request = CopilotRequest(question="private-question-marker",
+            history=[{"role": "user", "text": "private-history-marker"}])
+        with self.assertLogs("uvicorn.error.copilot.tools", level="INFO") as captured:
+            reply = self.run_chat(response(call()), response(), request=request)
+        self.assertEqual(len(captured.records), 1)
+        record = captured.records[0]
+        self.assertRegex(record.getMessage(),
+            r"^Copilot tool=get_skill_gap_analysis status=ok duration_ms=\d+\.\d{2}$")
+        self.assertIsNone(record.exc_info)
+        logged = repr(record.__dict__)
+        for private in [request.question, request.history[0].text, str(USER_ID),
+                        reply.text, reply.sources[0].excerpt, '"skill_id"']:
+            self.assertNotIn(private, logged)
+
+    def test_invalid_tool_arguments_and_unknown_names_are_not_logged(self):
+        for tool_call, expected in [
+            (call(args={"skill_id": "private-argument-marker"}), "get_skill_gap_analysis status=invalid_arguments"),
+            (call(name="private-name-marker\nforged-log"), "unregistered status=unsupported_tool"),
+        ]:
+            with self.subTest(expected=expected), self.assertLogs("uvicorn.error.copilot.tools", level="INFO") as captured:
+                self.run_chat(response(tool_call), response(intent="tool_error", sources=[], text="Unavailable"))
+            self.assertEqual(len(captured.records), 1)
+            self.assertIn(expected, captured.records[0].getMessage())
+            self.assertNotIn("private-", repr(captured.records[0].__dict__))
+            self.assertNotIn("forged-log", repr(captured.records[0].__dict__))
+
+    def test_tool_exception_logs_status_without_exception_details(self):
+        with patch.object(self.tools, "dispatch", side_effect=RuntimeError("private-exception-marker")):
+            with self.assertLogs("uvicorn.error.copilot.tools", level="INFO") as captured:
+                with self.assertRaises(RuntimeError):
+                    self.run_chat(response(call()))
+        self.assertEqual(len(captured.records), 1)
+        self.assertRegex(captured.records[0].getMessage(),
+            r"^Copilot tool=get_skill_gap_analysis status=error duration_ms=\d+\.\d{2}$")
+        self.assertNotIn("private-exception-marker", repr(captured.records[0].__dict__))
+        self.assertIsNone(captured.records[0].exc_info)
+
+    def test_only_skill_gap_tool_is_registered_and_dispatchable(self):
+        definition = agent_definition("test-model")
+        self.assertEqual([tool["name"] for tool in definition["tools"]], ["get_skill_gap_analysis"])
+        self.tools.dispatch("get_skill_gap_analysis", '{"skill_id":"sql"}')
+        result = self.tools.dispatch("get_learning_suggestions", '{"skill_id":"sql","available_hours":8}')
+        self.assertEqual(result.status, "unsupported_tool")
+        self.assertEqual(result.sources, [])
+
+    def test_unregistered_learning_call_cannot_supply_evidence(self):
+        with self.assertRaises(CopilotError):
+            self.run_chat(response(call()), response(call("get_learning_suggestions",
+                {"skill_id": "sql", "available_hours": 8}, "call-2")),
+                response(intent="learning_advice", sources=["sample-report-sql", "sample-suggestion-sql"]))
 
     def test_follow_up_history_is_untrusted_input_and_not_identity(self):
         request = CopilotRequest(question="What next?", history=[{"role": "assistant", "text": "Old sample answer"}])
@@ -93,11 +139,11 @@ class CopilotTests(unittest.TestCase):
             with self.subTest(name=name, args=args):
                 self.assertNotEqual(self.tools.dispatch(name, args).status, "ok")
 
-    def test_suggestions_require_prior_analysis_and_respect_time_budget(self):
-        args = '{"skill_id":"sql","available_hours":2}'
-        self.assertEqual(self.tools.dispatch("get_learning_suggestions", args).status, "invalid_arguments")
+    def test_reserved_suggestion_fixture_requires_analysis_and_respects_budget(self):
+        args = SuggestionArguments(skill_id="sql", available_hours=2)
+        self.assertEqual(self.tools.get_learning_suggestions(args).status, "invalid_arguments")
         self.tools.dispatch("get_skill_gap_analysis", '{"skill_id":"sql"}')
-        result = self.tools.dispatch("get_learning_suggestions", args)
+        result = self.tools.get_learning_suggestions(args)
         self.assertEqual(result.status, "not_found")
         self.assertEqual(result.sources, [])
 

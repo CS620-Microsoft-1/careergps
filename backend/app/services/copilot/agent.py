@@ -1,4 +1,5 @@
 """Stateless Foundry orchestration with bounded, server-dispatched mock tools."""
+import logging
 from contextlib import ExitStack
 from time import monotonic
 
@@ -9,6 +10,8 @@ from app.services.copilot.tools import TOOLS, MockCopilotTools, ToolContext
 INSTRUCTIONS = BACKEND_ROOT / "app/prompts/copilot/Instructions.md"
 MAX_ROUNDS = 4
 MAX_TOOL_CALLS = 4
+# Reuse Uvicorn's console handler and level without enabling verbose SDK logging.
+tool_logger = logging.getLogger("uvicorn.error.copilot.tools")
 
 
 def agent_definition(model: str) -> dict:
@@ -59,7 +62,17 @@ def run_orchestrator(client, reference: dict, request: CopilotRequest, tools: Mo
                 if call_id in call_ids or len(call_ids) >= MAX_TOOL_CALLS:
                     raise CopilotError("Copilot reached its tool limit. Try a more specific question.")
                 call_ids.add(call_id)
-                result = tools.dispatch(call["name"], call["arguments"])
+                # Model-supplied names can contain arbitrary text; log only registered names.
+                tool_name = call["name"] if call["name"] in {tool["name"] for tool in TOOLS} else "unregistered"
+                started = monotonic()
+                tool_status = "error"
+                try:
+                    result = tools.dispatch(call["name"], call["arguments"])
+                    tool_status = result.status
+                finally:
+                    # Never log arguments, results, messages, identity or exception text.
+                    tool_logger.info("Copilot tool=%s status=%s duration_ms=%.2f",
+                                     tool_name, tool_status, (monotonic() - started) * 1000)
                 if result.status == "ok":
                     evidence.update({source.id: source for source in result.sources})
                     evidence_by_tool.setdefault(call["name"], set()).update(source.id for source in result.sources)
@@ -78,8 +91,9 @@ def run_orchestrator(client, reference: dict, request: CopilotRequest, tools: Mo
         if any(not set(ids).intersection(evidence_by_tool.get(name, set())) for name in required):
             raise CopilotError("Copilot did not retrieve the evidence needed for this answer.")
         if answer.intent == "unsupported_action":
-            answer.text = ("This version can explain sample skill gaps and suggest learning or projects. "
-                           "It cannot modify your profile, save settings or plans, or start an analysis. No changes were made.")
+            answer.text = ("This version can explain sample skill gaps and their evidence. "
+                           "Learning and project recommendations are not enabled yet. It cannot modify your profile, "
+                           "save settings or plans, or start an analysis. No changes were made.")
             ids = []
         return CopilotReply(text=answer.text, sources=[evidence[source_id] for source_id in ids], intent=answer.intent)
     raise CopilotError("Copilot reached its response limit. Try a more specific question.")
@@ -91,7 +105,7 @@ class FoundryCopilotService:
 
     def chat(self, request: CopilotRequest, context: ToolContext) -> CopilotReply:
         settings = self.settings
-        if not settings.copilot_foundry_project_endpoint or not settings.copilot_foundry_agent_version or settings.copilot_foundry_agent_version == "latest":
+        if not settings.orchestrator_foundry_project_endpoint or not settings.orchestrator_foundry_agent_version or settings.orchestrator_foundry_agent_version == "latest":
             raise CopilotError("Copilot is not configured. Set its project endpoint and a concrete Agent version.", 503)
         try:
             from azure.ai.projects import AIProjectClient
@@ -99,14 +113,14 @@ class FoundryCopilotService:
             deadline = monotonic() + settings.copilot_timeout_seconds
             with ExitStack() as stack:
                 credential = stack.enter_context(DefaultAzureCredential(process_timeout=10))
-                project = stack.enter_context(AIProjectClient(endpoint=settings.copilot_foundry_project_endpoint,
+                project = stack.enter_context(AIProjectClient(endpoint=settings.orchestrator_foundry_project_endpoint,
                     credential=credential, retry_total=0, connection_timeout=10, read_timeout=15))
-                version = project.agents.get_version(settings.copilot_foundry_agent_name, settings.copilot_foundry_agent_version)
+                version = project.agents.get_version(settings.orchestrator_foundry_agent_name, settings.orchestrator_foundry_agent_version)
                 if not matches_contract(version.definition.as_dict()):
                     raise CopilotError("Copilot Agent does not match the local tool and response contracts. Run the setup script.", 503)
                 client = stack.enter_context(project.get_openai_client(timeout=30, max_retries=0))
-                return run_orchestrator(client, {"type": "agent_reference", "name": settings.copilot_foundry_agent_name,
-                    "version": settings.copilot_foundry_agent_version}, request, MockCopilotTools(context), deadline=deadline)
+                return run_orchestrator(client, {"type": "agent_reference", "name": settings.orchestrator_foundry_agent_name,
+                    "version": settings.orchestrator_foundry_agent_version}, request, MockCopilotTools(context), deadline=deadline)
         except CopilotError:
             raise
         except Exception as error:
