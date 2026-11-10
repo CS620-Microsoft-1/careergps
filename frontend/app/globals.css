@@ -9,6 +9,11 @@
  */
 @custom-variant dark (&:is(.dark *));
 
+/* Stronger than Tailwind's default ease-out, which is too weak to read as motion in UI. */
+@theme {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
 @theme inline {
   --font-sans: var(--font-nunito), ui-rounded, "SF Pro Rounded", system-ui, sans-serif;
   --font-heading: var(--font-sans);
@@ -143,9 +148,110 @@
   background-image: repeating-linear-gradient(-45deg, var(--danger) 0 2px, var(--danger-soft) 2px 6px);
 }
 
+/* Hover colors plus the press scale. Pair with active:scale-[…]; Tailwind v4 writes the scale property. */
+@utility pressable {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    scale 160ms var(--ease-out);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+@keyframes settle-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--step-from));
+  }
+}
+@keyframes ring-draw {
+  from {
+    stroke-dasharray: 0 var(--ring-length);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+  /* Fill mode is backwards only, so no transform (or stacking context) outlives the entrance. */
+  .entrance-rise {
+    animation: rise-in var(--enter-ms, 300ms) var(--ease-out) backwards;
+  }
+  .entrance-settle {
+    animation: settle-in 500ms var(--ease-out) backwards;
+  }
+  .entrance-pop {
+    animation: pop-in 200ms var(--ease-out) backwards;
+  }
+  .entrance-step {
+    --step-from: 12px;
+    animation: step-in 220ms var(--ease-out) backwards;
+  }
+  .entrance-step-back {
+    --step-from: -12px;
+    animation: step-in 220ms var(--ease-out) backwards;
+  }
+  .ring-reveal {
+    animation: ring-draw 600ms var(--ease-out) backwards;
+  }
+  /* A panel that keeps its contents mounted. The clip margin leaves room for focus rings. */
+  .collapse-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition:
+      grid-template-rows 240ms var(--ease-out),
+      opacity 160ms var(--ease-out);
+  }
+  .collapse-panel[data-open="true"] {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+  .collapse-panel > * {
+    min-height: 0;
+    overflow: clip;
+    overflow-clip-margin: 4px;
+  }
+  /* Browsers without ::details-content or interpolate-size open these instantly. */
+  .details-smooth {
+    interpolate-size: allow-keywords;
+  }
+  .details-smooth::details-content {
+    block-size: 0;
+    opacity: 0;
+    overflow: clip;
+    overflow-clip-margin: 4px;
+    transition:
+      block-size 240ms var(--ease-out),
+      opacity 160ms var(--ease-out),
+      content-visibility 240ms allow-discrete;
+  }
+  .details-smooth[open]::details-content {
+    block-size: auto;
+    opacity: 1;
   }
   html {
     @apply font-sans;
@@ -185,6 +291,24 @@
     *::after {
       animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
+    }
+    /* Keep the fades that explain a change; drop the movement. In this layer so these can beat the rule above. */
+    .entrance-rise,
+    .entrance-settle,
+    .entrance-pop,
+    .entrance-step,
+    .entrance-step-back {
+      animation-name: fade-in !important;
+      animation-duration: 200ms !important;
+    }
+    .collapse-panel {
+      transition-property: opacity !important;
+      transition-duration: 160ms !important;
+    }
+    .details-smooth::details-content {
+      transition:
+        opacity 160ms var(--ease-out),
+        content-visibility 160ms allow-discrete;
     }
   }
 }
