@@ -51,8 +51,8 @@ function ReadyRoute({ role }: { role: string }) {
 
   return <>
     <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:gap-8 sm:text-left">
-      <MatchRing value={match} size={120} stroke={12} />
-      <div className="grid gap-2">
+      <MatchRing value={match} size={120} stroke={12} reveal className="entrance-settle" />
+      <div className="entrance-rise grid gap-2 [animation-delay:150ms]">
         <h1 className="max-w-3xl text-page-title">
           {match === null ? `Your route to ${role}` : `You’re ${percent(match)} of the way to ${role}`}
         </h1>
@@ -62,7 +62,7 @@ function ReadyRoute({ role }: { role: string }) {
     </div>
 
     <div className="mt-8 grid items-start gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
-      <section aria-labelledby="gaps" className="rounded-2xl border border-border bg-card p-6 shadow-card">
+      <section aria-labelledby="gaps" className="entrance-rise rounded-2xl border border-border bg-card p-6 shadow-card [animation-delay:230ms]">
         <div className="flex items-baseline justify-between gap-3">
           <h2 id="gaps" className="text-section">Biggest gaps</h2>
           <span className="eyebrow">By demand</span>
@@ -75,7 +75,7 @@ function ReadyRoute({ role }: { role: string }) {
         <div className="mt-4"><GapLegend /></div>
       </section>
 
-      <section aria-labelledby="nextup">
+      <section aria-labelledby="nextup" className="entrance-rise [animation-delay:310ms]">
         <h2 id="nextup" className="text-section">What happens next</h2>
         <p className="mt-1 text-muted-foreground">Three steps from here to a plan you can follow.</p>
         <ol className="mt-4 grid gap-3">

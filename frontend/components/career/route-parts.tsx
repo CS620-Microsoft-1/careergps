@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import NumberFlow from "@number-flow/react";
 import {
   Award,
   Bookmark,
@@ -51,9 +53,29 @@ export function ResourceIcon({ type, className }: { type: ResourceType; classNam
   );
 }
 
-/** Progress ring with the match percent in the middle. value is 0–1, or null while unknown. */
-export function MatchRing({ value, size = 160, stroke = 14, label = "match", className }: {
-  value: number | null; size?: number; stroke?: number; label?: string | null; className?: string;
+/** NumberFlow timings. Its defaults run past the 300ms budget for UI. */
+export const numberTiming = (duration: number) => {
+  const timing = { duration, easing: "cubic-bezier(0.23, 1, 0.32, 1)" };
+  return { transformTiming: timing, spinTiming: timing, opacityTiming: timing };
+};
+
+/** Counts up from 0 once it has mounted, in step with a ring's arc or a bar's fill. */
+export function RevealPercent({ value }: { value: number }) {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setShown(value));
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
+  return <NumberFlow value={Math.round(shown * 100)} suffix="%" {...numberTiming(600)} />;
+}
+
+/**
+ * Progress ring with the match percent in the middle. value is 0–1, or null while unknown.
+ * reveal draws the arc and counts up on mount: only for the first result, as the ring is on pages
+ * students revisit.
+ */
+export function MatchRing({ value, size = 160, stroke = 14, label = "match", reveal = false, className }: {
+  value: number | null; size?: number; stroke?: number; label?: string | null; reveal?: boolean; className?: string;
 }) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -64,12 +86,14 @@ export function MatchRing({ value, size = 160, stroke = 14, label = "match", cla
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--sunken)" strokeWidth={stroke} />
         {value !== null && (
           <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--foreground)" strokeWidth={stroke}
-            strokeLinecap="round" strokeDasharray={`${shown * circumference} ${circumference}`} />
+            strokeLinecap="round" strokeDasharray={`${shown * circumference} ${circumference}`}
+            className={cn("transition-[stroke-dasharray] duration-[280ms] ease-out", reveal && "ring-reveal")}
+            style={{ "--ring-length": circumference } as React.CSSProperties} />
         )}
       </svg>
       <div className="absolute text-center">
         <p className="font-extrabold tracking-[-0.02em]" style={{ fontSize: Math.max(14, size * 0.22), lineHeight: 1.1 }}>
-          {value === null ? "—" : percent(value)}
+          {value === null ? "—" : reveal ? <RevealPercent value={value} /> : percent(value)}
         </p>
         {label && size >= 96 && <p className="text-sm text-muted-foreground">{label}</p>}
       </div>
