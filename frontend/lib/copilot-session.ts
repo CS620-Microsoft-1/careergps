@@ -1,5 +1,7 @@
 import { z } from "zod";
-import { respondToMockCopilot, type CopilotResponder, type CopilotSource } from "./copilot-mock.ts";
+import { respondToMockCopilot } from "./copilot-mock.ts";
+import type { CopilotResponder, CopilotSource } from "./copilot-types.ts";
+import { errorMessage } from "./api/client.ts";
 
 export const MAX_COPILOT_INPUT = 2000;
 export const SAMPLE_ANALYSIS_ID = "sample-swe-v1";
@@ -60,7 +62,7 @@ const storedSchema = z.object({
 });
 const replySchema = z.object({ text: z.string().min(1).max(8000), sources: z.array(sourceSchema).max(10) });
 
-/** One continuous conversation. Storage and responder are injectable for the future backend. */
+/** One continuous conversation. Storage and responder are injectable for the backend and offline tests. */
 export class CopilotSession {
   private state: CopilotState = INITIAL;
   private listeners = new Set<() => void>();
@@ -156,10 +158,11 @@ export class CopilotSession {
       this.controller = null;
       this.update({ messages: [...this.state.messages.map(m => m.id === messageId ? { ...m, replyState: "completed" as const } : m),
         { id: this.id(), role: "assistant", createdAt: this.now(), analysisId: SAMPLE_ANALYSIS_ID, ...reply }], pendingId: null });
-    } catch {
+    } catch (error) {
       if (controller.signal.aborted || this.controller !== controller) return;
       this.controller = null;
-      this.update({ messages: this.state.messages.map(m => m.id === messageId ? { ...m, replyState: "failed" } : m), pendingId: null });
+      this.update({ messages: this.state.messages.map(m => m.id === messageId ? { ...m, replyState: "failed" } : m), pendingId: null,
+        error: errorMessage(error, "Copilot could not reply. Please try again.") });
     }
   }
   cancel = () => {

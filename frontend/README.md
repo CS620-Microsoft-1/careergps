@@ -61,7 +61,7 @@ app/                 routes, layouts, global styles
 components/ui/       shadcn/ui primitives (owned source, restyle freely)
 components/layout/   app shell: sidebar, topbar, mobile nav, user menu, page header, backend status
 components/auth/     login, signup, onboarding pieces
-components/copilot/ Non-modal Copilot dock and continuous mock conversation
+components/copilot/ Non-modal Copilot dock and continuous conversation
 components/common/   shared building blocks (logo, form fields, empty states)
 lib/                 nav items, form options, validation schemas, utilities
 lib/api/             every call to the backend API (see "Connect to the backend")
@@ -165,10 +165,17 @@ Below 1024px it appears after the report, with a **Back to report**
 link. Closing the panel restores the report width. There is one continuous conversation,
 without a conversation list or a new-chat action.
 
-This is a **scripted mock**, not an Agent. It uses a fictional SWE profile (SQL, deployment,
-and testing), never reads the actual résumé or report, and never starts analysis or saves a
-plan. Ask “Why is SQL a gap?”, then “Which project should I build first?”; sample evidence
-can be expanded under replies. Subsequent topic-specific questions update the mock topic.
+The default responder calls the authenticated backend **Foundry orchestrator with mock tools**.
+It uses a fictional SWE profile (SQL, deployment and testing), never reads the actual résumé
+or report, and never starts analysis or saves a plan. Ask “Why is SQL a gap?”, then
+“Which project should I build first?”; sample evidence can be expanded under replies.
+The backend must be configured with your own Foundry project and a pinned Copilot Agent
+version; see [backend setup](../backend/README.md#copilot-orchestrator-with-mock-tools).
+
+Set `NEXT_PUBLIC_COPILOT_MODE=local` and restart Next.js for the offline scripted demo.
+The default is `foundry`; API failures never silently fall back to scripted replies.
+Foundry mode requires Supabase login and the backend. Existing stored sample replies remain
+visible; **Clear and restart** removes them if you want a fresh conversation.
 
 Messages, source excerpts, a sample analysis version, the draft, and panel visibility are
 saved to browser localStorage under the Supabase user ID. They survive closing, app
@@ -184,13 +191,16 @@ stop a pending reply, retry a failed/interrupted reply, and write a draft while 
 Refreshing during a reply preserves the question and offers retry, rather than auto-running it.
 
 The panel's **Clear and restart** button asks for confirmation before removing this account's
-browser history and draft. Confirmation stops a pending reply and starts with empty context;
+browser history and draft. Confirmation stops waiting for a pending reply and starts with empty context;
 Cancel leaves everything intact. Other accounts and site storage are untouched. If browser
 storage cannot be cleared, an error is shown and the current conversation is retained.
 
-`lib/copilot-session.ts` owns persistence and request lifecycle; `lib/copilot-mock.ts` is the
-injected async responder. Only the last 20 messages go to that mock; full history stays saved.
-A future backend should replace browser persistence with authenticated conversation/message
-storage and supply real, authorized analysis context. This change adds no API or database schema.
+`lib/copilot-session.ts` owns persistence and request lifecycle. The provider injects either
+`lib/api/copilot.ts` (Foundry) or `lib/copilot-mock.ts` (explicit local mode). The backend gets
+at most 20 recent messages within a 24,000-character request budget; full history stays saved
+in the browser. No server conversation ID or previous response ID carries hidden context
+between requests. Stopping or clearing discards late replies; an already-running backend
+request may still finish and consume model tokens. The backend has bounded tool rounds and
+timeouts. This phase adds no database schema or cross-device history storage.
 
 Validation: `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`.

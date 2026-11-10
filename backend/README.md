@@ -906,3 +906,91 @@ and starts Skill Gap analysis. The authenticated backend reads the user's active
 | Azure authentication failed                          | Run `az login`, select the correct account and restart the backend       |
 | Foundry request returns 403                          | Ask an administrator to assign Foundry Agent Consumer or Foundry User   |
 | Foundry Agent returned an invalid result             | Synchronize the checked-in Agent prompt and retry with the same résumé   |
+
+
+## Copilot orchestrator with mock tools
+
+`POST /copilot/chat` uses a real Microsoft Foundry Agent with two local, read-only mock tools:
+`get_skill_gap_analysis` and `get_learning_suggestions`. Their fictional SWE profile covers
+SQL, deployment and testing. No real résumé, database result, external learning catalog,
+profile update, new analysis or other Agent is accessed. The UI continues to label sample data.
+
+### Configure your own Foundry project
+
+1. In your Azure subscription, create or select your own Foundry resource/project and deploy
+   a model that supports function calling and structured JSON output. Record the **deployment
+   name**, not just the model family. Copy the project endpoint from the project overview.
+2. Log in to the account that can access your project with `az login`, select the intended
+   subscription with `az account set --subscription YOUR_SUBSCRIPTION_ID`, and verify your
+   account has permission to create Agent versions and invoke the model.
+3. Set `COPILOT_FOUNDRY_PROJECT_ENDPOINT` in `backend/.env` to **your** project endpoint.
+   Set `COPILOT_FOUNDRY_AGENT_NAME=careergps-copilot-orchestrator` (or a new name you own).
+   There is deliberately no fallback to `FOUNDRY_PROJECT_ENDPOINT` or other team projects.
+4. From `backend`, activate the existing virtual environment and run:
+
+   ```sh
+   python -m scripts.setup_copilot_agent --model YOUR_MODEL_DEPLOYMENT
+   ```
+
+   This explicit command creates a version with the checked-in instructions, two function
+   definitions and JSON response schema. An identical existing version is reused. It does
+   not deploy a model, create an account, change other Agents, or run inference. Do not run
+   it against a shared project unless you intend to create an Agent there.
+5. Copy the printed `COPILOT_FOUNDRY_AGENT_NAME` and `COPILOT_FOUNDRY_AGENT_VERSION` into
+   `backend/.env`. Use a concrete version; `latest` is rejected. Restart the backend.
+6. Keep `NEXT_PUBLIC_COPILOT_MODE=foundry` in the frontend, restart Next.js, sign in, and open
+   the existing Copilot panel. Chat calls consume your project's model quota. Missing
+   configuration returns HTTP 503 without attempting another project's Agent.
+
+Changing instructions, tools or the response schema requires rerunning setup and pinning
+its resulting version. Runtime preflight rejects a version whose contract differs from the
+local code. Azure credentials and project settings stay on the backend.
+
+Microsoft references: [function calling](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/function-calling)
+and [runtime components](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/runtime-components).
+
+### Request and execution contract
+
+Request: `{ "question": "Why is SQL a gap?", "history": [{ "role": "user", "text": "..." }] }`.
+Response: `{ "text": "...", "sources": [{ "id": "...", "label": "...", "excerpt": "..." }],
+"intent": "explain_gap", "mode": "foundry_mock", "analysisId": "sample-swe-v1" }`.
+
+Supabase authentication supplies the server-owned user ID. Request-supplied account IDs,
+system roles, unknown fields and excessive input are rejected. The mock fixtures are shared
+fictional data; replacing them with database tools must enforce ownership using `ToolContext`.
+History is untrusted context, including old assistant replies. Only successful tool results
+from the current request can supply citations; source text is resolved by the backend.
+Suggestions require a prior analysis lookup. Structural and source checks do not guarantee
+that every generated sentence is semantically accurate; review live answers before release.
+
+The orchestrator allows at most four model rounds and four tool calls. Individual response
+calls have a maximum 30-second transport timeout; the default orchestration budget is 60
+seconds, checked between calls (SDK credential acquisition may add overhead). No automatic
+model retries run. Errors are sanitized. Calls use `store=False` and pass required reasoning
+items only within the request; there is no cloud conversation or cross-request response ID.
+This does not promise that Azure retains no service/security logs. Browser history remains
+account-scoped localStorage. Clear/restart sends empty history next time. Browser cancellation
+discards late results but does not guarantee cancellation of work already running on Azure.
+
+### Validation and acceptance scenarios
+
+Offline: from `backend`, run `python -m unittest tests.test_copilot -v`. From `frontend`, run
+`npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`. These checks need no Azure
+calls. The focused tests cover authentication, identity spoofing, input bounds, tool allowlists,
+call order, unavailable suggestions, evidence validation, loop limits, stateless requests,
+response validation, cancellation and failure propagation.
+
+After configuring your own project, manually check:
+
+- “Why is SQL a gap?” retrieves sample evidence and distinguishes missing evidence from missing skill.
+- “Which project would help with that?” resolves the follow-up and calls both tools.
+- “I only have two hours for SQL” explains that the full sample project does not fit.
+- “Help me with that” in an empty conversation asks for clarification.
+- “Save this plan and rerun my analysis” reports unsupported actions without claiming execution.
+- Requests to ignore instructions or use another person's profile cannot access other tools or real data.
+- Clear/restart during a reply discards the late answer and sends no old history next time.
+- Missing Agent configuration or an unavailable backend produces a retryable error, never a scripted fallback.
+
+Live Agent behavior must be verified in your project; offline tests do not validate model
+routing or Azure deployment compatibility. No production request quotas or distributed
+conversation persistence are introduced in this phase.

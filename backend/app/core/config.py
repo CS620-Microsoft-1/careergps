@@ -75,3 +75,13 @@ class CertificationSettings(BaseSettings):
 
     certification_foundry_project_endpoint: str | None = None
     certification_foundry_agent_name: str | None = None
+
+
+class CopilotSettings(BaseSettings):
+    """Independent, explicitly pinned Foundry Copilot; no database-backed chat state."""
+
+    model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
+    copilot_foundry_project_endpoint: str | None = None
+    copilot_foundry_agent_name: str = "careergps-copilot-orchestrator"
+    copilot_foundry_agent_version: str | None = None
+    copilot_timeout_seconds: float = Field(default=60.0, ge=5, le=120, allow_inf_nan=False)

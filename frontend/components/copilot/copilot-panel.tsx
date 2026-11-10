@@ -5,6 +5,7 @@ import { ArrowDown, ArrowLeft, ArrowUp, FileText, LoaderCircle, RotateCcw, Spark
 import { useCopilot } from "@/components/copilot/copilot-provider";
 import { Button } from "@/components/ui/button";
 import { MAX_COPILOT_INPUT, type CopilotMessage } from "@/lib/copilot-session";
+import { LOCAL_COPILOT } from "@/lib/api/copilot";
 import { cn } from "@/lib/utils";
 
 const QUESTIONS = ["Why is SQL a gap?", "Which project should I build first?", "I already used SQL. What evidence helps?"];
@@ -67,7 +68,7 @@ export function CopilotPanel() {
       <Button variant="ghost" size="icon-sm" onClick={close} aria-label="Close Copilot"><X /></Button>
     </header>
     <div className="shrink-0 border-b bg-background px-5 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-1 text-xs"><span className="font-bold">Sample data · No Agent connected</span><span className="font-mono text-muted-foreground">REPORT V1</span></div>
+      <div className="flex flex-wrap items-center justify-between gap-1 text-xs"><span className="font-bold">{LOCAL_COPILOT ? "Sample data · Local demo" : "Sample data · Foundry Agent"}</span><span className="font-mono text-muted-foreground">REPORT V1</span></div>
       <p className="mt-1 text-xs text-muted-foreground">Fictional SWE profile · SQL, deployment & testing.<br />Replies do not use your résumé or the report on the left.</p>
       <button type="button" className="mt-2 flex min-h-9 items-center gap-1 text-xs font-bold underline lg:hidden"
         onClick={() => document.getElementById("career-report")?.focus()}><ArrowLeft aria-hidden className="size-3" />Back to report</button>
@@ -102,7 +103,7 @@ export function CopilotPanel() {
         <p className="mt-5 text-xs/5 text-muted-foreground">One ongoing conversation. Come back anytime to continue where you left off.</p>
       </div>}
       <div className="space-y-5">{state.messages.slice(firstVisible).map(message => <Message key={message.id} message={message} />)}</div>
-      {state.pendingId && <p role="status" className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><LoaderCircle aria-hidden className="size-4 animate-spin" />Preparing sample reply…</p>}
+      {state.pendingId && <p role="status" className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><LoaderCircle aria-hidden className="size-4 animate-spin" />{LOCAL_COPILOT ? "Preparing sample reply…" : "Working on your question…"}</p>}
       {retryable && <div role="status" className="mt-4 rounded-xl bg-secondary p-3 text-sm">
         <p>{STATUS[last.replyState as keyof typeof STATUS]}</p>
         <Button variant="outline" size="sm" className="mt-2" onClick={() => void session.retry()}>Retry reply</Button>
@@ -129,7 +130,7 @@ export function CopilotPanel() {
             : <Button type="submit" size="icon-sm" disabled={!state.loaded || !state.draft.trim()} aria-label="Send message"><ArrowUp /></Button>}
         </div>
       </form>
-      <p className="mt-2 text-center text-[0.6875rem] text-muted-foreground">{state.storageWarning || sessionOnly ? "History is not being saved" : "History saved in this browser"} · Scripted replies</p>
+      <p className="mt-2 text-center text-[0.6875rem] text-muted-foreground">{state.storageWarning || sessionOnly ? "History is not being saved" : "History saved in this browser"} · {LOCAL_COPILOT ? "Scripted replies" : "AI replies may be inaccurate"}</p>
       <div className="mt-2 flex justify-center">
         <Button ref={clearButton} type="button" variant="ghost" size="sm"
           disabled={!state.loaded || confirmClear || (!state.messages.length && !state.draft && !state.storageWarning)}

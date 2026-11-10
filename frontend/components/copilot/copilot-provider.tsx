@@ -5,6 +5,9 @@ import { useAccount } from "@/components/layout/account-provider";
 import { CopilotSession, createCopilotStorage, type CopilotState } from "@/lib/copilot-session";
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/supabase/config";
 
+import { LOCAL_COPILOT, respondToCopilot } from "@/lib/api/copilot";
+import { respondToMockCopilot } from "@/lib/copilot-mock";
+
 const CopilotContext = createContext<{ session: CopilotSession; state: CopilotState; sessionOnly: boolean } | null>(null);
 
 export function CopilotProvider({ children }: { children: React.ReactNode }) {
@@ -14,7 +17,7 @@ export function CopilotProvider({ children }: { children: React.ReactNode }) {
 }
 
 function OwnerConversation({ owner, ready, children }: { owner: string | null; ready: boolean; children: React.ReactNode }) {
-  const [session] = useState(() => new CopilotSession(createCopilotStorage(owner)));
+  const [session] = useState(() => new CopilotSession({ ...createCopilotStorage(owner), respond: LOCAL_COPILOT ? respondToMockCopilot : respondToCopilot }));
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot, session.getServerSnapshot);
   useEffect(() => {
     if (ready) session.initialize();

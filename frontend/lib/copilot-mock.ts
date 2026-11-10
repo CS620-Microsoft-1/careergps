@@ -5,13 +5,8 @@ export const COPILOT_TOPICS = {
   testing: { label: "Software testing", short: "Testing" },
 } as const;
 export type CopilotTopic = keyof typeof COPILOT_TOPICS;
-export type CopilotSource = { id: string; label: string; excerpt: string };
-export type CopilotReply = { text: string; sources: CopilotSource[] };
-export type CopilotRequest = {
-  question: string;
-  history: { role: "user" | "assistant"; text: string }[];
-};
-export type CopilotResponder = (request: CopilotRequest, signal: AbortSignal) => Promise<CopilotReply>;
+export type { CopilotSource, CopilotReply, CopilotRequest, CopilotResponder } from "./copilot-types.ts";
+import type { CopilotResponder, CopilotRequest, CopilotReply } from "./copilot-types.ts";
 
 const FIXTURES: Record<CopilotTopic, { evidence: string; finding: string; project: string }> = {
   sql: {
