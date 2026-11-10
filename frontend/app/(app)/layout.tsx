@@ -1,6 +1,7 @@
 import { AccountProvider } from "@/components/layout/account-provider";
 import { BackendStatusProvider } from "@/components/layout/backend-status-provider";
-import { Navbar } from "@/components/layout/navbar";
+import { CopilotProvider } from "@/components/copilot/copilot-provider";
+import { CopilotWorkspace } from "@/components/copilot/copilot-workspace";
 import { OnboardingGuard } from "@/components/layout/onboarding-guard";
 import { PlanProvider } from "@/components/plan/plan-provider";
 import { SkillGapProvider } from "@/components/skill-gaps/skill-gap-provider";
@@ -13,10 +14,9 @@ export default function AppLayout({ children }: LayoutProps<"/">) {
       <AccountProvider>
         <SkillGapProvider>
           <PlanProvider>
-            <div className="min-h-dvh">
-              <Navbar />
-              <main className="mx-auto w-full max-w-300 px-4 pt-8 pb-24 sm:px-6 sm:pt-10">{children}</main>
-            </div>
+            <CopilotProvider>
+              <CopilotWorkspace>{children}</CopilotWorkspace>
+            </CopilotProvider>
           </PlanProvider>
         </SkillGapProvider>
       </AccountProvider>

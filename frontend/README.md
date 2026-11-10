@@ -61,7 +61,7 @@ app/                 routes, layouts, global styles
 components/ui/       shadcn/ui primitives (owned source, restyle freely)
 components/layout/   app shell: sidebar, topbar, mobile nav, user menu, page header, backend status
 components/auth/     login, signup, onboarding pieces
-components/panels/   Copilot panel and the hook to open it from anywhere
+components/copilot/ Non-modal Copilot dock and continuous mock conversation
 components/common/   shared building blocks (logo, form fields, empty states)
 lib/                 nav items, form options, validation schemas, utilities
 lib/api/             every call to the backend API (see "Connect to the backend")
@@ -157,9 +157,35 @@ plus with the browser's default font size raised to 20px. No page may scroll hor
 
 ## Copilot
 
-The **Ask CareerGPS** panel (`components/panels/`) is the single place for questions,
-explanations and sources: there are no separate "why", source or analysis-detail panels.
-Each answer will carry its citations and the agent steps behind it. Any component can open
-it with `useCopilot().openCopilot("Why is Docker a high-priority gap?")`.
-The answer format is designed together with the backend Copilot API; until then the
-panel is a shell with the input disabled.
+Open **Copilot** in the app navigation. It occupies a right-hand column on desktop;
+reports remain interactive. Only while the panel is open, gap-report columns adapt to the
+remaining space; closing it restores their original layout. Existing navigation controls
+keep their order and styles; the existing menu is used below 1280px to leave room for Copilot.
+Below 1024px it appears after the report, with a **Back to report**
+link. Closing the panel restores the report width. There is one continuous conversation,
+without a conversation list or a new-chat action.
+
+This is a **scripted mock**, not an Agent. It uses a fictional SWE profile (SQL, deployment,
+and testing), never reads the actual résumé or report, and never starts analysis or saves a
+plan. Ask “Why is SQL a gap?”, then “Which project should I build first?”; sample evidence
+can be expanded under replies. Subsequent topic-specific questions update the mock topic.
+
+Messages, source excerpts, a sample analysis version, the draft, and panel visibility are
+saved to browser localStorage under the Supabase user ID. They survive closing, app
+navigation and refresh. UI-only development without Supabase uses a separate preview key;
+if configured authentication cannot identify the user, the conversation is memory-only.
+Storage is local to this browser, not synced across devices, and clearing browser data
+removes it. Storage failures are shown without silently discarding messages. Another tab
+changing the same history prevents this tab from overwriting it; refresh to load that history.
+
+The panel renders the latest 40 messages with **Load earlier messages** for older history.
+Enter sends; Shift+Enter inserts a line break; composing IME text does not send. You can
+stop a pending reply, retry a failed/interrupted reply, and write a draft while waiting.
+Refreshing during a reply preserves the question and offers retry, rather than auto-running it.
+
+`lib/copilot-session.ts` owns persistence and request lifecycle; `lib/copilot-mock.ts` is the
+injected async responder. Only the last 20 messages go to that mock; full history stays saved.
+A future backend should replace browser persistence with authenticated conversation/message
+storage and supply real, authorized analysis context. This change adds no API or database schema.
+
+Validation: `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`.

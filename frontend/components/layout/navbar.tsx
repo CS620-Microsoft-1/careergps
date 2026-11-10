@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Check, ChevronDown, LogOut, Menu, Plus, User } from "lucide-react";
 
+import { CopilotLauncher } from "@/components/copilot/copilot-launcher";
 import { ROLE_NAMES } from "@/components/career/route-parts";
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
 import { useAccount } from "@/components/layout/account-provider";
@@ -23,7 +24,7 @@ import { NAV_ITEMS, isActive } from "@/lib/nav";
 import { getSupabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
-/** Sticky top bar: wordmark, destination switcher, page links (a menu below lg) and the profile menu. */
+/** Sticky top bar: wordmark, destination switcher, page links (a menu below xl) and the profile menu. */
 export function Navbar() {
   const pathname = usePathname();
   return (
@@ -33,10 +34,11 @@ export function Navbar() {
           CareerGPS
         </Link>
         <RouteSwitcher />
-        <nav aria-label="Main" className="hidden shrink-0 items-center gap-0.5 lg:flex">
+        <nav aria-label="Main" className="hidden shrink-0 items-center gap-0.5 xl:flex">
           {NAV_ITEMS.map((item) => <NavLink key={item.href} {...item} active={isActive(pathname, item.href)} />)}
         </nav>
         <div className="flex-1" />
+        <CopilotLauncher />
         <ProfileMenu active={isActive(pathname, "/profile")} />
         <PhoneMenu pathname={pathname} />
       </div>
@@ -126,7 +128,7 @@ function PhoneMenu({ pathname }: { pathname: string }) {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant="outline" size="icon" className="lg:hidden" aria-label="Open menu"><Menu /></Button>
+        <Button variant="outline" size="icon" className="xl:hidden" aria-label="Open menu"><Menu /></Button>
       </SheetTrigger>
       <SheetContent side="right" className="gap-1 p-4 pt-16">
         <SheetTitle className="sr-only">Menu</SheetTitle>

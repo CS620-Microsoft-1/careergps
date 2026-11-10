@@ -17,6 +17,7 @@ import {
   SourceNote,
   skillLabel,
 } from "@/components/career/route-parts";
+import { useCopilot } from "@/components/copilot/copilot-provider";
 import { SkillEvidence } from "@/components/gaps/skill-evidence";
 import { usePlan } from "@/components/plan/plan-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
@@ -37,6 +38,7 @@ import type { CoreSkillGapReport, CoreSkillResult, SkillGapRun } from "@/types/a
 
 export function GapsView() {
   const { family, run, snapshot } = useSkillGapAnalysis();
+  const { state: { open: copilotOpen } } = useCopilot();
   const role = ROLE_NAMES[family];
   if (run?.status !== "completed" || !run.report || !snapshot) {
     return <>
@@ -63,14 +65,14 @@ export function GapsView() {
       </div>} />
     {sample && <div className="-mt-4 mb-8"><SourceNote>Based on {sample.toLocaleString()} {role.toLowerCase()} job postings in the current market snapshot.</SourceNote></div>}
 
-    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+    <div className={cn("grid items-start gap-6", copilotOpen ? "@min-[56rem]:grid-cols-[minmax(0,1fr)_19rem]" : "lg:grid-cols-[minmax(0,1fr)_19rem]")}>
       <div className="grid gap-5">
         {gaps.length === 0 && <div className="rounded-2xl bg-success-soft p-6">
           <h2 className="text-title">No gaps left for {role.toLowerCase()}</h2>
           <p className="mt-1">Every skill postings ask for shows strong evidence in your résumé.</p>
         </div>}
         {gaps.map((gap, index) => <GapCard key={gap.skill_id} gap={gap} rank={index + 1} report={report}
-          defaultOpen={index === 0} />)}
+          defaultOpen={index === 0} copilotOpen={copilotOpen} />)}
       </div>
 
       <aside className="grid gap-5">
@@ -100,8 +102,8 @@ export function GapsView() {
 }
 
 /** One gap: always its name, demand and bar; the ways to close it and the rating open and close. */
-function GapCard({ gap, rank, report, defaultOpen }: {
-  gap: CoreSkillResult; rank: number; report: CoreSkillGapReport; defaultOpen: boolean;
+function GapCard({ gap, rank, report, defaultOpen, copilotOpen }: {
+  gap: CoreSkillResult; rank: number; report: CoreSkillGapReport; defaultOpen: boolean; copilotOpen: boolean;
 }) {
   const plan = usePlan();
   const [open, setOpen] = useState(defaultOpen);
@@ -112,7 +114,7 @@ function GapCard({ gap, rank, report, defaultOpen }: {
   const name = skillLabel(gap.skill_id);
   const panel = `gap-panel-${gap.skill_id}`;
   return (
-    <section aria-labelledby={`gap-${gap.skill_id}`} className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
+    <section aria-labelledby={`gap-${gap.skill_id}`} className={cn("rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8", copilotOpen && "@container/gap")}>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
         <h2 id={`gap-${gap.skill_id}`} className="flex min-w-0 flex-1 basis-56 items-baseline gap-3 text-section">
           <span className="font-mono text-sm font-normal text-muted-foreground">{String(rank).padStart(2, "0")}</span>{name}
@@ -131,7 +133,7 @@ function GapCard({ gap, rank, report, defaultOpen }: {
         <p className="eyebrow mt-6 mb-3">Ways to close it</p>
         {plan.status === "loading" ? <p className="text-muted-foreground">Loading resources…</p>
           : shown.length === 0 ? <p className="text-muted-foreground">No resources for this skill yet.</p>
-          : <div className="grid gap-3 sm:grid-cols-3">
+          : <div className={cn("grid gap-3", copilotOpen ? "@min-[36rem]/gap:grid-cols-3" : "sm:grid-cols-3")}>
             {shown.map((resource) => <div key={resource.id} className="flex flex-col rounded-xl bg-sunken p-4">
               <ResourceIcon type={resource.type} />
               <p className="eyebrow mt-3">{RESOURCE_TYPES[resource.type].label}</p>

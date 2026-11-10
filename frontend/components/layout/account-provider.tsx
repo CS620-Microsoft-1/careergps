@@ -6,7 +6,7 @@ import { getMe, updateAccount } from "@/lib/api/me";
 import { getSupabase } from "@/lib/supabase/client";
 import type { User } from "@/types/api";
 
-type AccountState = { status: "loading" | "ready"; email: string | null; user: User | null };
+type AccountState = { status: "loading" | "ready"; email: string | null; authUserId: string | null; user: User | null };
 type AccountContextValue = AccountState & {
   initials: string;
   displayName: string;
@@ -18,21 +18,23 @@ const AccountContext = createContext<AccountContextValue | null>(null);
 
 /** The signed-in student, shared by the nav bar and the pages. Works from Supabase alone if the API is down. */
 export function AccountProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AccountState>({ status: "loading", email: null, user: null });
+  const [state, setState] = useState<AccountState>({ status: "loading", email: null, authUserId: null, user: null });
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       let email: string | null = null;
+      let authUserId: string | null = null;
       let user: User | null = null;
       try {
         const { data } = await getSupabase().auth.getUser();
         email = data.user?.email ?? null;
+        authUserId = data.user?.id ?? null;
         if (data.user) user = (await getMe().catch(() => null))?.user ?? null;
       } catch {
         // Supabase isn't configured (UI-only development).
       }
-      if (!cancelled) setState({ status: "ready", email, user });
+      if (!cancelled) setState({ status: "ready", email, authUserId, user });
     })();
     return () => {
       cancelled = true;
