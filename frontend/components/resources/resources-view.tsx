@@ -160,7 +160,7 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
       <div className="grid gap-1">
         {options.map((option) => (
           <button key={option.key ?? "all"} type="button" aria-pressed={option.key === value} onClick={() => onChange(option.key)}
-            className={cn("flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-background",
+            className={cn("flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left pressable hover:bg-background motion-safe:active:scale-[0.98]",
               option.key === value && "bg-accent font-bold hover:bg-accent")}>
             <span>{option.label}</span><span className="font-mono text-sm">{option.count}</span>
           </button>

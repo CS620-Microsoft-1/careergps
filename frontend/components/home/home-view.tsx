@@ -245,7 +245,7 @@ function Destinations() {
           return (
             <button key={key} type="button" disabled={locked && key !== family} onClick={() => void switchTo(key)}
               aria-pressed={key === family}
-              className={cn("grid gap-1 rounded-xl border border-border px-4 py-3.5 text-left transition-colors hover:bg-background disabled:opacity-60",
+              className={cn("grid gap-1 rounded-xl border border-border px-4 py-3.5 text-left pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60",
                 key === family && "border-2 border-foreground")}>
               <span className="flex items-baseline justify-between gap-2">
                 <b>{ROLE_NAMES[key]}</b>
@@ -260,7 +260,7 @@ function Destinations() {
         })}
         {families.length < FAMILIES.length && (
           <Link href={ADD_DESTINATION_HREF}
-            className="grid place-content-center rounded-xl border border-dashed border-line-strong px-4 py-3.5 text-center font-bold transition-colors hover:bg-background">
+            className="grid place-content-center rounded-xl border border-dashed border-line-strong px-4 py-3.5 text-center font-bold pressable hover:bg-background motion-safe:active:scale-[0.98]">
             + Add a destination
           </Link>
         )}

@@ -308,7 +308,7 @@ function ChoiceCard({ icon: Icon, title, detail, disabled = false, onClick }: {
 }) {
   return (
     <button type="button" disabled={disabled} onClick={onClick}
-      className="flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 text-left transition-colors hover:bg-background disabled:opacity-60">
+      className="flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 text-left pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60">
       <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-accent"><Icon className="size-5" /></span>
       <span className="min-w-0 flex-1">
         <span className="block text-title">{title}</span>
@@ -377,7 +377,7 @@ function RoleStep({ goal, onChange, saving, error, explored = [], title = "Choos
           const added = explored.includes(key);
           return (
             <button key={key} type="button" role="radio" aria-checked={selected} disabled={added} onClick={() => onChange({ ...goal, family: key })}
-              className={cn("flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 text-left transition-colors hover:bg-background disabled:opacity-60 disabled:hover:bg-card",
+              className={cn("flex items-center gap-4 rounded-2xl border border-border bg-card px-5 py-4 text-left pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60 disabled:hover:bg-card",
                 selected && "border-2 border-foreground px-[1.1875rem] py-[0.9375rem]")}>
               <span aria-hidden className={cn("grid size-5 shrink-0 place-items-center rounded-full border-2", selected ? "border-foreground" : "border-line-strong")}>
                 {selected && <span className="size-2.5 rounded-full bg-foreground" />}

@@ -45,7 +45,7 @@ export function DestinationsView() {
         const selected = key === family;
         return (
           <button key={key} type="button" aria-pressed={selected} disabled={locked && !selected} onClick={() => void switchTo(key)}
-            className={cn("grid gap-4 rounded-2xl border border-border bg-card p-6 text-left shadow-card transition-colors hover:bg-background disabled:opacity-60",
+            className={cn("grid gap-4 rounded-2xl border border-border bg-card p-6 text-left shadow-card pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60",
               selected && "border-2 border-foreground")}>
             <span className="flex items-baseline justify-between gap-3">
               <span className="text-title">{ROLE_NAMES[key]}</span>
@@ -68,7 +68,7 @@ export function DestinationsView() {
       })}
       {snapshot && explored.length < FAMILIES.length && (
         <Link href={ADD_DESTINATION_HREF}
-          className="grid min-h-40 place-content-center justify-items-center gap-2 rounded-2xl border border-dashed border-line-strong p-6 text-center transition-colors hover:bg-card">
+          className="grid min-h-40 place-content-center justify-items-center gap-2 rounded-2xl border border-dashed border-line-strong p-6 text-center pressable hover:bg-card motion-safe:active:scale-[0.98]">
           <span aria-hidden className="grid size-10 place-items-center rounded-full bg-accent"><Plus className="size-5" /></span>
           <span className="text-title">Add a destination</span>
           <span className="text-sm text-muted-foreground">Compare your résumé with another role</span>
