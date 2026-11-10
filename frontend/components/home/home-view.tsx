@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import NumberFlow from "@number-flow/react";
 import { ArrowRight, Bookmark, CircleDashed, Flag, LoaderCircle, MapPin } from "lucide-react";
 
 import {
@@ -11,6 +12,7 @@ import {
   RESOURCE_TYPES,
   ROLE_NAMES,
   skillLabel,
+  numberTiming,
 } from "@/components/career/route-parts";
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
 import { useSwitchRoute } from "@/components/layout/use-switch-route";
@@ -204,10 +206,13 @@ function ResourceSnapshot({ gaps }: { gaps: string[] }) {
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="rounded-lg bg-accent px-4 py-3.5">
-          <p className="font-mono text-xl font-medium">{plan.items.length}</p><p className="text-sm">saved to plan</p>
+          <p className="font-mono text-xl font-medium"><NumberFlow key={plan.status} value={plan.items.length} {...numberTiming(280)} /></p>
+          <p className="text-sm">saved to plan</p>
         </div>
         <div className="rounded-lg bg-sunken px-4 py-3.5">
-          <p className="font-mono text-xl font-medium">{unsaved.length}</p><p className="text-sm text-muted-foreground">more for your top gaps</p>
+          <p className="font-mono text-xl font-medium"><NumberFlow key={plan.status} value={unsaved.length} {...numberTiming(280)} /></p>
+          <p className="text-sm text-muted-foreground">more for your top gaps</p>
+      {/* Counters keyed so they mount at the loaded counts instead of rolling up from 0 on every visit. */}
         </div>
       </div>
       {plan.status === "error" && <p role="alert" className="mt-3 text-sm text-destructive">{plan.error}</p>}
