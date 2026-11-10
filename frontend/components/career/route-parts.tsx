@@ -241,10 +241,11 @@ export function AnalysisGate({ children }: { children?: React.ReactNode }) {
   );
 }
 
-function AnalysisSteps({ calculating }: { calculating: boolean }) {
+/** saving: the end of setup, while the confirmed résumé is still being saved. */
+export function AnalysisSteps({ calculating = false, saving = false }: { calculating?: boolean; saving?: boolean }) {
   const steps = [
-    { label: "Résumé confirmed", done: true, active: false },
-    { label: "Read skill evidence", done: calculating, active: !calculating },
+    saving ? { label: "Saving your résumé", done: false, active: true } : { label: "Résumé confirmed", done: true, active: false },
+    { label: "Read skill evidence", done: calculating, active: !saving && !calculating },
     { label: "Calculate gaps", done: false, active: calculating },
   ];
   return (

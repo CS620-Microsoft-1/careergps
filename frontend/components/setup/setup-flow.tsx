@@ -19,6 +19,7 @@ import { acceptedTerms, type SignupMetadata } from "@/lib/auth/account";
 import { DEFAULT_UNIVERSITY, EXPERIENCE_LEVELS, RESUME_ACCEPT, RESUME_MAX_BYTES, RESUME_MIME_TYPES, type ExperienceLevel } from "@/lib/options";
 import { FAMILY_LABELS, profileForAnalysis, queueSkillGapAnalysis } from "@/lib/skill-gap-profile";
 import { text } from "@/lib/resume-format";
+import { startSetupSave } from "@/lib/setup-save";
 import { getSupabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { JobFamily, MarketDemandSnapshot, ResumeAnalysis, ResumeClassification, SavedResume, User } from "@/types/api";
@@ -63,7 +64,6 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
   const [goal, setGoal] = useState<Goal>({ family: null, level: "Internship", location: "" });
   const [account, setAccount] = useState<User | null>(null);
   const [signup, setSignup] = useState<SignupMetadata>();
-  const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string>();
   /** addRole: which résumé the new destination uses; null until the student picks. */
   const [resumeChoice, setResumeChoice] = useState<"current" | "new" | null>(null);
@@ -164,10 +164,10 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
     if (!problem) goToStep(2);
   };
 
-  const save = async () => {
+  const save = () => {
     if (!goal.family) return setSaveError("Choose a target role.");
     if (!goal.level) return setSaveError("Choose internship or full-time.");
-    if (addRole && resumeChoice === "current" && current) return void saveRole(current, goal.family, goal.level);
+    if (addRole && resumeChoice === "current" && current) return saveRole(current, goal.family, goal.level);
     if (!analysis || !classification) return;
     const details = { first_name: basics.firstName.trim().slice(0, 100), last_name: basics.lastName.trim().slice(0, 100),
       university: basics.university.trim().slice(0, 150) };
@@ -175,14 +175,13 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
       graduation_year: Number(basics.graduationYear), preferred_location: goal.location.trim().slice(0, 100) || ANY_LOCATION };
     const resume = { original_filename: analysis.filename, parser: analysis.extraction.parser,
       ocr_pages: analysis.extraction.ocr_pages, agent_name: analysis.agent.name, classification };
-    setSaving(true);
-    setSaveError(undefined);
-    try {
+    const family = goal.family;
+    const persist = async () => {
       const { user } = await getMe();
       if (user) {
         // A new résumé for this role (adding the destination if new), then select the role: one after
         // the other, so a failed upload leaves the account on its old role.
-        await addResume({ ...resume, job_family: goal.family });
+        await addResume({ ...resume, job_family: family });
         await updateAccount({ ...details, ...goals });
       } else {
         // First time: this creates the account, with the terms consent given at sign-up.
@@ -190,39 +189,29 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
         if (!data.user) throw new Error("Not logged in");
         await createAccount({ ...details, ...goals, accept_terms: acceptedTerms(data.user), resume });
       }
-    } catch (error) {
-      setSaveError(errorMessage(error, "Couldn’t save your profile. Try again."));
-      setSaving(false);
-      return;
-    }
-    // Saved first; the route page then analyzes the saved résumé by its id.
-    try {
-      const [{ user }, saved] = await Promise.all([getMe(), getSavedResume()]);
-      if (user && saved) queueSkillGapAnalysis(profileForAnalysis(user, saved));
-    } catch { /* Saving succeeded; the analysis can still be started from the route page. */ }
-    // A new destination opens on its home page; first-time setup shows the route result first.
-    router.push(addRole ? "/dashboard" : "/onboarding/route");
+      // Saved first; the route page then analyzes the saved résumé by its id.
+      try {
+        const [{ user: savedUser }, saved] = await Promise.all([getMe(), getSavedResume()]);
+        if (savedUser && saved) queueSkillGapAnalysis(profileForAnalysis(savedUser, saved));
+      } catch { /* Saving succeeded; the analysis can still be started from the route page. */ }
+    };
+    // Open the route page now; it shows the save as its first loading step.
+    startSetupSave(persist, (error) => errorMessage(error, "Couldn’t save your profile. Try again."));
+    router.push("/onboarding/route");
   };
 
   /** Add a destination that uses the current résumé, and select it. */
-  const saveRole = async (source: SavedResume, family: JobFamily, level: ExperienceLevel) => {
-    setSaving(true);
-    setSaveError(undefined);
-    let profile;
-    try {
+  const saveRole = (source: SavedResume, family: JobFamily, level: ExperienceLevel) => {
+    const location = goal.location.trim().slice(0, 100) || ANY_LOCATION;
+    const persist = async () => {
       await setDestinationResume(family, source.id);
-      await updateAccount({ target_role: FAMILY_LABELS[family], experience_level: level,
-        preferred_location: goal.location.trim().slice(0, 100) || ANY_LOCATION });
+      await updateAccount({ target_role: FAMILY_LABELS[family], experience_level: level, preferred_location: location });
       const [{ user }, saved] = await Promise.all([getMe(), getSavedResume()]);
       if (!user || !saved) throw new Error("Upload your résumé first.");
-      profile = profileForAnalysis(user, saved);
-    } catch (error) {
-      setSaveError(errorMessage(error, "Couldn’t save your target role. Try again."));
-      setSaving(false);
-      return;
-    }
-    queueSkillGapAnalysis(profile);
-    router.push("/dashboard");
+      queueSkillGapAnalysis(profileForAnalysis(user, saved));
+    };
+    startSetupSave(persist, (error) => errorMessage(error, "Couldn’t save your target role. Try again."));
+    router.push("/onboarding/route");
   };
 
   if (addRole && resumeChoice === null) {
@@ -241,9 +230,9 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
 
   if (addRole && resumeChoice === "current") {
     return <Frame screen="current-role" direction={direction} wide>
-      <RoleStep goal={goal} onChange={setGoal} saving={saving} error={saveError} explored={explored}
+      <RoleStep goal={goal} onChange={setGoal} error={saveError} explored={explored}
         title="Add a destination" description="We’ll compare your current résumé with real job postings for this role. Location is optional."
-        onBack={() => chooseResume(null)} onSubmit={() => void save()} />
+        onBack={() => chooseResume(null)} onSubmit={save} />
     </Frame>;
   }
 
@@ -257,8 +246,8 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
 
   if (step === 2) {
     return <Frame screen="role" direction={direction} step={2} wide>
-      <RoleStep goal={goal} onChange={setGoal} saving={saving} error={saveError} explored={addRole ? explored : []}
-        onBack={() => goToStep(1)} onSubmit={() => void save()} />
+      <RoleStep goal={goal} onChange={setGoal} error={saveError} explored={addRole ? explored : []}
+        onBack={() => goToStep(1)} onSubmit={save} />
     </Frame>;
   }
 
@@ -354,9 +343,9 @@ function Dropzone({ onFile }: { onFile: (file: File | undefined) => void }) {
   );
 }
 
-function RoleStep({ goal, onChange, saving, error, explored = [], title = "Choose a target role",
+function RoleStep({ goal, onChange, error, explored = [], title = "Choose a target role",
   description = "We’ll compare your résumé with real job postings for this role. Location is optional.", onBack, onSubmit }: {
-  goal: Goal; onChange: (goal: Goal) => void; saving: boolean; error?: string; explored?: JobFamily[];
+  goal: Goal; onChange: (goal: Goal) => void; error?: string; explored?: JobFamily[];
   title?: string; description?: string; onBack: () => void; onSubmit: () => void;
 }) {
   const [query, setQuery] = useState("");
@@ -435,7 +424,7 @@ function RoleStep({ goal, onChange, saving, error, explored = [], title = "Choos
       {error && <p role="alert" className="mt-6 text-destructive">{error}</p>}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
         <Button type="button" variant="ghost" size="lg" onClick={onBack}>Back</Button>
-        <Button type="submit" size="lg" disabled={saving}>{saving ? "Saving…" : "Calculate my route"}<ArrowRight data-icon="inline-end" /></Button>
+        <Button type="submit" size="lg">Calculate my route<ArrowRight data-icon="inline-end" /></Button>
       </div>
     </form>
   );
