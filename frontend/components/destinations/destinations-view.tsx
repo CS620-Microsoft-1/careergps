@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { FileText, LoaderCircle, Plus, RotateCcw, TrendingUp, Upload } from "lucide-react";
 
@@ -32,6 +33,8 @@ export function DestinationsView() {
   const report = run?.status === "completed" ? run.report : null;
   const role = ROLE_NAMES[family];
 
+  /** Set by picking a role, so the market fades in after a switch but not on arrival. */
+  const [switched, setSwitched] = useState(false);
   return <>
     <RoutePageHeader title="Your destinations"
       description="Focus on a few. Pick one to see what its job market is asking for right now." />
@@ -44,7 +47,8 @@ export function DestinationsView() {
         const gaps = done ? rankGaps(latest.report!).length : null;
         const selected = key === family;
         return (
-          <button key={key} type="button" aria-pressed={selected} disabled={locked && !selected} onClick={() => void switchTo(key)}
+          <button key={key} type="button" aria-pressed={selected} disabled={locked && !selected}
+            onClick={() => { setSwitched(true); void switchTo(key); }}
             className={cn("grid gap-4 rounded-2xl border border-border bg-card p-6 text-left shadow-card pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60",
               selected && "border-2 border-foreground")}>
             <span className="flex items-baseline justify-between gap-3">
@@ -92,7 +96,9 @@ export function DestinationsView() {
         <p className="flex-1">{market.error}</p>
         <Button size="sm" variant="raised" onClick={market.reload}><RotateCcw data-icon="inline-start" />Try again</Button>
       </div>
-      : market.data && <Market data={market.data} report={report} family={family} />}
+      : market.data && <div className={cn(switched && "entrance-rise [--enter-ms:200ms]")}>
+        <Market data={market.data} report={report} family={family} />
+      </div>}
 
     {!report && snapshot && <div className="mt-6"><AnalysisGate /></div>}
   </>;
