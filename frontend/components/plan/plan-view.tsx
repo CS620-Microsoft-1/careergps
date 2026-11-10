@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import NumberFlow from "@number-flow/react";
 import { ArrowRight, Check, CircleCheck, Flag, LoaderCircle, Plus, RotateCcw, X } from "lucide-react";
+import { MotionConfig, motion } from "motion/react";
 
 import {
   MatchRing,
@@ -10,6 +12,7 @@ import {
   ROLE_NAMES,
   ResourceIcon,
   RoutePageHeader,
+  numberTiming,
   skillLabel,
 } from "@/components/career/route-parts";
 import { usePlan } from "@/components/plan/plan-provider";
@@ -18,6 +21,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { orderPlan, rankGaps, type OrderedPlan, type PlanStep } from "@/lib/career";
 import { cn } from "@/lib/utils";
+
+/** Steps moving to their new place. Strong ease-in-out: this is movement on screen, not an entrance. */
+const STEP_MOVE = { duration: 0.28, ease: [0.77, 0, 0.175, 1] } as const;
 
 export function PlanView() {
   const { family, run, snapshot, loaded, error } = useSkillGapAnalysis();
@@ -60,7 +66,7 @@ export function PlanView() {
         <div className="grid gap-4 md:grid-cols-2">
           <div className="flex items-center gap-4 rounded-2xl border border-border bg-card px-6 py-5 shadow-card">
             <MatchRing value={ordered.done.length / total} size={52} stroke={6} label={null} className="[&_p]:hidden" />
-            <div><p className="font-mono text-xl font-medium">{ordered.done.length} of {total}</p><p className="text-sm text-muted-foreground">steps done</p></div>
+            <div><p className="font-mono text-xl font-medium"><NumberFlow value={ordered.done.length} {...numberTiming(280)} /> of <NumberFlow value={total} {...numberTiming(280)} /></p><p className="text-sm text-muted-foreground">steps done</p></div>
           </div>
           <div className="rounded-2xl border border-border bg-card px-6 py-5 shadow-card">
             <p className="eyebrow">Next turn</p>
@@ -71,7 +77,9 @@ export function PlanView() {
           </div>
         </div>
 
-        {view === "flowchart" ? <Flowchart ordered={ordered} role={role} /> : <PlanList ordered={ordered} />}
+        <MotionConfig reducedMotion="user" transition={STEP_MOVE}>
+          {view === "flowchart" ? <Flowchart ordered={ordered} role={role} /> : <PlanList ordered={ordered} />}
+        </MotionConfig>
 
         <div className="grid gap-4 md:grid-cols-2">
           <section aria-labelledby="why" className="rounded-2xl bg-sunken p-6">
@@ -115,15 +123,16 @@ function Flowchart({ ordered, role }: { ordered: OrderedPlan; role: string }) {
           <p className="eyebrow mb-4 sm:ml-24">Main path</p>
           <ol className="grid">
             {nodes.map(({ step, state, label }, index) => (
-              <li key={step.resource.id} className="grid sm:grid-cols-[6rem_minmax(0,1fr)]">
+              // layoutId, not just layout: a finished alongside step moves here from the other column.
+              <motion.li key={step.resource.id} layout="position" layoutId={`plan-step-${step.resource.id}`} className="grid sm:grid-cols-[6rem_minmax(0,1fr)]">
                 <span className={cn("hidden pt-5 pr-4 text-right font-mono text-sm sm:block", state === "next" ? "font-sans font-bold" : "text-muted-foreground")}>{label}</span>
                 <div>
                   {index > 0 && <Connector solid={state === "done"} />}
                   <PlanNode step={step} state={state} label={label} />
                 </div>
-              </li>
+              </motion.li>
             ))}
-            <li className="grid sm:grid-cols-[6rem_minmax(0,1fr)]">
+            <motion.li layout="position" className="grid sm:grid-cols-[6rem_minmax(0,1fr)]">
               <span className="hidden pt-5 pr-4 text-right font-mono text-sm text-muted-foreground sm:block">Goal</span>
               <div>
                 {nodes.length > 0 && <Connector solid={false} />}
@@ -132,15 +141,15 @@ function Flowchart({ ordered, role }: { ordered: OrderedPlan; role: string }) {
                   <div><p className="text-title">Destination: {role}</p><p className="text-sm text-deep-muted">Ready to apply for {role.toLowerCase()} roles</p></div>
                 </div>
               </div>
-            </li>
+            </motion.li>
           </ol>
         </div>
 
         <div>
           <p className="eyebrow mb-4">Alongside</p>
           {ordered.alongside.length ? <ul className="grid gap-4">
-            {ordered.alongside.map((step) => <li key={step.resource.id}><PlanNode step={step} state="alongside" label="Alongside" /></li>)}
-            <li className="text-sm text-muted-foreground">Keep going weekly while you work through the main path.</li>
+            {ordered.alongside.map((step) => <motion.li key={step.resource.id} layout="position" layoutId={`plan-step-${step.resource.id}`}><PlanNode step={step} state="alongside" label="Alongside" /></motion.li>)}
+            <motion.li layout="position" className="text-sm text-muted-foreground">Keep going weekly while you work through the main path.</motion.li>
           </ul> : <p className="rounded-xl border border-dashed border-line-strong p-5 text-sm text-muted-foreground">
             Clubs and meetups you save run here, next to the main path. <Link href="/resources" className="font-bold text-foreground underline">Find one</Link>
           </p>}
@@ -170,7 +179,7 @@ function PlanNode({ step, state, label }: { step: PlanStep; state: "done" | "nex
       state === "alongside" && "border border-dashed border-line-strong bg-card")}>
       <p className="sr-only sm:hidden">{label}</p>
       <div className="flex items-start gap-3">
-        {state === "done" ? <CircleCheck aria-hidden className="mt-0.5 size-5 shrink-0 text-success" />
+        {state === "done" ? <CircleCheck aria-hidden className={cn("mt-0.5 size-5 shrink-0 text-success", plan.justCompleted === resource.id && "entrance-pop")} />
           : state !== "next" && <ResourceIcon type={resource.type} className="size-8 bg-sunken" />}
         <div className="min-w-0 flex-1">
           {state === "next" && <div className="mb-2 flex flex-wrap items-center gap-2">
@@ -209,7 +218,7 @@ function PlanList({ ordered }: { ordered: OrderedPlan }) {
           const done = step.item.status === "done";
           const busy = plan.pending.has(step.resource.id);
           return (
-            <li key={step.resource.id} className="flex flex-wrap items-center gap-3 px-5 py-4 sm:px-6">
+            <motion.li key={step.resource.id} layout="position" className="flex flex-wrap items-center gap-3 px-5 py-4 sm:px-6">
               <input type="checkbox" checked={done} disabled={busy} aria-label={`${step.resource.title} done`}
                 onChange={() => void plan.setStatus(step.resource.id, done ? "saved" : "done")}
                 className="size-5 shrink-0 accent-foreground" />
@@ -222,7 +231,7 @@ function PlanList({ ordered }: { ordered: OrderedPlan }) {
               </div>
               {step.resource.url && <Button asChild size="sm" variant="secondary"><a href={step.resource.url} target="_blank" rel="noreferrer">Open</a></Button>}
               <Button size="sm" variant="ghost" disabled={busy} onClick={() => void plan.remove(step.resource.id)}>Remove</Button>
-            </li>
+            </motion.li>
           );
         })}
       </ol>
