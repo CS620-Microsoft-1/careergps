@@ -9,6 +9,8 @@ from app.services.resources import load_projects
 
 
 MAX_PROJECTS = 3
+# GitHub sync can add hundreds of projects; the agent sees only the best-covering ones.
+MAX_AGENT_CANDIDATES = 25
 
 
 def _candidates(career_path: str, available_hours: int | None,
@@ -24,6 +26,21 @@ def _candidates(career_path: str, available_hours: int | None,
         ids = {item["skill_id"] for item in verified_skill_gaps}
         candidates = [p for p in candidates if ids.intersection(p.get("supported_skill_ids", []))]
     return candidates
+
+
+def _shortlist(candidates: list[dict], verified_skill_gaps: list[dict[str, str]] | None,
+               skill_gaps: list[str]) -> list[dict]:
+    """The candidates that cover the most (and highest-priority) gaps, catalog order breaking ties."""
+    if len(candidates) <= MAX_AGENT_CANDIDATES:
+        return candidates
+    if verified_skill_gaps:
+        weight = {gap["skill_id"]: len(verified_skill_gaps) - i for i, gap in enumerate(verified_skill_gaps)}
+        score = lambda p: sum(weight.get(skill, 0) for skill in set(p.get("supported_skill_ids", [])))  # noqa: E731
+    else:
+        wanted = {gap.casefold() for gap in skill_gaps}
+        score = lambda p: len(wanted & {s.casefold() for s in p.get("skills_practiced", [])})  # noqa: E731
+    ranked = sorted(enumerate(candidates), key=lambda pair: (-score(pair[1]), pair[0]))
+    return [project for _, project in ranked[:MAX_AGENT_CANDIDATES]]
 
 
 def rank_projects(
@@ -76,7 +93,8 @@ def recommend_projects(
     if not settings.resources_project_endpoint:
         raise ValueError("RESOURCES_PROJECT_ENDPOINT is not configured.")
 
-    candidates = _candidates(career_path, available_hours, verified_skill_gaps)
+    candidates = _shortlist(_candidates(career_path, available_hours, verified_skill_gaps),
+                            verified_skill_gaps, skill_gaps)
     if not candidates:
         return {"recommendations": [], "no_match_reason": "No projects match the career path, skill gaps, and time budget."}
 

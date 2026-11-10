@@ -1,0 +1,5944 @@
+[
+  {
+    "id": "gh_aiml_cool_coders_credit_card_fraud_detection",
+    "career_path": "AI/ML Engineering",
+    "title": "Credit Card Fraud Detection",
+    "description": "Credit Card Fraud Detection using ML",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=jCoF1rMs_0s"
+  },
+  {
+    "id": "gh_aiml_cool_coders_face_recognition_app",
+    "career_path": "AI/ML Engineering",
+    "title": "Face Recognition App",
+    "description": "Face Recognition + Attendance using OpenCV",
+    "skills_practiced": [
+      "Deep learning"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 15,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "deep_learning"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=sz25xxF_AVE"
+  },
+  {
+    "id": "gh_aiml_cool_coders_movie_recomendation_engine",
+    "career_path": "AI/ML Engineering",
+    "title": "Movie Recomendation Engine",
+    "description": "A Movie Recommendation System Using ML",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=XoTwndOgXBM"
+  },
+  {
+    "id": "gh_aiml_open_source_projects_kangjul3854_hyufa",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to kangjul3854/hyufa",
+    "description": "HYUFA is an AI finance assistant for university students and young professionals — from basic financial knowledge to personalized portfolio guidance. HYUFA는 간단한 금융 상식부터 포트폴리오 추천까지, 대학생과 사회초년생을 위한 AI 금융 상담 서비스입니다. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Generative AI"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "HTML basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "generative_ai"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/kangjul3854/hyufa",
+    "stars": 245
+  },
+  {
+    "id": "gh_aiml_oss_data_analysis_apache_hamilton",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to apache/hamilton",
+    "description": "Apache Hamilton helps data scientists and engineers define testable, modular, self-documenting dataflows, that encode lineage/tracing and metadata. Runs and scales everywhere python does. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Retrieval-augmented generation",
+      "MLOps",
+      "Feature engineering"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Jupyter Notebook basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "rag",
+      "mlops",
+      "feature_engineering"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/apache/hamilton",
+    "stars": 2627
+  },
+  {
+    "id": "gh_aiml_oss_data_analysis_javascriptdata_danfojs",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to javascriptdata/danfojs",
+    "description": "Danfo.js is an open source, JavaScript library providing high performance, intuitive, and easy to use data structures for manipulating and processing structured data. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Deep learning"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "deep_learning"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/javascriptdata/danfojs",
+    "stars": 5067
+  },
+  {
+    "id": "gh_aiml_oss_data_analysis_lance_format_lance",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to lance-format/lance",
+    "description": "Open Lakehouse Format for Multimodal AI. Convert from Parquet in 2 lines of code for 100x faster random access, vector index, and data versioning. Compatible with Pandas, DuckDB, Polars, Pyarrow, and PyTorch with more integrations coming.. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Large language models",
+      "Generative AI",
+      "Vector representations & retrieval",
+      "MLOps"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Rust basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "llm",
+      "generative_ai",
+      "vector_retrieval",
+      "mlops"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/lance-format/lance",
+    "stars": 7279
+  },
+  {
+    "id": "gh_aiml_oss_data_analysis_rio_labs_rio",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to rio-labs/rio",
+    "description": "WebApps in pure Python. No JavaScript, HTML and CSS needed Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/rio-labs/rio",
+    "stars": 3650
+  },
+  {
+    "id": "gh_aiml_oss_data_analysis_root_project_root",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to root-project/root",
+    "description": "The official repository for ROOT: analyzing, storing and visualizing big data, scientifically Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "C++ basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/root-project/root",
+    "stars": 3342
+  },
+  {
+    "id": "gh_aiml_oss_data_analysis_secretflow_secretflow",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to secretflow/secretflow",
+    "description": "A unified framework for privacy-preserving data analysis and machine learning Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/secretflow/secretflow",
+    "stars": 2719
+  },
+  {
+    "id": "gh_aiml_oss_data_analysis_statsmodels_statsmodels",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to statsmodels/statsmodels",
+    "description": "Statsmodels: statistical modeling and econometrics in Python Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/statsmodels/statsmodels",
+    "stars": 11746
+  },
+  {
+    "id": "gh_aiml_oss_data_visualization_aimhubio_aim",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to aimhubio/aim",
+    "description": "Aim 💫 — An easy-to-use & supercharged open-source experiment tracker. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Prompt engineering",
+      "MLOps",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "prompt_engineering",
+      "mlops",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/aimhubio/aim",
+    "stars": 6297
+  },
+  {
+    "id": "gh_aiml_oss_data_visualization_visactor_skills",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to VisActor/skills",
+    "description": "Agent skills for the VisActor visualization ecosystem. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "HTML basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/VisActor/skills",
+    "stars": 475
+  },
+  {
+    "id": "gh_aiml_oss_llm_canner_wrenai",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to Canner/WrenAI",
+    "description": "GenBI (Generative BI) for AI agents, an open-source, governed text-to-SQL through an open context layer that turns natural-language questions into trusted dashboards, charts, and SQL across 20+ data sources, such as BigQuery, Snowflake, PostgreSQL, ClickHouse, Amazon Redshift, D… Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Retrieval-augmented generation",
+      "Agents & tool use",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "rag",
+      "ai_agents",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Canner/WrenAI",
+    "stars": 18133
+  },
+  {
+    "id": "gh_aiml_oss_llm_corsairdev_corsair",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to corsairdev/corsair",
+    "description": "Connect your users to their apps Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Agents & tool use"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "ai_agents"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/corsairdev/corsair",
+    "stars": 15674
+  },
+  {
+    "id": "gh_aiml_oss_llm_kubesphere_kubesphere",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to kubesphere/kubesphere",
+    "description": "The container platform tailored for Kubernetes multi-cloud, datacenter, and edge management ⎈ 🖥 ☁️ Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/kubesphere/kubesphere",
+    "stars": 17079
+  },
+  {
+    "id": "gh_aiml_oss_llm_langchain4j_langchain4j",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to langchain4j/langchain4j",
+    "description": "LangChain4j is an idiomatic, open-source Java library for building LLM-powered applications on the JVM. It offers a unified API over popular LLM providers and vector stores, and makes implementing tool calling (including MCP support), agents and RAG easy. It integrates seamlessl… Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Retrieval-augmented generation",
+      "Vector representations & retrieval",
+      "Agents & tool use"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Java basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "rag",
+      "vector_retrieval",
+      "ai_agents"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/langchain4j/langchain4j",
+    "stars": 13387
+  },
+  {
+    "id": "gh_aiml_oss_llm_langgenius_dify",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to langgenius/dify",
+    "description": "Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collaborative workspace. Deploy on cloud, VPC, or self-hosted, so teams move from prototype to production without rebuilding the stack. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Retrieval-augmented generation",
+      "Agents & tool use",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "rag",
+      "ai_agents",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/langgenius/dify",
+    "stars": 160884
+  },
+  {
+    "id": "gh_aiml_oss_llm_llmware_ai_llmware",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to llmware-ai/llmware",
+    "description": "Unified framework for building enterprise RAG pipelines with small, specialized models Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Retrieval-augmented generation",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "rag",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/llmware-ai/llmware",
+    "stars": 14823
+  },
+  {
+    "id": "gh_aiml_oss_llm_milvus_io_milvus",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to milvus-io/milvus",
+    "description": "Milvus is a high-performance, cloud-native vector database built for scalable vector ANN search Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Retrieval-augmented generation",
+      "Vector representations & retrieval"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "rag",
+      "vector_retrieval"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/milvus-io/milvus",
+    "stars": 46632
+  },
+  {
+    "id": "gh_aiml_oss_llm_modelscope_ms_swift",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to modelscope/ms-swift",
+    "description": "Use PEFT or Full-parameter to CPT/SFT/DPO/GRPO 600+ LLMs (Qwen3.8, DeepSeek-V4, GLM-5.1, InternLM3, Llama4, ...) and 300+ MLLMs (Qwen3-VL, Qwen3-Omni, InternVL3.5, Ovis2.5, GLM5.3, Gemma4, Llava, Phi4, ...) (AAAI 2025). Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Fine-tuning",
+      "Large language models",
+      "Generative AI",
+      "Vector representations & retrieval",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "fine_tuning",
+      "llm",
+      "generative_ai",
+      "vector_retrieval",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/modelscope/ms-swift",
+    "stars": 16080
+  },
+  {
+    "id": "gh_aiml_oss_llm_open_llm_vtuber_open_llm_vtuber",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to Open-LLM-VTuber/Open-LLM-VTuber",
+    "description": "Talk to any LLM with hands-free voice interaction, voice interruption, and Live2D avatar running locally across platforms Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Open-LLM-VTuber/Open-LLM-VTuber",
+    "stars": 14669
+  },
+  {
+    "id": "gh_aiml_oss_llm_openhands_openhands",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to OpenHands/OpenHands",
+    "description": "🙌 OpenHands: AI-Driven Development Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/OpenHands/OpenHands",
+    "stars": 93149
+  },
+  {
+    "id": "gh_aiml_oss_llm_portkey_ai_gateway",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to Portkey-AI/gateway",
+    "description": "A blazing fast AI Gateway with integrated guardrails. Route to 1,600+ LLMs, 50+ AI Guardrails with 1 fast & friendly API. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Agents & tool use"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "ai_agents"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Portkey-AI/gateway",
+    "stars": 13363
+  },
+  {
+    "id": "gh_aiml_oss_llm_rtk_ai_rtk",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to rtk-ai/rtk",
+    "description": "CLI proxy that reduces LLM token consumption by 60-90% on common dev commands. Single Rust binary, zero dependencies Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Agents & tool use"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Rust basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "ai_agents"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/rtk-ai/rtk",
+    "stars": 86115
+  },
+  {
+    "id": "gh_aiml_oss_llm_sgl_project_sglang",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to sgl-project/sglang",
+    "description": "SGLang is a high-performance serving framework for large language models and multimodal models. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Deep learning",
+      "Large language models",
+      "Generative AI",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "deep_learning",
+      "llm",
+      "generative_ai",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/sgl-project/sglang",
+    "stars": 38694
+  },
+  {
+    "id": "gh_aiml_oss_llm_significant_gravitas_autogpt",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to Significant-Gravitas/AutoGPT",
+    "description": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Agents & tool use",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "ai_agents",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Significant-Gravitas/AutoGPT",
+    "stars": 187983
+  },
+  {
+    "id": "gh_aiml_oss_llm_startrail_org_leann",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to StarTrail-org/LEANN",
+    "description": "[MLsys2026 Best Paper]: https://arxiv.org/abs/2506.08276. RAG on Everything with LEANN. Enjoy 97% storage savings while running a fast, accurate, and 100% private RAG application on your personal device. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Retrieval-augmented generation",
+      "Vector representations & retrieval",
+      "Agents & tool use",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "rag",
+      "vector_retrieval",
+      "ai_agents",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/StarTrail-org/LEANN",
+    "stars": 13788
+  },
+  {
+    "id": "gh_aiml_oss_llm_thesysdev_openui",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to thesysdev/openui",
+    "description": "The Open Standard for Generative UI Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Agents & tool use"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "ai_agents"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/thesysdev/openui",
+    "stars": 15061
+  },
+  {
+    "id": "gh_aiml_oss_llm_transformeroptimus_superagi",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to TransformerOptimus/SuperAGI",
+    "description": "SuperAGI - A dev-first open source autonomous AI agent framework. Enabling developers to build, manage & run useful autonomous agents quickly and reliably. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Large language models",
+      "Generative AI",
+      "Vector representations & retrieval",
+      "Agents & tool use",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "llm",
+      "generative_ai",
+      "vector_retrieval",
+      "ai_agents",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/TransformerOptimus/SuperAGI",
+    "stars": 17742
+  },
+  {
+    "id": "gh_aiml_oss_llm_vllm_project_vllm",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to vllm-project/vllm",
+    "description": "A high-throughput and memory-efficient inference and serving engine for LLMs Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Deep learning",
+      "Large language models",
+      "Generative AI",
+      "Model deployment & serving",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "deep_learning",
+      "llm",
+      "generative_ai",
+      "model_deployment",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/vllm-project/vllm",
+    "stars": 96690
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_apache_airflow",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to apache/airflow",
+    "description": "Apache Airflow - A platform to programmatically author, schedule, and monitor workflows Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "MLOps",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "mlops",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/apache/airflow",
+    "stars": 47439
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_argoproj_argo_workflows",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to argoproj/argo-workflows",
+    "description": "Workflow Engine for Kubernetes Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "MLOps"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "mlops"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/argoproj/argo-workflows",
+    "stars": 17087
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_bigscience_workshop_petals",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to bigscience-workshop/petals",
+    "description": "🌸 Run LLMs at home, BitTorrent-style. Fine-tuning and inference up to 10x faster than offloading Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Fine-tuning",
+      "Large language models",
+      "Generative AI",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "fine_tuning",
+      "llm",
+      "generative_ai",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/bigscience-workshop/petals",
+    "stars": 10705
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_cleanlab_cleanlab",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to cleanlab/cleanlab",
+    "description": "Cleanlab's open-source library is the standard data-centric AI package for data quality and machine learning with messy, real-world data and labels. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/cleanlab/cleanlab",
+    "stars": 11741
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_ggml_org_ggml",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to ggml-org/ggml",
+    "description": "Tensor library for machine learning Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "C++ basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/ggml-org/ggml",
+    "stars": 15603
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_julialang_julia",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to JuliaLang/julia",
+    "description": "The Julia Programming Language Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Julia basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/JuliaLang/julia",
+    "stars": 49256
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_laion_ai_open_assistant",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to LAION-AI/Open-Assistant",
+    "description": "OpenAssistant is a chat-based assistant that understands tasks, can interact with third-party systems, and retrieve information dynamically to do so. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Large language models",
+      "Generative AI",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "llm",
+      "generative_ai",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/LAION-AI/Open-Assistant",
+    "stars": 37351
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_lightning_ai_pytorch_lightning",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to Lightning-AI/pytorch-lightning",
+    "description": "Pretrain, finetune ANY AI model of ANY size on 1 or 10,000+ GPUs with zero code changes. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Fine-tuning",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "fine_tuning",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Lightning-AI/pytorch-lightning",
+    "stars": 31448
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_makazhanalpamys_soup",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to MakazhanAlpamys/Soup",
+    "description": "Fine-tune LLMs from one YAML. Layer streaming trains an 8B model on a 4 GB laptop GPU. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Fine-tuning",
+      "Large language models",
+      "Generative AI",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "fine_tuning",
+      "llm",
+      "generative_ai",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/MakazhanAlpamys/Soup",
+    "stars": 10449
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_modular_modular",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to modular/modular",
+    "description": "The Modular Platform (includes MAX & Mojo) Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Mojo basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/modular/modular",
+    "stars": 30127
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_nltk_nltk",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to nltk/nltk",
+    "description": "NLTK Source Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/nltk/nltk",
+    "stars": 14768
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_onnx_onnx",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to onnx/onnx",
+    "description": "Open standard for machine learning interoperability Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/onnx/onnx",
+    "stars": 21671
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_piskvorky_gensim",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to piskvorky/gensim",
+    "description": "Topic Modelling for Humans Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Vector representations & retrieval",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "vector_retrieval",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/piskvorky/gensim",
+    "stars": 16512
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_pytorch_pytorch",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to pytorch/pytorch",
+    "description": "Tensors and Dynamic neural networks in Python with strong GPU acceleration Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/pytorch/pytorch",
+    "stars": 105329
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_ray_project_ray",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to ray-project/ray",
+    "description": "Ray is an AI compute engine. Ray consists of a core distributed runtime and a set of AI Libraries for accelerating ML workloads. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Large language models",
+      "Generative AI",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "llm",
+      "generative_ai",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/ray-project/ray",
+    "stars": 44251
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_shap_shap",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to shap/shap",
+    "description": "A game theoretic approach to explain the output of any machine learning model. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Jupyter Notebook basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/shap/shap",
+    "stars": 25854
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_sktime_sktime",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to sktime/sktime",
+    "description": "A unified framework for machine learning with time series Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/sktime/sktime",
+    "stars": 10097
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_skypilot_org_skypilot",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to skypilot-org/skypilot",
+    "description": "The AI Compute Platform for frontier teams. SkyPilot turns fragmented AI compute into one AI supercomputer, so frontier AI teams build custom intelligence faster. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Large language models",
+      "Generative AI",
+      "MLOps",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "llm",
+      "generative_ai",
+      "mlops",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/skypilot-org/skypilot",
+    "stars": 10816
+  },
+  {
+    "id": "gh_aiml_oss_machine_learning_voxel51_fiftyone",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to voxel51/fiftyone",
+    "description": "Refine high-quality datasets and visual AI models Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Vector representations & retrieval"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "vector_retrieval"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/voxel51/fiftyone",
+    "stars": 11292
+  },
+  {
+    "id": "gh_aiml_oss_react_arc53_docsgpt",
+    "career_path": "AI/ML Engineering",
+    "title": "Contribute to arc53/DocsGPT",
+    "description": "Private AI platform for agents, assistants and enterprise search. Built-in Agent Builder, Deep research, Document analysis, Multi-model support, and API connectivity for agents. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training",
+      "Deep learning",
+      "Large language models",
+      "Generative AI",
+      "Retrieval-augmented generation",
+      "Python development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training",
+      "deep_learning",
+      "llm",
+      "generative_ai",
+      "rag",
+      "python"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/arc53/DocsGPT",
+    "stars": 18369
+  },
+  {
+    "id": "gh_data_oss_data_analysis_apache_hamilton",
+    "career_path": "Data Analyst",
+    "title": "Contribute to apache/hamilton",
+    "description": "Apache Hamilton helps data scientists and engineers define testable, modular, self-documenting dataflows, that encode lineage/tracing and metadata. Runs and scales everywhere python does. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data pipelines"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Jupyter Notebook basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_pipelines"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/apache/hamilton",
+    "stars": 2627
+  },
+  {
+    "id": "gh_data_oss_data_analysis_cannylab_tsne_cuda",
+    "career_path": "Data Analyst",
+    "title": "Contribute to CannyLab/tsne-cuda",
+    "description": "GPU Accelerated t-SNE for CUDA with Python bindings Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Cuda basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/CannyLab/tsne-cuda",
+    "stars": 1957
+  },
+  {
+    "id": "gh_data_oss_data_analysis_cloudquery_cloudquery",
+    "career_path": "Data Analyst",
+    "title": "Contribute to cloudquery/cloudquery",
+    "description": "Data pipelines for cloud config and security data. Build cloud asset inventory, CSPM, FinOps, and vulnerability management solutions. Extract from AWS, Azure, GCP, and 70+ cloud and SaaS sources. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Analytical scripting",
+      "Data analysis",
+      "Data pipelines"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis",
+      "data_pipelines"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/cloudquery/cloudquery",
+    "stars": 6558
+  },
+  {
+    "id": "gh_data_oss_data_analysis_gchq_cyberchef",
+    "career_path": "Data Analyst",
+    "title": "Contribute to gchq/CyberChef",
+    "description": "The Cyber Swiss Army Knife - a web app for encryption, encoding, compression and data analysis Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "JavaScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/gchq/CyberChef",
+    "stars": 36366
+  },
+  {
+    "id": "gh_data_oss_data_analysis_javascriptdata_danfojs",
+    "career_path": "Data Analyst",
+    "title": "Contribute to javascriptdata/danfojs",
+    "description": "Danfo.js is an open source, JavaScript library providing high performance, intuitive, and easy to use data structures for manipulating and processing structured data. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/javascriptdata/danfojs",
+    "stars": 5067
+  },
+  {
+    "id": "gh_data_oss_data_analysis_kanaries_graphic_walker",
+    "career_path": "Data Analyst",
+    "title": "Contribute to Kanaries/graphic-walker",
+    "description": "An open source alternative to Tableau. Embeddable visual analytic Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Dashboard development",
+      "Business intelligence tools"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "dashboarding",
+      "bi_tools"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Kanaries/graphic-walker",
+    "stars": 3291
+  },
+  {
+    "id": "gh_data_oss_data_analysis_kanaries_pygwalker",
+    "career_path": "Data Analyst",
+    "title": "Contribute to Kanaries/pygwalker",
+    "description": "PyGWalker: Turn your dataframe into an interactive UI for visual analysis Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Dashboard development",
+      "Business intelligence tools"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "dashboarding",
+      "bi_tools"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Kanaries/pygwalker",
+    "stars": 16007
+  },
+  {
+    "id": "gh_data_oss_data_analysis_lance_format_lance",
+    "career_path": "Data Analyst",
+    "title": "Contribute to lance-format/lance",
+    "description": "Open Lakehouse Format for Multimodal AI. Convert from Parquet in 2 lines of code for 100x faster random access, vector index, and data versioning. Compatible with Pandas, DuckDB, Polars, Pyarrow, and PyTorch with more integrations coming.. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Analytical scripting",
+      "Data analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Rust basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/lance-format/lance",
+    "stars": 7279
+  },
+  {
+    "id": "gh_data_oss_data_analysis_metabase_metabase",
+    "career_path": "Data Analyst",
+    "title": "Contribute to metabase/metabase",
+    "description": "The easy-to-use open source Business Intelligence and Embedded Analytics tool that lets everyone work with data :barchart: Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Dashboard development",
+      "Business intelligence tools"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Clojure basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "dashboarding",
+      "bi_tools"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/metabase/metabase",
+    "stars": 50267
+  },
+  {
+    "id": "gh_data_oss_data_analysis_mito_ds_mito",
+    "career_path": "Data Analyst",
+    "title": "Contribute to mito-ds/mito",
+    "description": "Jupyter extensions that help you write code faster: Context aware AI Chat, Autocomplete, and Spreadsheet Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Dashboard development",
+      "Spreadsheet analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Jupyter Notebook basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "dashboarding",
+      "spreadsheets"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/mito-ds/mito",
+    "stars": 2655
+  },
+  {
+    "id": "gh_data_oss_data_analysis_multiprocessio_datastation",
+    "career_path": "Data Analyst",
+    "title": "Contribute to multiprocessio/datastation",
+    "description": "App to easily query, script, and visualize data from every database, file, and API. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/multiprocessio/datastation",
+    "stars": 2950
+  },
+  {
+    "id": "gh_data_oss_data_analysis_nvidia_cudf",
+    "career_path": "Data Analyst",
+    "title": "Contribute to NVIDIA/cudf",
+    "description": "cuDF - GPU DataFrame Library Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "C++ basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/NVIDIA/cudf",
+    "stars": 9798
+  },
+  {
+    "id": "gh_data_oss_data_analysis_openrefine_openrefine",
+    "career_path": "Data Analyst",
+    "title": "Contribute to OpenRefine/OpenRefine",
+    "description": "OpenRefine is a free, open source power tool for working with messy data and improving it Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Java basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/OpenRefine/OpenRefine",
+    "stars": 12095
+  },
+  {
+    "id": "gh_data_oss_data_analysis_pandas_dev_pandas",
+    "career_path": "Data Analyst",
+    "title": "Contribute to pandas-dev/pandas",
+    "description": "Flexible and powerful data analysis / manipulation library for Python, providing labeled data structures similar to R data.frame objects, statistical functions, and much more Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Statistics"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "statistics"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/pandas-dev/pandas",
+    "stars": 50574
+  },
+  {
+    "id": "gh_data_oss_data_analysis_rio_labs_rio",
+    "career_path": "Data Analyst",
+    "title": "Contribute to rio-labs/rio",
+    "description": "WebApps in pure Python. No JavaScript, HTML and CSS needed Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/rio-labs/rio",
+    "stars": 3650
+  },
+  {
+    "id": "gh_data_oss_data_analysis_root_project_root",
+    "career_path": "Data Analyst",
+    "title": "Contribute to root-project/root",
+    "description": "The official repository for ROOT: analyzing, storing and visualizing big data, scientifically Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Statistics",
+      "Large-scale processing"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "C++ basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "statistics",
+      "large_scale_processing"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/root-project/root",
+    "stars": 3342
+  },
+  {
+    "id": "gh_data_oss_data_analysis_running_elephant_datart",
+    "career_path": "Data Analyst",
+    "title": "Contribute to running-elephant/datart",
+    "description": "Datart is a next generation Data Visualization Open Platform Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Dashboard development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "dashboarding"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/running-elephant/datart",
+    "stars": 2311
+  },
+  {
+    "id": "gh_data_oss_data_analysis_secretflow_secretflow",
+    "career_path": "Data Analyst",
+    "title": "Contribute to secretflow/secretflow",
+    "description": "A unified framework for privacy-preserving data analysis and machine learning Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/secretflow/secretflow",
+    "stars": 2719
+  },
+  {
+    "id": "gh_data_oss_data_analysis_statsmodels_statsmodels",
+    "career_path": "Data Analyst",
+    "title": "Contribute to statsmodels/statsmodels",
+    "description": "Statsmodels: statistical modeling and econometrics in Python Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Statistics"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "statistics"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/statsmodels/statsmodels",
+    "stars": 11746
+  },
+  {
+    "id": "gh_data_oss_data_analysis_visactor_vtable",
+    "career_path": "Data Analyst",
+    "title": "Contribute to VisActor/VTable",
+    "description": "VTable is not just a high-performance multidimensional data analysis table, but also a grid artist that creates art between rows and columns. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Spreadsheet analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "spreadsheets"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/VisActor/VTable",
+    "stars": 3682
+  },
+  {
+    "id": "gh_data_oss_data_visualization_aimhubio_aim",
+    "career_path": "Data Analyst",
+    "title": "Contribute to aimhubio/aim",
+    "description": "Aim 💫 — An easy-to-use & supercharged open-source experiment tracker. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization",
+      "Analytical scripting"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization",
+      "analytical_scripting"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/aimhubio/aim",
+    "stars": 6297
+  },
+  {
+    "id": "gh_data_oss_data_visualization_antvis_g6",
+    "career_path": "Data Analyst",
+    "title": "Contribute to antvis/G6",
+    "description": "♾ A Graph Visualization Framework in JavaScript. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/antvis/G6",
+    "stars": 12385
+  },
+  {
+    "id": "gh_data_oss_data_visualization_antvis_l7",
+    "career_path": "Data Analyst",
+    "title": "Contribute to antvis/L7",
+    "description": "🌎 Large-scale WebGL-powered Geospatial Data Visualization analysis engine. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/antvis/L7",
+    "stars": 4077
+  },
+  {
+    "id": "gh_data_oss_data_visualization_arpanghosh8453_open_dronelog",
+    "career_path": "Data Analyst",
+    "title": "Contribute to arpanghosh8453/open-dronelog",
+    "description": "Drone Log analyzer: A high-performance universal dashboard application for organizing and analyzing DJI/Litchi flight logs privately in one place. Supports plugin for custom flight log formats. Built with Tauri v2, DuckDB, and React. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Dashboard development",
+      "Statistics"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "dashboarding",
+      "statistics"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/arpanghosh8453/open-dronelog",
+    "stars": 1588
+  },
+  {
+    "id": "gh_data_oss_data_visualization_grafana_grafana",
+    "career_path": "Data Analyst",
+    "title": "Contribute to grafana/grafana",
+    "description": "The open and composable observability and data visualization platform. Visualize metrics, logs, and traces from multiple sources like Prometheus, Loki, Elasticsearch, InfluxDB, Postgres and many more. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization",
+      "Dashboard development"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "dashboarding"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/grafana/grafana",
+    "stars": 77820
+  },
+  {
+    "id": "gh_data_oss_data_visualization_microsoft_sanddance",
+    "career_path": "Data Analyst",
+    "title": "Contribute to microsoft/SandDance",
+    "description": "Visually explore, understand, and present your data. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization",
+      "Dashboard development",
+      "Business intelligence tools"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization",
+      "dashboarding",
+      "bi_tools"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/microsoft/SandDance",
+    "stars": 7158
+  },
+  {
+    "id": "gh_data_oss_data_visualization_mlomb_chat_analytics",
+    "career_path": "Data Analyst",
+    "title": "Contribute to mlomb/chat-analytics",
+    "description": "Generate interactive, beautiful and insightful chat analysis reports Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/mlomb/chat-analytics",
+    "stars": 1197
+  },
+  {
+    "id": "gh_data_oss_data_visualization_nikolaydubina_go_recipes",
+    "career_path": "Data Analyst",
+    "title": "Contribute to nikolaydubina/go-recipes",
+    "description": "🦩 Tools for Go projects Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/nikolaydubina/go-recipes",
+    "stars": 4810
+  },
+  {
+    "id": "gh_data_oss_data_visualization_openspace_openspace",
+    "career_path": "Data Analyst",
+    "title": "Contribute to OpenSpace/OpenSpace",
+    "description": "This is the official GitHub repository for OpenSpace: an open source astrovisualization project. For instructions on how to build and run OpenSpace, see the Getting Started Guides on the wiki page at http://docs.openspaceproject.com. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "C++ basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/OpenSpace/OpenSpace",
+    "stars": 1299
+  },
+  {
+    "id": "gh_data_oss_data_visualization_plotly_plotly_js",
+    "career_path": "Data Analyst",
+    "title": "Contribute to plotly/plotly.js",
+    "description": "Open-source JavaScript charting library behind Plotly and Dash Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "JavaScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/plotly/plotly.js",
+    "stars": 18379
+  },
+  {
+    "id": "gh_data_oss_data_visualization_sourcerer_io_sourcerer_app",
+    "career_path": "Data Analyst",
+    "title": "Contribute to sourcerer-io/sourcerer-app",
+    "description": "🦄 Sourcerer app makes a visual profile from your GitHub and git repositories. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Kotlin basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/sourcerer-io/sourcerer-app",
+    "stars": 6736
+  },
+  {
+    "id": "gh_data_oss_data_visualization_visactor_skills",
+    "career_path": "Data Analyst",
+    "title": "Contribute to VisActor/skills",
+    "description": "Agent skills for the VisActor visualization ecosystem. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "HTML basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/VisActor/skills",
+    "stars": 475
+  },
+  {
+    "id": "gh_data_oss_llm_canner_wrenai",
+    "career_path": "Data Analyst",
+    "title": "Contribute to Canner/WrenAI",
+    "description": "GenBI (Generative BI) for AI agents, an open-source, governed text-to-SQL through an open context layer that turns natural-language questions into trusted dashboards, charts, and SQL across 20+ data sources, such as BigQuery, Snowflake, PostgreSQL, ClickHouse, Amazon Redshift, D… Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL",
+      "Data visualization",
+      "Dashboard development",
+      "Data modeling",
+      "Data warehousing",
+      "Analytical scripting"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "sql",
+      "data_visualization",
+      "dashboarding",
+      "data_modeling",
+      "warehousing",
+      "analytical_scripting"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Canner/WrenAI",
+    "stars": 18133
+  },
+  {
+    "id": "gh_data_oss_machine_learning_apache_airflow",
+    "career_path": "Data Analyst",
+    "title": "Contribute to apache/airflow",
+    "description": "Apache Airflow - A platform to programmatically author, schedule, and monitor workflows Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data pipelines",
+      "Analytical scripting"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_pipelines",
+      "analytical_scripting"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/apache/airflow",
+    "stars": 47439
+  },
+  {
+    "id": "gh_data_oss_machine_learning_argoproj_argo_workflows",
+    "career_path": "Data Analyst",
+    "title": "Contribute to argoproj/argo-workflows",
+    "description": "Workflow Engine for Kubernetes Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data pipelines"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_pipelines"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/argoproj/argo-workflows",
+    "stars": 17087
+  },
+  {
+    "id": "gh_data_oss_machine_learning_cleanlab_cleanlab",
+    "career_path": "Data Analyst",
+    "title": "Contribute to cleanlab/cleanlab",
+    "description": "Cleanlab's open-source library is the standard data-centric AI package for data quality and machine learning with messy, real-world data and labels. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis",
+      "Data quality"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis",
+      "data_quality"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/cleanlab/cleanlab",
+    "stars": 11741
+  },
+  {
+    "id": "gh_data_oss_machine_learning_pytorch_pytorch",
+    "career_path": "Data Analyst",
+    "title": "Contribute to pytorch/pytorch",
+    "description": "Tensors and Dynamic neural networks in Python with strong GPU acceleration Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/pytorch/pytorch",
+    "stars": 105329
+  },
+  {
+    "id": "gh_data_oss_machine_learning_shap_shap",
+    "career_path": "Data Analyst",
+    "title": "Contribute to shap/shap",
+    "description": "A game theoretic approach to explain the output of any machine learning model. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Analytical scripting",
+      "Data analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Jupyter Notebook basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "analytical_scripting",
+      "data_analysis"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/shap/shap",
+    "stars": 25854
+  },
+  {
+    "id": "gh_data_oss_machine_learning_sktime_sktime",
+    "career_path": "Data Analyst",
+    "title": "Contribute to sktime/sktime",
+    "description": "A unified framework for machine learning with time series Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Statistics",
+      "Analytical scripting"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "statistics",
+      "analytical_scripting"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/sktime/sktime",
+    "stars": 10097
+  },
+  {
+    "id": "gh_data_oss_machine_learning_voxel51_fiftyone",
+    "career_path": "Data Analyst",
+    "title": "Contribute to voxel51/fiftyone",
+    "description": "Refine high-quality datasets and visual AI models Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization",
+      "Data quality"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization",
+      "data_quality"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/voxel51/fiftyone",
+    "stars": 11292
+  },
+  {
+    "id": "gh_data_oss_react_apitable_apitable",
+    "career_path": "Data Analyst",
+    "title": "Contribute to apitable/apitable",
+    "description": "🚀🎉📚 APITable, an API-oriented low-code platform for building collaborative apps and better than all other Airtable open-source alternatives. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization",
+      "Dashboard development",
+      "Spreadsheet analysis"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization",
+      "dashboarding",
+      "spreadsheets"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/apitable/apitable",
+    "stars": 15664
+  },
+  {
+    "id": "gh_data_oss_react_recharts_recharts",
+    "career_path": "Data Analyst",
+    "title": "Contribute to recharts/recharts",
+    "description": "Redefined chart library built with React and D3 Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Data visualization"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "data_visualization"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/recharts/recharts",
+    "stars": 27694
+  },
+  {
+    "id": "gh_swe_cool_coders_10_user_interfaces",
+    "career_path": "Software Engineering",
+    "title": "10 User Interfaces",
+    "description": "10 User Interfaces using HTML, CSS and JavaScript",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 15,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=Rz-rey4Q1bw&list=LL&index=6&t=8839s"
+  },
+  {
+    "id": "gh_swe_cool_coders_a_covid_19_tracker",
+    "career_path": "Software Engineering",
+    "title": "A COVID-19 Tracker",
+    "description": "A COVID-19 Tracker using React JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=cF3pIMJUZxM&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=2"
+  },
+  {
+    "id": "gh_swe_cool_coders_airbnb_clone_application",
+    "career_path": "Software Engineering",
+    "title": "Airbnb Clone Application",
+    "description": "A React App for Airbnb Home page Clone",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=IQaCL8_bwA4&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=7"
+  },
+  {
+    "id": "gh_swe_cool_coders_amazon_clone_using_solidity",
+    "career_path": "Software Engineering",
+    "title": "Amazon Clone using Solidity",
+    "description": "Solidity, Ethers.js, React & Hardhat",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=X1ahXNYkpL8"
+  },
+  {
+    "id": "gh_swe_cool_coders_build_brand_page",
+    "career_path": "Software Engineering",
+    "title": "Build Brand Page",
+    "description": "Design with React",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 15,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=W7up-w1QYpw&ab_channel=DoSomeCoding"
+  },
+  {
+    "id": "gh_swe_cool_coders_business_card_generator",
+    "career_path": "Software Engineering",
+    "title": "Business Card Generator",
+    "description": "A Business Card Generator using React JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=mGORpgEOsT4"
+  },
+  {
+    "id": "gh_swe_cool_coders_chess_game_app",
+    "career_path": "Software Engineering",
+    "title": "Chess Game App",
+    "description": "A Two Player Chess game application using JavaScript",
+    "skills_practiced": [
+      "Algorithms & data structures",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 15,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "algorithms",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=SS5amIbX0Mo&list=LL&index=3&t=56s"
+  },
+  {
+    "id": "gh_swe_cool_coders_collaborative_whiteboard",
+    "career_path": "Software Engineering",
+    "title": "Collaborative Whiteboard",
+    "description": "A real-time drawing app with multiple users using WebSockets",
+    "skills_practiced": [
+      "Distributed systems",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "distributed_systems",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=ifxK3E5l3u0"
+  },
+  {
+    "id": "gh_swe_cool_coders_discord_clone_mern_stack",
+    "career_path": "Software Engineering",
+    "title": "Discord Clone - MERN STACK",
+    "description": "Discord Clone App using MERN Stack",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=YzcnqYNXM90"
+  },
+  {
+    "id": "gh_swe_cool_coders_e_commerce_application",
+    "career_path": "Software Engineering",
+    "title": "E-Commerce Application",
+    "description": "MongoDB, Reactjs, Nextjs",
+    "skills_practiced": [
+      "Frontend development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=XtciU6BnQdo"
+  },
+  {
+    "id": "gh_swe_cool_coders_facebook_clone_application",
+    "career_path": "Software Engineering",
+    "title": "Facebook Clone Application",
+    "description": "A facebook Clone Application using React JS and Firebase",
+    "skills_practiced": [
+      "Frontend development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=B-kxUMHBxNo&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=6"
+  },
+  {
+    "id": "gh_swe_cool_coders_fitness_app",
+    "career_path": "Software Engineering",
+    "title": "Fitness App",
+    "description": "A fitness app that sends you new workouts per email every day using Python and HarperDB.",
+    "skills_practiced": [
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=KMkmA4i2FQc"
+  },
+  {
+    "id": "gh_swe_cool_coders_flipkart_clone_application",
+    "career_path": "Software Engineering",
+    "title": "Flipkart Clone Application",
+    "description": "A Full-Stack Flipkart Clone using MERN Stack",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=tvdFYmJEaw4&list=PLB_Wd4-5SGAYsxD4JGaVdXll3PnoyI-AM"
+  },
+  {
+    "id": "gh_swe_cool_coders_full_stack_amazon_clone",
+    "career_path": "Software Engineering",
+    "title": "Full-Stack Amazon Clone",
+    "description": "A Full-Stack AMAZON Clone using REACT JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=RDV3Z1KCBvo&feature=youtu.be&ck_subscriber_id=857936933"
+  },
+  {
+    "id": "gh_swe_cool_coders_full_stack_nft_marketplace",
+    "career_path": "Software Engineering",
+    "title": "Full Stack NFT Marketplace",
+    "description": "Ethereum, Polygon and Next.js",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=GKJBEEXUha0"
+  },
+  {
+    "id": "gh_swe_cool_coders_full_stack_twitter_clone",
+    "career_path": "Software Engineering",
+    "title": "Full-Stack Twitter Clone",
+    "description": "Next JS, Recoil JS, Tailwind CSS, Nextauth & Firebase",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Security",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "security",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=5Wak0iyGCrc&t"
+  },
+  {
+    "id": "gh_swe_cool_coders_github_jobs_app",
+    "career_path": "Software Engineering",
+    "title": "Github Jobs App",
+    "description": "A GitHub Jobs App using React Hooks and Github API",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=fxY1q4SCB64&list=LL&index=2"
+  },
+  {
+    "id": "gh_swe_cool_coders_gmail_clone",
+    "career_path": "Software Engineering",
+    "title": "Gmail Clone",
+    "description": "Gmail Clone using React JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=b7nrXjS6Dqs"
+  },
+  {
+    "id": "gh_swe_cool_coders_google_drive_clone_with_react",
+    "career_path": "Software Engineering",
+    "title": "Google Drive Clone With React",
+    "description": "Google Drive Clone using React, Firebase",
+    "skills_practiced": [
+      "Frontend development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=ljuCH6_jrYE"
+  },
+  {
+    "id": "gh_swe_cool_coders_instagram_clone_application",
+    "career_path": "Software Engineering",
+    "title": "Instagram Clone Application",
+    "description": "An Instagram Clone application using React JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=f7T48W0cwXM"
+  },
+  {
+    "id": "gh_swe_cool_coders_invoice_application",
+    "career_path": "Software Engineering",
+    "title": "Invoice Application",
+    "description": "Vue 3, Vuex & Firebase",
+    "skills_practiced": [
+      "Frontend development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=vsJtN54aA7w"
+  },
+  {
+    "id": "gh_swe_cool_coders_linkedin_clone",
+    "career_path": "Software Engineering",
+    "title": "LinkedIn Clone",
+    "description": "LinkedIn Clone using React JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=QaYts9sPmcY&t=3s"
+  },
+  {
+    "id": "gh_swe_cool_coders_messenger_clone_mern_stack",
+    "career_path": "Software Engineering",
+    "title": "Messenger Clone - MERN STACK",
+    "description": "Messenger Clone App using MERN Stack",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=8GMx8r9zQXg"
+  },
+  {
+    "id": "gh_swe_cool_coders_netflix_clone_fullstack",
+    "career_path": "Software Engineering",
+    "title": "Netflix Clone - FullStack",
+    "description": "A Netflix clone application using TMDB API",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=x_EEwGe-a9o&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=1&t=291s"
+  },
+  {
+    "id": "gh_swe_cool_coders_password_generator",
+    "career_path": "Software Engineering",
+    "title": "Password Generator",
+    "description": "Password Generator App using Python",
+    "skills_practiced": [
+      "Security",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 15,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "security",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=SwgBZ0BQNLQ"
+  },
+  {
+    "id": "gh_swe_cool_coders_react_photo_gallery",
+    "career_path": "Software Engineering",
+    "title": "React Photo Gallery",
+    "description": "Photo Gallery App using React JS and Firebase",
+    "skills_practiced": [
+      "Frontend development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=vUe91uOx7R0"
+  },
+  {
+    "id": "gh_swe_cool_coders_real_estate_app_like_zillow",
+    "career_path": "Software Engineering",
+    "title": "Real Estate App like Zillow",
+    "description": "Solidity, Ethereum, Hardhat, React",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=C4blK6X-D_4"
+  },
+  {
+    "id": "gh_swe_cool_coders_robinhood_clone",
+    "career_path": "Software Engineering",
+    "title": "Robinhood Clone",
+    "description": "Robinhood Clone using React JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=TxggrQ0nHjY&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=18"
+  },
+  {
+    "id": "gh_swe_cool_coders_signal_clone",
+    "career_path": "Software Engineering",
+    "title": "Signal Clone",
+    "description": "Signal Clone using React JS",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=MJzmZ9qmdaE"
+  },
+  {
+    "id": "gh_swe_cool_coders_tic_tac_toe",
+    "career_path": "Software Engineering",
+    "title": "TIC TAC TOE",
+    "description": "Tic Tac Toe game using Python",
+    "skills_practiced": [
+      "Algorithms & data structures",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "beginner",
+    "estimated_hours": 15,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "algorithms",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=BHh654_7Cmw"
+  },
+  {
+    "id": "gh_swe_cool_coders_tik_tok_clone_mern_stack",
+    "career_path": "Software Engineering",
+    "title": "Tik Tok Clone - MERN STACK",
+    "description": "Tik Tok Clone App using MERN Stack",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=g8yGxDMyGiE"
+  },
+  {
+    "id": "gh_swe_cool_coders_tmdb_movie_app",
+    "career_path": "Software Engineering",
+    "title": "TMDB Movie App",
+    "description": "An interactive Movie Database app using ReactJS.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=ufodJVcpmps"
+  },
+  {
+    "id": "gh_swe_cool_coders_travel_log_mern_stack",
+    "career_path": "Software Engineering",
+    "title": "Travel Log - MERN STACK",
+    "description": "Travel Log App using MERN Stack",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=5pQsl9u_10M"
+  },
+  {
+    "id": "gh_swe_cool_coders_voting_application_mern",
+    "career_path": "Software Engineering",
+    "title": "Voting Application - MERN",
+    "description": "A Voting App using MERN Stack",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "advanced",
+    "estimated_hours": 50,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=0oziV0FLhXc&list=PLBeQxJQNprbgrNfcntLO8N2Y-dzlMZXZe"
+  },
+  {
+    "id": "gh_swe_cool_coders_weather_app",
+    "career_path": "Software Engineering",
+    "title": "Weather App",
+    "description": "Weather app in React JS using the Open Weather Map API",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=GuA0_Z1llYU"
+  },
+  {
+    "id": "gh_swe_cool_coders_wildfire_tracker_with_react",
+    "career_path": "Software Engineering",
+    "title": "Wildfire Tracker With React",
+    "description": "Wild Fire Detection using React, NASA API",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 30,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://www.youtube.com/watch?v=ontX4zfVqK8&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=17"
+  },
+  {
+    "id": "gh_swe_open_source_projects_kangjul3854_hyufa",
+    "career_path": "Software Engineering",
+    "title": "Contribute to kangjul3854/hyufa",
+    "description": "HYUFA is an AI finance assistant for university students and young professionals — from basic financial knowledge to personalized portfolio guidance. HYUFA는 간단한 금융 상식부터 포트폴리오 추천까지, 대학생과 사회초년생을 위한 AI 금융 상담 서비스입니다. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "HTML basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/kangjul3854/hyufa",
+    "stars": 245
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_cannylab_tsne_cuda",
+    "career_path": "Software Engineering",
+    "title": "Contribute to CannyLab/tsne-cuda",
+    "description": "GPU Accelerated t-SNE for CUDA with Python bindings Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Algorithms & data structures",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Cuda basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "algorithms",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/CannyLab/tsne-cuda",
+    "stars": 1957
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_cloudquery_cloudquery",
+    "career_path": "Software Engineering",
+    "title": "Contribute to cloudquery/cloudquery",
+    "description": "Data pipelines for cloud config and security data. Build cloud asset inventory, CSPM, FinOps, and vulnerability management solutions. Extract from AWS, Azure, GCP, and 70+ cloud and SaaS sources. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Backend & API development",
+      "SQL & relational databases",
+      "Containers",
+      "Cloud platforms",
+      "Security",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "backend_apis",
+      "relational_sql",
+      "containers",
+      "cloud",
+      "security",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/cloudquery/cloudquery",
+    "stars": 6558
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_gchq_cyberchef",
+    "career_path": "Software Engineering",
+    "title": "Contribute to gchq/CyberChef",
+    "description": "The Cyber Swiss Army Knife - a web app for encryption, encoding, compression and data analysis Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Security",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "JavaScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "security",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/gchq/CyberChef",
+    "stars": 36366
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_javascriptdata_danfojs",
+    "career_path": "Software Engineering",
+    "title": "Contribute to javascriptdata/danfojs",
+    "description": "Danfo.js is an open source, JavaScript library providing high performance, intuitive, and easy to use data structures for manipulating and processing structured data. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Algorithms & data structures",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "algorithms",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/javascriptdata/danfojs",
+    "stars": 5067
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_kanaries_graphic_walker",
+    "career_path": "Software Engineering",
+    "title": "Contribute to Kanaries/graphic-walker",
+    "description": "An open source alternative to Tableau. Embeddable visual analytic Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Kanaries/graphic-walker",
+    "stars": 3291
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_kanaries_pygwalker",
+    "career_path": "Software Engineering",
+    "title": "Contribute to Kanaries/pygwalker",
+    "description": "PyGWalker: Turn your dataframe into an interactive UI for visual analysis Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Kanaries/pygwalker",
+    "stars": 16007
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_metabase_metabase",
+    "career_path": "Software Engineering",
+    "title": "Contribute to metabase/metabase",
+    "description": "The easy-to-use open source Business Intelligence and Embedded Analytics tool that lets everyone work with data :barchart: Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL & relational databases",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Clojure basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "relational_sql",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/metabase/metabase",
+    "stars": 50267
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_multiprocessio_datastation",
+    "career_path": "Software Engineering",
+    "title": "Contribute to multiprocessio/datastation",
+    "description": "App to easily query, script, and visualize data from every database, file, and API. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Backend & API development",
+      "SQL & relational databases",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "backend_apis",
+      "relational_sql",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/multiprocessio/datastation",
+    "stars": 2950
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_pandas_dev_pandas",
+    "career_path": "Software Engineering",
+    "title": "Contribute to pandas-dev/pandas",
+    "description": "Flexible and powerful data analysis / manipulation library for Python, providing labeled data structures similar to R data.frame objects, statistical functions, and much more Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Algorithms & data structures",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "algorithms",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/pandas-dev/pandas",
+    "stars": 50574
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_rio_labs_rio",
+    "career_path": "Software Engineering",
+    "title": "Contribute to rio-labs/rio",
+    "description": "WebApps in pure Python. No JavaScript, HTML and CSS needed Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/rio-labs/rio",
+    "stars": 3650
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_running_elephant_datart",
+    "career_path": "Software Engineering",
+    "title": "Contribute to running-elephant/datart",
+    "description": "Datart is a next generation Data Visualization Open Platform Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "SQL & relational databases",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "relational_sql",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/running-elephant/datart",
+    "stars": 2311
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_secretflow_secretflow",
+    "career_path": "Software Engineering",
+    "title": "Contribute to secretflow/secretflow",
+    "description": "A unified framework for privacy-preserving data analysis and machine learning Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Security",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "security",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/secretflow/secretflow",
+    "stars": 2719
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_statsmodels_statsmodels",
+    "career_path": "Software Engineering",
+    "title": "Contribute to statsmodels/statsmodels",
+    "description": "Statsmodels: statistical modeling and econometrics in Python Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Software testing",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "testing",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/statsmodels/statsmodels",
+    "stars": 11746
+  },
+  {
+    "id": "gh_swe_oss_data_analysis_visactor_vtable",
+    "career_path": "Software Engineering",
+    "title": "Contribute to VisActor/VTable",
+    "description": "VTable is not just a high-performance multidimensional data analysis table, but also a grid artist that creates art between rows and columns. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/VisActor/VTable",
+    "stars": 3682
+  },
+  {
+    "id": "gh_swe_oss_data_visualization_arpanghosh8453_open_dronelog",
+    "career_path": "Software Engineering",
+    "title": "Contribute to arpanghosh8453/open-dronelog",
+    "description": "Drone Log analyzer: A high-performance universal dashboard application for organizing and analyzing DJI/Litchi flight logs privately in one place. Supports plugin for custom flight log formats. Built with Tauri v2, DuckDB, and React. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Containers",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "containers",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/arpanghosh8453/open-dronelog",
+    "stars": 1588
+  },
+  {
+    "id": "gh_swe_oss_data_visualization_grafana_grafana",
+    "career_path": "Software Engineering",
+    "title": "Contribute to grafana/grafana",
+    "description": "The open and composable observability and data visualization platform. Visualize metrics, logs, and traces from multiple sources like Prometheus, Loki, Elasticsearch, InfluxDB, Postgres and many more. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "NoSQL & search",
+      "SQL & relational databases",
+      "Observability & operations",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "nosql_search",
+      "relational_sql",
+      "observability_operations",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/grafana/grafana",
+    "stars": 77820
+  },
+  {
+    "id": "gh_swe_oss_data_visualization_nikolaydubina_go_recipes",
+    "career_path": "Software Engineering",
+    "title": "Contribute to nikolaydubina/go-recipes",
+    "description": "🦩 Tools for Go projects Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Software testing",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "testing",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/nikolaydubina/go-recipes",
+    "stars": 4810
+  },
+  {
+    "id": "gh_swe_oss_data_visualization_visactor_skills",
+    "career_path": "Software Engineering",
+    "title": "Contribute to VisActor/skills",
+    "description": "Agent skills for the VisActor visualization ecosystem. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "HTML basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/VisActor/skills",
+    "stars": 475
+  },
+  {
+    "id": "gh_swe_oss_llm_canner_wrenai",
+    "career_path": "Software Engineering",
+    "title": "Contribute to Canner/WrenAI",
+    "description": "GenBI (Generative BI) for AI agents, an open-source, governed text-to-SQL through an open context layer that turns natural-language questions into trusted dashboards, charts, and SQL across 20+ data sources, such as BigQuery, Snowflake, PostgreSQL, ClickHouse, Amazon Redshift, D… Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "SQL & relational databases",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "relational_sql",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Canner/WrenAI",
+    "stars": 18133
+  },
+  {
+    "id": "gh_swe_oss_llm_corsairdev_corsair",
+    "career_path": "Software Engineering",
+    "title": "Contribute to corsairdev/corsair",
+    "description": "Connect your users to their apps Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Backend & API development",
+      "Security",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "backend_apis",
+      "security",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/corsairdev/corsair",
+    "stars": 15674
+  },
+  {
+    "id": "gh_swe_oss_llm_kubesphere_kubesphere",
+    "career_path": "Software Engineering",
+    "title": "Contribute to kubesphere/kubesphere",
+    "description": "The container platform tailored for Kubernetes multi-cloud, datacenter, and edge management ⎈ 🖥 ☁️ Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Containers",
+      "Cloud platforms",
+      "CI/CD & delivery automation",
+      "Observability & operations",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "containers",
+      "cloud",
+      "delivery_automation",
+      "observability_operations",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/kubesphere/kubesphere",
+    "stars": 17079
+  },
+  {
+    "id": "gh_swe_oss_llm_langchain4j_langchain4j",
+    "career_path": "Software Engineering",
+    "title": "Contribute to langchain4j/langchain4j",
+    "description": "LangChain4j is an idiomatic, open-source Java library for building LLM-powered applications on the JVM. It offers a unified API over popular LLM providers and vector stores, and makes implementing tool calling (including MCP support), agents and RAG easy. It integrates seamlessl… Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Java basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/langchain4j/langchain4j",
+    "stars": 13387
+  },
+  {
+    "id": "gh_swe_oss_llm_langgenius_dify",
+    "career_path": "Software Engineering",
+    "title": "Contribute to langgenius/dify",
+    "description": "Build Agentic workflows, RAG pipelines, with rich AI model and tool support on one collaborative workspace. Deploy on cloud, VPC, or self-hosted, so teams move from prototype to production without rebuilding the stack. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Cloud platforms",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "cloud",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/langgenius/dify",
+    "stars": 160884
+  },
+  {
+    "id": "gh_swe_oss_llm_milvus_io_milvus",
+    "career_path": "Software Engineering",
+    "title": "Contribute to milvus-io/milvus",
+    "description": "Milvus is a high-performance, cloud-native vector database built for scalable vector ANN search Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Distributed systems",
+      "Cloud platforms",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "distributed_systems",
+      "cloud",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/milvus-io/milvus",
+    "stars": 46632
+  },
+  {
+    "id": "gh_swe_oss_llm_portkey_ai_gateway",
+    "career_path": "Software Engineering",
+    "title": "Contribute to Portkey-AI/gateway",
+    "description": "A blazing fast AI Gateway with integrated guardrails. Route to 1,600+ LLMs, 50+ AI Guardrails with 1 fast & friendly API. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Portkey-AI/gateway",
+    "stars": 13363
+  },
+  {
+    "id": "gh_swe_oss_llm_significant_gravitas_autogpt",
+    "career_path": "Software Engineering",
+    "title": "Contribute to Significant-Gravitas/AutoGPT",
+    "description": "AutoGPT is the vision of accessible AI for everyone, to use and to build on. Our mission is to provide the tools, so that you can focus on what matters. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Significant-Gravitas/AutoGPT",
+    "stars": 187983
+  },
+  {
+    "id": "gh_swe_oss_llm_thesysdev_openui",
+    "career_path": "Software Engineering",
+    "title": "Contribute to thesysdev/openui",
+    "description": "The Open Standard for Generative UI Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/thesysdev/openui",
+    "stars": 15061
+  },
+  {
+    "id": "gh_swe_oss_llm_transformeroptimus_superagi",
+    "career_path": "Software Engineering",
+    "title": "Contribute to TransformerOptimus/SuperAGI",
+    "description": "SuperAGI - A dev-first open source autonomous AI agent framework. Enabling developers to build, manage & run useful autonomous agents quickly and reliably. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/TransformerOptimus/SuperAGI",
+    "stars": 17742
+  },
+  {
+    "id": "gh_swe_oss_machine_learning_argoproj_argo_workflows",
+    "career_path": "Software Engineering",
+    "title": "Contribute to argoproj/argo-workflows",
+    "description": "Workflow Engine for Kubernetes Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Containers",
+      "Cloud platforms",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Go basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "containers",
+      "cloud",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/argoproj/argo-workflows",
+    "stars": 17087
+  },
+  {
+    "id": "gh_swe_oss_machine_learning_bigscience_workshop_petals",
+    "career_path": "Software Engineering",
+    "title": "Contribute to bigscience-workshop/petals",
+    "description": "🌸 Run LLMs at home, BitTorrent-style. Fine-tuning and inference up to 10x faster than offloading Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Distributed systems",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "distributed_systems",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/bigscience-workshop/petals",
+    "stars": 10705
+  },
+  {
+    "id": "gh_swe_oss_machine_learning_laion_ai_open_assistant",
+    "career_path": "Software Engineering",
+    "title": "Contribute to LAION-AI/Open-Assistant",
+    "description": "OpenAssistant is a chat-based assistant that understands tasks, can interact with third-party systems, and retrieve information dynamically to do so. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/LAION-AI/Open-Assistant",
+    "stars": 37351
+  },
+  {
+    "id": "gh_swe_oss_machine_learning_ray_project_ray",
+    "career_path": "Software Engineering",
+    "title": "Contribute to ray-project/ray",
+    "description": "Ray is an AI compute engine. Ray consists of a core distributed runtime and a set of AI Libraries for accelerating ML workloads. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Distributed systems",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "distributed_systems",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/ray-project/ray",
+    "stars": 44251
+  },
+  {
+    "id": "gh_swe_oss_machine_learning_skypilot_org_skypilot",
+    "career_path": "Software Engineering",
+    "title": "Contribute to skypilot-org/skypilot",
+    "description": "The AI Compute Platform for frontier teams. SkyPilot turns fragmented AI compute into one AI supercomputer, so frontier AI teams build custom intelligence faster. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Distributed systems",
+      "Cloud platforms",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "distributed_systems",
+      "cloud",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/skypilot-org/skypilot",
+    "stars": 10816
+  },
+  {
+    "id": "gh_swe_oss_react_apitable_apitable",
+    "career_path": "Software Engineering",
+    "title": "Contribute to apitable/apitable",
+    "description": "🚀🎉📚 APITable, an API-oriented low-code platform for building collaborative apps and better than all other Airtable open-source alternatives. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/apitable/apitable",
+    "stars": 15664
+  },
+  {
+    "id": "gh_swe_oss_react_arc53_docsgpt",
+    "career_path": "Software Engineering",
+    "title": "Contribute to arc53/DocsGPT",
+    "description": "Private AI platform for agents, assistants and enterprise search. Built-in Agent Builder, Deep research, Document analysis, Multi-model support, and API connectivity for agents. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/arc53/DocsGPT",
+    "stars": 18369
+  },
+  {
+    "id": "gh_swe_oss_react_automattic_harper",
+    "career_path": "Software Engineering",
+    "title": "Contribute to Automattic/harper",
+    "description": "Offline, privacy-first grammar checker. Fast, open-source, Rust-powered Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Rust basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Automattic/harper",
+    "stars": 17566
+  },
+  {
+    "id": "gh_swe_oss_react_carbon_design_system_carbon",
+    "career_path": "Software Engineering",
+    "title": "Contribute to carbon-design-system/carbon",
+    "description": "A design system built by IBM Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/carbon-design-system/carbon",
+    "stars": 9614
+  },
+  {
+    "id": "gh_swe_oss_react_decaporg_decap_cms",
+    "career_path": "Software Engineering",
+    "title": "Contribute to decaporg/decap-cms",
+    "description": "A Git-based CMS for Static Site Generators Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Cloud platforms",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "JavaScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "cloud",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/decaporg/decap-cms",
+    "stars": 19472
+  },
+  {
+    "id": "gh_swe_oss_react_flagsmith_flagsmith",
+    "career_path": "Software Engineering",
+    "title": "Contribute to Flagsmith/flagsmith",
+    "description": "Flagsmith is an open-source feature flag platform with remote config, experimentation, and self-hosted or cloud deployment options. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Containers",
+      "Cloud platforms",
+      "Software testing",
+      "CI/CD & delivery automation",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "containers",
+      "cloud",
+      "testing",
+      "delivery_automation",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/Flagsmith/flagsmith",
+    "stars": 7064
+  },
+  {
+    "id": "gh_swe_oss_react_flybywiresim_aircraft",
+    "career_path": "Software Engineering",
+    "title": "Contribute to flybywiresim/aircraft",
+    "description": "The A32NX & A380X Project are community driven open source projects to create free Airbus aircraft in Microsoft Flight Simulator that are as close to reality as possible. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/flybywiresim/aircraft",
+    "stars": 5432
+  },
+  {
+    "id": "gh_swe_oss_react_mattermost_mattermost",
+    "career_path": "Software Engineering",
+    "title": "Contribute to mattermost/mattermost",
+    "description": "Mattermost is an open source platform for secure collaboration across the entire software development lifecycle.. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/mattermost/mattermost",
+    "stars": 39572
+  },
+  {
+    "id": "gh_swe_oss_react_medusajs_medusa",
+    "career_path": "Software Engineering",
+    "title": "Contribute to medusajs/medusa",
+    "description": "The world's most flexible commerce platform for agents and developers Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/medusajs/medusa",
+    "stars": 37169
+  },
+  {
+    "id": "gh_swe_oss_react_meteor_meteor",
+    "career_path": "Software Engineering",
+    "title": "Contribute to meteor/meteor",
+    "description": "Meteor, the JavaScript App Platform Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "NoSQL & search",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "JavaScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "nosql_search",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/meteor/meteor",
+    "stars": 44796
+  },
+  {
+    "id": "gh_swe_oss_react_microsoft_react_native_windows",
+    "career_path": "Software Engineering",
+    "title": "Contribute to microsoft/react-native-windows",
+    "description": "A framework for building native Windows apps with React. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "C++ basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/microsoft/react-native-windows",
+    "stars": 17376
+  },
+  {
+    "id": "gh_swe_oss_react_nativescript_nativescript",
+    "career_path": "Software Engineering",
+    "title": "Contribute to NativeScript/NativeScript",
+    "description": "⚡ Write Native with TypeScript ✨ Best of all worlds (TypeScript, Swift, Objective C, Kotlin, Java, Dart). Use what you love ❤️ Angular, React, Solid, Svelte, Vue with: iOS (UIKit, SwiftUI), Android (View, Jetpack Compose), Flutter and you name it compatible. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/NativeScript/NativeScript",
+    "stars": 25702
+  },
+  {
+    "id": "gh_swe_oss_react_oven_sh_bun",
+    "career_path": "Software Engineering",
+    "title": "Contribute to oven-sh/bun",
+    "description": "Incredibly fast JavaScript runtime, bundler, test runner, and package manager – all in one Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Software testing",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Rust basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "testing",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/oven-sh/bun",
+    "stars": 96748
+  },
+  {
+    "id": "gh_swe_oss_react_rahuldkjain_github_profile_readme_generator",
+    "career_path": "Software Engineering",
+    "title": "Contribute to rahuldkjain/github-profile-readme-generator",
+    "description": "🚀 Generate GitHub profile README easily with the latest add-ons like visitors count, GitHub stats, etc using minimal UI. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/rahuldkjain/github-profile-readme-generator",
+    "stars": 24469
+  },
+  {
+    "id": "gh_swe_oss_react_react_toolbox_react_toolbox",
+    "career_path": "Software Engineering",
+    "title": "Contribute to react-toolbox/react-toolbox",
+    "description": "A set of React components implementing Google's Material Design specification with the power of CSS Modules Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/react-toolbox/react-toolbox",
+    "stars": 8604
+  },
+  {
+    "id": "gh_swe_oss_react_recharts_recharts",
+    "career_path": "Software Engineering",
+    "title": "Contribute to recharts/recharts",
+    "description": "Redefined chart library built with React and D3 Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/recharts/recharts",
+    "stars": 27694
+  },
+  {
+    "id": "gh_swe_oss_react_saltyshiomix_nextron",
+    "career_path": "Software Engineering",
+    "title": "Contribute to saltyshiomix/nextron",
+    "description": "⚡ Next.js + Electron ⚡ Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/saltyshiomix/nextron",
+    "stars": 4438
+  },
+  {
+    "id": "gh_swe_oss_react_styleguidist_react_styleguidist",
+    "career_path": "Software Engineering",
+    "title": "Contribute to styleguidist/react-styleguidist",
+    "description": "Isolated React component development environment with a living style guide Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/styleguidist/react-styleguidist",
+    "stars": 11050
+  },
+  {
+    "id": "gh_swe_oss_react_ueberdosis_tiptap",
+    "career_path": "Software Engineering",
+    "title": "Contribute to ueberdosis/tiptap",
+    "description": "The headless rich text editor framework for web artisans. Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "TypeScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/ueberdosis/tiptap",
+    "stars": 39013
+  },
+  {
+    "id": "gh_swe_oss_react_vercel_next_js",
+    "career_path": "Software Engineering",
+    "title": "Contribute to vercel/next.js",
+    "description": "The React Framework Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
+    "skills_practiced": [
+      "Frontend development",
+      "Backend & API development",
+      "Cloud platforms",
+      "Programming & languages",
+      "Version control"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "JavaScript basics",
+      "Reading an unfamiliar codebase"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 20,
+    "deliverables": [
+      "Merged pull request",
+      "Issue discussion with maintainers",
+      "Write-up of the change"
+    ],
+    "supported_skill_ids": [
+      "frontend",
+      "backend_apis",
+      "cloud",
+      "programming",
+      "version_control"
+    ],
+    "source": "github",
+    "source_kind": "open_source",
+    "url": "https://github.com/vercel/next.js",
+    "stars": 143454
+  }
+]

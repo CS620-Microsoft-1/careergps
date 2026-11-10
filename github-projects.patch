@@ -1,0 +1,1895 @@
+diff --git a/backend/README.md b/backend/README.md
+index b73cf17..ed24d71 100644
+--- a/backend/README.md
++++ b/backend/README.md
+@@ -384,6 +384,24 @@ To add companies, add them to `data/company_candidates.yaml` and run
+ `data/companies.yaml`. Check each match before committing, since a slug can belong to a
+ different company with the same name.
+ 
++## Sync real projects from GitHub
++
++The resources agent recommends from `data/projects.json` (hand-written) plus
++`data/github_projects.json` (real projects pulled from GitHub). The sources are listed in
++`data/project_sources.yaml`: an `idea_list` repo whose README has project tables, or a GitHub
++`topic` whose top repos become "contribute to <repo>" projects.
++
++```bash
++export GITHUB_TOKEN=<fine-grained token, no scopes needed>   # optional; raises the search limit
++python -m scripts.sync_github_projects             # every source
++python -m scripts.sync_github_projects --source cool_coders --dry-run
++```
++
++Skills are assigned by keyword rules in `app/services/github_projects.py`, and a project is
++only offered for a role when it practices a skill specific to that role. Review the diff of
++`data/github_projects.json` before committing. The agent sees at most 25 candidates per
++request, the ones that cover the most high-priority gaps.
++
+ ## Job posting analysis
+ 
+ ### JD quick start on a new computer
+diff --git a/backend/app/services/github_projects.py b/backend/app/services/github_projects.py
+new file mode 100644
+index 0000000..417a2a0
+--- /dev/null
++++ b/backend/app/services/github_projects.py
+@@ -0,0 +1,330 @@
++"""Turn real GitHub sources (data/project_sources.yaml) into project-catalog entries.
++
++Two kinds of source:
++  * idea_list: a repo whose README lists project ideas in Markdown tables
++    (e.g. The-Cool-Coders/Project-Ideas-And-Resources).
++  * topic: a GitHub topic (e.g. open-source-projects); its top repos become
++    "contribute to <repo>" projects.
++
++Every entry has the same shape as data/projects.json, so the resources agent, the rule
++ranking and the Resources page use them unchanged. Skills come only from conservative
++keyword rules over the name, description, language and topics: a project is only offered for
++a role when it practices at least one skill specific to that role.
++"""
++from __future__ import annotations
++
++import json
++import re
++from dataclasses import dataclass, field
++from functools import lru_cache
++from typing import Any, Iterable
++
++import httpx2
++
++from app.services.skill_gaps.assets import ASSET_ROOT
++
++GITHUB_API = "https://api.github.com"
++RAW_GITHUB = "https://raw.githubusercontent.com"
++USER_AGENT = "CareerGPS/0.1 (project catalog sync; +https://github.com/CS620-Microsoft-1/careergps)"
++
++# Same career_path names as data/projects.json (see FAMILY_TO_CATALOG in resources.py).
++CAREER_PATHS = {
++    "software_engineer": "Software Engineering",
++    "data_analyst": "Data Analyst",
++    "ai_engineer": "AI/ML Engineering",
++}
++_FAMILY_PREFIX = {"software_engineer": "swe", "data_analyst": "data", "ai_engineer": "aiml"}
++
++# (pattern, skill ids). Patterns are matched case-insensitively on word boundaries against
++# "name. description. language. topics".
++_SWE_RULES: list[tuple[str, tuple[str, ...]]] = [
++    (r"react(?:\s?js)?|vue|angular|svelte|next\.?js|html|css|tailwind|front[- ]?end|user interfaces?|\bui\b|clone", ("frontend",)),
++    (r"rest(?:ful)? api|graphql|express|django|flask|fastapi|spring(?: boot)?|node(?:\.?js)?|back[- ]?end|\bapi\b|server", ("backend_apis",)),
++    (r"full[- ]?stack|mern|mean stack", ("frontend", "backend_apis")),
++    (r"mern|mongo(?:db)?|firebase|firestore|redis|elasticsearch|harperdb|nosql", ("nosql_search",)),
++    (r"sql|postgres(?:ql)?|mysql|sqlite|relational database", ("relational_sql",)),
++    (r"websockets?|real[- ]time|micro[- ]?services?|distributed|kafka|multiple users", ("distributed_systems",)),
++    (r"docker|kubernetes|k8s|containers?", ("containers",)),
++    (r"aws|azure|gcp|google cloud|cloud|serverless|vercel|netlify", ("cloud",)),
++    (r"auth(?:entication|orization)?|nextauth|oauth|jwt|password|security|encryption", ("security",)),
++    (r"tests?|testing|jest|pytest|cypress|unit tests?", ("testing",)),
++    (r"ci/cd|github actions|continuous integration|devops", ("delivery_automation",)),
++    (r"algorithms?|chess|tic[- ]tac[- ]toe|sudoku|path ?finding|data structures", ("algorithms",)),
++    (r"monitoring|observability|logging|prometheus|grafana", ("observability_operations",)),
++]
++_DATA_RULES: list[tuple[str, tuple[str, ...]]] = [
++    (r"sql|postgres(?:ql)?|mysql|sqlite|bigquery|duckdb", ("sql",)),
++    (r"pandas|jupyter|notebooks?|numpy|\br\b|data analysis|analytics|exploratory", ("analytical_scripting", "data_analysis")),
++    (r"visuali[sz]ation|charts?|plotly|matplotlib|seaborn|d3(?:\.js)?|dashboards?", ("data_visualization",)),
++    (r"dashboards?|streamlit|power ?bi|tableau|looker|metabase|superset", ("dashboarding",)),
++    (r"power ?bi|tableau|looker|metabase|superset", ("bi_tools",)),
++    (r"statistics|statistical|regression|hypothesis", ("statistics",)),
++    (r"a/?b test(?:ing)?|experiment analysis", ("experimentation",)),
++    (r"etl|elt|airflow|dagster|prefect|data pipelines?|ingestion|scrap(?:er|ing)", ("data_pipelines",)),
++    (r"dbt|data model(?:ing)?|star schema|warehouse|snowflake|redshift", ("data_modeling", "warehousing")),
++    (r"spark|pyspark|hadoop|big data", ("large_scale_processing",)),
++    (r"data cleaning|data quality|great expectations|data validation", ("data_quality",)),
++    (r"excel|spreadsheets?|google sheets", ("spreadsheets",)),
++]
++_AI_RULES: list[tuple[str, tuple[str, ...]]] = [
++    (r"machine learning|\bml\b|scikit[- ]learn|sklearn|recommend(?:ation|er)?|fraud detection|classifier|classification|prediction|predictive", ("machine_learning", "model_training")),
++    (r"deep learning|neural net(?:work)?s?|pytorch|tensorflow|keras|cnn|transformers?|opencv|computer vision|face recognition|image recognition", ("deep_learning",)),
++    (r"fine[- ]?tun(?:e|ing)|lora", ("fine_tuning",)),
++    (r"llms?|gpt|openai|large language models?|chatgpt|gemini|claude|llama|ollama", ("llm", "generative_ai")),
++    (r"generative ai|gen ?ai|stable diffusion|diffusion", ("generative_ai",)),
++    (r"rag|retrieval[- ]augmented(?: generation)?", ("rag",)),
++    (r"embeddings?|vector (?:db|database|search|store)|pinecone|faiss|chroma|weaviate|qdrant", ("vector_retrieval",)),
++    (r"ai agents?|agentic|langchain|langgraph|autogen|crewai|tool use|function calling", ("ai_agents",)),
++    (r"prompt engineering|prompt templates?|system prompts?", ("prompt_engineering",)),
++    (r"mlops|mlflow|kubeflow|model registry|weights (?:&|and) biases", ("mlops",)),
++    (r"model serving|inference server|deploy(?:ed|ment)? (?:a |the )?model", ("model_deployment",)),
++    (r"model evaluation|llm evals?|evals? (?:harness|framework)", ("model_evaluation",)),
++    (r"feature engineering", ("feature_engineering",)),
++]
++
++_RULES = {"software_engineer": _SWE_RULES, "data_analyst": _DATA_RULES, "ai_engineer": _AI_RULES}
++# Skills every entry gets in a role it qualifies for (it is code in a GitHub repository).
++_BASE_SKILLS = {
++    "software_engineer": ("programming", "version_control"),
++    "data_analyst": (),
++    "ai_engineer": (),
++}
++_LANGUAGE_SKILLS = {
++    "ai_engineer": {"python": ("python",)},
++    "data_analyst": {"python": ("analytical_scripting",), "r": ("analytical_scripting",),
++                     "jupyter notebook": ("analytical_scripting",)},
++}
++# A role needs at least one of its own skills, not just these generic ones.
++_GENERIC = {"programming", "version_control", "python", "analytical_scripting"}
++
++_LIST_REPO = re.compile(
++    r"awesome|curated|\blist of\b|collection of|roadmaps?|interview|cheat ?sheets?|resources|"
++    r"tutorials?|books?|hacktoberfest|first[- ]contributions?|project[- ]ideas|for beginners",
++    re.I,
++)
++
++_TIERS = {
++    "1": ("beginner", 15),
++    "2": ("intermediate", 30),
++    "3": ("advanced", 50),
++}
++MAX_DESCRIPTION = 280
++
++
++@dataclass
++class RawProject:
++    """One project before skills are assigned."""
++
++    source_id: str
++    slug: str
++    title: str
++    description: str
++    url: str
++    difficulty: str
++    estimated_hours: int
++    kind: str  # "idea" or "open_source"
++    language: str | None = None
++    topics: list[str] = field(default_factory=list)
++    stars: int | None = None
++
++
++# --- Parsing -------------------------------------------------------------------------------------
++
++_ROW = re.compile(r"^\s*\|(.+)\|\s*$")
++_LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
++
++
++def _clean(text: str, limit: int = MAX_DESCRIPTION) -> str:
++    """Untrusted text from GitHub: strip Markdown/HTML noise and cap length before it reaches the agent."""
++    text = re.sub(r"<[^>]+>", " ", text)
++    text = re.sub(r"[`*_#>]", "", text)
++    text = re.sub(r"\s+", " ", text).strip()
++    return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
++
++
++def slugify(text: str) -> str:
++    return re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")[:60]
++
++
++def parse_idea_table(markdown: str, source_id: str) -> list[RawProject]:
++    """Rows shaped `| [Name](url) | Short description | 1-Beginner |` from any Markdown table."""
++    projects: list[RawProject] = []
++    seen: set[str] = set()
++    for line in markdown.splitlines():
++        row = _ROW.match(line)
++        if not row:
++            continue
++        cells = [cell.strip() for cell in row.group(1).split("|")]
++        if len(cells) < 3:
++            continue
++        link = _LINK.search(cells[0])
++        tier = re.match(r"\s*(\d)", cells[2])
++        if not link or not tier:
++            continue  # header, separator, or a non-project table (e.g. tutorials)
++        title = _clean(link.group(1), 80)
++        slug = slugify(title)
++        if not slug or slug in seen:
++            continue
++        seen.add(slug)
++        difficulty, hours = _TIERS.get(tier.group(1), ("intermediate", 30))
++        projects.append(RawProject(
++            source_id=source_id, slug=slug, title=title, description=_clean(cells[1]),
++            url=link.group(2), difficulty=difficulty, estimated_hours=hours, kind="idea",
++        ))
++    return projects
++
++
++def is_list_repo(repo: dict[str, Any]) -> bool:
++    text = f"{repo.get('name', '')} {repo.get('description') or ''}"
++    return bool(_LIST_REPO.search(text))
++
++
++def repo_to_raw(repo: dict[str, Any], source_id: str) -> RawProject:
++    """A GitHub search result as a 'make a first contribution' project."""
++    name = repo["full_name"]
++    description = _clean(repo.get("description") or "")
++    return RawProject(
++        source_id=source_id, slug=slugify(name), title=f"Contribute to {name}",
++        description=(description + " " if description else "")
++        + "Pick a good-first-issue, discuss it with maintainers, and get a pull request merged.",
++        url=repo["html_url"], difficulty="intermediate", estimated_hours=20, kind="open_source",
++        language=repo.get("language"), topics=list(repo.get("topics") or []),
++        stars=repo.get("stargazers_count"),
++    )
++
++
++# --- Skills --------------------------------------------------------------------------------------
++
++
++def _matches(pattern: str, text: str) -> bool:
++    return re.search(rf"(?<![a-z0-9])(?:{pattern})(?![a-z0-9])", text, re.I) is not None
++
++
++@lru_cache
++def _skill_names(family: str) -> dict[str, str]:
++    catalog = json.loads((ASSET_ROOT / "core_catalog.json").read_text(encoding="utf-8"))
++    return {skill["skill_id"]: skill["skill_name"] for module in catalog["families"][family]["modules"]
++            for skill in module["skills"]}
++
++
++def skills_for(raw: RawProject, family: str) -> tuple[list[str], list[str]]:
++    """(supported_skill_ids, skill names) for one role; empty when the role doesn't fit."""
++    text = ". ".join([raw.title, raw.description, raw.language or "", " ".join(raw.topics)]).replace("-", " ")
++    skills: list[str] = []
++
++    def add(ids: Iterable[str]) -> None:
++        for skill in ids:
++            if skill not in skills:
++                skills.append(skill)
++
++    for pattern, ids in _RULES[family]:
++        if _matches(pattern, text):
++            add(ids)
++    language = (raw.language or "").lower()
++    if family == "ai_engineer" and _matches("python", text):
++        language = language or "python"
++    add(_LANGUAGE_SKILLS.get(family, {}).get(language, ()))
++    if not set(skills) - _GENERIC:
++        return [], []
++    add(_BASE_SKILLS[family])
++    names = _skill_names(family)
++    unknown = [skill for skill in skills if skill not in names]
++    if unknown:  # a rule drifted from core_catalog.json
++        raise ValueError(f"Unknown {family} skill ids: {unknown}")
++    return skills, [names[skill] for skill in skills]
++
++
++def _prerequisites(raw: RawProject, family: str) -> list[str]:
++    prerequisites = ["Git and GitHub basics"]
++    if raw.language:
++        prerequisites.append(f"{raw.language} basics")
++    elif family == "ai_engineer":
++        prerequisites.append("Python basics")
++    if raw.kind == "open_source":
++        prerequisites.append("Reading an unfamiliar codebase")
++    return prerequisites
++
++
++def _deliverables(raw: RawProject) -> list[str]:
++    if raw.kind == "open_source":
++        return ["Merged pull request", "Issue discussion with maintainers", "Write-up of the change"]
++    return ["Working project", "GitHub repository", "README with screenshots or a demo"]
++
++
++def to_catalog_entries(raw: RawProject) -> list[dict[str, Any]]:
++    """One projects.json-shaped entry per role the project practices."""
++    entries = []
++    for family, career_path in CAREER_PATHS.items():
++        skill_ids, keywords = skills_for(raw, family)
++        if not skill_ids:
++            continue
++        entries.append({
++            "id": f"gh_{_FAMILY_PREFIX[family]}_{raw.source_id}_{raw.slug}",
++            "career_path": career_path,
++            "title": raw.title,
++            "description": raw.description,
++            "skills_practiced": keywords,
++            "prerequisites": _prerequisites(raw, family),
++            "difficulty": raw.difficulty,
++            "estimated_hours": raw.estimated_hours,
++            "deliverables": _deliverables(raw),
++            "supported_skill_ids": skill_ids,
++            "source": "github",
++            "source_kind": raw.kind,
++            "url": raw.url,
++            **({"stars": raw.stars} if raw.stars is not None else {}),
++        })
++    return entries
++
++
++# --- Fetching ------------------------------------------------------------------------------------
++
++
++def create_client(token: str | None = None, transport: httpx2.BaseTransport | None = None) -> httpx2.Client:
++    headers = {"User-Agent": USER_AGENT, "Accept": "application/vnd.github+json",
++               "X-GitHub-Api-Version": "2022-11-28"}
++    if token:
++        headers["Authorization"] = f"Bearer {token}"
++    return httpx2.Client(headers=headers, timeout=30.0, follow_redirects=True, transport=transport)
++
++
++def fetch_idea_list(client: httpx2.Client, source: dict[str, Any]) -> list[RawProject]:
++    url = f"{RAW_GITHUB}/{source['repo']}/{source.get('branch', 'main')}/{source.get('path', 'README.md')}"
++    request = client.build_request("GET", url)
++    # Public raw files need no token, and an invalid one turns them into 404s.
++    request.headers.pop("Authorization", None)
++    response = client.send(request)
++    response.raise_for_status()
++    return parse_idea_table(response.text, source["id"])
++
++
++def fetch_topic(client: httpx2.Client, source: dict[str, Any]) -> list[RawProject]:
++    limit = int(source.get("limit", 50))
++    min_stars = int(source.get("min_stars", 0))
++    projects: list[RawProject] = []
++    page = 1
++    while len(projects) < limit and page <= 5:
++        response = client.get(f"{GITHUB_API}/search/repositories", params={
++            "q": f"topic:{source['topic']} archived:false fork:false stars:>={min_stars}",
++            "sort": "stars", "order": "desc", "per_page": "100", "page": str(page),
++        })
++        response.raise_for_status()
++        items = response.json().get("items", [])
++        for repo in items:
++            if repo.get("archived") or repo.get("fork") or not repo.get("language") or is_list_repo(repo):
++                continue
++            projects.append(repo_to_raw(repo, source["id"]))
++            if len(projects) >= limit:
++                break
++        if len(items) < 100:
++            break
++        page += 1
++    return projects
++
++
++def build_catalog(raw_projects: Iterable[RawProject]) -> list[dict[str, Any]]:
++    entries: dict[str, dict[str, Any]] = {}
++    for raw in raw_projects:
++        for entry in to_catalog_entries(raw):
++            entries.setdefault(entry["id"], entry)
++    return sorted(entries.values(), key=lambda e: (e["career_path"], e["id"]))
+diff --git a/backend/app/services/resources.py b/backend/app/services/resources.py
+index 79c5818..21574b4 100644
+--- a/backend/app/services/resources.py
++++ b/backend/app/services/resources.py
+@@ -12,6 +12,8 @@ from app.services.skill_gaps.storage import load
+ 
+ CATALOG_PATH = BACKEND_ROOT / "data" / "resources.yaml"
+ PROJECTS_PATH = BACKEND_ROOT / "data" / "projects.json"
++# Real projects pulled from GitHub by scripts/sync_github_projects.py (optional; may be absent).
++GITHUB_PROJECTS_PATH = BACKEND_ROOT / "data" / "github_projects.json"
+ 
+ # projects.json names roles by career path.
+ FAMILY_TO_CATALOG = {
+@@ -40,14 +42,23 @@ def load_catalog() -> tuple[dict, ...]:
+ 
+ @lru_cache
+ def load_projects() -> tuple[dict, ...]:
+-    return tuple(json.loads(PROJECTS_PATH.read_text(encoding="utf-8")))
++    """Hand-written projects first, then the GitHub-sourced ones; an id appears once."""
++    projects = json.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
++    if GITHUB_PROJECTS_PATH.exists():
++        projects += json.loads(GITHUB_PROJECTS_PATH.read_text(encoding="utf-8"))
++    unique: dict[str, dict] = {}
++    for project in projects:
++        unique.setdefault(project["id"], project)
++    return tuple(unique.values())
+ 
+ 
+ def _project(project: dict) -> dict:
+     """A projects.json entry (the resources agent's catalog) as a resource."""
+-    return {"id": project["id"], "type": "project", "title": project["title"], "provider": "Project",
++    provider = "GitHub" if project.get("source") == "github" else "Project"
++    return {"id": project["id"], "type": "project", "title": project["title"], "provider": provider,
+             "meta": f"{project['difficulty'].capitalize()} · about {project['estimated_hours']} hours",
+-            "description": project["description"], "skills": project["supported_skill_ids"]}
++            "description": project["description"], "skills": project["supported_skill_ids"],
++            "url": project.get("url")}
+ 
+ 
+ def _certification(item, family: str) -> dict:
+diff --git a/backend/app/services/resources_agent.py b/backend/app/services/resources_agent.py
+index 8fb582e..b73f7b5 100644
+--- a/backend/app/services/resources_agent.py
++++ b/backend/app/services/resources_agent.py
+@@ -9,6 +9,8 @@ from app.services.resources import load_projects
+ 
+ 
+ MAX_PROJECTS = 3
++# GitHub sync can add hundreds of projects; the agent sees only the best-covering ones.
++MAX_AGENT_CANDIDATES = 25
+ 
+ 
+ def _candidates(career_path: str, available_hours: int | None,
+@@ -26,6 +28,21 @@ def _candidates(career_path: str, available_hours: int | None,
+     return candidates
+ 
+ 
++def _shortlist(candidates: list[dict], verified_skill_gaps: list[dict[str, str]] | None,
++               skill_gaps: list[str]) -> list[dict]:
++    """The candidates that cover the most (and highest-priority) gaps, catalog order breaking ties."""
++    if len(candidates) <= MAX_AGENT_CANDIDATES:
++        return candidates
++    if verified_skill_gaps:
++        weight = {gap["skill_id"]: len(verified_skill_gaps) - i for i, gap in enumerate(verified_skill_gaps)}
++        score = lambda p: sum(weight.get(skill, 0) for skill in set(p.get("supported_skill_ids", [])))  # noqa: E731
++    else:
++        wanted = {gap.casefold() for gap in skill_gaps}
++        score = lambda p: len(wanted & {s.casefold() for s in p.get("skills_practiced", [])})  # noqa: E731
++    ranked = sorted(enumerate(candidates), key=lambda pair: (-score(pair[1]), pair[0]))
++    return [project for _, project in ranked[:MAX_AGENT_CANDIDATES]]
++
++
+ def rank_projects(
+     career_path: str,
+     existing_skills: list[str],
+@@ -76,7 +93,8 @@ def recommend_projects(
+     if not settings.resources_project_endpoint:
+         raise ValueError("RESOURCES_PROJECT_ENDPOINT is not configured.")
+ 
+-    candidates = _candidates(career_path, available_hours, verified_skill_gaps)
++    candidates = _shortlist(_candidates(career_path, available_hours, verified_skill_gaps),
++                            verified_skill_gaps, skill_gaps)
+     if not candidates:
+         return {"recommendations": [], "no_match_reason": "No projects match the career path, skill gaps, and time budget."}
+ 
+diff --git a/backend/data/github_projects.json b/backend/data/github_projects.json
+new file mode 100644
+index 0000000..45e4324
+--- /dev/null
++++ b/backend/data/github_projects.json
+@@ -0,0 +1,1180 @@
++[
++  {
++    "id": "gh_aiml_cool_coders_credit_card_fraud_detection",
++    "career_path": "AI/ML Engineering",
++    "title": "Credit Card Fraud Detection",
++    "description": "Credit Card Fraud Detection using ML",
++    "skills_practiced": [
++      "Machine learning",
++      "Model training"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics",
++      "Python basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "machine_learning",
++      "model_training"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=jCoF1rMs_0s"
++  },
++  {
++    "id": "gh_aiml_cool_coders_face_recognition_app",
++    "career_path": "AI/ML Engineering",
++    "title": "Face Recognition App",
++    "description": "Face Recognition + Attendance using OpenCV",
++    "skills_practiced": [
++      "Deep learning"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics",
++      "Python basics"
++    ],
++    "difficulty": "beginner",
++    "estimated_hours": 15,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "deep_learning"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=sz25xxF_AVE"
++  },
++  {
++    "id": "gh_aiml_cool_coders_movie_recomendation_engine",
++    "career_path": "AI/ML Engineering",
++    "title": "Movie Recomendation Engine",
++    "description": "A Movie Recommendation System Using ML",
++    "skills_practiced": [
++      "Machine learning",
++      "Model training"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics",
++      "Python basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "machine_learning",
++      "model_training"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=XoTwndOgXBM"
++  },
++  {
++    "id": "gh_swe_cool_coders_10_user_interfaces",
++    "career_path": "Software Engineering",
++    "title": "10 User Interfaces",
++    "description": "10 User Interfaces using HTML, CSS and JavaScript",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "beginner",
++    "estimated_hours": 15,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=Rz-rey4Q1bw&list=LL&index=6&t=8839s"
++  },
++  {
++    "id": "gh_swe_cool_coders_a_covid_19_tracker",
++    "career_path": "Software Engineering",
++    "title": "A COVID-19 Tracker",
++    "description": "A COVID-19 Tracker using React JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=cF3pIMJUZxM&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=2"
++  },
++  {
++    "id": "gh_swe_cool_coders_airbnb_clone_application",
++    "career_path": "Software Engineering",
++    "title": "Airbnb Clone Application",
++    "description": "A React App for Airbnb Home page Clone",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=IQaCL8_bwA4&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=7"
++  },
++  {
++    "id": "gh_swe_cool_coders_amazon_clone_using_solidity",
++    "career_path": "Software Engineering",
++    "title": "Amazon Clone using Solidity",
++    "description": "Solidity, Ethers.js, React & Hardhat",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=X1ahXNYkpL8"
++  },
++  {
++    "id": "gh_swe_cool_coders_build_brand_page",
++    "career_path": "Software Engineering",
++    "title": "Build Brand Page",
++    "description": "Design with React",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "beginner",
++    "estimated_hours": 15,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=W7up-w1QYpw&ab_channel=DoSomeCoding"
++  },
++  {
++    "id": "gh_swe_cool_coders_business_card_generator",
++    "career_path": "Software Engineering",
++    "title": "Business Card Generator",
++    "description": "A Business Card Generator using React JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=mGORpgEOsT4"
++  },
++  {
++    "id": "gh_swe_cool_coders_chess_game_app",
++    "career_path": "Software Engineering",
++    "title": "Chess Game App",
++    "description": "A Two Player Chess game application using JavaScript",
++    "skills_practiced": [
++      "Algorithms & data structures",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "beginner",
++    "estimated_hours": 15,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "algorithms",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=SS5amIbX0Mo&list=LL&index=3&t=56s"
++  },
++  {
++    "id": "gh_swe_cool_coders_collaborative_whiteboard",
++    "career_path": "Software Engineering",
++    "title": "Collaborative Whiteboard",
++    "description": "A real-time drawing app with multiple users using WebSockets",
++    "skills_practiced": [
++      "Distributed systems",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "distributed_systems",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=ifxK3E5l3u0"
++  },
++  {
++    "id": "gh_swe_cool_coders_discord_clone_mern_stack",
++    "career_path": "Software Engineering",
++    "title": "Discord Clone - MERN STACK",
++    "description": "Discord Clone App using MERN Stack",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=YzcnqYNXM90"
++  },
++  {
++    "id": "gh_swe_cool_coders_e_commerce_application",
++    "career_path": "Software Engineering",
++    "title": "E-Commerce Application",
++    "description": "MongoDB, Reactjs, Nextjs",
++    "skills_practiced": [
++      "Frontend development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=XtciU6BnQdo"
++  },
++  {
++    "id": "gh_swe_cool_coders_facebook_clone_application",
++    "career_path": "Software Engineering",
++    "title": "Facebook Clone Application",
++    "description": "A facebook Clone Application using React JS and Firebase",
++    "skills_practiced": [
++      "Frontend development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=B-kxUMHBxNo&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=6"
++  },
++  {
++    "id": "gh_swe_cool_coders_fitness_app",
++    "career_path": "Software Engineering",
++    "title": "Fitness App",
++    "description": "A fitness app that sends you new workouts per email every day using Python and HarperDB.",
++    "skills_practiced": [
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=KMkmA4i2FQc"
++  },
++  {
++    "id": "gh_swe_cool_coders_flipkart_clone_application",
++    "career_path": "Software Engineering",
++    "title": "Flipkart Clone Application",
++    "description": "A Full-Stack Flipkart Clone using MERN Stack",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=tvdFYmJEaw4&list=PLB_Wd4-5SGAYsxD4JGaVdXll3PnoyI-AM"
++  },
++  {
++    "id": "gh_swe_cool_coders_full_stack_amazon_clone",
++    "career_path": "Software Engineering",
++    "title": "Full-Stack Amazon Clone",
++    "description": "A Full-Stack AMAZON Clone using REACT JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=RDV3Z1KCBvo&feature=youtu.be&ck_subscriber_id=857936933"
++  },
++  {
++    "id": "gh_swe_cool_coders_full_stack_nft_marketplace",
++    "career_path": "Software Engineering",
++    "title": "Full Stack NFT Marketplace",
++    "description": "Ethereum, Polygon and Next.js",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=GKJBEEXUha0"
++  },
++  {
++    "id": "gh_swe_cool_coders_full_stack_twitter_clone",
++    "career_path": "Software Engineering",
++    "title": "Full-Stack Twitter Clone",
++    "description": "Next JS, Recoil JS, Tailwind CSS, Nextauth & Firebase",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "NoSQL & search",
++      "Security",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "nosql_search",
++      "security",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=5Wak0iyGCrc&t"
++  },
++  {
++    "id": "gh_swe_cool_coders_github_jobs_app",
++    "career_path": "Software Engineering",
++    "title": "Github Jobs App",
++    "description": "A GitHub Jobs App using React Hooks and Github API",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=fxY1q4SCB64&list=LL&index=2"
++  },
++  {
++    "id": "gh_swe_cool_coders_gmail_clone",
++    "career_path": "Software Engineering",
++    "title": "Gmail Clone",
++    "description": "Gmail Clone using React JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=b7nrXjS6Dqs"
++  },
++  {
++    "id": "gh_swe_cool_coders_google_drive_clone_with_react",
++    "career_path": "Software Engineering",
++    "title": "Google Drive Clone With React",
++    "description": "Google Drive Clone using React, Firebase",
++    "skills_practiced": [
++      "Frontend development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=ljuCH6_jrYE"
++  },
++  {
++    "id": "gh_swe_cool_coders_instagram_clone_application",
++    "career_path": "Software Engineering",
++    "title": "Instagram Clone Application",
++    "description": "An Instagram Clone application using React JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=f7T48W0cwXM"
++  },
++  {
++    "id": "gh_swe_cool_coders_invoice_application",
++    "career_path": "Software Engineering",
++    "title": "Invoice Application",
++    "description": "Vue 3, Vuex & Firebase",
++    "skills_practiced": [
++      "Frontend development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=vsJtN54aA7w"
++  },
++  {
++    "id": "gh_swe_cool_coders_linkedin_clone",
++    "career_path": "Software Engineering",
++    "title": "LinkedIn Clone",
++    "description": "LinkedIn Clone using React JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=QaYts9sPmcY&t=3s"
++  },
++  {
++    "id": "gh_swe_cool_coders_messenger_clone_mern_stack",
++    "career_path": "Software Engineering",
++    "title": "Messenger Clone - MERN STACK",
++    "description": "Messenger Clone App using MERN Stack",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=8GMx8r9zQXg"
++  },
++  {
++    "id": "gh_swe_cool_coders_netflix_clone_fullstack",
++    "career_path": "Software Engineering",
++    "title": "Netflix Clone - FullStack",
++    "description": "A Netflix clone application using TMDB API",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=x_EEwGe-a9o&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=1&t=291s"
++  },
++  {
++    "id": "gh_swe_cool_coders_password_generator",
++    "career_path": "Software Engineering",
++    "title": "Password Generator",
++    "description": "Password Generator App using Python",
++    "skills_practiced": [
++      "Security",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "beginner",
++    "estimated_hours": 15,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "security",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=SwgBZ0BQNLQ"
++  },
++  {
++    "id": "gh_swe_cool_coders_react_photo_gallery",
++    "career_path": "Software Engineering",
++    "title": "React Photo Gallery",
++    "description": "Photo Gallery App using React JS and Firebase",
++    "skills_practiced": [
++      "Frontend development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=vUe91uOx7R0"
++  },
++  {
++    "id": "gh_swe_cool_coders_real_estate_app_like_zillow",
++    "career_path": "Software Engineering",
++    "title": "Real Estate App like Zillow",
++    "description": "Solidity, Ethereum, Hardhat, React",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=C4blK6X-D_4"
++  },
++  {
++    "id": "gh_swe_cool_coders_robinhood_clone",
++    "career_path": "Software Engineering",
++    "title": "Robinhood Clone",
++    "description": "Robinhood Clone using React JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=TxggrQ0nHjY&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=18"
++  },
++  {
++    "id": "gh_swe_cool_coders_signal_clone",
++    "career_path": "Software Engineering",
++    "title": "Signal Clone",
++    "description": "Signal Clone using React JS",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=MJzmZ9qmdaE"
++  },
++  {
++    "id": "gh_swe_cool_coders_tic_tac_toe",
++    "career_path": "Software Engineering",
++    "title": "TIC TAC TOE",
++    "description": "Tic Tac Toe game using Python",
++    "skills_practiced": [
++      "Algorithms & data structures",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "beginner",
++    "estimated_hours": 15,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "algorithms",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=BHh654_7Cmw"
++  },
++  {
++    "id": "gh_swe_cool_coders_tik_tok_clone_mern_stack",
++    "career_path": "Software Engineering",
++    "title": "Tik Tok Clone - MERN STACK",
++    "description": "Tik Tok Clone App using MERN Stack",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=g8yGxDMyGiE"
++  },
++  {
++    "id": "gh_swe_cool_coders_tmdb_movie_app",
++    "career_path": "Software Engineering",
++    "title": "TMDB Movie App",
++    "description": "An interactive Movie Database app using ReactJS.",
++    "skills_practiced": [
++      "Frontend development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=ufodJVcpmps"
++  },
++  {
++    "id": "gh_swe_cool_coders_travel_log_mern_stack",
++    "career_path": "Software Engineering",
++    "title": "Travel Log - MERN STACK",
++    "description": "Travel Log App using MERN Stack",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=5pQsl9u_10M"
++  },
++  {
++    "id": "gh_swe_cool_coders_voting_application_mern",
++    "career_path": "Software Engineering",
++    "title": "Voting Application - MERN",
++    "description": "A Voting App using MERN Stack",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "NoSQL & search",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "advanced",
++    "estimated_hours": 50,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "nosql_search",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=0oziV0FLhXc&list=PLBeQxJQNprbgrNfcntLO8N2Y-dzlMZXZe"
++  },
++  {
++    "id": "gh_swe_cool_coders_weather_app",
++    "career_path": "Software Engineering",
++    "title": "Weather App",
++    "description": "Weather app in React JS using the Open Weather Map API",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=GuA0_Z1llYU"
++  },
++  {
++    "id": "gh_swe_cool_coders_wildfire_tracker_with_react",
++    "career_path": "Software Engineering",
++    "title": "Wildfire Tracker With React",
++    "description": "Wild Fire Detection using React, NASA API",
++    "skills_practiced": [
++      "Frontend development",
++      "Backend & API development",
++      "Programming & languages",
++      "Version control"
++    ],
++    "prerequisites": [
++      "Git and GitHub basics"
++    ],
++    "difficulty": "intermediate",
++    "estimated_hours": 30,
++    "deliverables": [
++      "Working project",
++      "GitHub repository",
++      "README with screenshots or a demo"
++    ],
++    "supported_skill_ids": [
++      "frontend",
++      "backend_apis",
++      "programming",
++      "version_control"
++    ],
++    "source": "github",
++    "source_kind": "idea",
++    "url": "https://www.youtube.com/watch?v=ontX4zfVqK8&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=17"
++  }
++]
+diff --git a/backend/data/project_sources.yaml b/backend/data/project_sources.yaml
+new file mode 100644
+index 0000000..d5bb65d
+--- /dev/null
++++ b/backend/data/project_sources.yaml
+@@ -0,0 +1,20 @@
++# Real GitHub sources for the resources agent's project catalog.
++# `python -m scripts.sync_github_projects` reads this file and writes data/github_projects.json,
++# which load_projects() merges with the hand-written data/projects.json.
++#
++# kind: idea_list   -> a repo whose README lists project ideas in Markdown tables
++#                      (| [Name](link) | Short description | Tier |)
++# kind: topic       -> a GitHub topic; the top repos by stars become "contribute to X" projects
++sources:
++  - id: cool_coders
++    kind: idea_list
++    repo: The-Cool-Coders/Project-Ideas-And-Resources
++    branch: main
++    path: README.md
++
++  - id: open_source_projects
++    kind: topic
++    topic: open-source-projects
++    # Repos pulled from the topic (sorted by stars). Lists/"awesome" repos are skipped.
++    limit: 60
++    min_stars: 50
+diff --git a/backend/scripts/sync_github_projects.py b/backend/scripts/sync_github_projects.py
+new file mode 100644
+index 0000000..8c2d9e0
+--- /dev/null
++++ b/backend/scripts/sync_github_projects.py
+@@ -0,0 +1,77 @@
++"""Pull real projects from the GitHub sources in data/project_sources.yaml into data/github_projects.json.
++
++Run from backend/ (weekly is plenty; the resources agent reads the saved file, never GitHub live):
++    python -m scripts.sync_github_projects
++    python -m scripts.sync_github_projects --source cool_coders
++    python -m scripts.sync_github_projects --dry-run
++
++Set GITHUB_TOKEN (a fine-grained token with no permissions is enough) to raise the search API
++limit from 10 to 30 requests a minute. A source that fails keeps its entries from the last run,
++so one GitHub hiccup does not empty the catalog. Exits 1 only when every source failed.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import os
++import sys
++from pathlib import Path
++
++import yaml
++
++BACKEND_ROOT = Path(__file__).resolve().parents[1]
++sys.path.insert(0, str(BACKEND_ROOT))
++
++from app.services.github_projects import build_catalog, create_client, fetch_idea_list, fetch_topic  # noqa: E402
++
++SOURCES_PATH = BACKEND_ROOT / "data" / "project_sources.yaml"
++OUTPUT_PATH = BACKEND_ROOT / "data" / "github_projects.json"
++FETCHERS = {"idea_list": fetch_idea_list, "topic": fetch_topic}
++
++
++def _source_of(entry_id: str, source_ids: list[str]) -> str | None:
++    # ids look like gh_<family>_<source_id>_<slug>
++    rest = entry_id.split("_", 2)[-1] if entry_id.startswith("gh_") else ""
++    return next((source for source in source_ids if rest.startswith(source + "_")), None)
++
++
++def main() -> int:
++    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
++    parser.add_argument("--source", action="append", default=[], help="source id from project_sources.yaml")
++    parser.add_argument("--dry-run", action="store_true", help="print counts without writing the file")
++    args = parser.parse_args()
++
++    sources = yaml.safe_load(SOURCES_PATH.read_text(encoding="utf-8"))["sources"]
++    if args.source:
++        sources = [source for source in sources if source["id"] in args.source]
++    all_ids = [source["id"] for source in yaml.safe_load(SOURCES_PATH.read_text(encoding="utf-8"))["sources"]]
++
++    previous = json.loads(OUTPUT_PATH.read_text(encoding="utf-8")) if OUTPUT_PATH.exists() else []
++    kept = {entry["id"]: entry for entry in previous}
++    failures = 0
++    with create_client(os.environ.get("GITHUB_TOKEN")) as client:
++        for source in sources:
++            try:
++                raw = FETCHERS[source["kind"]](client, source)
++            except Exception as error:  # keep last run's entries for this source
++                failures += 1
++                print(f"error {source['id']}: {type(error).__name__}: {error}")
++                continue
++            entries = build_catalog(raw)
++            kept = {k: v for k, v in kept.items() if _source_of(k, all_ids) != source["id"]}
++            kept.update({entry["id"]: entry for entry in entries})
++            print(f"ok    {source['id']}: {len(raw)} projects -> {len(entries)} role entries")
++
++    catalog = sorted(kept.values(), key=lambda e: (e["career_path"], e["id"]))
++    by_path: dict[str, int] = {}
++    for entry in catalog:
++        by_path[entry["career_path"]] = by_path.get(entry["career_path"], 0) + 1
++    print("total", len(catalog), by_path)
++    if not args.dry_run:
++        OUTPUT_PATH.write_text(json.dumps(catalog, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
++        print(f"wrote {OUTPUT_PATH.relative_to(BACKEND_ROOT)}")
++    return 1 if sources and failures == len(sources) else 0
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())
+diff --git a/backend/tests/test_github_projects.py b/backend/tests/test_github_projects.py
+new file mode 100644
+index 0000000..95abe12
+--- /dev/null
++++ b/backend/tests/test_github_projects.py
+@@ -0,0 +1,144 @@
++import json
++import tempfile
++import unittest
++from pathlib import Path
++from unittest.mock import patch
++
++import httpx2
++
++from app.services import resources
++from app.services.github_projects import (
++    RawProject,
++    build_catalog,
++    create_client,
++    fetch_idea_list,
++    fetch_topic,
++    parse_idea_table,
++    skills_for,
++)
++from app.services.resources_agent import MAX_AGENT_CANDIDATES, _shortlist, rank_projects
++
++README = """
++## Projects
++| Tier | Developer Profile |
++| :--: | --- |
++|  1   | Developers in the early stages of their learning journey. |
++
++### Tier-1: Beginner Projects
++| Name | Short Description | Tier |
++| :--- | :--- | :--- |
++| [Password Generator](https://www.youtube.com/watch?v=a) | Password Generator App using Python | 1-Beginner |
++| [Movie Recomendation Engine](https://www.youtube.com/watch?v=b)| A Movie Recommendation System Using ML|2-Intermediate|
++|  [Discord Clone - MERN STACK ](https://www.youtube.com/watch?v=c) | Discord Clone App using MERN Stack |3-Advanced |
++| [Password Generator](https://www.youtube.com/watch?v=dup) | duplicate row | 1-Beginner |
++
++## Awesome Tutorials
++| TOPIC | TUTOR |
++| --- | --- |
++| [React JS Tutorial](https://www.youtube.com/watch?v=d) | FreeCodeCamp |
++"""
++
++
++def _repo(name, description, language="Python", topics=(), **extra):
++    return {"full_name": name, "name": name.split("/")[1], "description": description, "language": language,
++            "topics": list(topics), "html_url": f"https://github.com/{name}", "stargazers_count": 500,
++            "archived": False, "fork": False, **extra}
++
++
++SEARCH = {"items": [
++    _repo("acme/rag-chat", "A RAG chatbot over your docs with LangChain and a vector database",
++          topics=["llm", "open-source-projects"]),
++    _repo("acme/awesome-oss", "A curated list of open source projects"),
++    _repo("acme/old", "Django REST API", archived=True),
++    _repo("acme/dash", "Interactive dashboards with Streamlit and pandas for exploratory data analysis"),
++    _repo("acme/no-lang", "A web app with React", language=None),
++    _repo("acme/shop", "E-commerce site built with Next.js, PostgreSQL and Docker", language="TypeScript"),
++]}
++
++
++def _transport(request: httpx2.Request) -> httpx2.Response:
++    if request.url.host == "raw.githubusercontent.com":
++        assert "authorization" not in request.headers
++        return httpx2.Response(200, text=README)
++    if request.url.path == "/search/repositories":
++        assert "topic:open-source-projects" in request.url.params["q"]
++        return httpx2.Response(200, json=SEARCH)
++    return httpx2.Response(404)
++
++
++class ParseTest(unittest.TestCase):
++    def test_only_project_rows_are_parsed_once_each(self):
++        projects = parse_idea_table(README, "cool")
++        self.assertEqual([p.title for p in projects],
++                         ["Password Generator", "Movie Recomendation Engine", "Discord Clone - MERN STACK"])
++        self.assertEqual([p.difficulty for p in projects], ["beginner", "intermediate", "advanced"])
++        self.assertEqual(projects[2].description, "Discord Clone App using MERN Stack")
++
++    def test_skills_are_role_specific(self):
++        mern = RawProject("s", "x", "Discord Clone", "Clone using MERN Stack", "u", "advanced", 50, "idea")
++        self.assertEqual(skills_for(mern, "software_engineer")[0],
++                         ["frontend", "backend_apis", "nosql_search", "programming", "version_control"])
++        self.assertEqual(skills_for(mern, "ai_engineer"), ([], []))
++        self.assertEqual(skills_for(mern, "data_analyst"), ([], []))
++        # Python alone is not an AI project.
++        python_only = RawProject("s", "y", "Tic Tac Toe", "Game using Python", "u", "beginner", 15, "idea")
++        self.assertEqual(skills_for(python_only, "ai_engineer"), ([], []))
++
++
++class FetchTest(unittest.TestCase):
++    def test_idea_list_and_topic_become_catalog_entries(self):
++        with create_client("bad-token", transport=httpx2.MockTransport(_transport)) as client:
++            ideas = fetch_idea_list(client, {"id": "cool", "repo": "o/r"})
++            repos = fetch_topic(client, {"id": "oss", "topic": "open-source-projects", "limit": 10})
++        self.assertEqual(len(ideas), 3)
++        self.assertEqual([p.slug for p in repos], ["acme_rag_chat", "acme_dash", "acme_shop"])
++        catalog = build_catalog([*ideas, *repos])
++        by_id = {entry["id"]: entry for entry in catalog}
++        rag = by_id["gh_aiml_oss_acme_rag_chat"]
++        self.assertEqual(rag["career_path"], "AI/ML Engineering")
++        self.assertTrue({"rag", "vector_retrieval", "ai_agents", "llm", "python"} <= set(rag["supported_skill_ids"]))
++        self.assertEqual(rag["url"], "https://github.com/acme/rag-chat")
++        self.assertIn("gh_data_oss_acme_dash", by_id)
++        self.assertIn("gh_swe_oss_acme_shop", by_id)
++        self.assertTrue({"relational_sql", "containers"} <= set(by_id["gh_swe_oss_acme_shop"]["supported_skill_ids"]))
++        for entry in catalog:
++            self.assertTrue(entry["skills_practiced"])
++            self.assertEqual(len(entry["skills_practiced"]), len(entry["supported_skill_ids"]))
++
++
++class CatalogMergeTest(unittest.TestCase):
++    def test_load_projects_merges_github_entries_and_ranking_uses_them(self):
++        with tempfile.TemporaryDirectory() as tmp:
++            extra = Path(tmp) / "github_projects.json"
++            with create_client(transport=httpx2.MockTransport(_transport)) as client:
++                catalog = build_catalog(fetch_topic(client, {"id": "oss", "topic": "open-source-projects"}))
++            extra.write_text(json.dumps(catalog), encoding="utf-8")
++            resources.load_projects.cache_clear()
++            try:
++                with patch.object(resources, "GITHUB_PROJECTS_PATH", extra):
++                    ids = [p["id"] for p in resources.load_projects()]
++                    self.assertIn("swe_01", ids)
++                    self.assertIn("gh_aiml_oss_acme_rag_chat", ids)
++                    self.assertEqual(len(ids), len(set(ids)))
++                    # No hand-written project practices agents & tool use; the GitHub repo does.
++                    gaps = [{"skill_id": "ai_agents", "skill_name": "Agents & tool use", "definition": ""}]
++                    picks = rank_projects("AI/ML Engineering", [], ["Agents & tool use"], None, gaps)
++                    self.assertIn("gh_aiml_oss_acme_rag_chat", [r["project_id"] for r in picks["recommendations"]])
++                    listed = {r["id"]: r for r in resources.resources_for("ai_engineer", None)}
++                    self.assertEqual(listed["gh_aiml_oss_acme_rag_chat"]["provider"], "GitHub")
++                    self.assertEqual(listed["gh_aiml_oss_acme_rag_chat"]["url"], "https://github.com/acme/rag-chat")
++            finally:
++                resources.load_projects.cache_clear()
++
++    def test_agent_shortlist_keeps_best_covering_projects(self):
++        gaps = [{"skill_id": "rag", "skill_name": "RAG", "definition": ""},
++                {"skill_id": "llm", "skill_name": "LLM", "definition": ""}]
++        filler = [{"id": f"f{i}", "supported_skill_ids": ["llm"]} for i in range(40)]
++        best = {"id": "best", "supported_skill_ids": ["rag", "llm"]}
++        shortlist = _shortlist([*filler, best], gaps, [])
++        self.assertEqual(len(shortlist), MAX_AGENT_CANDIDATES)
++        self.assertEqual(shortlist[0]["id"], "best")
++
++
++if __name__ == "__main__":
++    unittest.main()

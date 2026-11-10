@@ -384,6 +384,24 @@ To add companies, add them to `data/company_candidates.yaml` and run
 `data/companies.yaml`. Check each match before committing, since a slug can belong to a
 different company with the same name.
 
+## Sync real projects from GitHub
+
+The resources agent recommends from `data/projects.json` (hand-written) plus
+`data/github_projects.json` (real projects pulled from GitHub). The sources are listed in
+`data/project_sources.yaml`: an `idea_list` repo whose README has project tables, or a GitHub
+`topic` whose top repos become "contribute to <repo>" projects.
+
+```bash
+export GITHUB_TOKEN=<fine-grained token, no scopes needed>   # optional; raises the search limit
+python -m scripts.sync_github_projects             # every source
+python -m scripts.sync_github_projects --source cool_coders --dry-run
+```
+
+Skills are assigned by keyword rules in `app/services/github_projects.py`, and a project is
+only offered for a role when it practices a skill specific to that role. Review the diff of
+`data/github_projects.json` before committing. The agent sees at most 25 candidates per
+request, the ones that cover the most high-priority gaps.
+
 ## Job posting analysis
 
 ### JD quick start on a new computer

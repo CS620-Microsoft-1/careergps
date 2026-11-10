@@ -12,6 +12,8 @@ from app.services.skill_gaps.storage import load
 
 CATALOG_PATH = BACKEND_ROOT / "data" / "resources.yaml"
 PROJECTS_PATH = BACKEND_ROOT / "data" / "projects.json"
+# Real projects pulled from GitHub by scripts/sync_github_projects.py (optional; may be absent).
+GITHUB_PROJECTS_PATH = BACKEND_ROOT / "data" / "github_projects.json"
 
 # projects.json names roles by career path.
 FAMILY_TO_CATALOG = {
@@ -40,14 +42,23 @@ def load_catalog() -> tuple[dict, ...]:
 
 @lru_cache
 def load_projects() -> tuple[dict, ...]:
-    return tuple(json.loads(PROJECTS_PATH.read_text(encoding="utf-8")))
+    """Hand-written projects first, then the GitHub-sourced ones; an id appears once."""
+    projects = json.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
+    if GITHUB_PROJECTS_PATH.exists():
+        projects += json.loads(GITHUB_PROJECTS_PATH.read_text(encoding="utf-8"))
+    unique: dict[str, dict] = {}
+    for project in projects:
+        unique.setdefault(project["id"], project)
+    return tuple(unique.values())
 
 
 def _project(project: dict) -> dict:
     """A projects.json entry (the resources agent's catalog) as a resource."""
-    return {"id": project["id"], "type": "project", "title": project["title"], "provider": "Project",
+    provider = "GitHub" if project.get("source") == "github" else "Project"
+    return {"id": project["id"], "type": "project", "title": project["title"], "provider": provider,
             "meta": f"{project['difficulty'].capitalize()} · about {project['estimated_hours']} hours",
-            "description": project["description"], "skills": project["supported_skill_ids"]}
+            "description": project["description"], "skills": project["supported_skill_ids"],
+            "url": project.get("url")}
 
 
 def _certification(item, family: str) -> dict:
