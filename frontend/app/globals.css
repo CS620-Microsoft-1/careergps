@@ -207,12 +207,12 @@
     animation: pop-in 200ms var(--ease-out) backwards;
   }
   .entrance-step {
-    --step-from: 12px;
-    animation: step-in 220ms var(--ease-out) backwards;
+    --step-from: 32px;
+    animation: step-in 320ms var(--ease-out) backwards;
   }
   .entrance-step-back {
-    --step-from: -12px;
-    animation: step-in 220ms var(--ease-out) backwards;
+    --step-from: -32px;
+    animation: step-in 320ms var(--ease-out) backwards;
   }
   .ring-reveal {
     animation: ring-draw 600ms var(--ease-out) backwards;
