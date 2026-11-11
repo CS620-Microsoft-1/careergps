@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { LoaderCircle, RotateCcw } from "lucide-react";
+import { ArrowRight, LoaderCircle, RotateCcw } from "lucide-react";
 
 import { AnalysisSteps } from "@/components/career/route-parts";
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,8 @@ export function SetupSaveGate({ children }: { children: React.ReactNode }) {
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <Button variant="ghost" size="lg" onClick={() => router.back()}>Back</Button>
+        {/* Matches the route page; home opens once the route is ready. */}
+        <Button size="lg" disabled>Go to my home page<ArrowRight data-icon="inline-end" /></Button>
       </div>
     </div>
   );

@@ -19,9 +19,11 @@ const NEXT_STEPS = [
 /** After setup: the first match and the biggest gaps, while or once the analysis runs. */
 export function RouteResult() {
   const router = useRouter();
-  const { family, run } = useSkillGapAnalysis();
+  const { family, run, loaded, restoring, submitting } = useSkillGapAnalysis();
   const role = ROLE_NAMES[family];
   const report = run?.status === "completed" ? run.report : null;
+  // Home waits for the route; it opens again if the analysis fails or there's nothing to run.
+  const loading = !report && (!loaded || restoring || submitting || run?.status === "queued" || run?.status === "running");
 
   return (
     <div className="mx-auto flex w-full max-w-300 flex-1 flex-col px-4 py-6 sm:px-6">
@@ -31,7 +33,9 @@ export function RouteResult() {
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         {/* Back to the setup step that led here: the résumé review, or Add a destination. */}
         <Button variant="ghost" size="lg" onClick={() => router.back()}>Back</Button>
-        <Button asChild size="lg"><Link href="/dashboard">Go to my home page<ArrowRight data-icon="inline-end" /></Link></Button>
+        {loading
+          ? <Button size="lg" disabled>Go to my home page<ArrowRight data-icon="inline-end" /></Button>
+          : <Button asChild size="lg"><Link href="/dashboard">Go to my home page<ArrowRight data-icon="inline-end" /></Link></Button>}
       </div>
     </div>
   );
