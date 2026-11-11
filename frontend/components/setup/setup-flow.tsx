@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Check, FileText, Search, Upload, X } from "lucide-react";
 
@@ -19,7 +19,7 @@ import { acceptedTerms, type SignupMetadata } from "@/lib/auth/account";
 import { DEFAULT_UNIVERSITY, EXPERIENCE_LEVELS, RESUME_ACCEPT, RESUME_MAX_BYTES, RESUME_MIME_TYPES, type ExperienceLevel } from "@/lib/options";
 import { FAMILY_LABELS, profileForAnalysis, queueSkillGapAnalysis } from "@/lib/skill-gap-profile";
 import { text } from "@/lib/resume-format";
-import { startSetupSave } from "@/lib/setup-save";
+import { setupSave, startSetupSave, type SetupSaveStep } from "@/lib/setup-save";
 import { getSupabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { JobFamily, MarketDemandSnapshot, ResumeAnalysis, ResumeClassification, SavedResume, User } from "@/types/api";
@@ -176,42 +176,38 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
     const resume = { original_filename: analysis.filename, parser: analysis.extraction.parser,
       ocr_pages: analysis.extraction.ocr_pages, agent_name: analysis.agent.name, classification };
     const family = goal.family;
-    const persist = async () => {
-      const { user } = await getMe();
-      if (user) {
-        // A new résumé for this role (adding the destination if new), then select the role: one after
-        // the other, so a failed upload leaves the account on its old role.
-        await addResume({ ...resume, job_family: family });
-        await updateAccount({ ...details, ...goals });
-      } else {
+    // Separate steps, so a retry repeats only the one that failed: never a second résumé upload.
+    let returning = false;
+    const persist: SetupSaveStep[] = [
+      async () => { returning = Boolean((await getMe()).user); },
+      async () => {
+        if (returning) {
+          // A new résumé for this role (adding the destination if new), then select the role: one after
+          // the other, so a failed upload leaves the account on its old role.
+          await addResume({ ...resume, job_family: family });
+          return;
+        }
         // First time: this creates the account, with the terms consent given at sign-up.
         const { data } = await getSupabase().auth.getUser();
         if (!data.user) throw new Error("Not logged in");
         await createAccount({ ...details, ...goals, accept_terms: acceptedTerms(data.user), resume });
-      }
-      // Saved first; the route page then analyzes the saved résumé by its id.
-      try {
-        const [{ user: savedUser }, saved] = await Promise.all([getMe(), getSavedResume()]);
-        if (savedUser && saved) queueSkillGapAnalysis(profileForAnalysis(savedUser, saved));
-      } catch { /* Saving succeeded; the analysis can still be started from the route page. */ }
-    };
+      },
+      async () => { if (returning) await updateAccount({ ...details, ...goals }); },
+      showSavedRoute,
+    ];
     // Open the route page now; it shows the save as its first loading step.
-    startSetupSave(persist, (error) => errorMessage(error, "Couldn’t save your profile. Try again."));
-    router.push("/onboarding/route");
+    if (startSetupSave(persist, (error) => errorMessage(error, "Couldn’t save your profile. Try again."))) router.push("/onboarding/route");
   };
 
   /** Add a destination that uses the current résumé, and select it. */
   const saveRole = (source: SavedResume, family: JobFamily, level: ExperienceLevel) => {
     const location = goal.location.trim().slice(0, 100) || ANY_LOCATION;
-    const persist = async () => {
-      await setDestinationResume(family, source.id);
-      await updateAccount({ target_role: FAMILY_LABELS[family], experience_level: level, preferred_location: location });
-      const [{ user }, saved] = await Promise.all([getMe(), getSavedResume()]);
-      if (!user || !saved) throw new Error("Upload your résumé first.");
-      queueSkillGapAnalysis(profileForAnalysis(user, saved));
-    };
-    startSetupSave(persist, (error) => errorMessage(error, "Couldn’t save your target role. Try again."));
-    router.push("/onboarding/route");
+    const persist: SetupSaveStep[] = [
+      () => setDestinationResume(family, source.id).then(() => {}),
+      () => updateAccount({ target_role: FAMILY_LABELS[family], experience_level: level, preferred_location: location }).then(() => {}),
+      showSavedRoute,
+    ];
+    if (startSetupSave(persist, (error) => errorMessage(error, "Couldn’t save your target role. Try again."))) router.push("/onboarding/route");
   };
 
   if (addRole && resumeChoice === null) {
@@ -349,6 +345,8 @@ function RoleStep({ goal, onChange, error, explored = [], title = "Choose a targ
   title?: string; description?: string; onBack: () => void; onSubmit: () => void;
 }) {
   const [query, setQuery] = useState("");
+  // A second submit would start a second save (and upload the résumé twice).
+  const saving = useSyncExternalStore(setupSave.subscribe, setupSave.getSnapshot, setupSave.getServerSnapshot).status === "saving";
   const [markets, setMarkets] = useState<Partial<Record<JobFamily, MarketDemandSnapshot | null>>>({});
   useEffect(() => {
     let active = true;
@@ -424,10 +422,18 @@ function RoleStep({ goal, onChange, error, explored = [], title = "Choose a targ
       {error && <p role="alert" className="mt-6 text-destructive">{error}</p>}
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-border pt-6">
         <Button type="button" variant="ghost" size="lg" onClick={onBack}>Back</Button>
-        <Button type="submit" size="lg">Calculate my route<ArrowRight data-icon="inline-end" /></Button>
+        <Button type="submit" size="lg" disabled={saving}>Calculate my route<ArrowRight data-icon="inline-end" /></Button>
       </div>
     </form>
   );
+}
+
+/** The last save step: queue the analysis of what was just saved. */
+async function showSavedRoute() {
+  const [{ user }, saved] = await Promise.all([getMe(), getSavedResume()]);
+  if (!user || !saved) throw new Error("Upload your résumé first.");
+  const profile = profileForAnalysis(user, saved);
+  queueSkillGapAnalysis(profile);
 }
 
 function prefillBasics(classification: ResumeClassification, account: User | null,

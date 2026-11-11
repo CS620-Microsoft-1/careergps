@@ -8,11 +8,16 @@ export type SetupSaveState =
   | { status: "saving" }
   | { status: "failed"; error: string };
 
+/** One request of the save. Steps run in order; a retry starts again at the one that failed. */
+export type SetupSaveStep = () => Promise<void>;
+
 const IDLE: SetupSaveState = { status: "idle" };
 
 let state: SetupSaveState = IDLE;
-let task: (() => Promise<void>) | null = null;
+let steps: SetupSaveStep[] = [];
 let toMessage: (error: unknown) => string = () => "Couldn’t save your profile. Try again.";
+/** Each save gets its own id, so a step finishing late can't advance a newer save. */
+let current = 0;
 const listeners = new Set<() => void>();
 
 function set(next: SetupSaveState) {
@@ -20,26 +25,33 @@ function set(next: SetupSaveState) {
   listeners.forEach((listener) => listener());
 }
 
-function run() {
-  if (!task) return;
-  const current = task;
+async function run(id: number) {
   set({ status: "saving" });
-  current().then(
-    () => { if (task === current) { task = null; set(IDLE); } },
-    (error: unknown) => { if (task === current) set({ status: "failed", error: toMessage(error) }); },
-  );
+  try {
+    while (steps.length) {
+      await steps[0]();
+      if (id !== current) return;
+      // Done: a retry must not repeat it (a second résumé upload would add a duplicate version).
+      steps = steps.slice(1);
+    }
+    set(IDLE);
+  } catch (error) {
+    if (id === current) set({ status: "failed", error: toMessage(error) });
+  }
 }
 
-/** Start the save; the route page shows it as the first loading step. */
-export function startSetupSave(save: () => Promise<void>, message: (error: unknown) => string) {
-  task = save;
+/** Start the save; the route page shows it as the first loading step. Ignored while one is running. */
+export function startSetupSave(save: SetupSaveStep[], message: (error: unknown) => string): boolean {
+  if (state.status === "saving") return false;
+  steps = save;
   toMessage = message;
-  run();
+  void run(++current);
+  return true;
 }
 
-/** Run the same save again after it failed. */
+/** Continue a failed save from the step that failed. */
 export function retrySetupSave() {
-  if (state.status === "failed") run();
+  if (state.status === "failed") void run(current);
 }
 
 export const setupSave = {
