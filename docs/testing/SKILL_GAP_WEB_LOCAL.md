@@ -115,7 +115,9 @@ as the gap priority (`app/services/skill_gaps/match.py`). It is an uncalibrated
 summary, not a hiring probability. Common responsibilities are not yet computed.
 
 Saved resources (the action plan) use the same local-JSON approach, one file per
-user under `local_results/plans`. The resource catalog is `data/resources.yaml`.
+user under `local_results/plans`. The resource catalog is `data/resources.yaml`, except
+certifications, school courses and clubs, which come from the database once it is seeded
+(see "Catalog tables" in `backend/README.md`).
 
 ## Endpoints
 

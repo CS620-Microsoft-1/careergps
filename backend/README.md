@@ -260,6 +260,7 @@ app/
 │   └── check_connection.py  # connectivity test
 ├── models/
 │   ├── __init__.py          # import every model here so Alembic can see it
+│   ├── catalog.py           # certifications, school_courses, student_orgs, catalog_versions
 │   ├── job_posting.py       # job_postings + ingest_runs
 │   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
 │   └── user.py              # users (id = the Supabase Auth account id)
@@ -268,6 +269,8 @@ app/
 │   └── market.py            # NormalizedPosting, MarketProfile
 └── services/
     ├── accounts.py          # creates and updates users + their confirmed résumés
+    ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
+    ├── catalog_writes.py    # writes them: seed script and catalog refresh
     ├── resume_children.py   # builds the résumé child table rows from confirmed_data
     └── postings/            # job board adapters (Greenhouse, Ashby, Lever) and daily ingest
 data/
@@ -276,6 +279,7 @@ data/
 scripts/
 ├── backfill_resume_children.py  # rebuild résumé child rows for résumés already stored
 ├── ingest_postings.py       # daily job posting ingest
+├── seed_catalog.py          # load certifications, courses and clubs from data/ into the database
 └── probe_boards.py          # find which companies have a public job board
 migrations/
 ├── env.py                   # Alembic setup: reads settings, loads models
@@ -348,6 +352,10 @@ the API on another port, update it there and restart `npm run dev`.
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+The catalog tests in `tests/test_catalog_postgres.py` run only when `CGPS_TEST_DATABASE_URL` points at a
+throwaway local Postgres (they drop and recreate the `public` and `auth` schemas); CI skips them.
+Never point it at the shared database.
 
 To run a live smoke test against the configured Foundry Agent using synthetic files:
 
@@ -858,6 +866,39 @@ The unrelated existing résumé tests are unchanged.
 - `POST /me` reads `auth.users` (`email_confirmed_at` and `created_at`, the terms consent time)
   directly. That works with the `postgres` role used now; a limited database role for the backend
   will need `SELECT` on `auth.users`, or those two columns.
+
+## Catalog tables
+
+Certifications, school courses and student organizations live in the `certifications`,
+`school_courses` and `student_orgs` tables. Online courses (`data/resources.yaml`) and projects
+(`data/projects.json`) are still files.
+
+- Ids are the slugs from the data files (`aws-cloud-practitioner`, `uw-cs-320`) and never change.
+  Rows are never deleted: a resource that is no longer offered gets `active = false`, and the API
+  stops listing it. To rename one, add a new row and deactivate the old one.
+- `skills` is JSONB: per job family for certifications, a plain list for courses and clubs. Skill ids
+  are checked against the core skill catalog when a row is written, not by the database.
+- `catalog_versions` holds the certification catalog version. Cached certification recommendations
+  are reused only while it is unchanged; it changes only when a field the recommendations use
+  (name, provider, url, cost, level, skills, active) changes.
+- The API caches what it reads for 5 minutes (`app/services/catalog_store.py`). While the tables are
+  missing or all three are empty, it reads `data/certifications.json` and `data/resources.yaml`
+  instead and logs a warning. On other database errors it keeps the last catalog it read, or answers
+  503 if it has none.
+- Write rows through `app/services/catalog_writes.py`: it validates skills, keeps `sort_order`,
+  changes the version, and clears the cache after the caller commits.
+
+Load the data files into the tables (one transaction; safe to re-run):
+
+```bash
+python -m scripts.seed_catalog --dry-run   # report what would change, then roll back
+python -m scripts.seed_catalog             # add missing rows; existing rows are left alone
+python -m scripts.seed_catalog --update    # also overwrite existing rows with the files' values
+```
+
+It prints only table names and counts. On the shared database, the database owner (currently
+Abanish) runs `alembic upgrade head` and then `python -m scripts.seed_catalog`, after the PR is
+merged into `dev`. Until then the app keeps reading the files.
 
 ## Changing the schema
 

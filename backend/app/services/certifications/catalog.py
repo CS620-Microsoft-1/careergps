@@ -1,13 +1,14 @@
-"""Load the local certification catalog and check it against the core skill catalog.
+"""The certification catalog, and the checks against the core skill catalog.
 
-The catalog is a reviewed JSON file for now; it is expected to move into the database later.
+The API reads it from the database (app/services/catalog_store.py). data/certifications.json is the
+seed for scripts/seed_catalog.py and the fallback while the tables are missing or empty.
 """
-from functools import lru_cache
 import json
 from pathlib import Path
 
 from app.core.config import BACKEND_ROOT
 from app.schemas.certifications import Certification
+from app.services import catalog_store
 from app.services.skill_gaps.assets import ASSET_ROOT
 
 CATALOG_PATH = BACKEND_ROOT / "data" / "certifications.json"
@@ -46,9 +47,10 @@ def load_catalog(path: Path = CATALOG_PATH) -> dict:
     return validate_catalog(raw, core)
 
 
-@lru_cache(maxsize=1)
 def get_catalog() -> dict:
-    return load_catalog()
+    """The current catalog, {"version", "certifications"}, cached for a few minutes."""
+    snapshot = catalog_store.get_snapshot()
+    return {"version": snapshot.certification_version, "certifications": list(snapshot.certifications)}
 
 
 def for_family(catalog: dict, family: str) -> list[Certification]:

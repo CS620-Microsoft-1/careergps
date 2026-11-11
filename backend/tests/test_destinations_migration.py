@@ -53,8 +53,10 @@ class DestinationsMigrationTests(unittest.TestCase):
         self.assertIn("u.active_resume_id IS NOT NULL", sql)
         self.assertIn("DROP TABLE destinations", self.render(REVISION, "downgrade"))
 
-    def test_drop_is_the_single_head_and_syncs_the_pointer_first(self) -> None:
-        self.assertEqual([DROP_REVISION], self.script.get_heads())
+    def test_drop_is_on_the_single_head_and_syncs_the_pointer_first(self) -> None:
+        heads = self.script.get_heads()
+        self.assertEqual(1, len(heads))
+        self.assertIn(DROP_REVISION, [revision.revision for revision in self.script.walk_revisions("base", heads[0])])
         sql = self.render(DROP_REVISION, "upgrade")
         # Never overwrite a destination: the code that ships with this migration no longer
         # updates active_resume_id, so an existing destination can be newer than the pointer.
