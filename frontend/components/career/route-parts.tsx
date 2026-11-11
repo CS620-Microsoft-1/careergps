@@ -222,9 +222,14 @@ export function AnalysisGate({ children }: { children?: React.ReactNode }) {
     title = "The analysis couldn’t finish";
     detail = run?.error ?? "Your confirmed résumé is safe. Try again in a moment.";
     action = <Button size="lg" onClick={() => void analyze(true)}><RotateCcw data-icon="inline-start" />Try again</Button>;
+  } else if (error) {
+    // Loading the saved analysis failed: say so instead of offering a first calculation.
+    title = "Couldn’t load your route";
+    detail = error;
+    action = <Button size="lg" onClick={() => void analyze(false)}><RotateCcw data-icon="inline-start" />Try again</Button>;
   } else {
     title = `No route to ${ROLE_NAMES[family]} yet`;
-    detail = error ?? `Compare your confirmed résumé with ${ROLE_NAMES[family].toLowerCase()} postings to see your match and gaps.`;
+    detail = `Compare your confirmed résumé with ${ROLE_NAMES[family].toLowerCase()} postings to see your match and gaps.`;
     action = <Button size="lg" onClick={() => void analyze(false)}>Calculate my route</Button>;
   }
   return (

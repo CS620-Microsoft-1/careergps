@@ -173,6 +173,41 @@ test("a failed reload keeps the profile and run already shown", async () => {
   assert.equal(state.error, undefined); assert.equal(f.latest.length, 1); f.disconnect();
 });
 
+test("an awaited destination hides the old run until it loads, then starts its analysis", async () => {
+  const f = changing(profile, { missing: (p) => p.job_family === "data_analyst" }); await f.session.initialize();
+  f.disconnect();
+  const next = { ...profile, job_family: "data_analyst" };
+  f.server.profile = next; f.server.intent = next;
+  f.session.expect(next);
+  assert.deepEqual(f.session.getSnapshot().awaiting, next);
+  f.reconnect(); await f.session.initialize();
+  const state = f.session.getSnapshot();
+  assert.equal(state.awaiting, null); assert.equal(state.awaitError, undefined);
+  assert.equal(state.snapshot.job_family, "data_analyst");
+  assert.deepEqual(f.starts, [{ family: "data_analyst", force: false }]); f.disconnect();
+});
+test("a failed load of the awaited destination reports an error and retries without using the intent", async () => {
+  const f = changing(); await f.session.initialize();
+  f.disconnect();
+  const next = { ...profile, resume_id: "resume-b" };
+  f.server.failLoad = 1; f.server.profile = next; f.server.intent = next;
+  f.session.expect(next);
+  f.reconnect(); await f.session.initialize();
+  let state = f.session.getSnapshot();
+  assert.deepEqual(state.awaiting, next); assert.equal(state.awaitError, "offline");
+  f.session.reload(); await f.session.initialize();
+  state = f.session.getSnapshot();
+  assert.equal(state.awaiting, null); assert.equal(state.awaitError, undefined);
+  assert.equal(state.snapshot.resume_id, "resume-b"); assert.equal(state.run.id, "run-resume-b"); f.disconnect();
+});
+test("loading a different profile than the awaited one keeps waiting with an error", async () => {
+  const f = changing(); await f.session.initialize();
+  f.disconnect();
+  f.session.expect({ ...profile, resume_id: "resume-b" });
+  f.reconnect(); await f.session.initialize();
+  const state = f.session.getSnapshot();
+  assert.equal(state.awaiting.resume_id, "resume-b"); assert.match(state.awaitError, /hasn’t loaded/); f.disconnect();
+});
 test("saved profile pairs the selected role (the target role by default) with its résumé", () => {
   const { profileForAnalysis } = load("skill-gap-profile.ts");
   const user = { id: "u", target_role: "Data Analyst" };

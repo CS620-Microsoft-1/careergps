@@ -5,10 +5,10 @@ import { createContext, useContext, useEffect, useState, useSyncExternalStore } 
 import { ApiError } from "@/lib/api/client";
 import { getMe, getSavedResume } from "@/lib/api/me";
 import { getLatestSkillGapRun, getSkillGapRun, startSkillGapRun } from "@/lib/api/skill-gaps";
-import { consumeSkillGapIntent, profileForAnalysis } from "@/lib/skill-gap-profile";
+import { consumeSkillGapIntent, profileForAnalysis, type SkillGapProfile } from "@/lib/skill-gap-profile";
 import { SkillGapSession, type SkillGapSessionState } from "@/lib/skill-gap-session";
 
-type SkillGapContextValue = SkillGapSessionState & Pick<SkillGapSession, "analyze" | "changeFamily">;
+type SkillGapContextValue = SkillGapSessionState & Pick<SkillGapSession, "analyze" | "changeFamily" | "reload">;
 const SkillGapContext = createContext<SkillGapContextValue | null>(null);
 
 function createSession() {
@@ -38,11 +38,16 @@ function createSession() {
 let shared: SkillGapSession | null = null;
 const getSession = () => typeof window === "undefined" ? createSession() : (shared ??= createSession());
 
+/** Setup saved this destination and résumé: the route page waits for them, not the ones shown before. */
+export function expectSkillGapProfile(profile: SkillGapProfile) {
+  getSession().expect(profile);
+}
+
 export function SkillGapProvider({ children }: { children: React.ReactNode }) {
   const [session] = useState(getSession);
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot, session.getServerSnapshot);
   useEffect(() => session.connect(), [session]);
-  return <SkillGapContext value={{ ...state, analyze: session.analyze, changeFamily: session.changeFamily }}>{children}</SkillGapContext>;
+  return <SkillGapContext value={{ ...state, analyze: session.analyze, changeFamily: session.changeFamily, reload: session.reload }}>{children}</SkillGapContext>;
 }
 
 export function useSkillGapAnalysis() {

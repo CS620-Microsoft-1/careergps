@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, LoaderCircle, RotateCcw } from "lucide-react";
 
 import { AnalysisGate, GapBar, GapLegend, GapMeta, MatchRing, ROLE_NAMES, SourceNote, skillLabel } from "@/components/career/route-parts";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
@@ -19,16 +19,21 @@ const NEXT_STEPS = [
 /** After setup: the first match and the biggest gaps, while or once the analysis runs. */
 export function RouteResult() {
   const router = useRouter();
-  const { family, run, loaded, restoring, submitting } = useSkillGapAnalysis();
+  const { family, run, snapshot, loaded, restoring, submitting, awaiting, awaitError, reload } = useSkillGapAnalysis();
   const role = ROLE_NAMES[family];
-  const report = run?.status === "completed" ? run.report : null;
-  // Home waits for the route; it opens again if the analysis fails or there's nothing to run.
-  const loading = !report && (!loaded || restoring || submitting || run?.status === "queued" || run?.status === "running");
+  // Until the destination and résumé setup just saved have loaded, anything shown is the old route.
+  const current = !awaiting && run !== null && snapshot !== null && run.user_id === snapshot.user_id
+    && run.resume_id === snapshot.resume_id && run.job_family === snapshot.job_family;
+  const report = current && run.status === "completed" ? run.report : null;
+  // Home waits for the new route; it opens again if the analysis fails or there's nothing to run.
+  const loading = !report && (Boolean(awaiting) || !loaded || restoring || submitting || run?.status === "queued" || run?.status === "running");
 
   return (
     <div className="mx-auto flex w-full max-w-300 flex-1 flex-col px-4 py-6 sm:px-6">
       {!report ? (
-        <div className="grid flex-1 place-items-center"><div className="w-full max-w-3xl"><AnalysisGate /></div></div>
+        <div className="grid flex-1 place-items-center"><div className="w-full max-w-3xl">
+          {awaiting ? <AwaitingRoute error={awaitError} onRetry={reload} /> : <AnalysisGate />}
+        </div></div>
       ) : <ReadyRoute role={role} />}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         {/* Back to the setup step that led here: the résumé review, or Add a destination. */}
@@ -37,6 +42,24 @@ export function RouteResult() {
           ? <Button size="lg" disabled>Go to my home page<ArrowRight data-icon="inline-end" /></Button>
           : <Button asChild size="lg"><Link href="/dashboard">Go to my home page<ArrowRight data-icon="inline-end" /></Link></Button>}
       </div>
+    </div>
+  );
+}
+
+/** The new destination is saved but not loaded yet, or loading it failed. */
+function AwaitingRoute({ error, onRetry }: { error?: string; onRetry: () => void }) {
+  return (
+    <div className="grid justify-items-center gap-3 rounded-2xl border border-border bg-card px-6 py-14 text-center" aria-busy={!error}>
+      {!error && <LoaderCircle aria-hidden className="size-7 motion-safe:animate-spin" />}
+      <div role="status" aria-live="polite" className="grid gap-1.5">
+        <h2 className="text-section">{error ? "Couldn’t load your route" : "Loading your route…"}</h2>
+        <p className="mx-auto max-w-lg text-muted-foreground">
+          {error ?? "Your saved résumé and destination will appear in a moment."}
+        </p>
+      </div>
+      {error && <div className="mt-2">
+        <Button size="lg" onClick={onRetry}><RotateCcw data-icon="inline-start" />Try again</Button>
+      </div>}
     </div>
   );
 }

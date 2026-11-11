@@ -8,6 +8,7 @@ import { ROLE_NAMES } from "@/components/career/route-parts";
 import { ResumeAnalysisProgress, type TimedStepEvent } from "@/components/onboarding/resume-analysis-progress";
 import { ResumeReview, type Basics } from "@/components/onboarding/resume-review";
 import { SetupStepper } from "@/components/setup/setup-shell";
+import { expectSkillGapProfile } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -428,12 +429,16 @@ function RoleStep({ goal, onChange, error, explored = [], title = "Choose a targ
   );
 }
 
-/** The last save step: queue the analysis of what was just saved. */
+/**
+ * The last save step: queue the analysis of what was just saved, and make the route page wait for
+ * that destination and résumé instead of showing a route loaded before.
+ */
 async function showSavedRoute() {
   const [{ user }, saved] = await Promise.all([getMe(), getSavedResume()]);
   if (!user || !saved) throw new Error("Upload your résumé first.");
   const profile = profileForAnalysis(user, saved);
   queueSkillGapAnalysis(profile);
+  expectSkillGapProfile(profile);
 }
 
 function prefillBasics(classification: ResumeClassification, account: User | null,
