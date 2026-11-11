@@ -195,3 +195,17 @@ test("save intent stores only identifiers and cannot transfer across users or re
     assert.equal(api.consumeSkillGapIntent(profile), false);
   } finally { global.sessionStorage = prior; }
 });
+test("a session shared by two pages stays connected until both disconnect", async () => {
+  const f = fixture({ latestRun: run({ status: "running", phase: "evidence", completed_at: null }) });
+  await f.session.initialize();
+  const second = f.session.connect(); await f.session.initialize();
+  assert.equal(f.session.getSnapshot().run.status, "running");
+  // The first page hides; the second still shows the run, so polling keeps going.
+  f.disconnect(); f.disconnect();
+  assert.ok(f.timers.size > 0);
+  second();
+  assert.equal(f.timers.size, 0);
+  // A reconnect doesn't drop what the other page already loaded.
+  f.reconnect();
+  assert.equal(f.session.getSnapshot().run.id, "run-a"); f.disconnect();
+});

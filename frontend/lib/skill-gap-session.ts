@@ -42,7 +42,9 @@ export class SkillGapSession {
   private reloading: Promise<void> | null = null;
   private loadFailed = false;
   private switches = 0;
-  private connected = false;
+  /** Mounted providers using this session; one shared session can be shown by more than one. */
+  private connections = 0;
+  private get connected() { return this.connections > 0; }
   private generation = 0;
   private pollInFlight = false;
   private pollTimer: ReturnType<typeof setTimeout> | undefined;
@@ -55,7 +57,7 @@ export class SkillGapSession {
     return () => { this.listeners.delete(listener); };
   };
   connect = () => {
-    this.connected = true;
+    this.connections++;
     // Shown again after the first load (the router hides the app while /onboarding is open): pick up a
     // new résumé or role, or recover from a failed load. An unchanged profile keeps its run.
     if (this.state.loaded && !this.reloading) {
@@ -63,7 +65,13 @@ export class SkillGapSession {
     }
     void this.initialize();
     this.scheduleTimers();
-    return () => { this.connected = false; this.stopTimers(); };
+    let open = true;
+    return () => {
+      if (!open) return;
+      open = false;
+      this.connections--;
+      if (!this.connected) this.stopTimers();
+    };
   };
   initialize = async (): Promise<void> => {
     this.initialization ??= this.loadInitialProfile();
