@@ -4,7 +4,11 @@
 #
 # kind: idea_list   -> a repo whose README lists project ideas in Markdown tables
 #                      (| [Name](link) | Short description | Tier |). Each idea keeps the name the
-#                      list gives it and links to the list's tutorial.
+#                      list gives it and links where the list does. Options, all optional:
+#                        title_column / description_column / tier_column: 0-based columns
+#                          (defaults 0, 1, 2; tier_column: null when the table has no tiers)
+#                        difficulty / hours: used when there's no tier column
+#                        roles: only offer these projects for these job families
 # kind: topic       -> a GitHub topic; its top repos become "Contribute to owner/repo" projects
 #                      (supported by the sync script, but not used: their titles read poorly next
 #                      to the rest of the catalog).
@@ -14,3 +18,17 @@ sources:
     repo: The-Cool-Coders/Project-Ideas-And-Resources
     branch: main
     path: README.md
+
+  # ~200 ML, deep learning, NLP, computer vision and generative AI projects, each a folder with
+  # code in the repo. The table is | No. | [Name](folder) | Description | with no difficulty column.
+  - id: ml_projectkart
+    kind: idea_list
+    repo: prathimacode-hub/ML-ProjectKart
+    branch: main
+    path: README.md
+    title_column: 1
+    description_column: 2
+    tier_column: null
+    difficulty: intermediate
+    hours: 25
+    roles: [ai_engineer, data_analyst]

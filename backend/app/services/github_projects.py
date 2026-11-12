@@ -55,7 +55,7 @@ _SWE_RULES: list[tuple[str, tuple[str, ...]]] = [
 _DATA_RULES: list[tuple[str, tuple[str, ...]]] = [
     (r"sql|postgres(?:ql)?|mysql|sqlite|bigquery|duckdb", ("sql",)),
     (r"pandas|jupyter|notebooks?|numpy|\br\b|data analysis|analytics|exploratory", ("analytical_scripting", "data_analysis")),
-    (r"visuali[sz]ation|charts?|plotly|matplotlib|seaborn|d3(?:\.js)?|dashboards?", ("data_visualization",)),
+    (r"visuali[sz]ations?|charts?|plotly|matplotlib|seaborn|d3(?:\.js)?|dashboards?", ("data_visualization",)),
     (r"dashboards?|streamlit|power ?bi|tableau|looker|metabase|superset", ("dashboarding",)),
     (r"power ?bi|tableau|looker|metabase|superset", ("bi_tools",)),
     (r"statistics|statistical|regression|hypothesis", ("statistics",)),
@@ -63,12 +63,18 @@ _DATA_RULES: list[tuple[str, tuple[str, ...]]] = [
     (r"etl|elt|airflow|dagster|prefect|data pipelines?|ingestion|scrap(?:er|ing)", ("data_pipelines",)),
     (r"dbt|data model(?:ing)?|star schema|warehouse|snowflake|redshift", ("data_modeling", "warehousing")),
     (r"spark|pyspark|hadoop|big data", ("large_scale_processing",)),
+    (r"(?:demand|consumption|sales|reviews?|customer|market|survey|report|price|performance) analysis|analysis of|"
+     r"insights?|eda|exploratory data analysis", ("data_analysis",)),
+    (r"customer segmentation|churn|retention|revenue|kpis?", ("business_analytics",)),
     (r"data cleaning|data quality|great expectations|data validation", ("data_quality",)),
     (r"excel|spreadsheets?|google sheets", ("spreadsheets",)),
 ]
 _AI_RULES: list[tuple[str, tuple[str, ...]]] = [
     (r"machine learning|\bml\b|scikit[- ]learn|sklearn|recommend(?:ation|er)?|fraud detection|classifier|classification|prediction|predictive", ("machine_learning", "model_training")),
     (r"deep learning|neural net(?:work)?s?|pytorch|tensorflow|keras|cnn|transformers?|opencv|computer vision|face recognition|image recognition", ("deep_learning",)),
+    (r"detection|recognition|identification|clustering|segmentation|anomaly|sentiment analysis|forecast(?:ing)?|"
+     r"time series|nlp|natural language processing|text summari[sz]ation", ("machine_learning", "model_training")),
+    (r"gans?|dcgan|generative adversarial networks?|autoencoders?|style transfer", ("deep_learning", "generative_ai")),
     (r"fine[- ]?tun(?:e|ing)|lora", ("fine_tuning",)),
     (r"llms?|gpt|openai|large language models?|chatgpt|gemini|claude|llama|ollama", ("llm", "generative_ai")),
     (r"generative ai|gen ?ai|stable diffusion|diffusion", ("generative_ai",)),
@@ -122,12 +128,14 @@ class RawProject:
     language: str | None = None
     topics: list[str] = field(default_factory=list)
     stars: int | None = None
+    roles: tuple[str, ...] | None = None  # job families this source may feed; None = any that fit
 
 
 # --- Parsing -------------------------------------------------------------------------------------
 
 _ROW = re.compile(r"^\s*\|(.+)\|\s*$")
-_LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
+# [text](url), where the url may hold one level of parentheses: "...%20(ASL)%20Recognition".
+_LINK = re.compile(r"\[([^\]]+)\]\(((?:[^()\s]|\([^()\s]*\))+)\)")
 
 
 def _clean(text: str, limit: int = MAX_DESCRIPTION) -> str:
@@ -142,30 +150,47 @@ def slugify(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "_", text.lower()).strip("_")[:60]
 
 
-def parse_idea_table(markdown: str, source_id: str) -> list[RawProject]:
-    """Rows shaped `| [Name](url) | Short description | 1-Beginner |` from any Markdown table."""
+def parse_idea_table(markdown: str, source_id: str, *, title_column: int = 0, description_column: int = 1,
+                     tier_column: int | None = 2, difficulty: str = "intermediate", hours: int = 30,
+                     link_base: str = "") -> list[RawProject]:
+    """Project rows from any Markdown table, e.g. `| [Name](url) | Short description | 1-Beginner |`.
+
+    Columns are 0-based. With tier_column=None every row gets `difficulty` and `hours`, and a row
+    needs a description of a few words, which keeps contributor or link tables out. Relative links
+    are resolved against link_base (the repo's tree URL).
+    """
     projects: list[RawProject] = []
     seen: set[str] = set()
+    needed = max(title_column, description_column, tier_column if tier_column is not None else 0) + 1
     for line in markdown.splitlines():
         row = _ROW.match(line)
         if not row:
             continue
         cells = [cell.strip() for cell in row.group(1).split("|")]
-        if len(cells) < 3:
+        if len(cells) < needed:
             continue
-        link = _LINK.search(cells[0])
-        tier = re.match(r"\s*(\d)", cells[2])
-        if not link or not tier:
-            continue  # header, separator, or a non-project table (e.g. tutorials)
+        link = _LINK.search(cells[title_column])
+        description = _clean(cells[description_column])
+        if tier_column is None:
+            tier = None
+            if not link or len(description.split()) < 4:
+                continue
+        else:
+            tier = re.match(r"\s*(\d)", cells[tier_column])
+            if not link or not tier:
+                continue  # header, separator, or a non-project table (e.g. tutorials)
         title = _clean(link.group(1), 80)
         slug = slugify(title)
         if not slug or slug in seen:
             continue
         seen.add(slug)
-        difficulty, hours = _TIERS.get(tier.group(1), ("intermediate", 30))
+        row_difficulty, row_hours = _TIERS.get(tier.group(1), (difficulty, hours)) if tier else (difficulty, hours)
+        url = link.group(2)
+        if link_base and not re.match(r"https?://", url):
+            url = link_base.rstrip("/") + "/" + url.lstrip("./")
         projects.append(RawProject(
-            source_id=source_id, slug=slug, title=title, description=_clean(cells[1]),
-            url=link.group(2), difficulty=difficulty, estimated_hours=hours, kind="idea",
+            source_id=source_id, slug=slug, title=title, description=description,
+            url=url, difficulty=row_difficulty, estimated_hours=row_hours, kind="idea",
         ))
     return projects
 
@@ -250,6 +275,8 @@ def to_catalog_entries(raw: RawProject) -> list[dict[str, Any]]:
     """One projects.json-shaped entry per role the project practices."""
     entries = []
     for family, career_path in CAREER_PATHS.items():
+        if raw.roles is not None and family not in raw.roles:
+            continue
         skill_ids, keywords = skills_for(raw, family)
         if not skill_ids:
             continue
@@ -290,7 +317,15 @@ def fetch_idea_list(client: httpx2.Client, source: dict[str, Any]) -> list[RawPr
     request.headers.pop("Authorization", None)
     response = client.send(request)
     response.raise_for_status()
-    return parse_idea_table(response.text, source["id"])
+    options = {key: source[key] for key in ("title_column", "description_column", "tier_column", "difficulty", "hours")
+               if key in source}
+    projects = parse_idea_table(response.text, source["id"],
+                                link_base=f"https://github.com/{source['repo']}/tree/{source.get('branch', 'main')}",
+                                **options)
+    if source.get("roles"):
+        for project in projects:
+            project.roles = tuple(source["roles"])
+    return projects
 
 
 def _search_query(source: dict[str, Any]) -> str:

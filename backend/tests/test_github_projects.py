@@ -87,6 +87,28 @@ class ParseTest(unittest.TestCase):
         self.assertEqual(skills_for(python_only, "software_engineer"), ([], []))
 
 
+class ColumnLayoutTest(unittest.TestCase):
+    def test_numbered_table_without_tiers_and_role_limits(self):
+        markdown = """
+| S.No | Project Name | Description |
+| --- | --- | --- |
+| 01. | [Mall Customer Segmentation](Mall%20Customer%20Segmentation) | Segment mall customers by spending with clustering. |
+| 02. | [Fake News Detection](https://github.com/o/r/tree/main/Fake) | Detect fake news articles with NLP. |
+| [Contributor](https://github.com/someone) | thanks |
+"""
+        projects = parse_idea_table(markdown, "kart", title_column=1, description_column=2, tier_column=None,
+                                    difficulty="intermediate", hours=25, link_base="https://github.com/o/r/tree/main")
+        self.assertEqual([p.title for p in projects], ["Mall Customer Segmentation", "Fake News Detection"])
+        self.assertEqual(projects[0].url, "https://github.com/o/r/tree/main/Mall%20Customer%20Segmentation")
+        self.assertEqual((projects[0].difficulty, projects[0].estimated_hours), ("intermediate", 25))
+        for project in projects:
+            project.roles = ("ai_engineer", "data_analyst")
+        paths = {(e["title"], e["career_path"]) for e in build_catalog(projects)}
+        self.assertIn(("Mall Customer Segmentation", "Data Analyst"), paths)
+        self.assertIn(("Fake News Detection", "AI/ML Engineering"), paths)
+        self.assertFalse(any(path == "Software Engineering" for _, path in paths))
+
+
 class FetchTest(unittest.TestCase):
     def test_idea_list_and_topic_become_catalog_entries(self):
         with create_client("bad-token", transport=httpx2.MockTransport(_transport)) as client:
