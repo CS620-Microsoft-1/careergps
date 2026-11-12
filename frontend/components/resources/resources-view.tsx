@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { BookmarkCheck, Check, ChevronRight, ExternalLink, Layers, LoaderCircle } from "lucide-react";
+import { BookmarkCheck, Check, ChevronDown, ChevronRight, ExternalLink, Layers, LoaderCircle } from "lucide-react";
 
 import {
   RESOURCE_TYPES,
@@ -33,7 +33,7 @@ export function ResourcesView() {
   const [type, setType] = useState<ResourceType | "all">("all");
 
   const report = run?.status === "completed" ? run.report : null;
-  const picks = usePicks(family, report ? run!.id : null);
+  const { byId: picks, projectsPending } = usePicks(family, report ? run!.id : null);
   const pickOrder = [...picks.keys()];
   const gaps = report ? rankGaps(report).map((gap) => gap.skill_id) : [];
   const requestedGap = params.get("gap");
@@ -103,6 +103,9 @@ export function ResourcesView() {
               const group = visible.filter((r) => r.type === key)
                 .sort((a, b) => rank(pickOrder, a.id) - rank(pickOrder, b.id));
               if (!group.length) return null;
+              // Projects: the agent's top picks up front, every other project under "More projects".
+              const split = key === "project" ? splitProjects(group, picks, gaps, projectsPending) : null;
+              const shown = split ? split.top : group;
               return (
                 <section key={key} aria-labelledby={`type-${key}`}>
                   <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -110,9 +113,25 @@ export function ResourcesView() {
                     <span className="font-mono text-sm">{group.length}</span>
                     <span className="text-sm text-muted-foreground">{RESOURCE_TYPES[key].blurb}</span>
                   </div>
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {group.map((resource) => <ResourceCard key={resource.id} resource={resource} gaps={gaps} pick={picks.get(resource.id)} />)}
-                  </div>
+                  {split && projectsPending && !split.top.length && (
+                    <p role="status" className="flex items-center gap-2 rounded-2xl border border-border bg-card p-5 text-muted-foreground">
+                      <LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Picking your top {TOP_PROJECTS} projects…
+                    </p>
+                  )}
+                  {shown.length > 0 && <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {shown.map((resource) => <ResourceCard key={resource.id} resource={resource} gaps={gaps} pick={picks.get(resource.id)} />)}
+                  </div>}
+                  {split && split.more.length > 0 && (
+                    <details className="group mt-4 rounded-2xl border border-border bg-card shadow-card">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-5 py-4 font-bold hover:bg-background [&::-webkit-details-marker]:hidden">
+                        <span>More projects <span className="ml-1 font-mono text-sm font-normal text-muted-foreground">{split.more.length}</span></span>
+                        <ChevronDown aria-hidden className="size-4.5 transition-transform group-open:rotate-180" />
+                      </summary>
+                      <div className="grid gap-4 border-t border-border p-4 sm:grid-cols-2 xl:grid-cols-3">
+                        {split.more.map((resource) => <ResourceCard key={resource.id} resource={resource} gaps={gaps} pick={picks.get(resource.id)} />)}
+                      </div>
+                    </details>
+                  )}
                 </section>
               );
             })}
@@ -171,8 +190,31 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
 }
 
 const NO_PICKS = new Map<string, string | null>();
+/** How many projects show before "More projects"; the agent recommends at most this many. */
+const TOP_PROJECTS = 3;
 
-/** Certification and project picks for the role's analysis: resource id → reason, in pick order. */
+/**
+ * The agent's project picks (in pick order) as the top projects, the rest under "More projects",
+ * ordered by how many of the student's gaps they close. Without picks (no analysis yet, the agent
+ * failed, or a gap filter hides them) the projects that close the most gaps go on top instead;
+ * while picks are still loading, nothing does, so the top doesn't jump when they arrive.
+ */
+function splitProjects(projects: Resource[], picks: Map<string, string | null>, gaps: string[], pending: boolean) {
+  const closed = (resource: Resource) => resource.skills.filter((skill) => gaps.includes(skill)).length;
+  const byCoverage = (list: Resource[]) => list
+    .map((resource, index) => ({ resource, index }))
+    .sort((a, b) => closed(b.resource) - closed(a.resource) || a.index - b.index)
+    .map(({ resource }) => resource);
+  const picked = projects.filter((resource) => picks.has(resource.id));
+  const top = picked.length ? picked.slice(0, TOP_PROJECTS) : pending ? [] : byCoverage(projects).slice(0, TOP_PROJECTS);
+  const onTop = new Set(top.map((resource) => resource.id));
+  return { top, more: byCoverage(projects.filter((resource) => !onTop.has(resource.id))) };
+}
+
+/**
+ * Certification and project picks for the role's analysis: resource id → reason, in pick order.
+ * projectsPending is true until the project picks for this analysis have come back (or failed).
+ */
 function usePicks(family: JobFamily, runId: string | null) {
   const [picks, setPicks] = useState<{ runId: string; byId: Map<string, string | null> } | null>(null);
   useEffect(() => {
@@ -193,7 +235,8 @@ function usePicks(family: JobFamily, runId: string | null) {
     });
     return () => { active = false; };
   }, [family, runId]);
-  return picks?.runId === runId ? picks.byId : NO_PICKS;
+  const loaded = picks?.runId === runId;
+  return { byId: loaded ? picks.byId : NO_PICKS, projectsPending: runId !== null && !loaded };
 }
 
 const rank = (order: string[], key: string) => {

@@ -54,7 +54,8 @@ def load_projects() -> tuple[dict, ...]:
 
 def _project(project: dict) -> dict:
     """A projects.json entry (the resources agent's catalog) as a resource."""
-    provider = "GitHub" if project.get("source") == "github" else "Project"
+    # GitHub idea lists link each idea to a build-along video; repos link to the repository.
+    provider = {"idea": "YouTube tutorial", "open_source": "GitHub"}.get(project.get("source_kind"), "Project")
     return {"id": project["id"], "type": "project", "title": project["title"], "provider": provider,
             "meta": f"{project['difficulty'].capitalize()} · about {project['estimated_hours']} hours",
             "description": project["description"], "skills": project["supported_skill_ids"],

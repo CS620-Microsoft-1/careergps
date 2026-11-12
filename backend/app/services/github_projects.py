@@ -46,7 +46,7 @@ _SWE_RULES: list[tuple[str, tuple[str, ...]]] = [
     (r"websockets?|real[- ]time|micro[- ]?services?|distributed|kafka|multiple users", ("distributed_systems",)),
     (r"docker|kubernetes|k8s|containers?", ("containers",)),
     (r"aws|azure|gcp|google cloud|cloud|serverless|vercel|netlify", ("cloud",)),
-    (r"auth(?:entication|orization)?|nextauth|oauth|jwt|password|security|encryption", ("security",)),
+    (r"auth(?:entication|orization)?|nextauth|oauth|jwt|security|encryption", ("security",)),
     (r"tests?|testing|jest|pytest|cypress|unit tests?", ("testing",)),
     (r"ci/cd|github actions|continuous integration|devops", ("delivery_automation",)),
     (r"algorithms?|chess|tic[- ]tac[- ]toe|sudoku|path ?finding|data structures", ("algorithms",)),
@@ -83,18 +83,14 @@ _AI_RULES: list[tuple[str, tuple[str, ...]]] = [
 ]
 
 _RULES = {"software_engineer": _SWE_RULES, "data_analyst": _DATA_RULES, "ai_engineer": _AI_RULES}
-# Skills every entry gets in a role it qualifies for (it is code in a GitHub repository).
-_BASE_SKILLS = {
-    "software_engineer": ("programming", "version_control"),
-    "data_analyst": (),
-    "ai_engineer": (),
-}
 _LANGUAGE_SKILLS = {
     "ai_engineer": {"python": ("python",)},
     "data_analyst": {"python": ("analytical_scripting",), "r": ("analytical_scripting",),
                      "jupyter notebook": ("analytical_scripting",)},
 }
-# A role needs at least one of its own skills, not just these generic ones.
+# A role needs at least one of its own skills, not just these generic ones. A project is only
+# tagged with what its own text names: being code in a repository doesn't make it practice
+# programming or version control as a skill gap.
 _GENERIC = {"programming", "version_control", "python", "analytical_scripting"}
 
 _LIST_REPO = re.compile(
@@ -226,7 +222,6 @@ def skills_for(raw: RawProject, family: str) -> tuple[list[str], list[str]]:
     add(_LANGUAGE_SKILLS.get(family, {}).get(language, ()))
     if not set(skills) - _GENERIC:
         return [], []
-    add(_BASE_SKILLS[family])
     names = _skill_names(family)
     unknown = [skill for skill in skills if skill not in names]
     if unknown:  # a rule drifted from core_catalog.json

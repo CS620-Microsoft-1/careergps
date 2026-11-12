@@ -3,55 +3,14 @@
 # which load_projects() merges with the hand-written data/projects.json.
 #
 # kind: idea_list   -> a repo whose README lists project ideas in Markdown tables
-#                      (| [Name](link) | Short description | Tier |)
-# kind: topic       -> a GitHub topic; the top repos by stars become "contribute to X" projects.
-#                      min_good_first_issues keeps only repos with that many open issues labeled
-#                      "good first issue", i.e. projects that actively welcome new contributors.
+#                      (| [Name](link) | Short description | Tier |). Each idea keeps the name the
+#                      list gives it and links to the list's tutorial.
+# kind: topic       -> a GitHub topic; its top repos become "Contribute to owner/repo" projects
+#                      (supported by the sync script, but not used: their titles read poorly next
+#                      to the rest of the catalog).
 sources:
   - id: cool_coders
     kind: idea_list
     repo: The-Cool-Coders/Project-Ideas-And-Resources
     branch: main
     path: README.md
-
-  - id: open_source_projects
-    kind: topic
-    topic: open-source-projects
-    limit: 60
-    min_stars: 50
-
-  # One topic per role, limited to repos that label beginner issues.
-  - id: oss_react
-    kind: topic
-    topic: react
-    min_good_first_issues: 10
-    limit: 20
-    min_stars: 500
-
-  - id: oss_data_analysis
-    kind: topic
-    topic: data-analysis
-    min_good_first_issues: 3
-    limit: 20
-    min_stars: 200
-
-  - id: oss_data_visualization
-    kind: topic
-    topic: data-visualization
-    min_good_first_issues: 3
-    limit: 20
-    min_stars: 200
-
-  - id: oss_machine_learning
-    kind: topic
-    topic: machine-learning
-    min_good_first_issues: 5
-    limit: 20
-    min_stars: 500
-
-  - id: oss_llm
-    kind: topic
-    topic: llm
-    min_good_first_issues: 5
-    limit: 20
-    min_stars: 500

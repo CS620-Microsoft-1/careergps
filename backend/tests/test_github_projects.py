@@ -77,12 +77,14 @@ class ParseTest(unittest.TestCase):
     def test_skills_are_role_specific(self):
         mern = RawProject("s", "x", "Discord Clone", "Clone using MERN Stack", "u", "advanced", 50, "idea")
         self.assertEqual(skills_for(mern, "software_engineer")[0],
-                         ["frontend", "backend_apis", "nosql_search", "programming", "version_control"])
+                         ["frontend", "backend_apis", "nosql_search"])
         self.assertEqual(skills_for(mern, "ai_engineer"), ([], []))
         self.assertEqual(skills_for(mern, "data_analyst"), ([], []))
         # Python alone is not an AI project.
-        python_only = RawProject("s", "y", "Tic Tac Toe", "Game using Python", "u", "beginner", 15, "idea")
+        python_only = RawProject("s", "y", "Password Generator", "App using Python", "u", "beginner", 15, "idea")
         self.assertEqual(skills_for(python_only, "ai_engineer"), ([], []))
+        # Nor is any repo a programming or version-control project just for being code on GitHub.
+        self.assertEqual(skills_for(python_only, "software_engineer"), ([], []))
 
 
 class FetchTest(unittest.TestCase):
@@ -126,9 +128,17 @@ class CatalogMergeTest(unittest.TestCase):
                     self.assertIn("gh_aiml_oss_acme_rag_chat", [r["project_id"] for r in picks["recommendations"]])
                     listed = {r["id"]: r for r in resources.resources_for("ai_engineer", None)}
                     self.assertEqual(listed["gh_aiml_oss_acme_rag_chat"]["provider"], "GitHub")
+                    self.assertTrue(all(r["provider"] == "Project" for r in listed.values() if r["type"] == "project"
+                                        and not r["id"].startswith("gh_")))
                     self.assertEqual(listed["gh_aiml_oss_acme_rag_chat"]["url"], "https://github.com/acme/rag-chat")
             finally:
                 resources.load_projects.cache_clear()
+
+    def test_idea_list_projects_are_labeled_as_tutorials(self):
+        idea = {"id": "gh_swe_cool_x", "title": "Weather App", "difficulty": "beginner", "estimated_hours": 15,
+                "description": "", "supported_skill_ids": ["frontend"], "source": "github", "source_kind": "idea",
+                "url": "https://www.youtube.com/watch?v=x"}
+        self.assertEqual(resources._project(idea)["provider"], "YouTube tutorial")
 
     def test_agent_shortlist_keeps_best_covering_projects(self):
         gaps = [{"skill_id": "rag", "skill_name": "RAG", "definition": ""},
