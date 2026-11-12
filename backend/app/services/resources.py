@@ -54,9 +54,8 @@ def load_projects() -> tuple[dict, ...]:
 
 def _project(project: dict) -> dict:
     """A projects.json entry (the resources agent's catalog) as a resource."""
-    # GitHub idea lists link each idea to a build-along video; repos link to the repository.
-    provider = {"idea": "YouTube tutorial", "open_source": "GitHub"}.get(project.get("source_kind"), "Project")
-    return {"id": project["id"], "type": "project", "title": project["title"], "provider": provider,
+    # Projects have no provider to name; the card's spot for it stays empty.
+    return {"id": project["id"], "type": "project", "title": project["title"], "provider": "",
             "meta": f"{project['difficulty'].capitalize()} · about {project['estimated_hours']} hours",
             "description": project["description"], "skills": project["supported_skill_ids"],
             "url": project.get("url")}

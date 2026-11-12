@@ -127,18 +127,16 @@ class CatalogMergeTest(unittest.TestCase):
                     picks = rank_projects("AI/ML Engineering", [], ["Agents & tool use"], None, gaps)
                     self.assertIn("gh_aiml_oss_acme_rag_chat", [r["project_id"] for r in picks["recommendations"]])
                     listed = {r["id"]: r for r in resources.resources_for("ai_engineer", None)}
-                    self.assertEqual(listed["gh_aiml_oss_acme_rag_chat"]["provider"], "GitHub")
-                    self.assertTrue(all(r["provider"] == "Project" for r in listed.values() if r["type"] == "project"
-                                        and not r["id"].startswith("gh_")))
+                    self.assertTrue(all(r["provider"] == "" for r in listed.values() if r["type"] == "project"))
                     self.assertEqual(listed["gh_aiml_oss_acme_rag_chat"]["url"], "https://github.com/acme/rag-chat")
             finally:
                 resources.load_projects.cache_clear()
 
-    def test_idea_list_projects_are_labeled_as_tutorials(self):
+    def test_projects_name_no_provider(self):
         idea = {"id": "gh_swe_cool_x", "title": "Weather App", "difficulty": "beginner", "estimated_hours": 15,
                 "description": "", "supported_skill_ids": ["frontend"], "source": "github", "source_kind": "idea",
                 "url": "https://www.youtube.com/watch?v=x"}
-        self.assertEqual(resources._project(idea)["provider"], "YouTube tutorial")
+        self.assertEqual(resources._project(idea)["provider"], "")
 
     def test_agent_shortlist_keeps_best_covering_projects(self):
         gaps = [{"skill_id": "rag", "skill_name": "RAG", "definition": ""},
