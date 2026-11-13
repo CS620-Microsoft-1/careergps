@@ -31,7 +31,12 @@ from app.models.skill_gap import SkillGapResult, SkillGapRunBranch, SkillGapRunR
 from app.services.skill_gaps.match import summarize_match
 from app.services.skill_gaps.persistence import STORAGE_SCHEMA_VERSION
 from app.services.skill_gaps.run_store import ActiveRunExists, DbRunStore
-from tests.skill_gap_fixtures import CONFIRMED_AT, reviewed_resume
+from tempfile import TemporaryDirectory
+
+from tests.skill_gap_fixtures import CONFIRMED_AT, RESUME_ID, USER_ID, group_manager, reviewed_resume
+# The module, not the class: importing a TestCase class here would run its tests twice.
+from tests import test_skill_gap_persistence as persistence_tests
+from tests.test_skill_gap_run_ownership import wait_for
 
 CONTRACTS = BACKEND_ROOT.parent / "docs" / "contracts"
 EXAMPLE = json.loads((CONTRACTS / "skill-gap-run-storage-v3.example.json").read_text(encoding="utf-8"))
@@ -41,8 +46,9 @@ RUN_FIELDS = {"demand_snapshot_fingerprint": "d" * 64, "catalog_version": "core-
 GROUPS = ("foundation", "lifecycle", "systems")
 
 
-@unittest.skipUnless(TEST_DATABASE_URL, "set TEST_DATABASE_URL to a throwaway Postgres to run")
-class DbRunStorePostgresTests(unittest.TestCase):
+class _PostgresCase(unittest.TestCase):
+    """Throwaway database with every migration, a fresh user and résumé per test, and the helpers."""
+
     @classmethod
     def setUpClass(cls) -> None:
         if "supabase" in TEST_DATABASE_URL:
@@ -64,7 +70,7 @@ class DbRunStorePostgresTests(unittest.TestCase):
         cls.engine.dispose()
 
     def setUp(self) -> None:
-        self.user_id, self.resume_id = uuid4(), uuid4()
+        self.user_id, self.resume_id = self.ids()
         with self.engine.begin() as connection:
             connection.execute(text("TRUNCATE users, auth.users CASCADE"))
             connection.execute(text("INSERT INTO auth.users (id, email_confirmed_at) VALUES (:id, now())"),
@@ -81,6 +87,9 @@ class DbRunStorePostgresTests(unittest.TestCase):
         self.store = DbRunStore(self.Session)
 
     # -- helpers ----------------------------------------------------------------------------------
+
+    def ids(self):
+        return uuid4(), uuid4()
 
     def state(self, **changes) -> dict:
         value = {"id": uuid4().hex, "user_id": str(self.user_id), "resume_id": str(self.resume_id),
@@ -133,7 +142,10 @@ class DbRunStorePostgresTests(unittest.TestCase):
         with self.Session() as session:
             return session.get(SkillGapRunRecord, UUID(run_id))
 
-    # -- tests ------------------------------------------------------------------------------------
+
+
+@unittest.skipUnless(TEST_DATABASE_URL, "set TEST_DATABASE_URL to a throwaway Postgres to run")
+class DbRunStorePostgresTests(_PostgresCase):
 
     def test_a_queued_run_keeps_its_snapshot_and_versions(self):
         state = self.state()
@@ -290,6 +302,60 @@ class DbRunStorePostgresTests(unittest.TestCase):
         self.store.create(state, reviewed_resume(), **RUN_FIELDS)
         with self.assertRaises(KeyError):
             self.store.load_report(state["id"])
+
+
+@unittest.skipUnless(TEST_DATABASE_URL, "set TEST_DATABASE_URL to a throwaway Postgres to run")
+class ManagerWithDbRunStorePostgresTests(_PostgresCase):
+    """The real SkillGapRunManager on DbRunStore, with synthetic Agents (no Azure)."""
+
+    def ids(self):
+        return USER_ID, RESUME_ID  # the fixtures submit runs for these
+
+    def manager(self, directory):
+        manager = group_manager(Path(directory), invoker=persistence_tests.MappingAThreeGroupRunTests.invoke, store=self.store)
+        self.addCleanup(manager.close)
+        return manager
+
+    def submit(self, manager, **changes):
+        options = {"user_id": USER_ID, "resume_id": RESUME_ID, "reviewed_resume": reviewed_resume(),
+                   "filename": "alex-example.pdf", "confirmed_at": CONFIRMED_AT, "job_family": "software_engineer"}
+        options.update(changes)
+        return manager.submit(**options)
+
+    def test_a_completed_run_is_in_the_database_and_survives_a_restart(self):
+        with TemporaryDirectory() as directory:
+            manager = self.manager(directory)
+            run = wait_for(manager, self.submit(manager))
+            self.assertEqual("completed", run.status, run.error)
+            row = self.run_row(run.id)
+            self.assertEqual(("completed", run.report, "alex-example.pdf"), (row.status, row.report, row.resume_filename))
+            self.assertEqual(run.match.score if run.match else None, float(row.match_score) if row.match_score is not None else None)
+            self.assertEqual(3, self.count(SkillGapRunBranch, run.id))
+            self.assertEqual(len(run.report["skills"]), self.count(SkillGapResult, run.id))
+            with self.Session() as session:
+                programming = session.get(SkillGapResult, (UUID(run.id), "programming"))
+            self.assertEqual("Implemented an API in Python", programming.evidence[0]["quote"])
+
+            # A new process (new manager, empty folder) finds the same run in the database.
+            with TemporaryDirectory() as other:
+                restarted = self.manager(other)
+                latest = restarted.latest(user_id=USER_ID, resume_id=RESUME_ID, reviewed_resume=reviewed_resume(),
+                                          job_family="software_engineer")
+                self.assertEqual((run.id, run.report), (latest.id, latest.report))
+                again = self.submit(restarted)
+                self.assertEqual((run.id, True), (again.id, again.reused))  # no new paid run
+
+    def test_a_run_interrupted_by_a_crash_fails_on_restart(self):
+        with TemporaryDirectory() as directory:
+            manager = self.manager(directory)
+            state = self.state()
+            self.store.create(state, reviewed_resume(), **RUN_FIELDS)
+            self.store.save_state(self.running(state))
+            with TemporaryDirectory() as other:
+                restarted = self.manager(other)
+                self.assertEqual("failed", restarted.get(state["id"], user_id=USER_ID).status)
+            self.assertEqual(("failed", "failed"), (self.run_row(state["id"]).status, self.run_row(state["id"]).phase))
+            manager.close()
 
 
 if __name__ == "__main__":

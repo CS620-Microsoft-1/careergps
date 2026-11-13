@@ -1,6 +1,7 @@
 """Owner-scoped, single-worker analysis using detached database resume snapshots.
 
-Run state and reports go through a run store (run_store.py; local JSON by default). Branch
+Run state and reports go through a run store (run_store.py): the API uses the database,
+tests and tools default to local JSON. Branch
 artifacts and the branch cache stay in local run folders. Workers never retain a request's
 ORM session, and polling/restoring never starts a model call.
 """
@@ -25,7 +26,7 @@ from .input import prepare
 from .core_cards import CoreSkillCards
 from .branch_cache import BRANCH_CACHE_VERSION, BranchCache
 from .match import summarize_match
-from .run_store import JsonRunStore, run_folder
+from .run_store import DbRunStore, JsonRunStore, run_folder
 from .storage import load, save_json
 from .schema import SCHEMA_NAME
 from .skill_groups import (
@@ -85,6 +86,8 @@ class SkillGapRunManager:
         self.branch_signature = configuration_signature(self.settings)
         self._latest_versions = uses_latest(self.settings)
         self._prepared_runs: dict[str, dict] = {}
+        # Snapshots of submitted runs the store hasn't created yet; the next _persist creates them.
+        self._unsaved: dict[str, dict] = {}
         self._lock = RLock()
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="local-skill-gap")
         self._states: dict[str, dict] = {}
@@ -112,7 +115,38 @@ class SkillGapRunManager:
         return run_folder(self.directory, identifier)
 
     def _persist(self, state: dict) -> None:
-        self.store.save_state(state)
+        reviewed = self._unsaved.pop(state["id"], None)
+        if reviewed is not None:
+            self.store.create(state, reviewed, **self._run_fields(state["job_family"]))
+        else:
+            self.store.save_state(state)
+
+    def _run_fields(self, job_family: JobFamily) -> dict:
+        """What a stored run records about the market data, catalog and policies it was computed with."""
+        cards = self.core_cards.signature(job_family)
+        return {"demand_snapshot_fingerprint": self.market["source_fingerprint"],
+                "catalog_version": f"{cards['version']}:{cards['catalog_sha256'][:12]}",
+                "partition_policy_version": self._partition_policy,
+                "selection_policy_version": self._selection_policy}
+
+    def _complete(self, state: dict, report: dict, extraction_audit: dict, output: dict, folder: Path) -> None:
+        """Hand the finished run to the store with each branch's saved input, answer and checks."""
+        def artifact(branch: str, name: str):
+            path = folder / "branches" / branch / name
+            return load(path) if path.is_file() else None
+
+        branches = {}
+        audit = (extraction_audit or {}).get("branches", {})
+        timings = state.get("azure_phase_timings", {}).get("branches", {})
+        for branch in state.get("branches", {}):
+            observed = artifact(branch, "observed_agent.json") or {}
+            branches[branch] = {
+                "payload": artifact(branch, "input.json"), "output": artifact(branch, "agent.response.json"),
+                "raw_response": artifact(branch, "agent.raw.json"), "definition": observed.get("definition"),
+                "timings": timings.get(branch), "validation": audit.get(branch, {}).get("validation"),
+                "response_processing": audit.get(branch, {}).get("response_processing")}
+        self.store.complete(state, report=report, extraction_audit=extraction_audit,
+                            merged_output=output, branches=branches)
 
     def _recover(self) -> None:
         # Interrupted tasks are never retried implicitly. A manual force request
@@ -125,7 +159,8 @@ class SkillGapRunManager:
                     state[name] = str(UUID(state[name]))
                 expected = self._cache_key(state["user_id"], state["resume_id"], state["resume_hash"],
                                            state["job_family"], state["calculation_fingerprint"])
-                if state["cache_key"] != expected:
+                # A database store doesn't keep the key; it is rebuilt from the stored fields.
+                if state.setdefault("cache_key", expected) != expected:
                     continue
                 created = datetime.fromisoformat(state["created_at"])
                 if created.tzinfo is None:
@@ -253,10 +288,12 @@ class SkillGapRunManager:
                     self._prepared_runs[identifier] = prepared
                     for (branch, name), value in configuration_artifacts.items():
                         save_json(folder / "branches" / branch / name, value)
+                self._unsaved[identifier] = reviewed
                 self._persist(state)
                 self._executor.submit(self._work, identifier, reviewed)
             except BaseException:
                 # Preserve the upstream queue-submission rollback protection.
+                self._unsaved.pop(identifier, None)
                 self._states.pop(identifier, None)
                 self._prepared_runs.pop(identifier, None)
                 if prior_id is None:
@@ -549,7 +586,7 @@ class SkillGapRunManager:
                              worker_seconds=round(time.perf_counter() - started, 3))
                 state['elapsed_seconds'] = round((datetime.now(timezone.utc) -
                     datetime.fromisoformat(state['created_at'])).total_seconds(), 3)
-                self._persist(state)
+                self._complete(state, report, extraction_audit, output, folder)
         except Exception as error:
             # Keep detailed SDK errors out of HTTP responses and do not retry.
             # The original response/artifacts, if any, remain local for diagnosis.
@@ -581,7 +618,9 @@ _manager_lock = Lock()
 
 @lru_cache(maxsize=1)
 def _cached_skill_gap_run_manager() -> SkillGapRunManager:
-    return SkillGapRunManager()
+    # The API keeps runs in the database; branch artifacts stay in local run folders.
+    from app.db.session import SessionLocal
+    return SkillGapRunManager(store=DbRunStore(SessionLocal))
 
 
 def get_skill_gap_run_manager() -> SkillGapRunManager:
