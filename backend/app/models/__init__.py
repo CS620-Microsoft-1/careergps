@@ -1,4 +1,5 @@
 # Import every model here so Alembic's autogenerate can see it.
+from app.models.catalog import CatalogCertification, CatalogVersion, SchoolCourse, StudentOrg
 from app.models.destination import Destination
 from app.models.job_posting import IngestRun, JobPosting
 from app.models.job_posting_analysis import (
@@ -17,9 +18,12 @@ from app.models.resume import (
     ResumeProject,
     ResumeSkill,
 )
+from app.models.skill_gap import SkillGapResult, SkillGapRunBranch, SkillGapRunRecord
 from app.models.user import User
 
 __all__ = [
+    "CatalogCertification",
+    "CatalogVersion",
     "Destination",
     "JobPostingAnalysis",
     "JobAnalysisLocation",
@@ -35,5 +39,10 @@ __all__ = [
     "ResumeExperience",
     "ResumeProject",
     "ResumeSkill",
+    "SchoolCourse",
+    "SkillGapResult",
+    "SkillGapRunBranch",
+    "SkillGapRunRecord",
+    "StudentOrg",
     "User",
 ]

@@ -1,4 +1,4 @@
-"""plan_items and skill_gap_runs migrations, rendered as offline SQL (no database)."""
+"""plan_items and Skill Gap storage migrations, rendered as offline SQL (no database)."""
 import io
 import sys
 import unittest
@@ -15,6 +15,7 @@ sys.path.insert(0, str(BACKEND_ROOT))
 
 PLAN_ITEMS = "3f8a1c6d2e90"
 SKILL_GAP_RUNS = "6d7e2b9a4c15"
+SKILL_GAP_RESULTS = "df5726089a8e"
 
 
 class LocalStateMigrationTests(unittest.TestCase):
@@ -58,6 +59,48 @@ class LocalStateMigrationTests(unittest.TestCase):
         self.assertIn("CREATE UNIQUE INDEX uq_skill_gap_runs_one_active", sql)
         self.assertIn("WHERE status IN ('queued', 'running')", sql)
         self.assertIn("ck_skill_gap_runs_completed_report", sql)
+
+    def test_skill_gap_results_follow_the_catalog_migration(self) -> None:
+        self.assertEqual("c9413046949c", self.script.get_revision(SKILL_GAP_RESULTS).down_revision)
+
+    def test_skill_gap_runs_gain_the_v3_storage_columns(self) -> None:
+        sql = self.render(SKILL_GAP_RESULTS, "upgrade")
+        for column in ("storage_schema_version", "resume_filename", "extraction_strategy", "partition_policy_version",
+                       "selection_policy_version", "reuse_from_run_id", "match_score", "scored_skill_count",
+                       "unscored_skill_count", "extraction_audit", "timings"):
+            with self.subTest(column=column):
+                self.assertIn(f"ALTER TABLE skill_gap_runs ADD COLUMN {column}", sql)
+        self.assertIn("ck_skill_gap_runs_match_when_completed", sql)
+        self.assertIn("ck_skill_gap_runs_v3_completed", sql)
+        self.assertIn("UNIQUE (id, user_id, job_family)", sql)
+
+    def test_one_branch_row_per_group_with_its_raw_answer(self) -> None:
+        sql = self.render(SKILL_GAP_RESULTS, "upgrade")
+        self.assertIn("CREATE TABLE skill_gap_run_branches", sql)
+        self.assertIn("PRIMARY KEY (run_id, branch)", sql)
+        self.assertIn("branch IN ('foundation', 'lifecycle', 'systems')", sql)
+        self.assertIn("model_calls >= 0 AND model_calls <= 1", sql)
+        self.assertIn("raw_output JSONB", sql)
+        self.assertIn("REFERENCES skill_gap_runs (id) ON DELETE CASCADE", sql)
+        self.assertIn("ALTER TABLE skill_gap_run_branches ENABLE ROW LEVEL SECURITY", sql)
+
+    def test_one_result_row_per_skill_owned_by_its_run(self) -> None:
+        sql = self.render(SKILL_GAP_RESULTS, "upgrade")
+        self.assertIn("CREATE TABLE skill_gap_results", sql)
+        self.assertIn("PRIMARY KEY (run_id, skill_id)", sql)
+        self.assertIn("FOREIGN KEY(run_id, user_id, job_family) REFERENCES skill_gap_runs (id, user_id, job_family) "
+                      "ON DELETE CASCADE", sql)
+        self.assertIn("ck_skill_gap_results_scored_values", sql)
+        self.assertIn("jsonb_typeof(evidence) = 'array'", sql)
+        self.assertIn("UNIQUE (run_id, priority_rank)", sql)
+        self.assertIn("ALTER TABLE skill_gap_results ENABLE ROW LEVEL SECURITY", sql)
+
+    def test_skill_gap_results_downgrade_restores_the_original_runs_table(self) -> None:
+        sql = self.render(SKILL_GAP_RESULTS, "downgrade")
+        self.assertIn("DROP TABLE skill_gap_results", sql)
+        self.assertIn("DROP TABLE skill_gap_run_branches", sql)
+        self.assertIn("ALTER TABLE skill_gap_runs DROP COLUMN storage_schema_version", sql)
+        self.assertIn("ALTER TABLE skill_gap_runs DROP CONSTRAINT uq_skill_gap_runs_id_user_family", sql)
 
 
 if __name__ == "__main__":

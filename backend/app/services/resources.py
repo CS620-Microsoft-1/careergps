@@ -1,4 +1,8 @@
-"""The curated resource catalog (data/resources.yaml plus certifications and projects), filtered by role and school."""
+"""The curated resource catalog, filtered by role and school.
+
+Certifications, school courses and student orgs come from the database (app/services/catalog_store.py);
+online courses from data/resources.yaml and projects from data/projects.json.
+"""
 from functools import lru_cache
 import json
 import re
@@ -6,7 +10,7 @@ import re
 import yaml
 
 from app.core.config import BACKEND_ROOT
-from app.services.certifications.catalog import get_catalog as certification_catalog
+from app.services import catalog_store
 from app.services.skill_gaps.assets import ASSET_ROOT
 from app.services.skill_gaps.storage import load
 
@@ -81,10 +85,12 @@ def resources_for(family: str, university: str | None) -> list[dict]:
     skills = family_skills(family)
     school = _school_key(university)
     result = []
-    certifications = [_certification(item, family) for item in certification_catalog()["certifications"]
-                      if family in item.skills]
+    snapshot = catalog_store.get_snapshot()
+    online = [entry for entry in load_catalog() if entry["type"] not in catalog_store.DATABASE_TYPES]
+    certifications = [_certification(item, family) for item in snapshot.certifications if family in item.skills]
     projects = [_project(project) for project in load_projects() if project["career_path"] == FAMILY_TO_CATALOG[family]]
-    for entry in [*load_catalog(), *certifications, *projects]:
+    # Same order as before the move: clubs, online courses, school courses, certifications, projects.
+    for entry in [*snapshot.student_orgs, *online, *snapshot.school_courses, *certifications, *projects]:
         if entry.get("school") and _school_key(entry["school"]) != school:
             continue
         closes = [skill for skill in entry["skills"] if skill in skills]

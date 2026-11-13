@@ -260,14 +260,18 @@ app/
 │   └── check_connection.py  # connectivity test
 ├── models/
 │   ├── __init__.py          # import every model here so Alembic can see it
+│   ├── catalog.py           # certifications, school_courses, student_orgs, catalog_versions
 │   ├── job_posting.py       # job_postings + ingest_runs
 │   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
+│   ├── skill_gap.py         # skill_gap_runs, skill_gap_run_branches, skill_gap_results
 │   └── user.py              # users (id = the Supabase Auth account id)
 ├── schemas/
 │   ├── me.py                # /me requests and responses
 │   └── market.py            # NormalizedPosting, MarketProfile
 └── services/
     ├── accounts.py          # creates and updates users + their confirmed résumés
+    ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
+    ├── catalog_writes.py    # writes them: seed script and catalog refresh
     ├── resume_children.py   # builds the résumé child table rows from confirmed_data
     └── postings/            # job board adapters (Greenhouse, Ashby, Lever) and daily ingest
 data/
@@ -276,6 +280,7 @@ data/
 scripts/
 ├── backfill_resume_children.py  # rebuild résumé child rows for résumés already stored
 ├── ingest_postings.py       # daily job posting ingest
+├── seed_catalog.py          # load certifications, courses and clubs from data/ into the database
 └── probe_boards.py          # find which companies have a public job board
 migrations/
 ├── env.py                   # Alembic setup: reads settings, loads models
@@ -347,6 +352,20 @@ the API on another port, update it there and restart `npm run dev`.
 
 ```bash
 python -m unittest discover -s tests -v
+```
+
+The catalog tests in `tests/test_catalog_postgres.py` run only when `CGPS_TEST_DATABASE_URL` points at a
+throwaway local Postgres (they drop and recreate the `public` and `auth` schemas); CI skips them.
+Never point it at the shared database.
+
+The account and Skill Gap storage tests (`tests/test_accounts_postgres.py`,
+`tests/test_skill_gap_store_postgres.py`) do the same with `TEST_DATABASE_URL`:
+
+```bash
+docker run --rm -d --name careergps-test-db -e POSTGRES_PASSWORD=test -p 55432:5432 postgres:17
+TEST_DATABASE_URL=postgresql+psycopg://postgres:test@localhost:55432/postgres \
+  python -m unittest tests.test_accounts_postgres tests.test_skill_gap_store_postgres
+docker stop careergps-test-db
 ```
 
 To run a live smoke test against the configured Foundry Agent using synthetic files:
@@ -872,10 +891,81 @@ The unrelated existing résumé tests are unchanged.
   use can't be deleted. `users.target_role` selects the destination the app shows.
 - The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
   autogenerate from proposing to drop it. It also never proposes dropping a table that has no model
-  (`plan_items` and `skill_gap_runs` exist only in migrations): write table drops by hand.
+  (`plan_items` exists only in migrations): write table drops by hand.
 - `POST /me` reads `auth.users` (`email_confirmed_at` and `created_at`, the terms consent time)
   directly. That works with the `postgres` role used now; a limited database role for the backend
   will need `SELECT` on `auth.users`, or those two columns.
+
+## Skill Gap result tables
+
+The API keeps every Skill Gap run in three tables (migration `df5726089a8e`, contract
+`docs/contracts/skill-gap-run-storage.schema.json` v3). `app/services/skill_gaps/run_store.py` writes
+them: `DbRunStore` for the API, `JsonRunStore` (the original local files) for tests and tools that
+build a `SkillGapRunManager` with a folder.
+
+| Table | One row per | Holds |
+| --- | --- | --- |
+| `skill_gap_runs` | analysis of one résumé for one role | status, versions, the résumé snapshot, the full v12 `report` the API returns, the merged Agent answer, `match_score` |
+| `skill_gap_run_branches` | skill-group Agent of a run (foundation, lifecycle, systems) | Agent and model, tokens, timings, the group's raw answer and its checks |
+| `skill_gap_results` | core skill of a completed run | evidence kind, strength, gap, grade, demand, priority and rank, plus the details and quoted `evidence` as JSONB |
+
+- Every run is kept (history). Deleting a résumé deletes its runs, branches and results.
+- `skill_gap_results` copies `user_id` and `job_family` from its run (checked by a foreign key), so
+  queries such as "this user's weakest skills" or "testing across all Software Engineer students"
+  need no join. `report` and the result rows are written together and never change afterwards.
+- A scored skill always has strength, gap, grade and priority; a skill that needs confirmation has
+  none of them and no rank (`ck_skill_gap_results_scored_values`).
+- Agent answers and quotes come from students' résumés: personal data, never log them.
+
+How a run is written (each step is one short transaction; none is open while an Agent runs):
+
+1. Queued: the run row, with the résumé snapshot and the versions it depends on. The database
+   allows one queued or running run per résumé, role and configuration, so a duplicate request
+   reuses the active run instead of paying for another.
+2. Running: status, phase, model calls and the three branch rows are updated as the Agents work.
+3. Completed: one transaction saves the report, the merged answer, the merge audit and
+   `match_score`, each branch's raw answer, checks and tokens, and one `skill_gap_results` row per
+   skill (`app/services/skill_gaps/persistence.py` builds the rows). A failure here leaves the run
+   as it was and marks it failed.
+4. Restart: runs still queued or running are marked failed ("start a new analysis"); nothing is
+   retried automatically.
+
+Still local, in `local_results/web_skill_gaps/<run>/`: each branch's input, raw response and checks,
+and the shared `_branch_cache/` that reuses a group's answer. Runs saved only as local JSON before
+this change are not shown by the app.
+
+## Catalog tables
+
+Certifications, school courses and student organizations live in the `certifications`,
+`school_courses` and `student_orgs` tables. Online courses (`data/resources.yaml`) and projects
+(`data/projects.json`) are still files.
+
+- Ids are the slugs from the data files (`aws-cloud-practitioner`, `uw-cs-320`) and never change.
+  Rows are never deleted: a resource that is no longer offered gets `active = false`, and the API
+  stops listing it. To rename one, add a new row and deactivate the old one.
+- `skills` is JSONB: per job family for certifications, a plain list for courses and clubs. Skill ids
+  are checked against the core skill catalog when a row is written, not by the database.
+- `catalog_versions` holds the certification catalog version. Cached certification recommendations
+  are reused only while it is unchanged; it changes only when a field the recommendations use
+  (name, provider, url, cost, level, skills, active) changes.
+- The API caches what it reads for 5 minutes (`app/services/catalog_store.py`). While the tables are
+  missing or all three are empty, it reads `data/certifications.json` and `data/resources.yaml`
+  instead and logs a warning. On other database errors it keeps the last catalog it read, or answers
+  503 if it has none.
+- Write rows through `app/services/catalog_writes.py`: it validates skills, keeps `sort_order`,
+  changes the version, and clears the cache after the caller commits.
+
+Load the data files into the tables (one transaction; safe to re-run):
+
+```bash
+python -m scripts.seed_catalog --dry-run   # report what would change, then roll back
+python -m scripts.seed_catalog             # add missing rows; existing rows are left alone
+python -m scripts.seed_catalog --update    # also overwrite existing rows with the files' values
+```
+
+It prints only table names and counts. On the shared database, the database owner (currently
+Abanish) runs `alembic upgrade head` and then `python -m scripts.seed_catalog`, after the PR is
+merged into `dev`. Until then the app keeps reading the files.
 
 ## Changing the schema
 

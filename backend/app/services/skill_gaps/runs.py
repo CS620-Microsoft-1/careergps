@@ -1,7 +1,9 @@
 """Owner-scoped, single-worker analysis using detached database resume snapshots.
 
-Results remain local JSON. Workers never retain a request's ORM session, and
-polling/restoring never starts a model call.
+Run state and reports go through a run store (run_store.py): the API uses the database,
+tests and tools default to local JSON. Branch
+artifacts and the branch cache stay in local run folders. Workers never retain a request's
+ORM session, and polling/restoring never starts a model call.
 """
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
@@ -10,7 +12,6 @@ from functools import lru_cache
 import hashlib
 import json
 from pathlib import Path
-import re
 from threading import Lock, RLock
 import time
 from typing import Callable
@@ -20,12 +21,12 @@ from app.core.config import BACKEND_ROOT, SkillGapSettings
 from app.schemas.skill_gap_web import JobFamily, SkillGapRun
 from .response import RESPONSE_PROCESSING_VERSION, calculate_web_report
 from .transport import SkillGapConfigurationError
-from .scoring import POLICY_VERSION
 from .assets import ASSET_ROOT
 from .input import prepare
 from .core_cards import CoreSkillCards
 from .branch_cache import BRANCH_CACHE_VERSION, BranchCache
 from .match import summarize_match
+from .run_store import DbRunStore, JsonRunStore, run_folder
 from .storage import load, save_json
 from .schema import SCHEMA_NAME
 from .skill_groups import (
@@ -37,7 +38,6 @@ from .skill_group_transport import (
     resolved_configuration_signature, uses_latest,
 )
 
-_ID = re.compile(r"[0-9a-f]{32}\Z")
 _ARTIFACTS = {"input.json", "reviewed_resume.json", "observed_agent.json", "agent.raw.json",
               "agent.response.json", "local_checks.json", "coverage_audit.json", "skill_gaps.json",
               "response_processing.json", "configuration_check.json", "extraction_audit.json",
@@ -59,9 +59,10 @@ def _sha(value: object) -> str:
 class SkillGapRunManager:
     def __init__(self, directory: Path | None = None, *, settings: SkillGapSettings | None = None,
                  group_invoker: Callable | None = None, group_preflight: Callable | None = None,
-                 invoker: Callable | None = None) -> None:
+                 invoker: Callable | None = None, store: JsonRunStore | None = None) -> None:
         self.directory = (directory or BACKEND_ROOT / "local_results" / "web_skill_gaps").resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
+        self.store = store or JsonRunStore(self.directory)
         self.settings = (settings or SkillGapSettings()).model_copy(deep=True)
         self._branches = GROUPS
         self._partition_policy = PARTITION_POLICY_VERSION
@@ -85,6 +86,8 @@ class SkillGapRunManager:
         self.branch_signature = configuration_signature(self.settings)
         self._latest_versions = uses_latest(self.settings)
         self._prepared_runs: dict[str, dict] = {}
+        # Snapshots of submitted runs the store hasn't created yet; the next _persist creates them.
+        self._unsaved: dict[str, dict] = {}
         self._lock = RLock()
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="local-skill-gap")
         self._states: dict[str, dict] = {}
@@ -109,56 +112,55 @@ class SkillGapRunManager:
         self._recover()
 
     def _folder(self, identifier: str) -> Path:
-        if not _ID.fullmatch(identifier):
-            raise KeyError(identifier)
-        return self.directory / identifier
+        return run_folder(self.directory, identifier)
 
     def _persist(self, state: dict) -> None:
-        folder = self._folder(state["id"])
-        save_json(folder / "status.json", state)
-        save_json(folder / "run.json", {
-            "mode": "authenticated_web", "status": state["status"], "phase": state["phase"],
-            "user_id": state["user_id"], "resume_id": state["resume_id"],
-            "resume_source": "resumes.confirmed_data", "result_storage": "local_json",
-            "job_family": state["job_family"], "resume_hash": state["resume_hash"],
-            "policy_version": POLICY_VERSION, "expected_schema_name": SCHEMA_NAME,
-            "calculation_fingerprint": state["calculation_fingerprint"],
-            "prompt_revision": state.get("prompt_revision"),
-            "instructions_sha256": state.get("instructions_sha256"),
-            "error_code": state.get("error_code"),
-            "response_processing_version": state.get("response_processing_version"),
-            "extraction_strategy": state.get("extraction_strategy", "single"),
-            "branches": state.get("branches", {}),
-            "branch_configuration": state.get("branch_configuration"),
-            "version_selection": state.get("version_selection", "pinned"),
-            "reuse_from_run_id": state.get("reuse_from_run_id"),
-            "branch_cache_policy": state.get("branch_cache_policy"),
-            "rebuild_report": state.get("rebuild_report", False),
-            "core_skill_cards": state.get("core_skill_cards"),
-            "local_reprocessing": state.get("local_reprocessing"),
-            "model_calls": state["model_calls"], "repair_calls": 0, "summary_calls": 0,
-            "created_at": state["created_at"], "completed_at": state["completed_at"],
-            "elapsed_seconds": state["elapsed_seconds"],
-            "azure_phase_timings": state.get("azure_phase_timings", {}),
-        })
+        reviewed = self._unsaved.pop(state["id"], None)
+        if reviewed is not None:
+            self.store.create(state, reviewed, **self._run_fields(state["job_family"]))
+        else:
+            self.store.save_state(state)
+
+    def _run_fields(self, job_family: JobFamily) -> dict:
+        """What a stored run records about the market data, catalog and policies it was computed with."""
+        cards = self.core_cards.signature(job_family)
+        return {"demand_snapshot_fingerprint": self.market["source_fingerprint"],
+                "catalog_version": f"{cards['version']}:{cards['catalog_sha256'][:12]}",
+                "partition_policy_version": self._partition_policy,
+                "selection_policy_version": self._selection_policy}
+
+    def _complete(self, state: dict, report: dict, extraction_audit: dict, output: dict, folder: Path) -> None:
+        """Hand the finished run to the store with each branch's saved input, answer and checks."""
+        def artifact(branch: str, name: str):
+            path = folder / "branches" / branch / name
+            return load(path) if path.is_file() else None
+
+        branches = {}
+        audit = (extraction_audit or {}).get("branches", {})
+        timings = state.get("azure_phase_timings", {}).get("branches", {})
+        for branch in state.get("branches", {}):
+            observed = artifact(branch, "observed_agent.json") or {}
+            branches[branch] = {
+                "payload": artifact(branch, "input.json"), "output": artifact(branch, "agent.response.json"),
+                "raw_response": artifact(branch, "agent.raw.json"), "definition": observed.get("definition"),
+                "timings": timings.get(branch), "validation": audit.get(branch, {}).get("validation"),
+                "response_processing": audit.get(branch, {}).get("response_processing")}
+        self.store.complete(state, report=report, extraction_audit=extraction_audit,
+                            merged_output=output, branches=branches)
 
     def _recover(self) -> None:
         # Interrupted tasks are never retried implicitly. A manual force request
         # is required; a prior request may already have reached the model.
-        for path in sorted(self.directory.glob("*/status.json")):
-            if not _ID.fullmatch(path.parent.name):
-                continue
+        for state in self.store.load_states():
             try:
-                state = load(path)
-                if state["id"] != path.parent.name:
-                    continue
                 # Ownerless pre-auth experiments are preserved on disk, never
                 # adopted by an account or exposed through the authenticated API.
                 for name in ("user_id", "resume_id"):
                     state[name] = str(UUID(state[name]))
                 expected = self._cache_key(state["user_id"], state["resume_id"], state["resume_hash"],
                                            state["job_family"], state["calculation_fingerprint"])
-                if state["cache_key"] != expected:
+                # A database store doesn't keep the key; it is rebuilt from the stored fields.
+                if state.setdefault("cache_key", expected) != expected:
                     continue
                 created = datetime.fromisoformat(state["created_at"])
                 if created.tzinfo is None:
@@ -183,7 +185,7 @@ class SkillGapRunManager:
         if state["status"] in ("queued", "running"):
             value["elapsed_seconds"] = round(max(0, (datetime.now(timezone.utc) -
                                                     datetime.fromisoformat(state["created_at"])).total_seconds()), 3)
-        value["report"] = load(self._folder(state["id"]) / "skill_gaps.json") if state["status"] == "completed" else None
+        value["report"] = self.store.load_report(state["id"]) if state["status"] == "completed" else None
         value["reused"] = reused
         value["match"] = summarize_match(value["report"])
         return SkillGapRun.model_validate(value)
@@ -286,10 +288,12 @@ class SkillGapRunManager:
                     self._prepared_runs[identifier] = prepared
                     for (branch, name), value in configuration_artifacts.items():
                         save_json(folder / "branches" / branch / name, value)
+                self._unsaved[identifier] = reviewed
                 self._persist(state)
                 self._executor.submit(self._work, identifier, reviewed)
             except BaseException:
                 # Preserve the upstream queue-submission rollback protection.
+                self._unsaved.pop(identifier, None)
                 self._states.pop(identifier, None)
                 self._prepared_runs.pop(identifier, None)
                 if prior_id is None:
@@ -582,7 +586,7 @@ class SkillGapRunManager:
                              worker_seconds=round(time.perf_counter() - started, 3))
                 state['elapsed_seconds'] = round((datetime.now(timezone.utc) -
                     datetime.fromisoformat(state['created_at'])).total_seconds(), 3)
-                self._persist(state)
+                self._complete(state, report, extraction_audit, output, folder)
         except Exception as error:
             # Keep detailed SDK errors out of HTTP responses and do not retry.
             # The original response/artifacts, if any, remain local for diagnosis.
@@ -614,7 +618,9 @@ _manager_lock = Lock()
 
 @lru_cache(maxsize=1)
 def _cached_skill_gap_run_manager() -> SkillGapRunManager:
-    return SkillGapRunManager()
+    # The API keeps runs in the database; branch artifacts stay in local run folders.
+    from app.db.session import SessionLocal
+    return SkillGapRunManager(store=DbRunStore(SessionLocal))
 
 
 def get_skill_gap_run_manager() -> SkillGapRunManager:
