@@ -16,10 +16,13 @@ class StudentCourse(Base):
         CheckConstraint("source IN ('manual', 'resume', 'plan')", name="ck_student_courses_source"),
     )
 
-    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", name="fk_student_courses_user", ondelete="CASCADE"), primary_key=True
+    )
     # Catalog rows are never deleted, only set inactive.
     course_id: Mapped[str] = mapped_column(
-        Text, ForeignKey("school_courses.id", ondelete="RESTRICT"), primary_key=True, index=True
+        Text, ForeignKey("school_courses.id", name="fk_student_courses_course", ondelete="RESTRICT"),
+        primary_key=True, index=True
     )
     # How it was added: the Taken button, a confirmed résumé match, or a plan item marked done.
     source: Mapped[str] = mapped_column(Text, server_default=text("'manual'"), nullable=False)

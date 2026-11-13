@@ -35,8 +35,10 @@ class StudentCoursesMigrationTests(unittest.TestCase):
     def test_creates_student_courses_with_foreign_keys_and_rls(self) -> None:
         sql = self.render(REVISION, "upgrade")
         self.assertIn("CREATE TABLE student_courses (", sql)
-        self.assertIn("FOREIGN KEY(user_id) REFERENCES users (id) ON DELETE CASCADE", sql)
-        self.assertIn("FOREIGN KEY(course_id) REFERENCES school_courses (id) ON DELETE RESTRICT", sql)
+        self.assertIn("CONSTRAINT fk_student_courses_user FOREIGN KEY(user_id) REFERENCES users (id)"
+                      " ON DELETE CASCADE", sql)
+        self.assertIn("CONSTRAINT fk_student_courses_course FOREIGN KEY(course_id) REFERENCES school_courses (id)"
+                      " ON DELETE RESTRICT", sql)
         self.assertIn("PRIMARY KEY (user_id, course_id)", sql)
         self.assertIn("ALTER TABLE student_courses ENABLE ROW LEVEL SECURITY", sql)
         self.assertNotIn("INSERT", sql)

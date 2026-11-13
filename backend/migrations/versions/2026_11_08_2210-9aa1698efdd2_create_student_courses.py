@@ -26,8 +26,9 @@ def upgrade() -> None:
     sa.Column('source', sa.Text(), server_default=sa.text("'manual'"), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.CheckConstraint("source IN ('manual', 'resume', 'plan')", name='ck_student_courses_source'),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
-    sa.ForeignKeyConstraint(['course_id'], ['school_courses.id'], ondelete='RESTRICT'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name='fk_student_courses_user', ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['course_id'], ['school_courses.id'], name='fk_student_courses_course',
+                            ondelete='RESTRICT'),
     sa.PrimaryKeyConstraint('user_id', 'course_id')
     )
     op.create_index('ix_student_courses_course_id', 'student_courses', ['course_id'], unique=False)
