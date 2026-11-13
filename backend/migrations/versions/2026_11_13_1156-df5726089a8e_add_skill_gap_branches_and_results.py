@@ -191,8 +191,8 @@ def upgrade() -> None:
                     ['user_id', 'job_family', 'skill_id'], unique=False)
 
     # Added by hand (autogenerate doesn't know about RLS); see the users migration.
-    for table in ('skill_gap_run_branches', 'skill_gap_results'):
-        op.execute(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY")
+    op.execute("ALTER TABLE skill_gap_run_branches ENABLE ROW LEVEL SECURITY")
+    op.execute("ALTER TABLE skill_gap_results ENABLE ROW LEVEL SECURITY")
 
 
 def downgrade() -> None:
