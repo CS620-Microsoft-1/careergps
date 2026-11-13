@@ -33,6 +33,8 @@ from app.db.base import Base
 
 _UUID_DEFAULT = {"default": uuid.uuid4, "server_default": text("gen_random_uuid()")}
 _SHA256 = "~ '^[0-9a-f]{64}$'"
+# Python None is SQL NULL, never a JSON null, so "IS NULL" checks and jsonb_typeof checks hold.
+_NULLABLE_JSONB = JSONB(none_as_null=True)
 _JOB_FAMILIES = "('software_engineer', 'data_analyst', 'ai_engineer')"
 _GROUPS = "('foundation', 'lifecycle', 'systems')"
 
@@ -123,9 +125,9 @@ class SkillGapRunRecord(Base):
     model_calls: Mapped[int] = mapped_column(SmallInteger, server_default=text("0"), nullable=False)
     error: Mapped[str | None] = mapped_column(Text)
     error_code: Mapped[str | None] = mapped_column(Text)
-    report: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    report: Mapped[dict[str, Any] | None] = mapped_column(_NULLABLE_JSONB)
     # The merged answer of the three groups (or the single Agent's answer in v1).
-    raw_agent_output: Mapped[Any] = mapped_column(JSONB, nullable=True)
+    raw_agent_output: Mapped[Any] = mapped_column(_NULLABLE_JSONB, nullable=True)
     # Added by df5726089a8e (storage v3).
     storage_schema_version: Mapped[str] = mapped_column(
         Text, server_default=text(f"'{STORAGE_SCHEMA_VERSION}'"), nullable=False)
@@ -139,7 +141,7 @@ class SkillGapRunRecord(Base):
     match_score: Mapped[Decimal | None] = mapped_column(Numeric(5, 4))
     scored_skill_count: Mapped[int | None] = mapped_column(SmallInteger)
     unscored_skill_count: Mapped[int | None] = mapped_column(SmallInteger)
-    extraction_audit: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    extraction_audit: Mapped[dict[str, Any] | None] = mapped_column(_NULLABLE_JSONB)
     timings: Mapped[dict[str, Any]] = mapped_column(JSONB, server_default=text("'{}'::jsonb"), nullable=False)
 
     def __repr__(self) -> str:
@@ -185,9 +187,9 @@ class SkillGapRunBranch(Base):
     output_tokens: Mapped[int | None] = mapped_column(Integer)
     reasoning_tokens: Mapped[int | None] = mapped_column(Integer)
     error_code: Mapped[str | None] = mapped_column(Text)
-    raw_output: Mapped[Any] = mapped_column(JSONB, nullable=True)
-    validation: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
-    response_processing: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    raw_output: Mapped[Any] = mapped_column(_NULLABLE_JSONB, nullable=True)
+    validation: Mapped[dict[str, Any] | None] = mapped_column(_NULLABLE_JSONB)
+    response_processing: Mapped[dict[str, Any] | None] = mapped_column(_NULLABLE_JSONB)
     created_at: Mapped[datetime] = _now_column()
     updated_at: Mapped[datetime] = _now_column(onupdate=func.now())
 
@@ -259,10 +261,10 @@ class SkillGapResult(Base):
     # 1 = the gap to work on first (the report's priority_order).
     priority_rank: Mapped[int | None] = mapped_column(SmallInteger)
     agent_assessment: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    original_agent_assessment: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    original_agent_assessment: Mapped[dict[str, Any] | None] = mapped_column(_NULLABLE_JSONB)
     scoring_breakdown: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
     reference_check: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False)
-    merge_audit: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
+    merge_audit: Mapped[dict[str, Any] | None] = mapped_column(_NULLABLE_JSONB)
     # One item per quoted proof: role, unit_id, activity_id, source_path, quote, start, end.
     evidence: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, server_default=text("'[]'::jsonb"), nullable=False)
     created_at: Mapped[datetime] = _now_column()
