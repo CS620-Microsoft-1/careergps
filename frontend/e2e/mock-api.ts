@@ -10,11 +10,14 @@ import { API_PREFIX } from "../playwright.config";
  * The backend, answered from fixed data for one data-analyst student at UW–Madison.
  *
  * Only `taken` changes during a test (PUT/DELETE /me/courses). Every call is recorded in `calls` as
- * "METHOD /path" when it arrives, so a test can check what the page sent.
+ * "METHOD /path" when it arrives, so a test can check what the page sent. A test can set
+ * `resumeMatches` before the page loads.
  */
 export class MockApi {
   readonly taken = new Set<string>();
   readonly calls: string[] = [];
+  /** Course ids GET /me/courses/resume-matches answers with. */
+  resumeMatches: string[] = [];
   private held: Promise<void> = Promise.resolve();
 
   /** Keep PUT /me/courses/{id} unanswered until the returned function is called. */
@@ -49,7 +52,7 @@ export class MockApi {
         case "/resources": return json(200, { job_family: FAMILY, resources: RESOURCES } satisfies ResourceList);
         case "/plan": return json(200, { job_family: FAMILY, items: [] } satisfies Plan);
         case "/me/courses": return json(200, { courses: [...this.taken].map(takenCourse) } satisfies TakenCourseList);
-        case "/me/courses/resume-matches": return json(200, { course_ids: [] });
+        case "/me/courses/resume-matches": return json(200, { course_ids: this.resumeMatches });
       }
     }
     const course = path.match(/^\/me\/courses\/([^/]+)$/)?.[1];

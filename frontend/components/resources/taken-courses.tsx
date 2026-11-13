@@ -8,6 +8,7 @@ import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { Button } from "@/components/ui/button";
 import { getResumeCourseMatches } from "@/lib/api/student-courses";
 import { courseCode } from "@/lib/career";
+import { readDismissed, writeDismissed } from "@/lib/dismissed-courses";
 import type { JobFamily, Resource } from "@/types/api";
 
 /** Mark taken / Taken, on a school course card. Marking hides the course from the lists. */
@@ -49,31 +50,14 @@ export function TakenUndo({ resource, onClose }: { resource: Resource; onClose: 
   );
 }
 
-const DISMISSED_KEY = "careergps:resume-course-matches:dismissed";
-
-function readDismissed(): string[] {
-  try {
-    const value: unknown = JSON.parse(localStorage.getItem(DISMISSED_KEY) ?? "[]");
-    return Array.isArray(value) ? value.filter((id): id is string => typeof id === "string") : [];
-  } catch {
-    return [];
-  }
-}
-
-function writeDismissed(ids: string[]) {
-  try {
-    localStorage.setItem(DISMISSED_KEY, JSON.stringify(ids));
-  } catch {
-    // Private mode or blocked storage: the prompt just comes back next time.
-  }
-}
-
 /**
  * Course codes found in the role's résumé. Nothing is saved until the student presses
- * "Mark them taken"; "Not now" hides these courses in this browser only.
+ * "Mark them taken"; "Not now" hides these courses for this account, in this browser only.
  */
 export function ResumeCourseMatches({ family, courses }: { family: JobFamily; courses: Resource[] }) {
-  const { status } = useAccount();
+  const { status, user } = useAccount();
+  // "anonymous" covers UI-only development, as in TakenCoursesProvider.
+  const userId = user?.id ?? "anonymous";
   const { taken, mark } = useTakenCourses();
   const [found, setFound] = useState<{ family: JobFamily; ids: string[] } | null>(null);
   const [dismissed, setDismissed] = useState<string[]>([]);
@@ -83,12 +67,12 @@ export function ResumeCourseMatches({ family, courses }: { family: JobFamily; co
     let active = true;
     getResumeCourseMatches(family).then((matches) => {
       if (active) {
-        setDismissed(readDismissed());
+        setDismissed(readDismissed(userId));
         setFound({ family, ids: matches.course_ids });
       }
     }, () => undefined);  // Only a suggestion; skip it when it fails.
     return () => { active = false; };
-  }, [family, status]);
+  }, [family, status, userId]);
 
   const ids = found?.family === family ? found.ids : [];
   const shown = courses.filter((course) => ids.includes(course.id) && !taken.has(course.id) && !dismissed.includes(course.id));
@@ -106,7 +90,7 @@ export function ResumeCourseMatches({ family, courses }: { family: JobFamily; co
         </Button>
         <Button type="button" size="sm" variant="raised" onClick={() => {
           const next = [...new Set([...dismissed, ...shown.map((course) => course.id)])];
-          writeDismissed(next);
+          writeDismissed(userId, next);
           setDismissed(next);
         }}>Not now</Button>
       </div>

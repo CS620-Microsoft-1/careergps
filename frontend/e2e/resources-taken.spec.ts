@@ -42,6 +42,21 @@ test("Undo waits until the course is saved, so its DELETE can't overtake the PUT
   expect(api.taken.size).toBe(0);
 });
 
+test("Not now hides a résumé suggestion and saves nothing", async ({ page, api }) => {
+  api.resumeMatches = ["uw-cs-564"];
+  await page.goto("/resources");
+  const suggestion = page.getByText("Found in your résumé: COMP SCI 564");
+  await expect(suggestion).toBeVisible();
+
+  await page.getByRole("button", { name: "Not now" }).click();
+  await expect(suggestion).toHaveCount(0);
+  await page.reload();
+  await expect(courseGroup(page).getByRole("article").filter({ hasText: "COMP SCI 564" })).toBeVisible();
+  await expect(suggestion).toHaveCount(0);
+  expect(api.calls).not.toContain("PUT /me/courses/uw-cs-564");
+  // One list per account is covered in lib/dismissed-courses.test.mts: these pages skip login.
+});
+
 test("Show N taken reveals a taken course, and Taken un-marks it", async ({ page, api }) => {
   api.taken.add("uw-cs-564");
   await page.goto("/resources");

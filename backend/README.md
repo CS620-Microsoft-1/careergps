@@ -1018,7 +1018,8 @@ scores don't change.
   or that belongs to another school than the student's university.
 - `GET /me/courses/resume-matches?job_family=…`: listed courses whose code appears in that role's
   résumé ("CS 400", "COMP SCI 400", "Comp. Sci. 400, 540"), not taken yet. A regex, no model call;
-  nothing is saved until the student confirms.
+  nothing is saved until the student confirms. "Not now" is remembered in the browser only
+  (`localStorage`, one list per account), so the question comes back on another device.
 
 ## Changing the schema
 

@@ -61,7 +61,8 @@ backend, no Supabase account and no Agent call. `playwright.config.ts` starts `n
 3102 with the Supabase variables empty (the pages then skip login) and `NEXT_PUBLIC_API_URL`
 pointing at `/api-mock` on the same origin, which `e2e/mock-api.ts` answers from fixed data through
 `page.route()`. The specs in `e2e/` cover the flows that cross pages: marking a UW course taken on
-Resources (Undo is off until the course is saved), and the "You took …" reminder on a Gaps card.
+Resources (Undo is off until the course is saved), "Not now" on a résumé suggestion, and the
+"You took …" reminder on a Gaps card.
 
 ```bash
 npx playwright install chromium   # once; downloads the browser (about 100 MB)
