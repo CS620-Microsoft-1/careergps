@@ -942,7 +942,9 @@ Certifications, school courses and student organizations live in the `certificat
   cross-listed), `credits` (`3`, `1-3`) and `last_taught` (`Fall 2025`), copied from the course
   guide; empty for courses added by hand. Prerequisites are not stored. A course whose
   `last_taught` is older than the last four fall/spring semesters is not listed
-  (`app/services/course_listing.py`).
+  (`app/services/course_listing.py`). The four semesters are counted back from the day the guide
+  data was retrieved (`"retrieved"` in `data/uw_courses/comp_sci.json`), not from today: see
+  "UW–Madison courses" below.
 - `catalog_versions` holds the certification catalog version. Cached certification recommendations
   are reused only while it is unchanged; it changes only when a field the recommendations use
   (name, provider, url, cost, level, skills, active) changes.
@@ -975,6 +977,13 @@ did not load); links point back to guide.wisc.edu. Skill tags are in
 description that supports them. `seed_catalog` writes these courses to `school_courses` as
 `uw-cs-<number>`.
 
+**Refresh the data once a semester**, after the guide shows the new term in Last Taught. Last
+Taught is only as new as the file, so the list of courses is decided as of the file's `retrieved`
+date: a course taught in one of the four fall/spring semesters up to that date is listed. Without a
+refresh the list stays as it was on that date. It does not shrink as time passes, but it also
+doesn't pick up new courses or drop ones the department stopped teaching. With more than one
+subject file, the oldest `retrieved` date is used for all of them.
+
 To refresh them:
 
 ```bash
@@ -986,6 +995,9 @@ python -m scripts.tag_uw_courses               # tag courses that have no entry 
 # 3. Review the tags file, then load the changes.
 python -m scripts.seed_catalog --update
 ```
+
+Commit both JSON files in the same PR: the API reads `retrieved` from the deployed file, and the
+database owner runs `seed_catalog --update` on the shared database after the merge.
 
 The tagger only accepts skill ids from the core catalog and checks that each quote appears in the
 description. Tags follow the description only, so a course gets no skill that its description

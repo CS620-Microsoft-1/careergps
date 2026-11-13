@@ -6,6 +6,8 @@ from scripts/tag_uw_courses.py (reviewed by hand). Every course is kept, also th
 resources.load_catalog() adds these entries to data/resources.yaml's, so scripts/seed_catalog.py
 writes them to school_courses and the file fallback lists them too.
 """
+from datetime import date
+from functools import lru_cache
 import json
 
 from app.core.config import BACKEND_ROOT
@@ -20,6 +22,22 @@ def meta(credits: str, last_taught: str | None) -> str:
     """"3 credits · Last taught Fall 2025"."""
     text = f"{credits} credit" + ("" if credits == "1" else "s")
     return f"{text} · Last taught {last_taught}" if last_taught else text
+
+
+@lru_cache
+def snapshot_date() -> date | None:
+    """When the course guide data was retrieved: the oldest "retrieved" date of the subject files.
+    None when there is no file or no valid date."""
+    dates = []
+    for slug in SUBJECTS:
+        path = DATA_DIR / f"{slug}.json"
+        if not path.exists():
+            continue
+        try:
+            dates.append(date.fromisoformat(json.loads(path.read_text(encoding="utf-8"))["retrieved"]))
+        except (KeyError, TypeError, ValueError):
+            continue
+    return min(dates, default=None)
 
 
 def course_entries() -> list[dict]:

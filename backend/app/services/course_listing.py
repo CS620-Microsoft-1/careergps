@@ -3,9 +3,15 @@
 A course not taught in the last RECENT_SEMESTERS fall/spring semesters is hidden. Summer sessions
 count as recent but do not count toward the window. A course without Last Taught (new, or added by
 hand) is always listed. Graduate courses are listed like any other.
+
+The semesters are counted back from the day the course guide data was retrieved, not from today:
+Last Taught is as old as that data, so counting from today would hide more courses every semester
+until someone refreshes it (backend/README.md, "UW–Madison courses").
 """
 from datetime import date
 import re
+
+from app.services import uw_courses
 
 RECENT_SEMESTERS = 4
 
@@ -37,11 +43,12 @@ def recent_cutoff(today: date) -> Term:
     return year, term
 
 
-def today() -> date:
-    """Tests patch this to pin the date."""
-    return date.today()
+def reference_date() -> date:
+    """The day the window is counted back from: when the course guide data was retrieved, or today
+    when there is no such data. Tests patch this to pin the date."""
+    return uw_courses.snapshot_date() or date.today()
 
 
 def is_listed(entry: dict, on: date | None = None) -> bool:
     taught = parse_term(entry.get("last_taught"))
-    return taught is None or taught >= recent_cutoff(on or today())
+    return taught is None or taught >= recent_cutoff(on or reference_date())
