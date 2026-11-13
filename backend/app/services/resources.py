@@ -35,6 +35,11 @@ def _school_key(name: str | None) -> str:
     return _SCHOOL_ALIASES.get(key, key)
 
 
+def same_school(school: str | None, university: str | None) -> bool:
+    """Whether a catalog row's school is the student's university, whichever way it is spelled."""
+    return _school_key(school) == _school_key(university)
+
+
 @lru_cache
 def load_catalog() -> tuple[dict, ...]:
     entries = yaml.safe_load(CATALOG_PATH.read_text(encoding="utf-8"))["resources"] + uw_courses.course_entries()

@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 
 from app.models import StudentCourse
 from app.services import catalog_writes
+from app.services.resources import same_school
 
 logger = logging.getLogger(__name__)
 
@@ -31,10 +32,13 @@ def list_taken(session: Session, user_id: uuid.UUID) -> list[StudentCourse]:
                                 .order_by(StudentCourse.created_at, StudentCourse.course_id)))
 
 
-def mark_taken(session: Session, user_id: uuid.UUID, course_id: str, source: str) -> StudentCourse:
+def mark_taken(session: Session, user_id: uuid.UUID, course_id: str, source: str,
+               university: str | None) -> StudentCourse:
     """Record a taken course and commit. Already recorded: keep the first row and its source.
-    KeyError when the course isn't in school_courses (inactive rows are allowed)."""
-    if catalog_writes.get_row(session, "school_course", course_id) is None:
+    KeyError when the course isn't in school_courses or belongs to another school than the
+    student's university (inactive rows are allowed)."""
+    course = catalog_writes.get_row(session, "school_course", course_id)
+    if course is None or not same_school(course.school, university):
         raise KeyError(course_id)
     session.execute(insert(StudentCourse).values(user_id=user_id, course_id=course_id, source=source)
                     .on_conflict_do_nothing(index_elements=["user_id", "course_id"]))
@@ -42,11 +46,11 @@ def mark_taken(session: Session, user_id: uuid.UUID, course_id: str, source: str
     return session.get(StudentCourse, (user_id, course_id), populate_existing=True)
 
 
-def record_done_course(session: Session, user_id: uuid.UUID, course_id: str) -> None:
+def record_done_course(session: Session, user_id: uuid.UUID, course_id: str, university: str | None) -> None:
     """A plan item marked done: record the course as taken. The plan is already saved, so a failure
     here (catalog not seeded yet, database down) is logged, not raised."""
     try:
-        mark_taken(session, user_id, course_id, "plan")
+        mark_taken(session, user_id, course_id, "plan", university)
     except (KeyError, SQLAlchemyError) as error:
         session.rollback()
         logger.warning("Could not record a done course as taken (%s)", type(error).__name__)

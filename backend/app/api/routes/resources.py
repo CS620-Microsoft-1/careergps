@@ -61,7 +61,7 @@ def save_plan_item(resource_id: str, data: PlanItemUpdate, user: User = Depends(
     except OSError:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Plan storage is unavailable") from None
     if data.status == "done" and entry["type"] == "school_course":
-        record_done_course(db, user.id, resource_id)
+        record_done_course(db, user.id, resource_id, user.university)
     return item
 
 

@@ -31,10 +31,11 @@ def list_taken_courses(user: User = Depends(get_current_db_user), db: Session = 
 @router.put("/{course_id}", response_model=TakenCourse)
 def mark_course_taken(course_id: str, data: TakenCourseUpdate | None = None,
                       user: User = Depends(get_current_db_user), db: Session = Depends(get_db)) -> TakenCourse:
-    """Mark a course taken. Repeating it keeps the first record."""
+    """Mark a course of the student's university taken. Repeating it keeps the first record."""
     source = data.source if data else "manual"
     try:
-        return TakenCourse.model_validate(student_courses.mark_taken(db, user.id, course_id, source))
+        return TakenCourse.model_validate(
+            student_courses.mark_taken(db, user.id, course_id, source, user.university))
     except KeyError:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Course not found") from None
     except SQLAlchemyError:

@@ -1014,7 +1014,8 @@ Resources lists and the gap cards, and the gap card says "You took X, which cove
 scores don't change.
 
 - `GET /me/courses`, `PUT /me/courses/{course_id}` (`{"source": "manual" | "resume"}`, optional),
-  `DELETE /me/courses/{course_id}`.
+  `DELETE /me/courses/{course_id}`. `PUT` answers 404 for a course that isn't in `school_courses`
+  or that belongs to another school than the student's university.
 - `GET /me/courses/resume-matches?job_family=…`: listed courses whose code appears in that role's
   résumé ("CS 400", "COMP SCI 400", "Comp. Sci. 400, 540"), not taken yet. A regex, no model call;
   nothing is saved until the student confirms.

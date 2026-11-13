@@ -21,6 +21,7 @@ from app.services import catalog_store, catalog_writes, student_courses
 from app.services.catalog_store import DatabaseCatalogSource, FileCatalogSource
 
 DATABASE_URL = os.environ.get("CGPS_TEST_DATABASE_URL")
+UW = "University of Wisconsin–Madison"
 COURSE = {"id": "uw-cs-564", "title": "COMP SCI 564: Database Management Systems", "provider": "UW–Madison course",
           "meta": "3 credits · Last taught Fall 2026", "description": "Relational databases.", "skills": ["sql"],
           "school": "University of Wisconsin–Madison", "course_code": "COMP SCI 564", "credits": "3",
@@ -84,8 +85,8 @@ class StudentCoursesPostgresTests(unittest.TestCase):
 
     def test_mark_keeps_the_first_record_and_unmark_deletes_it(self) -> None:
         with self.Session() as session:
-            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "resume")
-            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "manual")
+            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "resume", UW)
+            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "manual", UW)
         self.assertEqual([("uw-cs-564", "resume")], self.taken())
         self.assertEqual([], self.taken(self.add_user()))
         with self.Session() as session:
@@ -95,25 +96,34 @@ class StudentCoursesPostgresTests(unittest.TestCase):
 
     def test_unknown_courses_are_refused(self) -> None:
         with self.Session() as session, self.assertRaises(KeyError):
-            student_courses.mark_taken(session, self.user_id, "uw-cs-000", "manual")
+            student_courses.mark_taken(session, self.user_id, "uw-cs-000", "manual", UW)
+
+    def test_courses_of_another_school_are_refused(self) -> None:
+        with self.Session() as session:
+            for university in ("Northlake University", None, ""):
+                with self.assertRaises(KeyError):
+                    student_courses.mark_taken(session, self.user_id, "uw-cs-564", "manual", university)
+            # Another spelling of the same school is accepted.
+            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "manual", "UW-Madison")
+        self.assertEqual([("uw-cs-564", "manual")], self.taken())
 
     def test_inactive_courses_can_still_be_marked(self) -> None:
         with self.Session() as session:
             catalog_writes.deactivate(session, "school_course", "uw-cs-564")
             session.commit()
-            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "plan")
+            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "plan", UW)
         self.assertEqual([("uw-cs-564", "plan")], self.taken())
 
     def test_plan_hook_logs_instead_of_failing(self) -> None:
         with self.Session() as session, self.assertLogs(student_courses.logger, "WARNING"):
-            student_courses.record_done_course(session, self.user_id, "uw-cs-000")
+            student_courses.record_done_course(session, self.user_id, "uw-cs-000", UW)
             # The session is usable afterwards.
-            student_courses.record_done_course(session, self.user_id, "uw-cs-564")
+            student_courses.record_done_course(session, self.user_id, "uw-cs-564", UW)
         self.assertEqual([("uw-cs-564", "plan")], self.taken())
 
     def test_database_rules(self) -> None:
         with self.Session() as session:
-            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "manual")
+            student_courses.mark_taken(session, self.user_id, "uw-cs-564", "manual", UW)
         with self.engine.connect() as connection:
             with self.assertRaises(IntegrityError):  # courses are never deleted while someone took them
                 connection.execute(text("DELETE FROM school_courses WHERE id = 'uw-cs-564'"))

@@ -66,11 +66,13 @@ class _TakenStore:
     def __init__(self, known: set[str]) -> None:
         self.rows: dict[tuple[uuid.UUID, str], StudentCourse] = {}
         self.known = known
+        self.universities: list[str | None] = []
 
     def list_taken(self, session, user_id):
         return [row for (owner, _), row in self.rows.items() if owner == user_id]
 
-    def mark_taken(self, session, user_id, course_id, source):
+    def mark_taken(self, session, user_id, course_id, source, university):
+        self.universities.append(university)
         if course_id not in self.known:
             raise KeyError(course_id)
         return self.rows.setdefault((user_id, course_id), StudentCourse(
@@ -127,6 +129,13 @@ class TakenCoursesApiTests(unittest.TestCase):
         self.assertEqual([("uw-cs-564", "manual")], self.taken())
         self.assertEqual(204, self.client.delete("/me/courses/uw-cs-564", headers=self.headers).status_code)
         self.assertEqual([], self.taken())
+
+    def test_marking_passes_the_students_university(self) -> None:
+        university = onboarding_body()["university"]
+        self.client.put("/me/courses/uw-cs-564", headers=self.headers)
+        self.client.put("/plan/items/uw-cs-564", json={"job_family": "data_analyst", "status": "done"},
+                        headers=self.headers)
+        self.assertEqual([university, university], self.store.universities)
 
     def test_unknown_course_or_source(self) -> None:
         self.assertEqual(404, self.client.put("/me/courses/not-a-course", headers=self.headers).status_code)
