@@ -1,14 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:careergps:skill-gap-run-storage:v2",
-  "title": "Proposed Skill Gap run storage record, with historical v1 compatibility",
-  "description": "Database-owner review contract only. Historical v1 records retain the single-Agent bound; v2 describes the three skill-group extractor. This file does not create tables, change the public v12 Agent response, or implement PostgreSQL result persistence.",
+  "$id": "urn:careergps:skill-gap-run-storage:v3",
+  "title": "Skill Gap run storage record, with historical v1 and v2 compatibility",
+  "description": "Database-owner review contract. Historical v1 records retain the single-Agent bound; v2 describes the three skill-group extractor; v3 adds what PostgreSQL stores: run fields map to skill_gap_runs, branches to skill_gap_run_branches (one row per group) and results to skill_gap_results (one row per core skill, with its quoted evidence). This file does not create tables or change the public v12 Agent response.",
   "type": "object",
   "properties": {
     "storage_schema_version": {
       "enum": [
         "careergps.skill_gap_run_storage.v1",
-        "careergps.skill_gap_run_storage.v2"
+        "careergps.skill_gap_run_storage.v2",
+        "careergps.skill_gap_run_storage.v3"
       ]
     },
     "id": {
@@ -193,6 +194,89 @@
         "systems"
       ],
       "additionalProperties": false
+    },
+    "resume_filename": {
+      "type": "string",
+      "minLength": 1
+    },
+    "confirmed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "extraction_strategy": {
+      "enum": [
+        "single",
+        "skill_groups"
+      ]
+    },
+    "selection_policy_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reuse_from_run_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "uuid"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "match_score": {
+      "anyOf": [
+        {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "scored_skill_count": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "unscored_skill_count": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "extraction_audit": {
+      "anyOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "timings": {
+      "type": "object"
+    },
+    "results": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SkillResultRow"
+      },
+      "description": "One item per core skill of a completed run; empty before completion."
     }
   },
   "required": [
@@ -1906,6 +1990,128 @@
               "type": "null"
             }
           ]
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reasoning_effort": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_run_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "uuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inference_seconds": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "input_tokens": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cached_tokens": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "output_tokens": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reasoning_tokens": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "raw_output": {
+          "description": "The group's own Agent answer (Stage 1), or null when it made no request."
+        },
+        "validation": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "response_processing": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -1919,6 +2125,331 @@
       ],
       "additionalProperties": true,
       "description": "One assigned group. A new model request is counted at most once. Optional private cache/configuration audit fields may be retained; no numerical evidence is reconstructed from them."
+    },
+    "EvidenceItem": {
+      "type": "object",
+      "description": "One quoted proof for a skill. Practice items come from the checked proof spans; knowledge and uncertain items quote the whole cited unit.",
+      "properties": {
+        "role": {
+          "enum": [
+            "capability",
+            "method",
+            "check",
+            "finding",
+            "reference",
+            "knowledge",
+            "uncertain"
+          ]
+        },
+        "unit_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "activity_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_path": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 1
+        },
+        "start": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "end": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "role",
+        "unit_id",
+        "activity_id",
+        "source_path",
+        "quote",
+        "start",
+        "end"
+      ],
+      "additionalProperties": false
+    },
+    "SkillResultRow": {
+      "type": "object",
+      "description": "One skill_gap_results row: the report's skill row flattened for queries, plus its evidence.",
+      "properties": {
+        "skill_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skill_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "module_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "branch": {
+          "anyOf": [
+            {
+              "enum": [
+                "foundation",
+                "lifecycle",
+                "systems"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_kind": {
+          "enum": [
+            "absent",
+            "knowledge",
+            "practice",
+            "limited_practice",
+            "uncertain"
+          ]
+        },
+        "calculation_state": {
+          "enum": [
+            "scored",
+            "needs_confirmation"
+          ]
+        },
+        "evidence_strength": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "skill_gap": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "grade": {
+          "anyOf": [
+            {
+              "enum": [
+                "A",
+                "A-",
+                "B+",
+                "B",
+                "C",
+                "D",
+                "F"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "demand_required_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "demand_preferred_only_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "demand_unspecified_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "demand_n": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "demand_weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "priority": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "priority_rank": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "agent_assessment": {},
+        "original_agent_assessment": {},
+        "scoring_breakdown": {
+          "type": "object"
+        },
+        "reference_check": {
+          "$ref": "#/$defs/SkillCheck"
+        },
+        "merge_audit": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EvidenceItem"
+          }
+        }
+      },
+      "required": [
+        "skill_id",
+        "position",
+        "skill_name",
+        "module_id",
+        "module_name",
+        "branch",
+        "evidence_kind",
+        "calculation_state",
+        "evidence_strength",
+        "skill_gap",
+        "grade",
+        "demand_required_count",
+        "demand_preferred_only_count",
+        "demand_unspecified_count",
+        "demand_n",
+        "demand_weight",
+        "priority",
+        "priority_rank",
+        "agent_assessment",
+        "scoring_breakdown",
+        "reference_check",
+        "merge_audit",
+        "evidence"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "calculation_state": {
+                "const": "scored"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence_strength": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "skill_gap": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "grade": {
+                "enum": [
+                  "A",
+                  "A-",
+                  "B+",
+                  "B",
+                  "C",
+                  "D",
+                  "F"
+                ]
+              },
+              "priority": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "calculation_state": {
+                "const": "needs_confirmation"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence_strength": {
+                "type": "null"
+              },
+              "skill_gap": {
+                "type": "null"
+              },
+              "grade": {
+                "type": "null"
+              },
+              "priority": {
+                "type": "null"
+              },
+              "priority_rank": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "allOf": [
@@ -2072,6 +2603,46 @@
               "required": [
                 "partition_policy_version"
               ]
+            },
+            {
+              "required": [
+                "results"
+              ]
+            },
+            {
+              "required": [
+                "match_score"
+              ]
+            },
+            {
+              "required": [
+                "extraction_strategy"
+              ]
+            },
+            {
+              "required": [
+                "selection_policy_version"
+              ]
+            },
+            {
+              "required": [
+                "resume_filename"
+              ]
+            },
+            {
+              "required": [
+                "extraction_audit"
+              ]
+            },
+            {
+              "required": [
+                "scored_skill_count"
+              ]
+            },
+            {
+              "required": [
+                "unscored_skill_count"
+              ]
             }
           ]
         }
@@ -2096,6 +2667,142 @@
           },
           "agent_version": {
             "type": "null"
+          }
+        },
+        "not": {
+          "anyOf": [
+            {
+              "required": [
+                "results"
+              ]
+            },
+            {
+              "required": [
+                "match_score"
+              ]
+            },
+            {
+              "required": [
+                "extraction_strategy"
+              ]
+            },
+            {
+              "required": [
+                "selection_policy_version"
+              ]
+            },
+            {
+              "required": [
+                "resume_filename"
+              ]
+            },
+            {
+              "required": [
+                "extraction_audit"
+              ]
+            },
+            {
+              "required": [
+                "scored_skill_count"
+              ]
+            },
+            {
+              "required": [
+                "unscored_skill_count"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "storage_schema_version": {
+            "const": "careergps.skill_gap_run_storage.v3"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "branches",
+          "partition_policy_version",
+          "selection_policy_version",
+          "extraction_strategy",
+          "resume_filename",
+          "confirmed_at",
+          "match_score",
+          "scored_skill_count",
+          "unscored_skill_count",
+          "extraction_audit",
+          "timings",
+          "results"
+        ],
+        "properties": {
+          "agent_name": {
+            "type": "null"
+          },
+          "agent_version": {
+            "type": "null"
+          },
+          "extraction_strategy": {
+            "const": "skill_groups"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "storage_schema_version": {
+            "const": "careergps.skill_gap_run_storage.v3"
+          },
+          "status": {
+            "const": "completed"
+          }
+        },
+        "required": [
+          "storage_schema_version",
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "results": {
+            "minItems": 1
+          },
+          "scored_skill_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unscored_skill_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "extraction_audit": {
+            "type": "object"
+          }
+        }
+      },
+      "else": {
+        "if": {
+          "properties": {
+            "storage_schema_version": {
+              "const": "careergps.skill_gap_run_storage.v3"
+            }
+          },
+          "required": [
+            "storage_schema_version"
+          ]
+        },
+        "then": {
+          "properties": {
+            "results": {
+              "maxItems": 0
+            },
+            "match_score": {
+              "type": "null"
+            }
           }
         }
       }
