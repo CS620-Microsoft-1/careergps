@@ -13,10 +13,12 @@ from app.services.github_projects import (
     create_client,
     fetch_idea_list,
     fetch_topic,
+    keep_allowed_links,
     parse_idea_table,
     skills_for,
 )
 from app.services.resources_agent import MAX_AGENT_CANDIDATES, _shortlist, rank_projects
+from scripts.sync_github_projects import merge_catalog
 
 README = """
 ## Projects
@@ -87,6 +89,75 @@ class ParseTest(unittest.TestCase):
         self.assertEqual(skills_for(python_only, "software_engineer"), ([], []))
 
 
+def _idea(title, description, url="https://github.com/o/r"):
+    return RawProject("s", title.lower().replace(" ", "_"), title, description, url, "beginner", 15, "idea")
+
+
+class TaggingTest(unittest.TestCase):
+    """Tags must be backed by the project's own text, since the card says "Closes: ..."."""
+
+    def _ids(self, title, description, family):
+        return skills_for(_idea(title, description), family)[0]
+
+    def test_calling_an_api_is_not_building_one(self):
+        self.assertEqual(self._ids("Weather App", "Weather app in React JS using the Open Weather Map API",
+                                   "software_engineer"), ["frontend"])
+        self.assertNotIn("backend_apis", self._ids("Netflix Clone", "A Netflix clone application using TMDB API",
+                                                   "software_engineer"))
+        self.assertIn("backend_apis", self._ids("Notes API", "Build a REST API with Flask", "software_engineer"))
+
+    def test_real_time_multi_user_app_is_not_distributed_systems(self):
+        self.assertEqual(self._ids("Collaborative Whiteboard",
+                                   "A real-time drawing app with multiple users using WebSockets",
+                                   "software_engineer"), [])
+
+    def test_other_over_broad_words(self):
+        self.assertEqual(self._ids("Chess Game App", "A Two Player Chess game application using JavaScript",
+                                   "software_engineer"), [])
+        self.assertNotIn("cloud", self._ids("Word Cloud", "Word cloud generator in React", "software_engineer"))
+        self.assertNotIn("testing", self._ids("Speed Typing Test", "A typing test in React", "software_engineer"))
+        self.assertEqual(self._ids("Startup Profit Prediction", "Data about R&D spend", "data_analyst"), [])
+        self.assertEqual(self._ids("Animate Me", "An OpenCV project that converts an image to a cartoon",
+                                   "ai_engineer"), [])
+
+    def test_task_words_count_as_ml_unless_the_text_is_a_web_app(self):
+        self.assertEqual(self._ids("Wildfire Tracker", "Wild Fire Detection using React, NASA API", "ai_engineer"), [])
+        self.assertEqual(self._ids("Fake News Detection", "Detect fake news articles", "ai_engineer"),
+                         ["machine_learning", "model_training"])
+        self.assertEqual(self._ids("Income Prediction Web App", "Predict income bracket", "ai_engineer"),
+                         ["machine_learning", "model_training"])
+        self.assertIn("machine_learning", self._ids("Movie Recommender", "React front end over an ML recommender",
+                                                    "ai_engineer"))
+
+
+class SyncMergeTest(unittest.TestCase):
+    def _entry(self, source, slug, url="https://github.com/o/r", path="AI/ML Engineering"):
+        return {"id": f"gh_aiml_{source}_{slug}", "career_path": path, "title": slug, "url": url}
+
+    def test_removed_sources_lose_their_entries_and_unsynced_sources_keep_theirs(self):
+        previous = [self._entry("gone", "a"), self._entry("kept", "b"), self._entry("fresh", "old")]
+        catalog, notes = merge_catalog(previous, {"fresh": [self._entry("fresh", "new")]}, ["kept", "fresh"])
+        self.assertEqual([e["id"] for e in catalog], ["gh_aiml_fresh_new", "gh_aiml_kept_b"])
+        self.assertIn("removed 1 entries from sources no longer in project_sources.yaml", notes)
+
+    def test_entries_sharing_a_link_are_kept_and_reported(self):
+        same = "https://github.com/o/r/tree/main/Glass"
+        catalog, notes = merge_catalog([], {"kart": [self._entry("kart", "glass", same),
+                                                     self._entry("kart", "graduate", same)]}, ["kart"])
+        self.assertEqual(len(catalog), 2)
+        self.assertTrue(any("shared link" in note and "glass / graduate" in note for note in notes))
+
+    def test_only_allowed_link_hosts_are_kept(self):
+        kept, skipped = keep_allowed_links([
+            _idea("A", "x", "https://github.com/o/r/tree/main/A"),
+            _idea("B", "x", "https://www.youtube.com/watch?v=1"),
+            _idea("C", "x", "https://evil.example.com/github.com"),
+            _idea("D", "x", "http://github.com/o/r"),
+        ])
+        self.assertEqual([p.title for p in kept], ["A", "B"])
+        self.assertEqual([p.title for p in skipped], ["C", "D"])
+
+
 class ColumnLayoutTest(unittest.TestCase):
     def test_numbered_table_without_tiers_and_role_limits(self):
         markdown = """
@@ -110,6 +181,15 @@ class ColumnLayoutTest(unittest.TestCase):
 
 
 class FetchTest(unittest.TestCase):
+    def test_link_overrides_fix_rows_the_readme_links_wrongly(self):
+        markdown = "| 01. | [Gold Price Prediction](Graduate%20Admission) | Predict the gold price over time |\n"
+        transport = httpx2.MockTransport(lambda request: httpx2.Response(200, text=markdown))
+        with create_client(transport=transport) as client:
+            projects = fetch_idea_list(client, {
+                "id": "kart", "repo": "o/r", "title_column": 1, "description_column": 2, "tier_column": None,
+                "link_overrides": {"Gold Price Prediction": "Gold Price Prediction"}})
+        self.assertEqual(projects[0].url, "https://github.com/o/r/tree/main/Gold%20Price%20Prediction")
+
     def test_idea_list_and_topic_become_catalog_entries(self):
         with create_client("bad-token", transport=httpx2.MockTransport(_transport)) as client:
             ideas = fetch_idea_list(client, {"id": "cool", "repo": "o/r"})

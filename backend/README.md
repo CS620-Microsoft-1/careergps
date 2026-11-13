@@ -408,18 +408,37 @@ different company with the same name.
 The resources agent recommends from `data/projects.json` (hand-written) plus
 `data/github_projects.json` (real projects pulled from GitHub). The sources are listed in
 `data/project_sources.yaml`: an `idea_list` repo whose README has project tables, or a GitHub
-`topic` whose top repos become "contribute to <repo>" projects.
+`topic` whose top repos become "contribute to <repo>" projects (supported, but no topic source
+is configured).
 
 ```bash
-export GITHUB_TOKEN=<fine-grained token, no scopes needed>   # optional; raises the search limit
+export GITHUB_TOKEN=<fine-grained token, no scopes needed>   # optional; raises the rate limit
 python -m scripts.sync_github_projects             # every source
 python -m scripts.sync_github_projects --source cool_coders --dry-run
 ```
 
 Skills are assigned by keyword rules in `app/services/github_projects.py`, and a project is
-only offered for a role when it practices a skill specific to that role. Review the diff of
-`data/github_projects.json` before committing. The agent sees at most 25 candidates per
-request, the ones that cover the most high-priority gaps.
+only offered for a role when its own name or description names a skill specific to that role.
+The agent sees at most 25 candidates per request, the ones that cover the most
+high-priority gaps.
+
+**Re-syncing.** The app only reads the committed snapshot; GitHub is contacted only when
+someone runs the script. Re-sync on a branch and open a PR, so the change to
+`data/github_projects.json` is reviewed like code. In the diff, check:
+
+- **Links.** They come from other people's READMEs. Only `https` links to github.com and
+  youtube.com are kept (others print `skip`), but a link can still point at the wrong project.
+  The script prints `shared link` when two projects link to the same place; fix those with
+  `link_overrides` in `project_sources.yaml`.
+- **Tags.** Spot-check `supported_skill_ids` on new entries: the card tells students the
+  project "closes" those skills.
+- **Removed projects.** A project's id is built from its source and title
+  (`gh_<role>_<source>_<title>`). If an upstream README renames or drops a project, its id
+  changes or disappears, and students who saved it to their plan lose it.
+
+Removing a source from `project_sources.yaml` removes its projects on the next sync. Copied
+names and descriptions stay under each source's licence; see `data/THIRD_PARTY_NOTICES.md`,
+and add a section there for any new source.
 
 ## Job posting analysis
 

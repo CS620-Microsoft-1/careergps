@@ -9,6 +9,11 @@
 #                          (defaults 0, 1, 2; tier_column: null when the table has no tiers)
 #                        difficulty / hours: used when there's no tier column
 #                        roles: only offer these projects for these job families
+#                        link_overrides: {project title: folder in the repo} for rows the README
+#                          links to the wrong place (the sync prints "shared link" notes)
+#                      repo and license are copied onto every entry. The copied text stays under
+#                      the source's licence: see data/THIRD_PARTY_NOTICES.md, and add a section
+#                      there when you add a source.
 # kind: topic       -> a GitHub topic; its top repos become "Contribute to owner/repo" projects
 #                      (supported by the sync script, but not used: their titles read poorly next
 #                      to the rest of the catalog).
@@ -16,6 +21,7 @@ sources:
   - id: cool_coders
     kind: idea_list
     repo: The-Cool-Coders/Project-Ideas-And-Resources
+    license: MIT
     branch: main
     path: README.md
 
@@ -24,6 +30,7 @@ sources:
   - id: ml_projectkart
     kind: idea_list
     repo: prathimacode-hub/ML-ProjectKart
+    license: MPL-2.0
     branch: main
     path: README.md
     title_column: 1
@@ -32,3 +39,10 @@ sources:
     difficulty: intermediate
     hours: 25
     roles: [ai_engineer, data_analyst]
+    # The README links these four to other projects' folders (checked against the repo's file
+    # tree); each has its own folder.
+    link_overrides:
+      Gold Price Prediction: Gold Price Prediction
+      Graduate Admission Prediction: Graduate Admission Prediction
+      Object Detection using OpenCV: Object Detection using OpenCV
+      Olympic Medal Prediction: Olympic Medal Prediction

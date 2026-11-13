@@ -25,7 +25,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=jCoF1rMs_0s"
+    "url": "https://www.youtube.com/watch?v=jCoF1rMs_0s",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_aiml_cool_coders_face_recognition_app",
@@ -55,7 +57,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=sz25xxF_AVE"
+    "url": "https://www.youtube.com/watch?v=sz25xxF_AVE",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_aiml_cool_coders_movie_recomendation_engine",
@@ -83,35 +87,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=XoTwndOgXBM"
-  },
-  {
-    "id": "gh_aiml_cool_coders_wildfire_tracker_with_react",
-    "career_path": "AI/ML Engineering",
-    "title": "Wildfire Tracker With React",
-    "description": "Wild Fire Detection using React, NASA API",
-    "skills_practiced": [
-      "Machine learning",
-      "Model training"
-    ],
-    "prerequisites": [
-      "Git and GitHub basics",
-      "Python basics"
-    ],
-    "difficulty": "intermediate",
-    "estimated_hours": 30,
-    "deliverables": [
-      "Working project",
-      "GitHub repository",
-      "README with screenshots or a demo"
-    ],
-    "supported_skill_ids": [
-      "machine_learning",
-      "model_training"
-    ],
-    "source": "github",
-    "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=ontX4zfVqK8&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=17"
+    "url": "https://www.youtube.com/watch?v=XoTwndOgXBM",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_aiml_ml_projectkart_advertisement_click_prediction",
@@ -139,7 +117,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Advertisement%20Click%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Advertisement%20Click%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_advertisement_success_prediction",
@@ -167,7 +147,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Advertisement%20Success%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Advertisement%20Success%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_age_gender_and_ethnicity_prediction",
@@ -195,7 +177,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Age%2C%20Gender%20and%20Ethnicity%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Age%2C%20Gender%20and%20Ethnicity%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_airbnb_price_prediction",
@@ -223,7 +207,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Airbnb%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Airbnb%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_alpaca_identification",
@@ -231,9 +217,9 @@
     "title": "Alpaca Identification",
     "description": "The goal of this project is to make an identification cum classification model using deep neural networks, which will identify the images of Alpaca from the user given input.",
     "skills_practiced": [
+      "Deep learning",
       "Machine learning",
-      "Model training",
-      "Deep learning"
+      "Model training"
     ],
     "prerequisites": [
       "Git and GitHub basics",
@@ -247,13 +233,15 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
+      "deep_learning",
       "machine_learning",
-      "model_training",
-      "deep_learning"
+      "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Alpaca%20Identification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Alpaca%20Identification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_amazon_books_analysis",
@@ -281,7 +269,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Books%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Books%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_amazon_products_review_classification",
@@ -309,7 +299,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Products%20Reviews%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Products%20Reviews%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_american_sign_language_asl_recognition",
@@ -337,33 +329,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/American%20Sign%20Language%20(ASL)%20Recognition"
-  },
-  {
-    "id": "gh_aiml_ml_projectkart_animate_me",
-    "career_path": "AI/ML Engineering",
-    "title": "Animate Me !",
-    "description": "It is a simple OpenCV project that converts input image to a cartoon equivalent",
-    "skills_practiced": [
-      "Deep learning"
-    ],
-    "prerequisites": [
-      "Git and GitHub basics",
-      "Python basics"
-    ],
-    "difficulty": "intermediate",
-    "estimated_hours": 25,
-    "deliverables": [
-      "Working project",
-      "GitHub repository",
-      "README with screenshots or a demo"
-    ],
-    "supported_skill_ids": [
-      "deep_learning"
-    ],
-    "source": "github",
-    "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Animate%20Me!"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/American%20Sign%20Language%20(ASL)%20Recognition",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_appliances_energy_prediction",
@@ -391,7 +359,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Appliances%20Energy%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Appliances%20Energy%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_automated_essay_grading",
@@ -419,7 +389,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Automated%20Essay%20Grading"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Automated%20Essay%20Grading",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_avito_product_analysis_and_price_prediction",
@@ -447,7 +419,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Avito%20Product%20Analysis%20and%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Avito%20Product%20Analysis%20and%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_balls_image_classification",
@@ -455,9 +429,9 @@
     "title": "Balls Image Classification",
     "description": "The goal of this project is to make a deep learning model which will classify the images of different types of balls using the convoolution neural network, to be precise the MobileNet architecture.",
     "skills_practiced": [
+      "Deep learning",
       "Machine learning",
-      "Model training",
-      "Deep learning"
+      "Model training"
     ],
     "prerequisites": [
       "Git and GitHub basics",
@@ -471,13 +445,15 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
+      "deep_learning",
       "machine_learning",
-      "model_training",
-      "deep_learning"
+      "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Balls%20Image%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Balls%20Image%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_bank_customers_prediction",
@@ -505,7 +481,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bank%20Customers%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bank%20Customers%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_bike_crash_analysis",
@@ -533,7 +511,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Crash%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Crash%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_bike_rental_demand_analysis",
@@ -561,7 +541,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Rental%20Demand%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Rental%20Demand%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_bike_sharing_prediction",
@@ -589,7 +571,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Sharing%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Sharing%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_bird_species_classification_and_recognition",
@@ -597,9 +581,9 @@
     "title": "Bird Species Classification and Recognition",
     "description": "The goal is to complete an end to end computer vision problem with basic parts, such as bulding an input pipeline, compose the model, data augmentation etc.",
     "skills_practiced": [
+      "Deep learning",
       "Machine learning",
-      "Model training",
-      "Deep learning"
+      "Model training"
     ],
     "prerequisites": [
       "Git and GitHub basics",
@@ -613,13 +597,15 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
+      "deep_learning",
       "machine_learning",
-      "model_training",
-      "deep_learning"
+      "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bird%20Species%20Classification%20and%20Recognition"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bird%20Species%20Classification%20and%20Recognition",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_bitcoin_price_prediction",
@@ -647,7 +633,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bitcoin%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bitcoin%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_black_friday_sales_analysis_and_prediction",
@@ -675,7 +663,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Black%20Friday%20Sales-%20Analysis%20and%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Black%20Friday%20Sales-%20Analysis%20and%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_board_game_review_prediction",
@@ -703,7 +693,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Board%20Game%20Review%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Board%20Game%20Review%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_body_fat_prediction",
@@ -731,7 +723,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Body%20Fat%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Body%20Fat%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_book_genre_prediction",
@@ -759,7 +753,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Book%20Genre%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Book%20Genre%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_book_recommendation_systems",
@@ -787,7 +783,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Book%20Recommendation%20Systems"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Book%20Recommendation%20Systems",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_brain_tumor_detection_and_classification",
@@ -815,7 +813,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Brain%20Tumor%20Detection%20and%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Brain%20Tumor%20Detection%20and%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_brain_weight_prediction",
@@ -843,7 +843,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Brain%20Weight%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Brain%20Weight%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_brazil_fires_prediction",
@@ -871,7 +873,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Brazil%20Fires%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Brazil%20Fires%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_breast_cancer_prediction",
@@ -899,7 +903,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Breast%20Cancer%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Breast%20Cancer%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_campus_placement_prediction",
@@ -927,7 +933,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Campus%20Placement%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Campus%20Placement%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_campus_recruitment_analysis_and_prediction",
@@ -955,7 +963,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Campus%20Recruitment%20-%20Analysis%20and%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Campus%20Recruitment%20-%20Analysis%20and%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_captcha_decoding",
@@ -981,7 +991,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/CAPTCHA%20Decoding"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/CAPTCHA%20Decoding",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_car_brand_classification",
@@ -1009,7 +1021,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Car%20Brand%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Car%20Brand%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_car_prices_prediction",
@@ -1037,7 +1051,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Car%20Prices%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Car%20Prices%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_cartier_jewelry_classification",
@@ -1065,7 +1081,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cartier%20Jewelry%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cartier%20Jewelry%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_cats_vs_dogs_classification",
@@ -1093,7 +1111,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cats%20Vs%20Dogs%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cats%20Vs%20Dogs%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_cervical_cancer_risk_prediction",
@@ -1121,7 +1141,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cervical%20Cancer%20Risk%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cervical%20Cancer%20Risk%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_churn_risk_score_prediction",
@@ -1149,7 +1171,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Churn%20Risk%20Score%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Churn%20Risk%20Score%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_classification_of_images_using_mnist_and_cifar10",
@@ -1177,7 +1201,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Classification%20of%20Images%20using%20MNIST%20and%20CIFAR10"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Classification%20of%20Images%20using%20MNIST%20and%20CIFAR10",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_coffee_production_prediction",
@@ -1205,7 +1231,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Coffee%20Production%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Coffee%20Production%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_colour_identification_using_machine_learning",
@@ -1233,7 +1261,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Colour%20Identification%20using%20Machine%20Learning"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Colour%20Identification%20using%20Machine%20Learning",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_concrete_strength_prediction",
@@ -1261,7 +1291,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Concrete%20Strength%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Concrete%20Strength%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_cotton_disease_prediction",
@@ -1269,6 +1301,7 @@
     "title": "Cotton Disease Prediction",
     "description": "This project predicts the disease of cotton tree using Transfer Learning with Resnet152V2 model.",
     "skills_practiced": [
+      "Deep learning",
       "Machine learning",
       "Model training"
     ],
@@ -1284,12 +1317,15 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
+      "deep_learning",
       "machine_learning",
       "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cotton%20Disease%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cotton%20Disease%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_credit_card_fraud_detection",
@@ -1317,7 +1353,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Credit%20Card%20Fraud%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Credit%20Card%20Fraud%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_crop_recommendation_system",
@@ -1345,7 +1383,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Crop%20Recommendation%20System"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Crop%20Recommendation%20System",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_crop_yield_prediction",
@@ -1373,7 +1413,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Crop%20Yield%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Crop%20Yield%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_cryotherapy_analysis",
@@ -1401,7 +1443,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cryotherapy%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Cryotherapy%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_customer_region_classification",
@@ -1429,7 +1473,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Customer%20Region%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Customer%20Region%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_dance_form_classification",
@@ -1437,9 +1483,9 @@
     "title": "Dance Form Classification",
     "description": "The goal of this project is to classify the images of various dance forms and prepare a Classification model using Deep learning methods.",
     "skills_practiced": [
+      "Deep learning",
       "Machine learning",
-      "Model training",
-      "Deep learning"
+      "Model training"
     ],
     "prerequisites": [
       "Git and GitHub basics",
@@ -1453,13 +1499,15 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
+      "deep_learning",
       "machine_learning",
-      "model_training",
-      "deep_learning"
+      "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dance%20Form%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dance%20Form%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_dandelion_recognition",
@@ -1487,7 +1535,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dandelion%20Recognition"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dandelion%20Recognition",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_diabetes_prediction",
@@ -1515,7 +1565,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Diabetes%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Diabetes%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_diamond_price_prediction",
@@ -1543,7 +1595,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Diamond%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Diamond%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_disease_symptom_prediction",
@@ -1571,7 +1625,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Disease%20Symptom%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Disease%20Symptom%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_disneyland_reviews_analysis",
@@ -1599,7 +1655,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Disneyland%20Reviews%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Disneyland%20Reviews%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_dna_sequencing_classification",
@@ -1627,7 +1685,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/DNA%20Sequencing%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/DNA%20Sequencing%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_dog_breed_identification",
@@ -1655,7 +1715,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dog%20Breed%20Identification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dog%20Breed%20Identification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_dogecoin_price_prediction",
@@ -1683,7 +1745,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dogecoin%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dogecoin%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_driver_drowsiness_detection_system",
@@ -1711,7 +1775,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Driver%20Drowsiness%20Detection%20System"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Driver%20Drowsiness%20Detection%20System",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_dry_beans_classification",
@@ -1739,7 +1805,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dry%20Beans%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Dry%20Beans%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_email_classification",
@@ -1767,7 +1835,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Email_Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Email_Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_emoji_classification_using_opencv",
@@ -1776,8 +1846,7 @@
     "description": "The Goal of this project is to make a model which will predict the emotion shown using the input image. And also it will classify the particular emotion shown in the given image.",
     "skills_practiced": [
       "Machine learning",
-      "Model training",
-      "Deep learning"
+      "Model training"
     ],
     "prerequisites": [
       "Git and GitHub basics",
@@ -1792,12 +1861,13 @@
     ],
     "supported_skill_ids": [
       "machine_learning",
-      "model_training",
-      "deep_learning"
+      "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Emoji%20Classification%20using%20OpenCV"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Emoji%20Classification%20using%20OpenCV",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_emotion_classification",
@@ -1825,7 +1895,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Emotion%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Emotion%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_emotion_recognition_using_nlp",
@@ -1853,7 +1925,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Emotion%20Recognition%20Based%20on%20NLP"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Emotion%20Recognition%20Based%20on%20NLP",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_employee_retention_prediction",
@@ -1881,7 +1955,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Employee%20Retention%20Project"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Employee%20Retention%20Project",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_english_alphabet_classification",
@@ -1909,7 +1985,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/English%20Alphabet%20Classification/Model"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/English%20Alphabet%20Classification/Model",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_exports_classification",
@@ -1937,7 +2015,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Exports%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Exports%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_face_detection_using_pca",
@@ -1965,7 +2045,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Face%20detection%20using%20PCA"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Face%20detection%20using%20PCA",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_face_generation_using_dcgan",
@@ -1993,7 +2075,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Face%20Generation%20using%20DCGAN"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Face%20Generation%20using%20DCGAN",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_face_mask_detection_using_opencv",
@@ -2023,7 +2107,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Face%20Mask%20Detection%20using%20OpenCV"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Face%20Mask%20Detection%20using%20OpenCV",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_fake_currency_prediction",
@@ -2051,7 +2137,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fake%20Currency%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fake%20Currency%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_fake_job_posting_prediction",
@@ -2079,7 +2167,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fake%20Job%20Posting%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fake%20Job%20Posting%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_fake_news_detection",
@@ -2107,7 +2197,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fake%20News%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fake%20News%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_fashion_mnist_classification",
@@ -2135,7 +2227,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fashion%20MNIST%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fashion%20MNIST%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_fish_weight_prediction",
@@ -2163,7 +2257,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fish%20Weight%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fish%20Weight%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_flight_delay_prediction",
@@ -2191,7 +2287,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Flight%20Delay%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Flight%20Delay%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_flight_fare_prediction",
@@ -2219,7 +2317,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Flight%20Fare%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Flight%20Fare%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_flowers_recognition",
@@ -2247,7 +2347,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Flowers%20Recognition"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Flowers%20Recognition",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_football_match_prediction",
@@ -2275,7 +2377,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Football%20Match%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Football%20Match%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_football_team_rating_prediction",
@@ -2303,7 +2407,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Football%20Team%20Rating%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Football%20Team%20Rating%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_forest_cover_type_classification",
@@ -2331,7 +2437,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Forest%20Cover%20Type%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Forest%20Cover%20Type%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_forest_fire_prediction",
@@ -2359,7 +2467,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Forest%20Fire%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Forest%20Fire%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_fragnance_price_prediction",
@@ -2387,7 +2497,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fragnance%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fragnance%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_fresher_s_salary_prediction",
@@ -2415,7 +2527,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fresher's%20Salary%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fresher's%20Salary%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_gender_classification_using_dl",
@@ -2443,7 +2557,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Gender%20Classification%20Using%20DL"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Gender%20Classification%20Using%20DL",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_german_traffic_sign_classification",
@@ -2471,7 +2587,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/German%20Traffic%20Sign%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/German%20Traffic%20Sign%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_glass_classification",
@@ -2499,7 +2617,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Glass%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Glass%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_gold_price_prediction",
@@ -2527,7 +2647,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Graduate%20Admission%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Gold%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_got_episodes_imdb_rating_prediction",
@@ -2555,7 +2677,39 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/GOT%20Episodes%20IMDb%20Rating%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/GOT%20Episodes%20IMDb%20Rating%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
+  },
+  {
+    "id": "gh_aiml_ml_projectkart_graduate_admission_prediction",
+    "career_path": "AI/ML Engineering",
+    "title": "Graduate Admission Prediction",
+    "description": "To predict about the Graduate Admissions from an Indian perspective.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 25,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Graduate%20Admission%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_handwritten_digit_recognition",
@@ -2583,7 +2737,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Handwritten%20Digit%20Recognition"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Handwritten%20Digit%20Recognition",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_heart_attack_analysis",
@@ -2611,7 +2767,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heart%20Attack%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heart%20Attack%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_heart_disease_prediction",
@@ -2639,7 +2797,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heart%20Disease%20prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heart%20Disease%20prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_heights_and_weights_prediction",
@@ -2667,7 +2827,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heights%20and%20Weights%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heights%20and%20Weights%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_honey_bee_pollen_detection",
@@ -2695,7 +2857,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Honey%20Bee%20Pollen%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Honey%20Bee%20Pollen%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_horses_or_humans_classification",
@@ -2723,7 +2887,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Horses%20or%20Humans%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Horses%20or%20Humans%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_hotel_booking_prediction",
@@ -2751,7 +2917,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Hotel%20Booking%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Hotel%20Booking%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_hotel_rating_prediction",
@@ -2779,7 +2947,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Hotel%20Rating%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Hotel%20Rating%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_house_prices_prediction",
@@ -2807,7 +2977,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/House%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/House%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_human_activity_recognition_using_smartphones",
@@ -2835,7 +3007,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Human%20Activity%20Recognition%20using%20Smartphones"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Human%20Activity%20Recognition%20using%20Smartphones",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_ice_cream_revenue_prediction",
@@ -2863,7 +3037,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Ice%20Cream%20Revenue%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Ice%20Cream%20Revenue%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_image_compression_using_clustering",
@@ -2891,7 +3067,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Image%20Compression%20using%20Clustering"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Image%20Compression%20using%20Clustering",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_imagenet_classification",
@@ -2919,7 +3097,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Imagenet%20classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Imagenet%20classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_imdb_sentiment_analysis",
@@ -2947,7 +3127,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IMDB%20Sentiment%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IMDB%20Sentiment%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_income_prediction_web_app",
@@ -2975,7 +3157,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Income%20Prediction%20Web%20App"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Income%20Prediction%20Web%20App",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_insurance_claim_prediction",
@@ -3003,7 +3187,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Insurance%20Claim%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Insurance%20Claim%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_ipl_score_prediction",
@@ -3031,7 +3217,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IPL%20Score%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IPL%20Score%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_ipl_winner_prediction",
@@ -3059,7 +3247,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IPL%20Winner%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IPL%20Winner%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_iris_flower_classification",
@@ -3087,7 +3277,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IRIS%20Flower%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IRIS%20Flower%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_kidney_stone_prediction",
@@ -3115,7 +3307,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Kidney%20Stone%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Kidney%20Stone%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_laptop_prices_prediction",
@@ -3143,7 +3337,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Laptop%20Prices%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Laptop%20Prices%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_lego_minifigures",
@@ -3171,7 +3367,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/LEGO%20Minifigures"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/LEGO%20Minifigures",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_license_plate_detection_and_recognition",
@@ -3199,7 +3397,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/License%20Plate%20Detection%20and%20Recognition"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/License%20Plate%20Detection%20and%20Recognition",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_loan_eligibility_prediction",
@@ -3227,7 +3427,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Loan%20Eligibility%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Loan%20Eligibility%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_malaria_disease_detection",
@@ -3255,7 +3457,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Malaria%20Disease%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Malaria%20Disease%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_male_female_eyes_classification",
@@ -3263,9 +3467,9 @@
     "title": "Male & Female Eyes Classification",
     "description": "The goal of this project is to create a classification model which will classify the genders based on the eyes images as per given in the dataset. For this we are going to use different architectures of Convolution Neural Network.",
     "skills_practiced": [
+      "Deep learning",
       "Machine learning",
-      "Model training",
-      "Deep learning"
+      "Model training"
     ],
     "prerequisites": [
       "Git and GitHub basics",
@@ -3279,13 +3483,15 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
+      "deep_learning",
       "machine_learning",
-      "model_training",
-      "deep_learning"
+      "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Male%20%26%20Female%20Eyes%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Male%20%26%20Female%20Eyes%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_mall_customer_segmentation",
@@ -3313,7 +3519,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mall%20Customer%20Segmentation"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mall%20Customer%20Segmentation",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_marathon_time_prediction",
@@ -3341,7 +3549,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Marathon%20Time%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Marathon%20Time%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_marble_surface_anomaly_detection",
@@ -3369,7 +3579,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Marble%20Surface%20Anomaly%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Marble%20Surface%20Anomaly%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_mba_specialization_classification",
@@ -3397,7 +3609,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/MBA%20Specialization%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/MBA%20Specialization%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_mempool_prediction",
@@ -3425,7 +3639,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/MemPool%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/MemPool%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_mobile_price_range_classification",
@@ -3453,7 +3669,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mobile%20Price%20Range%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mobile%20Price%20Range%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_movie_oscar_win_prediction",
@@ -3481,7 +3699,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Movie%20Oscar%20Win%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Movie%20Oscar%20Win%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_movie_recommendation_system",
@@ -3509,7 +3729,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Movie%20Recommendation%20System"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Movie%20Recommendation%20System",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_mushroom_classification",
@@ -3537,7 +3759,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mushroom%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mushroom%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_music_genre_classification",
@@ -3565,7 +3789,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Music%20Genre%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Music%20Genre%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_nasa_asteroids_classification",
@@ -3593,7 +3819,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/NASA%20Asteroids%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/NASA%20Asteroids%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_natural_images_classification",
@@ -3601,9 +3829,9 @@
     "title": "Natural Images Classification",
     "description": "The goal of this project is to build the Classification Model for natural images using the Neural Networks and Deep Learning.",
     "skills_practiced": [
+      "Deep learning",
       "Machine learning",
-      "Model training",
-      "Deep learning"
+      "Model training"
     ],
     "prerequisites": [
       "Git and GitHub basics",
@@ -3617,13 +3845,15 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
+      "deep_learning",
       "machine_learning",
-      "model_training",
-      "deep_learning"
+      "model_training"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Natural%20Images%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Natural%20Images%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_nba_analysis_and_prediction",
@@ -3651,35 +3881,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/NBA-Analysis%20and%20Prediction"
-  },
-  {
-    "id": "gh_aiml_ml_projectkart_netflix_eda_and_recommedation_system",
-    "career_path": "AI/ML Engineering",
-    "title": "Netflix EDA and Recommedation System",
-    "description": "The project aims to gain insights from detailed EDA and recommend which movie to watch next.",
-    "skills_practiced": [
-      "Machine learning",
-      "Model training"
-    ],
-    "prerequisites": [
-      "Git and GitHub basics",
-      "Python basics"
-    ],
-    "difficulty": "intermediate",
-    "estimated_hours": 25,
-    "deliverables": [
-      "Working project",
-      "GitHub repository",
-      "README with screenshots or a demo"
-    ],
-    "supported_skill_ids": [
-      "machine_learning",
-      "model_training"
-    ],
-    "source": "github",
-    "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Netflix%20EDA%20and%20Recommedation%20System"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/NBA-Analysis%20and%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_object_detection_using_opencv",
@@ -3709,7 +3913,39 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Olympic%20Medal%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Object%20Detection%20using%20OpenCV",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
+  },
+  {
+    "id": "gh_aiml_ml_projectkart_olympic_medal_prediction",
+    "career_path": "AI/ML Engineering",
+    "title": "Olympic Medal Prediction",
+    "description": "The goal of this project is to make a prediction model which will predict whether an athlete will win medal or not.",
+    "skills_practiced": [
+      "Machine learning",
+      "Model training"
+    ],
+    "prerequisites": [
+      "Git and GitHub basics",
+      "Python basics"
+    ],
+    "difficulty": "intermediate",
+    "estimated_hours": 25,
+    "deliverables": [
+      "Working project",
+      "GitHub repository",
+      "README with screenshots or a demo"
+    ],
+    "supported_skill_ids": [
+      "machine_learning",
+      "model_training"
+    ],
+    "source": "github",
+    "source_kind": "idea",
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Olympic%20Medal%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_organ_donors_prediction",
@@ -3737,7 +3973,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Organ%20Donors%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Organ%20Donors%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_paris_housing_classification",
@@ -3765,7 +4003,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Paris%20Housing%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Paris%20Housing%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_parkinson_s_disease_prediction",
@@ -3793,7 +4033,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Parkinson's%20Disease%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Parkinson's%20Disease%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_password_strength_classifier",
@@ -3821,7 +4063,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Password%20Strength%20Classifier"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Password%20Strength%20Classifier",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_persian_license_plate_characters_identification",
@@ -3849,7 +4093,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Persian%20License%20Plate%20Characters%20Identification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Persian%20License%20Plate%20Characters%20Identification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_phishing_website_detection",
@@ -3877,7 +4123,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Phishing%20Website%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Phishing%20Website%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_plant_disease_prediction",
@@ -3905,7 +4153,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Plant%20Disease%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Plant%20Disease%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_plant_seedlings_classification",
@@ -3933,7 +4183,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Plant%20Seedlings%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Plant%20Seedlings%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_private_companies_prediction",
@@ -3961,7 +4213,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Private%20Companies%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Private%20Companies%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_productivity_prediction",
@@ -3989,7 +4243,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Productivity%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Productivity%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_railway_track_fault_detection",
@@ -4017,7 +4273,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Railway%20Track%20Fault%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Railway%20Track%20Fault%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_rain_prediction",
@@ -4045,7 +4303,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Rain%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Rain%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_reddit_tweets_prediction",
@@ -4073,7 +4333,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Reddit%20Tweets%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Reddit%20Tweets%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_restaurant_recommendation_system",
@@ -4101,7 +4363,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Restaurant%20Recommendation%20System"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Restaurant%20Recommendation%20System",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_resume_categorizing",
@@ -4129,7 +4393,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Resume%20Categorizing"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Resume%20Categorizing",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_road_lane_detection",
@@ -4157,7 +4423,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Road%20Lane%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Road%20Lane%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_salary_prediction",
@@ -4185,7 +4453,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Salary%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Salary%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_salary_range_classification",
@@ -4213,7 +4483,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Salary%20Range%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Salary%20Range%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_sarcasm_detection",
@@ -4241,7 +4513,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Sarcasm%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Sarcasm%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_shoulder_x_ray_classification",
@@ -4269,7 +4543,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Shoulder%20X-ray%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Shoulder%20X-ray%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_sign_language_prediction",
@@ -4297,7 +4573,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Sign%20Language%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Sign%20Language%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_social_network_influencer_prediction",
@@ -4325,7 +4603,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Social%20Network%20Influencer%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Social%20Network%20Influencer%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_soil_moisture_prediction",
@@ -4353,7 +4633,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Soil%20Moisture%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Soil%20Moisture%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_solar_eclipse_classification",
@@ -4381,7 +4663,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Solar%20Eclipse%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Solar%20Eclipse%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_solar_radiation_prediction",
@@ -4409,7 +4693,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Solar%20Radiation%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Solar%20Radiation%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_song_genre_classification",
@@ -4437,7 +4723,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Song%20Genre%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Song%20Genre%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_spam_email_detection",
@@ -4465,7 +4753,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Spam%20Email%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Spam%20Email%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_speech_emotion_recognition",
@@ -4493,7 +4783,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Speech%20Emotion%20Recognition"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Speech%20Emotion%20Recognition",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_stack_overflow_questions_quality_rating_prediction",
@@ -4521,7 +4813,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stack%20Overflow%20Questions%20Quality%20Rating%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stack%20Overflow%20Questions%20Quality%20Rating%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_stars_galaxies_and_quasars_classification",
@@ -4549,7 +4843,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stars%2C%20Galaxies%20and%20Quasars%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stars%2C%20Galaxies%20and%20Quasars%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_startup_profit_prediction",
@@ -4577,7 +4873,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Startup%20Profit%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Startup%20Profit%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_stock_price_prediction",
@@ -4605,7 +4903,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stock%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stock%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_stress_level_prediction",
@@ -4633,7 +4933,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stress%20Level%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stress%20Level%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_stroke_prediction",
@@ -4661,7 +4963,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stroke%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Stroke%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_student_performance_prediction",
@@ -4689,7 +4993,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Student%20Performance%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Student%20Performance%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_supermarket_sales_prediction",
@@ -4717,7 +5023,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Supermarket%20Sales%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Supermarket%20Sales%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_terrorist_attack_prediction",
@@ -4745,7 +5053,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Terrorist%20Attack%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Terrorist%20Attack%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_test_score_prediction",
@@ -4773,7 +5083,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Test%20Score%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Test%20Score%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_text_summarization",
@@ -4801,7 +5113,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Text%20Summarization"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Text%20Summarization",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_titanic_survival_prediction",
@@ -4829,7 +5143,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Titanic%20Survival%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Titanic%20Survival%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_traffic_sign_classification",
@@ -4857,7 +5173,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Traffic%20Sign%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Traffic%20Sign%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_twitter_sentiment_analysis",
@@ -4885,7 +5203,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Twitter%20Sentiment%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Twitter%20Sentiment%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_uber_fare_prediction",
@@ -4913,7 +5233,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Uber%20Fare%20predictions"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Uber%20Fare%20predictions",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_usa_house_pricing_prediction",
@@ -4941,7 +5263,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/USA%20House%20Pricing%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/USA%20House%20Pricing%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_vehicle_image_classification",
@@ -4969,7 +5293,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Vehicle%20Image%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Vehicle%20Image%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_walmart_sales_prediction",
@@ -4997,7 +5323,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Walmart%20Sales%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Walmart%20Sales%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_waste_classification",
@@ -5025,7 +5353,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Waste%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Waste%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_water_quality_prediction",
@@ -5053,7 +5383,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Water%20Quality%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Water%20Quality%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_web_page_phishing_detection",
@@ -5081,7 +5413,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Web%20Page%20Phishing%20Detection"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Web%20Page%20Phishing%20Detection",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_wine_quality_prediction",
@@ -5109,7 +5443,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Wine%20Quality%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Wine%20Quality%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_yotube_video_recommendation_system",
@@ -5137,7 +5473,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Youtube%20Video%20Recommendation%20System"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Youtube%20Video%20Recommendation%20System",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_zomato_banglore_resturants_recommendation",
@@ -5165,7 +5503,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Zomato%20Bangalore%20Restaurants%20Recommendation%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Zomato%20Bangalore%20Restaurants%20Recommendation%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_aiml_ml_projectkart_zoo_animal_classification",
@@ -5193,7 +5533,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Zoo-Animal-Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Zoo-Animal-Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_airline_passenger_satistfaction",
@@ -5218,7 +5560,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Airline%20Passenger%20Satisfaction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Airline%20Passenger%20Satisfaction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_amazon_data_analysis",
@@ -5245,7 +5589,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Data%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Data%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_amazon_mobile_phones_reviews_analysis",
@@ -5270,7 +5616,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Mobile%20Phones%20Reviews%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Amazon%20Mobile%20Phones%20Reviews%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_avito_product_analysis_and_price_prediction",
@@ -5297,7 +5645,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Avito%20Product%20Analysis%20and%20Price%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Avito%20Product%20Analysis%20and%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_bike_rental_demand_analysis",
@@ -5322,7 +5672,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Rental%20Demand%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Bike%20Rental%20Demand%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_churn_risk_score_prediction",
@@ -5347,7 +5699,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Churn%20Risk%20Score%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Churn%20Risk%20Score%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_covid_19_data_analysis",
@@ -5376,7 +5730,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Covid-19%20Data%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Covid-19%20Data%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_data_analysis_of_meteorological_data",
@@ -5403,7 +5759,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Data%20Analysis%20of%20Meteorological%20Data"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Data%20Analysis%20of%20Meteorological%20Data",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_diabetes_prediction",
@@ -5428,7 +5786,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Diabetes%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Diabetes%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_disneyland_reviews_analysis",
@@ -5453,7 +5813,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Disneyland%20Reviews%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Disneyland%20Reviews%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_employee_retention_prediction",
@@ -5478,7 +5840,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Employee%20Retention%20Project"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Employee%20Retention%20Project",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_exports_classification",
@@ -5503,7 +5867,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Exports%20Classification"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Exports%20Classification",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_fish_weight_prediction",
@@ -5528,7 +5894,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fish%20Weight%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fish%20Weight%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_fuel_consumption_analysis",
@@ -5553,7 +5921,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fuel%20Consumption%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Fuel%20Consumption%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_gold_price_prediction",
@@ -5578,7 +5948,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Graduate%20Admission%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Gold%20Price%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_heights_and_weights_prediction",
@@ -5603,7 +5975,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heights%20and%20Weights%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Heights%20and%20Weights%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_ice_cream_revenue_prediction",
@@ -5628,7 +6002,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Ice%20Cream%20Revenue%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Ice%20Cream%20Revenue%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_ipl_winner_prediction",
@@ -5653,7 +6029,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IPL%20Winner%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/IPL%20Winner%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_mall_customer_segmentation",
@@ -5678,7 +6056,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mall%20Customer%20Segmentation"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Mall%20Customer%20Segmentation",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_netflix_eda_and_recommedation_system",
@@ -5703,7 +6083,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Netflix%20EDA%20and%20Recommedation%20System"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Netflix%20EDA%20and%20Recommedation%20System",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_star_radiation_analysis_and_predcition",
@@ -5728,34 +6110,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Star%20Radiation%20Analysis%20and%20Prediction"
-  },
-  {
-    "id": "gh_data_ml_projectkart_startup_profit_prediction",
-    "career_path": "Data Analyst",
-    "title": "Startup Profit Prediction",
-    "description": "The goal is to predict Profit of the Startups. The dataset contains data about 50 startups. It has 5 columns: “R&D Spend”, “Administration”, “Marketing Spend”, “State”, “Profit”.",
-    "skills_practiced": [
-      "Analytical scripting",
-      "Data analysis"
-    ],
-    "prerequisites": [
-      "Git and GitHub basics"
-    ],
-    "difficulty": "intermediate",
-    "estimated_hours": 25,
-    "deliverables": [
-      "Working project",
-      "GitHub repository",
-      "README with screenshots or a demo"
-    ],
-    "supported_skill_ids": [
-      "analytical_scripting",
-      "data_analysis"
-    ],
-    "source": "github",
-    "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Startup%20Profit%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Star%20Radiation%20Analysis%20and%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_terrorist_attack_prediction",
@@ -5782,7 +6139,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Terrorist%20Attack%20Prediction"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/Terrorist%20Attack%20Prediction",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_u_s_weather_history_visualizations",
@@ -5807,7 +6166,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/U.S.%20Weather%20History%20Visualizations"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/U.S.%20Weather%20History%20Visualizations",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_data_ml_projectkart_world_happiness_report_analysis",
@@ -5834,7 +6195,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/World%20Happiness%20Report%20Analysis"
+    "url": "https://github.com/prathimacode-hub/ML-ProjectKart/tree/main/World%20Happiness%20Report%20Analysis",
+    "source_repo": "prathimacode-hub/ML-ProjectKart",
+    "license": "MPL-2.0"
   },
   {
     "id": "gh_swe_cool_coders_10_user_interfaces",
@@ -5859,7 +6222,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=Rz-rey4Q1bw&list=LL&index=6&t=8839s"
+    "url": "https://www.youtube.com/watch?v=Rz-rey4Q1bw&list=LL&index=6&t=8839s",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_a_covid_19_tracker",
@@ -5884,7 +6249,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=cF3pIMJUZxM&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=2"
+    "url": "https://www.youtube.com/watch?v=cF3pIMJUZxM&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=2",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_airbnb_clone_application",
@@ -5909,7 +6276,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=IQaCL8_bwA4&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=7"
+    "url": "https://www.youtube.com/watch?v=IQaCL8_bwA4&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=7",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_amazon_clone_using_solidity",
@@ -5934,7 +6303,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=X1ahXNYkpL8"
+    "url": "https://www.youtube.com/watch?v=X1ahXNYkpL8",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_build_brand_page",
@@ -5959,7 +6330,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=W7up-w1QYpw&ab_channel=DoSomeCoding"
+    "url": "https://www.youtube.com/watch?v=W7up-w1QYpw&ab_channel=DoSomeCoding",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_business_card_generator",
@@ -5984,57 +6357,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=mGORpgEOsT4"
-  },
-  {
-    "id": "gh_swe_cool_coders_chess_game_app",
-    "career_path": "Software Engineering",
-    "title": "Chess Game App",
-    "description": "A Two Player Chess game application using JavaScript",
-    "skills_practiced": [
-      "Algorithms & data structures"
-    ],
-    "prerequisites": [
-      "Git and GitHub basics"
-    ],
-    "difficulty": "beginner",
-    "estimated_hours": 15,
-    "deliverables": [
-      "Working project",
-      "GitHub repository",
-      "README with screenshots or a demo"
-    ],
-    "supported_skill_ids": [
-      "algorithms"
-    ],
-    "source": "github",
-    "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=SS5amIbX0Mo&list=LL&index=3&t=56s"
-  },
-  {
-    "id": "gh_swe_cool_coders_collaborative_whiteboard",
-    "career_path": "Software Engineering",
-    "title": "Collaborative Whiteboard",
-    "description": "A real-time drawing app with multiple users using WebSockets",
-    "skills_practiced": [
-      "Distributed systems"
-    ],
-    "prerequisites": [
-      "Git and GitHub basics"
-    ],
-    "difficulty": "advanced",
-    "estimated_hours": 50,
-    "deliverables": [
-      "Working project",
-      "GitHub repository",
-      "README with screenshots or a demo"
-    ],
-    "supported_skill_ids": [
-      "distributed_systems"
-    ],
-    "source": "github",
-    "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=ifxK3E5l3u0"
+    "url": "https://www.youtube.com/watch?v=mGORpgEOsT4",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_discord_clone_mern_stack",
@@ -6063,7 +6388,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=YzcnqYNXM90"
+    "url": "https://www.youtube.com/watch?v=YzcnqYNXM90",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_e_commerce_application",
@@ -6090,7 +6417,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=XtciU6BnQdo"
+    "url": "https://www.youtube.com/watch?v=XtciU6BnQdo",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_facebook_clone_application",
@@ -6117,7 +6446,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=B-kxUMHBxNo&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=6"
+    "url": "https://www.youtube.com/watch?v=B-kxUMHBxNo&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=6",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_fitness_app",
@@ -6142,7 +6473,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=KMkmA4i2FQc"
+    "url": "https://www.youtube.com/watch?v=KMkmA4i2FQc",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_flipkart_clone_application",
@@ -6171,7 +6504,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=tvdFYmJEaw4&list=PLB_Wd4-5SGAYsxD4JGaVdXll3PnoyI-AM"
+    "url": "https://www.youtube.com/watch?v=tvdFYmJEaw4&list=PLB_Wd4-5SGAYsxD4JGaVdXll3PnoyI-AM",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_full_stack_amazon_clone",
@@ -6198,7 +6533,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=RDV3Z1KCBvo&feature=youtu.be&ck_subscriber_id=857936933"
+    "url": "https://www.youtube.com/watch?v=RDV3Z1KCBvo&feature=youtu.be&ck_subscriber_id=857936933",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_full_stack_nft_marketplace",
@@ -6225,7 +6562,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=GKJBEEXUha0"
+    "url": "https://www.youtube.com/watch?v=GKJBEEXUha0",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_full_stack_twitter_clone",
@@ -6256,7 +6595,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=5Wak0iyGCrc&t"
+    "url": "https://www.youtube.com/watch?v=5Wak0iyGCrc&t",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_github_jobs_app",
@@ -6264,8 +6605,7 @@
     "title": "Github Jobs App",
     "description": "A GitHub Jobs App using React Hooks and Github API",
     "skills_practiced": [
-      "Frontend development",
-      "Backend & API development"
+      "Frontend development"
     ],
     "prerequisites": [
       "Git and GitHub basics"
@@ -6278,12 +6618,13 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
-      "frontend",
-      "backend_apis"
+      "frontend"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=fxY1q4SCB64&list=LL&index=2"
+    "url": "https://www.youtube.com/watch?v=fxY1q4SCB64&list=LL&index=2",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_gmail_clone",
@@ -6308,7 +6649,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=b7nrXjS6Dqs"
+    "url": "https://www.youtube.com/watch?v=b7nrXjS6Dqs",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_google_drive_clone_with_react",
@@ -6335,7 +6678,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=ljuCH6_jrYE"
+    "url": "https://www.youtube.com/watch?v=ljuCH6_jrYE",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_instagram_clone_application",
@@ -6360,7 +6705,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=f7T48W0cwXM"
+    "url": "https://www.youtube.com/watch?v=f7T48W0cwXM",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_invoice_application",
@@ -6387,7 +6734,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=vsJtN54aA7w"
+    "url": "https://www.youtube.com/watch?v=vsJtN54aA7w",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_linkedin_clone",
@@ -6412,7 +6761,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=QaYts9sPmcY&t=3s"
+    "url": "https://www.youtube.com/watch?v=QaYts9sPmcY&t=3s",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_messenger_clone_mern_stack",
@@ -6441,7 +6792,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=8GMx8r9zQXg"
+    "url": "https://www.youtube.com/watch?v=8GMx8r9zQXg",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_netflix_clone_fullstack",
@@ -6468,7 +6821,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=x_EEwGe-a9o&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=1&t=291s"
+    "url": "https://www.youtube.com/watch?v=x_EEwGe-a9o&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=1&t=291s",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_react_photo_gallery",
@@ -6495,7 +6850,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=vUe91uOx7R0"
+    "url": "https://www.youtube.com/watch?v=vUe91uOx7R0",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_real_estate_app_like_zillow",
@@ -6520,7 +6877,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=C4blK6X-D_4"
+    "url": "https://www.youtube.com/watch?v=C4blK6X-D_4",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_robinhood_clone",
@@ -6545,7 +6904,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=TxggrQ0nHjY&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=18"
+    "url": "https://www.youtube.com/watch?v=TxggrQ0nHjY&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=18",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_signal_clone",
@@ -6570,32 +6931,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=MJzmZ9qmdaE"
-  },
-  {
-    "id": "gh_swe_cool_coders_tic_tac_toe",
-    "career_path": "Software Engineering",
-    "title": "TIC TAC TOE",
-    "description": "Tic Tac Toe game using Python",
-    "skills_practiced": [
-      "Algorithms & data structures"
-    ],
-    "prerequisites": [
-      "Git and GitHub basics"
-    ],
-    "difficulty": "beginner",
-    "estimated_hours": 15,
-    "deliverables": [
-      "Working project",
-      "GitHub repository",
-      "README with screenshots or a demo"
-    ],
-    "supported_skill_ids": [
-      "algorithms"
-    ],
-    "source": "github",
-    "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=BHh654_7Cmw"
+    "url": "https://www.youtube.com/watch?v=MJzmZ9qmdaE",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_tik_tok_clone_mern_stack",
@@ -6624,7 +6962,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=g8yGxDMyGiE"
+    "url": "https://www.youtube.com/watch?v=g8yGxDMyGiE",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_tmdb_movie_app",
@@ -6649,7 +6989,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=ufodJVcpmps"
+    "url": "https://www.youtube.com/watch?v=ufodJVcpmps",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_travel_log_mern_stack",
@@ -6678,7 +7020,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=5pQsl9u_10M"
+    "url": "https://www.youtube.com/watch?v=5pQsl9u_10M",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_voting_application_mern",
@@ -6707,7 +7051,9 @@
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=0oziV0FLhXc&list=PLBeQxJQNprbgrNfcntLO8N2Y-dzlMZXZe"
+    "url": "https://www.youtube.com/watch?v=0oziV0FLhXc&list=PLBeQxJQNprbgrNfcntLO8N2Y-dzlMZXZe",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_weather_app",
@@ -6715,8 +7061,7 @@
     "title": "Weather App",
     "description": "Weather app in React JS using the Open Weather Map API",
     "skills_practiced": [
-      "Frontend development",
-      "Backend & API development"
+      "Frontend development"
     ],
     "prerequisites": [
       "Git and GitHub basics"
@@ -6729,12 +7074,13 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
-      "frontend",
-      "backend_apis"
+      "frontend"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=GuA0_Z1llYU"
+    "url": "https://www.youtube.com/watch?v=GuA0_Z1llYU",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   },
   {
     "id": "gh_swe_cool_coders_wildfire_tracker_with_react",
@@ -6742,8 +7088,7 @@
     "title": "Wildfire Tracker With React",
     "description": "Wild Fire Detection using React, NASA API",
     "skills_practiced": [
-      "Frontend development",
-      "Backend & API development"
+      "Frontend development"
     ],
     "prerequisites": [
       "Git and GitHub basics"
@@ -6756,11 +7101,12 @@
       "README with screenshots or a demo"
     ],
     "supported_skill_ids": [
-      "frontend",
-      "backend_apis"
+      "frontend"
     ],
     "source": "github",
     "source_kind": "idea",
-    "url": "https://www.youtube.com/watch?v=ontX4zfVqK8&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=17"
+    "url": "https://www.youtube.com/watch?v=ontX4zfVqK8&list=PLgxM_xd-x_qHa6ErJkxh4wIRc7Q36AMfC&index=17",
+    "source_repo": "The-Cool-Coders/Project-Ideas-And-Resources",
+    "license": "MIT"
   }
 ]

@@ -18,6 +18,7 @@ import re
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Iterable
+from urllib.parse import quote, urlparse
 
 import httpx2
 
@@ -38,23 +39,32 @@ _FAMILY_PREFIX = {"software_engineer": "swe", "data_analyst": "data", "ai_engine
 # (pattern, skill ids). Patterns are matched case-insensitively on word boundaries against
 # "name. description. language. topics".
 _SWE_RULES: list[tuple[str, tuple[str, ...]]] = [
-    (r"react(?:\s?js)?|vue|angular|svelte|next\.?js|html|css|tailwind|front[- ]?end|user interfaces?|\bui\b|clone", ("frontend",)),
-    (r"rest(?:ful)? api|graphql|express|django|flask|fastapi|spring(?: boot)?|node(?:\.?js)?|back[- ]?end|\bapi\b|server", ("backend_apis",)),
+    (r"react(?:\s?js)?|vue|angular|svelte|next\.?js|html|css|tailwind|front[- ]?end|user interfaces?|\bui\b", ("frontend",)),
+    # Building an API, not calling one: "using TMDB API" or "NASA API" doesn't count.
+    (r"rest(?:ful)? apis?|graphql|express(?:\.?js)?|django|flask|fastapi|spring(?: boot)?|node(?:\.?js)?|"
+     r"back[- ]?end|build(?:ing)? (?:an? |your own )?apis?|api servers?|web servers?", ("backend_apis",)),
     (r"full[- ]?stack|mern|mean stack", ("frontend", "backend_apis")),
     (r"mern|mongo(?:db)?|firebase|firestore|redis|elasticsearch|harperdb|nosql", ("nosql_search",)),
     (r"sql|postgres(?:ql)?|mysql|sqlite|relational database", ("relational_sql",)),
-    (r"websockets?|real[- ]time|micro[- ]?services?|distributed|kafka|multiple users", ("distributed_systems",)),
+    # Real-time or multi-user features alone (a WebSockets whiteboard) aren't distributed systems.
+    (r"micro[- ]?services?|distributed (?:systems?|computing)|kafka|rabbitmq|message queues?|"
+     r"load balanc(?:er|ing)|sharding|replication|consensus", ("distributed_systems",)),
     (r"docker|kubernetes|k8s|containers?", ("containers",)),
-    (r"aws|azure|gcp|google cloud|cloud|serverless|vercel|netlify", ("cloud",)),
+    (r"aws|azure|gcp|google cloud|cloud (?:deploy(?:ment)?|hosting|functions?|storage|run)|serverless|"
+     r"deploy(?:ed|ing)? (?:to|on) (?:the )?cloud|vercel|netlify|heroku", ("cloud",)),
     (r"auth(?:entication|orization)?|nextauth|oauth|jwt|security|encryption", ("security",)),
-    (r"tests?|testing|jest|pytest|cypress|unit tests?", ("testing",)),
+    (r"unit tests?|integration tests?|end[- ]to[- ]end tests?|test suites?|automated tests?|tdd|"
+     r"jest|pytest|cypress|playwright|selenium", ("testing",)),
     (r"ci/cd|github actions|continuous integration|devops", ("delivery_automation",)),
-    (r"algorithms?|chess|tic[- ]tac[- ]toe|sudoku|path ?finding|data structures", ("algorithms",)),
+    # A game is only algorithms practice when the text names the algorithm work (e.g. a minimax AI).
+    (r"algorithms?|path ?finding|data structures|minimax|dijkstra|a\* search|backtracking|"
+     r"sorting visuali[sz]er", ("algorithms",)),
     (r"monitoring|observability|logging|prometheus|grafana", ("observability_operations",)),
 ]
 _DATA_RULES: list[tuple[str, tuple[str, ...]]] = [
     (r"sql|postgres(?:ql)?|mysql|sqlite|bigquery|duckdb", ("sql",)),
-    (r"pandas|jupyter|notebooks?|numpy|\br\b|data analysis|analytics|exploratory", ("analytical_scripting", "data_analysis")),
+    (r"pandas|jupyter|notebooks?|numpy|r language|rstudio|tidyverse|ggplot2?|data analysis|analytics|exploratory",
+     ("analytical_scripting", "data_analysis")),
     (r"visuali[sz]ations?|charts?|plotly|matplotlib|seaborn|d3(?:\.js)?|dashboards?", ("data_visualization",)),
     (r"dashboards?|streamlit|power ?bi|tableau|looker|metabase|superset", ("dashboarding",)),
     (r"power ?bi|tableau|looker|metabase|superset", ("bi_tools",)),
@@ -70,10 +80,13 @@ _DATA_RULES: list[tuple[str, tuple[str, ...]]] = [
     (r"excel|spreadsheets?|google sheets", ("spreadsheets",)),
 ]
 _AI_RULES: list[tuple[str, tuple[str, ...]]] = [
-    (r"machine learning|\bml\b|scikit[- ]learn|sklearn|recommend(?:ation|er)?|fraud detection|classifier|classification|prediction|predictive", ("machine_learning", "model_training")),
-    (r"deep learning|neural net(?:work)?s?|pytorch|tensorflow|keras|cnn|transformers?|opencv|computer vision|face recognition|image recognition", ("deep_learning",)),
-    (r"detection|recognition|identification|clustering|segmentation|anomaly|sentiment analysis|forecast(?:ing)?|"
-     r"time series|nlp|natural language processing|text summari[sz]ation", ("machine_learning", "model_training")),
+    (r"machine learning|\bml\b|scikit[- ]learn|sklearn|recommendations?|recommender|fraud detection|classifiers?",
+     ("machine_learning", "model_training")),
+    # OpenCV alone is image processing (a cartoon filter), not deep learning.
+    (r"deep learning|neural net(?:work)?s?|pytorch|tensorflow|keras|caffe|cnns?|convolutional|lstm|transfer learning|"
+     r"transformers?|computer vision|face recognition|image recognition", ("deep_learning",)),
+    (r"clustering|anomaly detection|sentiment analysis|time series|nlp|natural language processing|"
+     r"text summari[sz]ation", ("machine_learning", "model_training")),
     (r"gans?|dcgan|generative adversarial networks?|autoencoders?|style transfer", ("deep_learning", "generative_ai")),
     (r"fine[- ]?tun(?:e|ing)|lora", ("fine_tuning",)),
     (r"llms?|gpt|openai|large language models?|chatgpt|gemini|claude|llama|ollama", ("llm", "generative_ai")),
@@ -87,6 +100,15 @@ _AI_RULES: list[tuple[str, tuple[str, ...]]] = [
     (r"model evaluation|llm evals?|evals? (?:harness|framework)", ("model_evaluation",)),
     (r"feature engineering", ("feature_engineering",)),
 ]
+
+# What a model does, rather than how it's built: "Fake News Detection", "Gold Price Prediction".
+# They count as ML practice unless the text describes a web app ("Wild Fire Detection using
+# React, NASA API"); a web app still counts when it also names an ML technique.
+_AI_TASK_RULES: list[tuple[str, tuple[str, ...]]] = [
+    (r"classification|prediction|predictive|detection|recognition|identification|segmentation|forecast(?:ing)?",
+     ("machine_learning", "model_training")),
+]
+_WEB_APP = r"react(?:\s?js)?|vue|angular|svelte|next\.?js|html|css|tailwind|mern|firebase"
 
 _RULES = {"software_engineer": _SWE_RULES, "data_analyst": _DATA_RULES, "ai_engineer": _AI_RULES}
 _LANGUAGE_SKILLS = {
@@ -241,6 +263,10 @@ def skills_for(raw: RawProject, family: str) -> tuple[list[str], list[str]]:
     for pattern, ids in _RULES[family]:
         if _matches(pattern, text):
             add(ids)
+    if family == "ai_engineer" and (skills or not _matches(_WEB_APP, text)):
+        for pattern, ids in _AI_TASK_RULES:
+            if _matches(pattern, text):
+                add(ids)
     language = (raw.language or "").lower()
     if family == "ai_engineer" and _matches("python", text):
         language = language or "python"
@@ -322,9 +348,13 @@ def fetch_idea_list(client: httpx2.Client, source: dict[str, Any]) -> list[RawPr
     projects = parse_idea_table(response.text, source["id"],
                                 link_base=f"https://github.com/{source['repo']}/tree/{source.get('branch', 'main')}",
                                 **options)
-    if source.get("roles"):
-        for project in projects:
+    overrides = source.get("link_overrides") or {}
+    for project in projects:
+        if source.get("roles"):
             project.roles = tuple(source["roles"])
+        if project.title in overrides:  # the upstream README links this project to the wrong place
+            project.url = f"https://github.com/{source['repo']}/tree/{source.get('branch', 'main')}/" + quote(
+                overrides[project.title])
     return projects
 
 
@@ -358,6 +388,19 @@ def fetch_topic(client: httpx2.Client, source: dict[str, Any]) -> list[RawProjec
             break
         page += 1
     return projects
+
+
+# Links come from other people's READMEs; only these sites can end up on a project card.
+ALLOWED_LINK_HOSTS = {"github.com", "www.github.com", "youtube.com", "www.youtube.com", "youtu.be"}
+
+
+def keep_allowed_links(raw_projects: Iterable[RawProject]) -> tuple[list[RawProject], list[RawProject]]:
+    """(projects whose link is https on an allowed host, the rest)."""
+    kept, skipped = [], []
+    for raw in raw_projects:
+        parsed = urlparse(raw.url)
+        (kept if parsed.scheme == "https" and parsed.hostname in ALLOWED_LINK_HOSTS else skipped).append(raw)
+    return kept, skipped
 
 
 def build_catalog(raw_projects: Iterable[RawProject]) -> list[dict[str, Any]]:
