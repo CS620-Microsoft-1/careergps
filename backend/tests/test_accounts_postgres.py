@@ -61,7 +61,8 @@ class AccountServicePostgresTests(unittest.TestCase):
         subprocess.run(
             [sys.executable, "-m", "alembic", "upgrade", "head"],
             cwd=BACKEND_ROOT,
-            env={**os.environ, "DATABASE_URL": TEST_DATABASE_URL},
+            # Both URLs: Alembic prefers MIGRATION_DATABASE_URL, which a developer's .env may point at Supabase.
+            env={**os.environ, "DATABASE_URL": TEST_DATABASE_URL, "MIGRATION_DATABASE_URL": TEST_DATABASE_URL},
             check=True,
             capture_output=True,
         )

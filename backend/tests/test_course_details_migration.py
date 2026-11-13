@@ -29,8 +29,8 @@ class CourseDetailsMigrationTests(unittest.TestCase):
             getattr(module, direction)()
         return output.getvalue()
 
-    def test_follows_the_catalog_migration(self) -> None:
-        self.assertEqual("c9413046949c", self.script.get_revision(REVISION).down_revision)
+    def test_follows_the_skill_gap_storage_migration(self) -> None:
+        self.assertEqual("df5726089a8e", self.script.get_revision(REVISION).down_revision)
 
     def test_adds_nullable_course_details_and_no_prerequisites(self) -> None:
         sql = self.render(REVISION, "upgrade")

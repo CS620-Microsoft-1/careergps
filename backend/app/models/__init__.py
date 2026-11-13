@@ -18,6 +18,7 @@ from app.models.resume import (
     ResumeProject,
     ResumeSkill,
 )
+from app.models.skill_gap import SkillGapResult, SkillGapRunBranch, SkillGapRunRecord
 from app.models.student_course import StudentCourse
 from app.models.user import User
 
@@ -40,6 +41,9 @@ __all__ = [
     "ResumeProject",
     "ResumeSkill",
     "SchoolCourse",
+    "SkillGapResult",
+    "SkillGapRunBranch",
+    "SkillGapRunRecord",
     "StudentCourse",
     "StudentOrg",
     "User",

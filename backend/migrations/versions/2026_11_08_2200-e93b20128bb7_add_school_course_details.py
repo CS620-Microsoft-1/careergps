@@ -1,7 +1,7 @@
 """Add course_code, credits and last_taught to school_courses.
 
 Revision ID: e93b20128bb7
-Revises: c9413046949c
+Revises: df5726089a8e
 
 Filled from the UW–Madison course guide by `python -m scripts.seed_catalog`. All three are
 nullable: courses added by hand may not have them. Prerequisites are deliberately not stored.
@@ -11,7 +11,7 @@ from alembic import op
 import sqlalchemy as sa
 
 revision = "e93b20128bb7"
-down_revision = "c9413046949c"
+down_revision = "df5726089a8e"
 branch_labels = None
 depends_on = None
 
