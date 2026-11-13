@@ -1,0 +1,528 @@
+[
+  {
+    "case_id": "c001",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I wrote a Python program that used pandas groupby on customer_id to aggregate purchase amounts into one total per customer.",
+        "kind": "claim"
+      },
+      {
+        "unit_id": "e002",
+        "text": "I checked the program's totals against hand-calculated totals for two customers and confirmed that a customer with no purchases produced zero.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "supported"
+    },
+    "rationale": "Explicit personal Python implementation, a specific groupby operation, and an executed check with expected outputs and a boundary case. Numerical improvement is unnecessary.",
+    "split": "reserved",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c002",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I personally used pandas in Python for a customer-data preparation task. I planned to check the resulting data later.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "Explicit personal use of a Python library for a stated task satisfies core practice. No concrete operation, procedure, or integration detail is described. A planned check is not an executed check. Under the proposed binary c2 rule, a library name is not partial credit.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c003",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "Technical skills: Python, pandas, NumPy, PyTorch.",
+        "kind": "listed"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "not_evidenced",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "A bare skills list is knowledge/listing evidence and does not establish the personal practice required by these three criteria. This is not a claim that the applicant lacks the skill.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c004",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "Our team built and tested a Python invoice parser that converted PDFs into rows. I participated in the project as a research assistant.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "uncertain",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "Relevant Python implementation exists, but the applicant's own programming contribution is unresolved. The proposed core-first rule leaves the skill pending and does not borrow the team's method or testing as personal c2/c3 evidence.",
+    "split": "reserved",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c005",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I implemented and tested a video pipeline using OpenCV's C++ API. This implementation contained no Python code or Python library calls.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "not_evidenced",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "The source explicitly identifies a C++ implementation and rules out Python. A library also having Python bindings cannot override that evidence.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c006",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I wrote a Python CSV-cleaning function that removed rows with empty customer_id values. I tested this function.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "partial"
+    },
+    "rationale": "The source states an actual personal test of the same function, but supplies no test case, observed behavior, diagnostic finding, or expected-output comparison. This is the deliberately narrow c3 partial category.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c007",
+    "skill_id": "llm",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I fine-tuned Qwen3-VL, a vision-language model, to transcribe photographed handwritten labels into text. I supplied image-and-instruction pairs and decoded model responses into text labels.",
+        "kind": "claim"
+      },
+      {
+        "unit_id": "e002",
+        "text": "I compared the model's transcriptions against reference transcriptions for held-out label images and inspected character substitution errors.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "supported"
+    },
+    "rationale": "A named vision-language model is explicitly used for a language task with textual output, so its image input does not disqualify it. Input/output details and an executed reference-based check are stated.",
+    "split": "reserved",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c008",
+    "skill_id": "llm",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I used GPT-4.1 to summarize meeting transcripts, sending each transcript with an instruction to return three bullet points. I built an output-saving workflow for future evaluation of the summaries.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "not_evidenced"
+    },
+    "rationale": "Named language-model use and a concrete input/output configuration establish c1/c2. Building a workflow for future evaluation does not state that any output was checked.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c009",
+    "skill_id": "llm",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "Skills: large language models, GPT, Qwen, prompt engineering.",
+        "kind": "listed"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "not_evidenced",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "The list names relevant technologies but establishes neither a personal language-model task nor a performed check.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c010",
+    "skill_id": "llm",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "Our team used GPT-4.1 to turn customer notes into short summaries and reviewed the outputs for omitted facts. I supported the project as a student assistant.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "uncertain",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "The team's language-model use is clear, but the applicant's contribution could be unrelated support. Core ownership remains unresolved; the team result cannot establish the applicant's c2/c3.",
+    "split": "reserved",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c011",
+    "skill_id": "llm",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I trained a ResNet image classifier to assign defect categories and evaluated its class accuracy. The project did not use a language model or generate text.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "not_evidenced",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "A neural image classifier and its evaluation do not establish a language-model task; the source explicitly excludes one.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c012",
+    "skill_id": "llm",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I used GPT-4.1 with a system instruction to turn each support ticket into a two-sentence summary. I checked the generated summaries.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "partial"
+    },
+    "rationale": "Personal model use and an input/output configuration are explicit. Checking the same outputs was performed, but no requirement, example, error category, or observed comparison is supplied.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c013",
+    "skill_id": "ai_agents",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I implemented an assistant in which a language model requested a lookup_order tool call with an order_id. My program required human approval before executing that request and passed the returned order status back to the model.",
+        "kind": "claim"
+      },
+      {
+        "unit_id": "e002",
+        "text": "I tested a rejected approval and verified that lookup_order was not executed, and tested an approved request against the expected order status.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "supported"
+    },
+    "rationale": "Explicit personal implementation, model-requested tool invocation, a concrete argument/result and human approval path, and executed control/tool-result checks. One tool and human review remain eligible.",
+    "split": "reserved",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c014",
+    "skill_id": "ai_agents",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I implemented a workflow where a language model emitted a search_catalog call, my code executed the call using the model's query argument, and the returned product IDs were appended to the model context. I prepared a test harness for later checks of failed tool calls.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "not_evidenced"
+    },
+    "rationale": "The model-mediated invocation and result-handling workflow is explicit. Preparing a harness for future checks does not establish that any tool failure or result was actually checked.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c015",
+    "skill_id": "ai_agents",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "Skills: AI agents, LangChain, function calling, tool use.",
+        "kind": "listed"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "not_evidenced",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "Technology names alone establish no personally designed or implemented model-mediated tool/action workflow.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c016",
+    "skill_id": "ai_agents",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I built an explainable decision agent that combined OCR outputs, engineering rules, and retrieved documents to produce traceable interpretations and route difficult cases for review.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "uncertain",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "Personal implementation and an agent label are present, but whether a model mediates the tool/action workflow remains unresolved. OCR, rules, retrieval and review routing alone neither prove nor expressly rule out that identity.",
+    "split": "reserved",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c017",
+    "skill_id": "ai_agents",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I built and tested a decision agent whose routing used only fixed if-else rules and keyword search. No language model or other learned model participated in its decisions, tool requests, or action control.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "not_evidenced",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "The source explicitly excludes model mediation. Its agent label and software tests cannot substitute for the required workflow identity.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c018",
+    "skill_id": "ai_agents",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I implemented a language-model assistant that requested get_weather with a city argument; my code invoked the tool and returned its temperature value to the model. I tested this tool-handling workflow.",
+        "kind": "claim"
+      }
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "partial"
+    },
+    "rationale": "Personal implementation, model mediation, a concrete invocation and returned value are explicit. Testing the same workflow occurred, but the checked behavior, error case or expected result is not stated.",
+    "split": "development",
+    "introduced_in": "v1",
+    "anchor_unit_ids": [
+      "e001"
+    ]
+  },
+  {
+    "case_id": "c019",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I used Python and pandas for data preparation in an insurance-claims project. I have not yet checked that work.",
+        "kind": "claim"
+      }
+    ],
+    "anchor_unit_ids": [
+      "e001"
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "The applicant explicitly performed a stated task using Python and pandas, satisfying c1. Data preparation names a task category, but no actual operation, transformation, function, library procedure, or input/output connection is described. The source expressly says the work has not been checked.",
+    "split": "wording_probe",
+    "introduced_in": "v1.1"
+  },
+  {
+    "case_id": "c020",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I used Python and pandas in an insurance-claims project to remove rows with missing policy_id values before producing a cleaned claims table. I have not yet checked that work.",
+        "kind": "claim"
+      }
+    ],
+    "anchor_unit_ids": [
+      "e001"
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "not_evidenced"
+    },
+    "rationale": "This pairs with x001 but adds a concrete row-removal operation and its condition. That detail satisfies c2 without source code, an exact API name, or reproducibility requirements. The explicit absence of checking keeps c3 not_evidenced.",
+    "split": "wording_probe",
+    "introduced_in": "v1.1"
+  },
+  {
+    "case_id": "c021",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I personally used NumPy in Python for data processing in a laboratory-measurement project. No validation of that work was performed.",
+        "kind": "claim"
+      }
+    ],
+    "anchor_unit_ids": [
+      "e001"
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "not_evidenced",
+      "c3": "not_evidenced"
+    },
+    "rationale": "Personal use of a Python library for a stated task establishes c1. Data processing and the laboratory application domain do not specify what operation or transformation was performed, so c2 receives no detail credit. Validation is explicitly absent.",
+    "split": "wording_probe",
+    "introduced_in": "v1.1"
+  },
+  {
+    "case_id": "c022",
+    "skill_id": "python",
+    "synthetic": true,
+    "units": [
+      {
+        "unit_id": "e001",
+        "text": "I personally used NumPy in Python to reshape each flat sequence of 24 laboratory measurements into a 4-by-6 array.",
+        "kind": "claim"
+      },
+      {
+        "unit_id": "e002",
+        "text": "I checked the reshaped array against a hand-arranged example and verified that the original measurement order was preserved.",
+        "kind": "claim"
+      }
+    ],
+    "anchor_unit_ids": [
+      "e001"
+    ],
+    "expected_criteria": {
+      "c1": "supported",
+      "c2": "supported",
+      "c3": "supported"
+    },
+    "rationale": "This pairs with x003 but states an actual reshape operation and its input/output structure. A separate unit states an executed check of the same operation against a concrete example and order-preservation criterion, supporting c3.",
+    "split": "wording_probe",
+    "introduced_in": "v1.1"
+  }
+]
