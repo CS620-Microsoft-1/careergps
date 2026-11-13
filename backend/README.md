@@ -358,6 +358,16 @@ The catalog tests in `tests/test_catalog_postgres.py` run only when `CGPS_TEST_D
 throwaway local Postgres (they drop and recreate the `public` and `auth` schemas); CI skips them.
 Never point it at the shared database.
 
+The account and Skill Gap storage tests (`tests/test_accounts_postgres.py`,
+`tests/test_skill_gap_store_postgres.py`) do the same with `TEST_DATABASE_URL`:
+
+```bash
+docker run --rm -d --name careergps-test-db -e POSTGRES_PASSWORD=test -p 55432:5432 postgres:17
+TEST_DATABASE_URL=postgresql+psycopg://postgres:test@localhost:55432/postgres \
+  python -m unittest tests.test_accounts_postgres tests.test_skill_gap_store_postgres
+docker stop careergps-test-db
+```
+
 To run a live smoke test against the configured Foundry Agent using synthetic files:
 
 ```bash
@@ -870,9 +880,10 @@ The unrelated existing résumé tests are unchanged.
 
 ## Skill Gap result tables
 
-Skill Gap runs will be stored in three tables (migration `df5726089a8e`, contract
-`docs/contracts/skill-gap-run-storage.schema.json` v3). **Not used yet:** runs are still saved as
-local JSON in `local_results/web_skill_gaps/` until the persistence change lands.
+The API keeps every Skill Gap run in three tables (migration `df5726089a8e`, contract
+`docs/contracts/skill-gap-run-storage.schema.json` v3). `app/services/skill_gaps/run_store.py` writes
+them: `DbRunStore` for the API, `JsonRunStore` (the original local files) for tests and tools that
+build a `SkillGapRunManager` with a folder.
 
 | Table | One row per | Holds |
 | --- | --- | --- |
@@ -887,6 +898,23 @@ local JSON in `local_results/web_skill_gaps/` until the persistence change lands
 - A scored skill always has strength, gap, grade and priority; a skill that needs confirmation has
   none of them and no rank (`ck_skill_gap_results_scored_values`).
 - Agent answers and quotes come from students' résumés: personal data, never log them.
+
+How a run is written (each step is one short transaction; none is open while an Agent runs):
+
+1. Queued: the run row, with the résumé snapshot and the versions it depends on. The database
+   allows one queued or running run per résumé, role and configuration, so a duplicate request
+   reuses the active run instead of paying for another.
+2. Running: status, phase, model calls and the three branch rows are updated as the Agents work.
+3. Completed: one transaction saves the report, the merged answer, the merge audit and
+   `match_score`, each branch's raw answer, checks and tokens, and one `skill_gap_results` row per
+   skill (`app/services/skill_gaps/persistence.py` builds the rows). A failure here leaves the run
+   as it was and marks it failed.
+4. Restart: runs still queued or running are marked failed ("start a new analysis"); nothing is
+   retried automatically.
+
+Still local, in `local_results/web_skill_gaps/<run>/`: each branch's input, raw response and checks,
+and the shared `_branch_cache/` that reuses a group's answer. Runs saved only as local JSON before
+this change are not shown by the app.
 
 ## Catalog tables
 

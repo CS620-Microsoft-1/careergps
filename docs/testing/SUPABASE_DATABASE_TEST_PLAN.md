@@ -66,6 +66,7 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-029 | Insert a `scored` result without a grade, or a `needs_confirmation` result with a `priority_rank` | Rejected by `ck_skill_gap_results_scored_values` | PASS (2026-11-13) |
 | DB-030 | Insert a result whose `user_id` or `job_family` differs from its run's | Rejected by `fk_skill_gap_results_run` | PASS (2026-11-13) |
 | DB-031 | Delete a résumé that has a Skill Gap run | The run, its branches and its results are deleted (cascade) | PASS (2026-11-13) |
+| DB-032 | Run one Skill Gap analysis through the app, then query its rows | 1 completed `skill_gap_runs` row with `report` and `match_score`; 3 `skill_gap_run_branches` rows with raw answers and tokens; one `skill_gap_results` row per core skill, with evidence for practice and knowledge skills | NOT RUN — waiting for a live run (manager tests on throwaway Postgres 17 passed, 2026-11-13) |
 
 ## Baseline automation
 
@@ -216,3 +217,9 @@ When a database-related PR changes the schema or security model:
 - `dev` at `5b254e1` (PR #49 merged). Before: shared database at `c9413046949c`, `skill_gap_runs` 0 rows and 26 columns, new tables absent; the `upgrade --sql` output matched the reviewed preview and contained no DROP, DELETE or TRUNCATE statements.
 - `alembic upgrade head` applied `df5726089a8e`; `alembic current` shows `df5726089a8e (head)` and `alembic check` reports no new operations (DB-024). RLS is enabled on all three tables (DB-025).
 - DB-026 to DB-031 ran in one transaction that was rolled back. Test rows referenced an existing résumé and user only by id; nothing was printed or kept. Each invalid row was rejected by the intended constraint, and deleting the résumé inside a savepoint removed the run, its branch and its result. Afterwards the three tables had 0 rows and the résumé was unchanged.
+
+### 2026-11-13 — Skill Gap runs saved through the API (before the live run)
+
+- Branch `feat/skill-gap-db-persistence` from `dev` (`5b254e1`). `get_skill_gap_run_manager()` now uses `DbRunStore`: the API creates, updates and completes Skill Gap runs in the three tables; branch artifacts and the branch cache stay local.
+- `tests/test_skill_gap_store_postgres.py` passed 12/12 and `tests/test_accounts_postgres.py` 12/12 on a throwaway Postgres 17 with every migration applied: one active run per configuration, progress and branch upserts, a single completion transaction (rolled back whole on a constraint error), SQL NULLs for a skipped branch, history and cascade on résumé delete, and the real manager with synthetic Agents surviving a restart (completed run found by `latest`, interrupted run failed).
+- No model call and no write to the shared database were made. Added DB-032 for the live run.
