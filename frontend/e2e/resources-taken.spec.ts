@@ -23,6 +23,25 @@ test("marking a course taken hides it; Undo brings it back", async ({ page, api 
   expect(api.taken.size).toBe(0);
 });
 
+test("Undo waits until the course is saved, so its DELETE can't overtake the PUT", async ({ page, api }) => {
+  const release = api.holdSaves();
+  await page.goto("/resources");
+  const card = courseGroup(page).getByRole("article").filter({ hasText: "COMP SCI 564" });
+  await card.getByRole("button", { name: "Mark taken" }).click();
+  const undo = page.getByRole("status").filter({ hasText: "Marked COMP SCI 564 as taken" })
+    .getByRole("button", { name: "Undo" });
+  await expect.poll(() => api.calls).toContain("PUT /me/courses/uw-cs-564");
+  await expect(undo).toBeDisabled();
+
+  release();
+  await expect(undo).toBeEnabled();
+  await undo.click();
+  await expect(card).toBeVisible();
+  await expect.poll(() => api.calls.filter((call) => call.endsWith(" /me/courses/uw-cs-564")))
+    .toEqual(["PUT /me/courses/uw-cs-564", "DELETE /me/courses/uw-cs-564"]);
+  expect(api.taken.size).toBe(0);
+});
+
 test("Show N taken reveals a taken course, and Taken un-marks it", async ({ page, api }) => {
   api.taken.add("uw-cs-564");
   await page.goto("/resources");

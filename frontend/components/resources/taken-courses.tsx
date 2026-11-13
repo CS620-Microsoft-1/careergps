@@ -33,14 +33,18 @@ export function TakenButton({ resource, onMarked }: { resource: Resource; onMark
   );
 }
 
-/** Shown after a course is marked taken and drops out of the list. */
+/**
+ * Shown after a course is marked taken and drops out of the list. Undo waits for the save to
+ * finish: sent earlier, its DELETE could reach the server before the PUT and leave the course taken.
+ */
 export function TakenUndo({ resource, onClose }: { resource: Resource; onClose: () => void }) {
-  const { unmark } = useTakenCourses();
+  const { pending, unmark } = useTakenCourses();
   return (
     <div role="status" className="mb-4 flex flex-wrap items-center gap-3 rounded-xl bg-success-soft px-4 py-2.5 text-sm">
       <Check aria-hidden className="size-4" />
       <p className="min-w-0 flex-1">Marked <b>{courseCode(resource)}</b> as taken. We’ll hide it from your lists.</p>
-      <Button type="button" size="sm" variant="raised" onClick={() => { void unmark(resource.id); onClose(); }}>Undo</Button>
+      <Button type="button" size="sm" variant="raised" disabled={pending.has(resource.id)}
+        onClick={() => { void unmark(resource.id); onClose(); }}>Undo</Button>
     </div>
   );
 }

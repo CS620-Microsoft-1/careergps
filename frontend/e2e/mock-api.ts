@@ -9,12 +9,20 @@ import { API_PREFIX } from "../playwright.config";
 /**
  * The backend, answered from fixed data for one data-analyst student at UW–Madison.
  *
- * Only `taken` changes during a test (PUT/DELETE /me/courses). Every answered call is recorded in
- * `calls` as "METHOD /path", so a test can check what the page sent.
+ * Only `taken` changes during a test (PUT/DELETE /me/courses). Every call is recorded in `calls` as
+ * "METHOD /path" when it arrives, so a test can check what the page sent.
  */
 export class MockApi {
   readonly taken = new Set<string>();
   readonly calls: string[] = [];
+  private held: Promise<void> = Promise.resolve();
+
+  /** Keep PUT /me/courses/{id} unanswered until the returned function is called. */
+  holdSaves(): () => void {
+    let release = () => {};
+    this.held = new Promise<void>((resolve) => { release = resolve; });
+    return release;
+  }
 
   constructor(private readonly page: Page) {}
 
@@ -46,8 +54,10 @@ export class MockApi {
     }
     const course = path.match(/^\/me\/courses\/([^/]+)$/)?.[1];
     if (course && method === "PUT") {
-      this.taken.add(course);
-      return json(200, takenCourse(course));
+      return this.held.then(() => {
+        this.taken.add(course);
+        return json(200, takenCourse(course));
+      });
     }
     if (course && method === "DELETE") {
       this.taken.delete(course);
