@@ -66,7 +66,7 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-029 | Insert a `scored` result without a grade, or a `needs_confirmation` result with a `priority_rank` | Rejected by `ck_skill_gap_results_scored_values` | PASS (2026-11-13) |
 | DB-030 | Insert a result whose `user_id` or `job_family` differs from its run's | Rejected by `fk_skill_gap_results_run` | PASS (2026-11-13) |
 | DB-031 | Delete a résumé that has a Skill Gap run | The run, its branches and its results are deleted (cascade) | PASS (2026-11-13) |
-| DB-032 | Run one Skill Gap analysis through the app, then query its rows | 1 completed `skill_gap_runs` row with `report` and `match_score`; 3 `skill_gap_run_branches` rows with raw answers and tokens; one `skill_gap_results` row per core skill, with evidence for practice and knowledge skills | NOT RUN — waiting for a live run (manager tests on throwaway Postgres 17 passed, 2026-11-13) |
+| DB-032 | Run one Skill Gap analysis through the app, then query its rows | 1 completed `skill_gap_runs` row with `report` and `match_score`; 3 `skill_gap_run_branches` rows with raw answers and tokens; one `skill_gap_results` row per core skill, with evidence for practice and knowledge skills | PASS (2026-11-13) |
 
 ## Baseline automation
 
@@ -223,3 +223,10 @@ When a database-related PR changes the schema or security model:
 - Branch `feat/skill-gap-db-persistence` from `dev` (`5b254e1`). `get_skill_gap_run_manager()` now uses `DbRunStore`: the API creates, updates and completes Skill Gap runs in the three tables; branch artifacts and the branch cache stay local.
 - `tests/test_skill_gap_store_postgres.py` passed 12/12 and `tests/test_accounts_postgres.py` 12/12 on a throwaway Postgres 17 with every migration applied: one active run per configuration, progress and branch upserts, a single completion transaction (rolled back whole on a constraint error), SQL NULLs for a skipped branch, history and cascade on résumé delete, and the real manager with synthetic Agents surviving a restart (completed run found by `latest`, interrupted run failed).
 - No model call and no write to the shared database were made. Added DB-032 for the live run.
+
+### 2026-11-13 — Live Skill Gap run saved in the shared database (DB-032)
+
+- Branch `feat/skill-gap-db-persistence` (draft PR #50) run locally against the shared database at `df5726089a8e`; before the run the three Skill Gap tables had 0 rows.
+- One Software Engineer analysis started from the app (3 Foundry calls, model `gpt-6-luna`, medium reasoning) completed in 51 s. Supabase then held 1 run (`completed`, storage v3, `match_score` 0.338, 22 scored / 0 unscored), 3 branch rows (each 1 model call, raw answer, input hash, tokens, validation `passed`) and 22 result rows (all ranked; 12 practice, 6 knowledge, 4 absent; 38 quotes; no practice or knowledge skill without evidence). State, gap and grade matched the stored report for every skill.
+- After restarting the API, reloading the page served the same run from the database (`GET /skill-gaps/runs/latest` 200) without starting a new analysis; still 1 run, 3 branches, 22 results.
+- Only ids, counts, statuses and timings were read; no résumé content was printed. The run is the tester's own account and stays as history.
