@@ -83,6 +83,13 @@ class HandoffTest(unittest.TestCase):
 
 
     def test_rules_cover_the_highest_priority_gaps_first(self):
+        # The hand-written catalog only; GitHub-synced projects are covered in test_github_projects.
+        from app.services import resources
+        resources.load_projects.cache_clear()
+        self.addCleanup(resources.load_projects.cache_clear)
+        no_github = patch.object(resources, "GITHUB_PROJECTS_PATH", Path("/nonexistent/github_projects.json"))
+        no_github.start()
+        self.addCleanup(no_github.stop)
         gaps = [{"skill_id": "rag", "skill_name": "RAG", "definition": ""},
                 {"skill_id": "mlops", "skill_name": "MLOps", "definition": ""}]
         result = rank_projects("AI/ML Engineering", [], ["RAG", "MLOps"], verified_skill_gaps=gaps)

@@ -216,7 +216,7 @@ function ResourceSnapshot({ gaps }: { gaps: string[] }) {
           <li key={resource.id} className="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3">
             <div className="min-w-0 flex-1">
               <p className="truncate font-bold">{resource.title}</p>
-              <p className="truncate text-sm text-muted-foreground">{resource.provider} · {skillLabel(resource.skills.find((s) => gaps.includes(s)) ?? resource.skills[0])}</p>
+              <p className="truncate text-sm text-muted-foreground">{[resource.provider, skillLabel(resource.skills.find((s) => gaps.includes(s)) ?? resource.skills[0])].filter(Boolean).join(" · ")}</p>
             </div>
             <Button size="icon-sm" variant="raised" aria-label={`Save ${resource.title} to plan`}
               disabled={plan.pending.has(resource.id)} onClick={() => void plan.setStatus(resource.id, "saved")}>
