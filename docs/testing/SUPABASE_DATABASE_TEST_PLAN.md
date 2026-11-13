@@ -58,6 +58,14 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-021 | Insert the same skill twice from the same source (e.g. listed) | Second insert rejected by `uq_resume_skills_evidence` (NULLs count as equal) | NOT RUN — runnable now that résumés have skill rows |
 | DB-022 | Insert a skill whose source link doesn't match `source` (e.g. `project` without `source_project_id`) | Rejected by `ck_resume_skills_source_link` | NOT RUN — runnable now that résumés have skill rows |
 | DB-023 | Run `python -m scripts.backfill_resume_children`, then compare each résumé's child rows with its `confirmed_data` | Every résumé reports `ok`; `listed` skills = Technical Skills without duplicates; one project/experience/education/achievement row per non-blank entry | NOT RUN — dry run passed for 6/6 résumés (2026-10-29) |
+| DB-024 | Alembic after applying `df5726089a8e` (Skill Gap branches and results) | `alembic current` shows `df5726089a8e (head)`; `alembic check` reports no new operations | NOT RUN — not applied yet; passed on a throwaway Postgres 17 (2026-11-13) |
+| DB-025 | Inspect RLS on `skill_gap_runs`, `skill_gap_run_branches`, `skill_gap_results` | RLS is enabled on all three | NOT RUN — passed on throwaway Postgres 17 |
+| DB-026 | Insert a completed v3 run without `scored_skill_count`, `unscored_skill_count` or `extraction_audit` | Rejected by `ck_skill_gap_runs_v3_completed` | NOT RUN — passed on throwaway Postgres 17 |
+| DB-027 | Insert a queued or running run with a `match_score` | Rejected by `ck_skill_gap_runs_match_when_completed` | NOT RUN — passed on throwaway Postgres 17 |
+| DB-028 | Insert a branch row with `model_calls = 2` or a branch other than foundation/lifecycle/systems | Rejected by `ck_skill_gap_run_branches_model_calls` / `ck_skill_gap_run_branches_branch` | NOT RUN — passed on throwaway Postgres 17 |
+| DB-029 | Insert a `scored` result without a grade, or a `needs_confirmation` result with a `priority_rank` | Rejected by `ck_skill_gap_results_scored_values` | NOT RUN — passed on throwaway Postgres 17 |
+| DB-030 | Insert a result whose `user_id` or `job_family` differs from its run's | Rejected by `fk_skill_gap_results_run` | NOT RUN — passed on throwaway Postgres 17 |
+| DB-031 | Delete a résumé that has a Skill Gap run | The run, its branches and its results are deleted (cascade) | NOT RUN — passed on throwaway Postgres 17 |
 
 ## Baseline automation
 
@@ -195,3 +203,10 @@ When a database-related PR changes the schema or security model:
 - `--dry-run` sent every row to the shared database and rolled back: 6/6 résumés passed all constraints (264 skills, 11 projects, 23 experiences, 7 educations, 3 achievements). The tables still had 0 rows afterwards.
 - `tests/test_accounts_postgres.py` passed 12/12 against a throwaway Postgres 17 container with every migration applied.
 - Only ids and counts were printed; no résumé content was read into logs. Added DB-023.
+
+### 2026-11-13 — Skill Gap result tables (schema only)
+
+- Branch `feat/skill-gap-db-storage` from `dev` (`bb2eb31`). Migration `df5726089a8e` extends `skill_gap_runs` (applied earlier by `6d7e2b9a4c15`, 0 rows on the shared database) with the storage v3 columns and adds `skill_gap_run_branches` and `skill_gap_results`; models in `app/models/skill_gap.py`. Contract: `docs/contracts/skill-gap-run-storage.schema.json` v3.
+- On a throwaway Postgres 17 container: `upgrade head`, `downgrade -1` (restores the original 26 `skill_gap_runs` columns) and `upgrade head` again passed. RLS is enabled on all three tables. `alembic check` and a model comparison reported no differences; CHECK constraint names match the models (19, 7 and 13).
+- A SQL script ran DB-026 to DB-031 on that container: every invalid row was rejected by the intended constraint, and deleting the résumé removed the run, its branches and its results. Only synthetic rows were used.
+- Not applied to the shared database yet; DB-024 to DB-031 stay NOT RUN there until the database owner applies it after merge. The application still writes runs to local JSON until the persistence change lands.

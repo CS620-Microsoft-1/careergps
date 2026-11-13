@@ -263,6 +263,7 @@ app/
 │   ├── catalog.py           # certifications, school_courses, student_orgs, catalog_versions
 │   ├── job_posting.py       # job_postings + ingest_runs
 │   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
+│   ├── skill_gap.py         # skill_gap_runs, skill_gap_run_branches, skill_gap_results
 │   └── user.py              # users (id = the Supabase Auth account id)
 ├── schemas/
 │   ├── me.py                # /me requests and responses
@@ -862,10 +863,30 @@ The unrelated existing résumé tests are unchanged.
   use can't be deleted. `users.target_role` selects the destination the app shows.
 - The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
   autogenerate from proposing to drop it. It also never proposes dropping a table that has no model
-  (`plan_items` and `skill_gap_runs` exist only in migrations): write table drops by hand.
+  (`plan_items` exists only in migrations): write table drops by hand.
 - `POST /me` reads `auth.users` (`email_confirmed_at` and `created_at`, the terms consent time)
   directly. That works with the `postgres` role used now; a limited database role for the backend
   will need `SELECT` on `auth.users`, or those two columns.
+
+## Skill Gap result tables
+
+Skill Gap runs will be stored in three tables (migration `df5726089a8e`, contract
+`docs/contracts/skill-gap-run-storage.schema.json` v3). **Not used yet:** runs are still saved as
+local JSON in `local_results/web_skill_gaps/` until the persistence change lands.
+
+| Table | One row per | Holds |
+| --- | --- | --- |
+| `skill_gap_runs` | analysis of one résumé for one role | status, versions, the résumé snapshot, the full v12 `report` the API returns, the merged Agent answer, `match_score` |
+| `skill_gap_run_branches` | skill-group Agent of a run (foundation, lifecycle, systems) | Agent and model, tokens, timings, the group's raw answer and its checks |
+| `skill_gap_results` | core skill of a completed run | evidence kind, strength, gap, grade, demand, priority and rank, plus the details and quoted `evidence` as JSONB |
+
+- Every run is kept (history). Deleting a résumé deletes its runs, branches and results.
+- `skill_gap_results` copies `user_id` and `job_family` from its run (checked by a foreign key), so
+  queries such as "this user's weakest skills" or "testing across all Software Engineer students"
+  need no join. `report` and the result rows are written together and never change afterwards.
+- A scored skill always has strength, gap, grade and priority; a skill that needs confirmation has
+  none of them and no rank (`ck_skill_gap_results_scored_values`).
+- Agent answers and quotes come from students' résumés: personal data, never log them.
 
 ## Catalog tables
 
