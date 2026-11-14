@@ -77,6 +77,15 @@ is reused on your machine.
 - `e2e/signed-in/` starts from a session that `e2e/auth.setup.ts` saves by logging in once. Set
   `E2E_EMAIL` and `E2E_PASSWORD` to a Supabase test account with a confirmed email (see
   `.env.example`); without them these tests are skipped. Never use a real student's account.
+  - `route.spec.ts`: Home, Gaps, saving a resource to the plan, the gap filter, Destinations.
+  - `resources-taken.spec.ts`: marking a UW course taken on Resources (Undo is off until the
+    course is saved), "Not now" on a résumé suggestion, and showing taken courses again.
+  - `gaps-taken.spec.ts`: the "You took …" reminder on a Gaps card.
+
+`mockApi(page, options)` answers from `test/fixtures.ts`. Options change what one test sees:
+`planItems`, `resources` (the taken-course specs pass `e2e/support/uw-courses.ts`, which adds
+three UW–Madison courses), `takenCourses` and `resumeCourseMatches`. It returns the recorded
+`calls`, the `taken` course ids, and `holdCourseSaves()` to keep a course save unanswered.
 
 ```bash
 npx playwright install chromium   # once; downloads the browser (about 100 MB)
@@ -84,13 +93,6 @@ npm run test:e2e                  # builds and starts the app, or reuses a serve
 npx playwright test --headed      # watch it run
 npx playwright show-report        # after a failure
 ```
-
-**Not run for now:** `e2e/gaps-taken.spec.ts` and `e2e/resources-taken.spec.ts` (marking a UW
-course taken, "Not now" on a résumé suggestion, the "You took …" reminder on a Gaps card). They
-use `e2e/mock-api.ts`, which expects a dev server with the Supabase variables empty and
-`NEXT_PUBLIC_API_URL` pointing at `/api-mock`. No project in `playwright.config.ts` matches them,
-so `npm run test:e2e` leaves them out without an error. They still need moving to the signed-in
-setup above.
 
 ## Structure
 
