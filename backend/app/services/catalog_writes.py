@@ -29,6 +29,7 @@ Result = Literal["inserted", "updated", "unchanged"]
 
 MODELS = {"certification": CatalogCertification, "school_course": SchoolCourse, "student_org": StudentOrg}
 CERTIFICATIONS = "certifications"
+COURSE_FIELDS = catalog_store.COURSE_FIELDS
 VERSIONED_FIELDS = frozenset({"name", "provider", "url", "cost_usd", "cost_note", "level", "skills", "active"})
 
 _VERSION_CHANGED = "catalog_writes.version_changed"
@@ -51,10 +52,15 @@ class _SchoolResourceData(BaseModel):
     provider: str
     meta: str
     description: str
-    skills: list[str] = Field(min_length=1)
+    # School courses may have none (seminars, research): they are listed in the catalog but close no gap.
+    skills: list[str]
     school: str = Field(min_length=1)
     url: str | None = None
     alongside: bool = False
+    # School courses only: details from the course guide.
+    course_code: str | None = None
+    credits: str | None = None
+    last_taught: str | None = None
 
 
 def certification_values(data: dict, verified_at: date) -> dict:
@@ -73,15 +79,21 @@ def school_resource_values(kind: Kind, data: dict) -> dict:
     entry = _SchoolResourceData.model_validate(data)
     if entry.type not in (None, kind):
         raise ValueError(f"{entry.id} is a {entry.type}, not a {kind}")
+    if kind == "student_org" and not entry.skills:
+        raise ValueError(f"{entry.id}: a student org needs at least one skill")
     known = set().union(*core_skill_ids(_core_catalog()).values())
     unknown = set(entry.skills) - known
     if unknown:
         raise ValueError(f"{entry.id} has unknown skills: {sorted(unknown)}")
-    values = entry.model_dump(exclude={"type", "alongside"})
+    values = entry.model_dump(exclude={"type", "alongside", *COURSE_FIELDS})
     if kind == "student_org":
         values["alongside"] = entry.alongside
+        if any(getattr(entry, field) is not None for field in COURSE_FIELDS):
+            raise ValueError(f"{entry.id}: only school courses have {', '.join(COURSE_FIELDS)}")
     elif entry.alongside:
         raise ValueError(f"{entry.id}: only student orgs can run alongside the plan")
+    else:
+        values.update({field: getattr(entry, field) for field in COURSE_FIELDS})
     return values
 
 

@@ -23,11 +23,13 @@ from app.schemas.resources import ResourceList
 from app.services import catalog_store, catalog_writes
 from app.services.catalog_store import DatabaseCatalogSource, FileCatalogSource
 from app.services.certifications.catalog import for_family, get_catalog
-from app.services.resources import resources_for
+from app.services.resources import load_catalog, resources_for
 from scripts.seed_catalog import seed
 
 DATABASE_URL = os.environ.get("CGPS_TEST_DATABASE_URL")
 FAMILIES = ("software_engineer", "data_analyst", "ai_engineer")
+# resources.yaml plus the course guide data (data/uw_courses).
+COURSES = sum(entry["type"] == "school_course" for entry in load_catalog())
 SCHOOLS = ("University of Wisconsin–Madison", "UW-Madison", "Another University", None)
 
 
@@ -75,7 +77,7 @@ class CatalogPostgresTests(unittest.TestCase):
 
     def setUp(self) -> None:
         with self.engine.begin() as connection:
-            connection.execute(text("TRUNCATE certifications, school_courses, student_orgs, catalog_versions"))
+            connection.execute(text("TRUNCATE student_courses, certifications, school_courses, student_orgs, catalog_versions"))
         catalog_store.use_source(DatabaseCatalogSource(self.Session))
 
     def tearDown(self) -> None:
@@ -96,7 +98,7 @@ class CatalogPostgresTests(unittest.TestCase):
             return session.get(CatalogVersion, catalog_writes.CERTIFICATIONS).version
 
     def test_seeded_database_gives_the_same_responses_as_the_files(self) -> None:
-        self.assertEqual({"certifications": {"inserted": 48}, "school_courses": {"inserted": 12},
+        self.assertEqual({"certifications": {"inserted": 48}, "school_courses": {"inserted": COURSES},
                           "student_orgs": {"inserted": 2}}, self.seed())
         self.assertEqual("database", catalog_store.get_snapshot().source)
         self.assertEqual("2026-10-26", self.version())
@@ -106,9 +108,9 @@ class CatalogPostgresTests(unittest.TestCase):
 
     def test_seed_again_changes_nothing(self) -> None:
         self.seed()
-        self.assertEqual({"certifications": {"skipped": 48}, "school_courses": {"skipped": 12},
+        self.assertEqual({"certifications": {"skipped": 48}, "school_courses": {"skipped": COURSES},
                           "student_orgs": {"skipped": 2}}, self.seed())
-        self.assertEqual({"certifications": {"unchanged": 48}, "school_courses": {"unchanged": 12},
+        self.assertEqual({"certifications": {"unchanged": 48}, "school_courses": {"unchanged": COURSES},
                           "student_orgs": {"unchanged": 2}}, self.seed(update=True))
         self.assertEqual("2026-10-26", self.version())
 

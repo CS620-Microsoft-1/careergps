@@ -1,0 +1,867 @@
+{
+  "102": {
+    "skills": [
+      "software_engineering"
+    ],
+    "quote": "Design and implement creative applications in an introductory coding environment."
+  },
+  "200": {
+    "skills": [
+      "software_engineering",
+      "code_quality",
+      "testing",
+      "debugging"
+    ],
+    "quote": "basic testing and debugging techniques, how to define and call functions (methods), and IO processing techniques. Also teaches and reinforces good programming practices including the use of a consistent style, and meaningful documentation."
+  },
+  "220": {
+    "skills": [
+      "python",
+      "programming",
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization"
+    ],
+    "quote": "Introduction to Data Science programming using Python. No previous programming experience required. Emphasis on analyzing real datasets in a variety of forms and visual communication."
+  },
+  "239": {
+    "skills": [],
+    "quote": ""
+  },
+  "240": {
+    "skills": [
+      "math_statistics",
+      "algorithms"
+    ],
+    "quote": "Basic concepts of mathematics (definitions, proofs, sets, functions, and relations) with a focus on discrete structures: integers, bits, strings, trees, and graphs. Propositional logic, Boolean algebra, and predicate logic. Mathematical induction and recursion. Invariants and algorithmic correctness. Recurrences and asymptotic growth analysis."
+  },
+  "252": {
+    "skills": [],
+    "quote": ""
+  },
+  "272": {
+    "skills": [
+      "frontend",
+      "security",
+      "software_engineering"
+    ],
+    "quote": "Introduces methods and tools for creating/maintaining secure and interactive web content."
+  },
+  "298": {
+    "skills": [],
+    "quote": ""
+  },
+  "300": {
+    "skills": [
+      "object_oriented_design",
+      "algorithms",
+      "testing",
+      "software_engineering"
+    ],
+    "quote": "Topics introduced: object-oriented design; class vs. object; create and define interfaces and iterators; searching and sorting; abstract data types (List,Stack,Queue,PriorityQueue(Heap),Binary Search Tree); generic interfaces (parametric polymorphism); how to design and write test methods and classes; array based vs. linked node implementations; introduction to complexity analysis; recursion."
+  },
+  "303": {
+    "skills": [
+      "programming",
+      "general_programming",
+      "software_engineering",
+      "object_oriented_design",
+      "testing",
+      "debugging",
+      "code_quality"
+    ],
+    "quote": "Build core programming skills by learning to comprehend, trace, and construct working Java programs."
+  },
+  "304": {
+    "skills": [],
+    "quote": ""
+  },
+  "310": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "Emphasis is on introduction of algorithms with the use of specific tools to illustrate the methods."
+  },
+  "319": {
+    "skills": [
+      "python",
+      "programming",
+      "analytical_scripting",
+      "data_analysis",
+      "data_visualization",
+      "relational_sql",
+      "sql"
+    ],
+    "quote": "Introduction to Data Science programming using Python. In addition to a survey of programming basics (control flow and data structures), web scraping, database queries, and tabular analysis will be introduced. Projects will emphasize analyzing real datasets in a variety of forms and visual communication using plotting tools."
+  },
+  "320": {
+    "skills": [
+      "python",
+      "programming",
+      "analytical_scripting",
+      "algorithms",
+      "machine_learning",
+      "experimentation",
+      "version_control",
+      "data_visualization"
+    ],
+    "quote": "Intermediate approach to Data Science programming using Python. Experience with basic tabular analysis in Python is assumed. Learn to implement data structures (e.g., graphs) to efficiently represent datasets. Software-engineering tools such as version control and Python virtual environments will be introduced, with an emphasis on reproducibility of analysis. Tracing and A/B testing will be introduced as techniques for generating meaningful datasets. Introduces basic classification, clustering, optimization, and simulation techniques. Plotting and visual communication will be emphasized throughout the course."
+  },
+  "352": {
+    "skills": [],
+    "quote": ""
+  },
+  "354": {
+    "skills": [
+      "programming",
+      "general_programming",
+      "performance"
+    ],
+    "quote": "An introduction to fundamental structures of computer systems and the C programming language with a focus on the low-level interrelationships and impacts on performance."
+  },
+  "368": {
+    "skills": [],
+    "quote": ""
+  },
+  "370": {
+    "skills": [
+      "algorithms",
+      "programming",
+      "general_programming",
+      "object_oriented_design",
+      "testing",
+      "version_control",
+      "software_engineering"
+    ],
+    "quote": "Implement these concepts in Java while analyzing correctness, efficiency, and appropriate use cases. Learn object-oriented design, testing, version control, and collaborative development."
+  },
+  "400": {
+    "skills": [
+      "algorithms",
+      "code_quality",
+      "software_engineering",
+      "object_oriented_design",
+      "performance"
+    ],
+    "quote": "Covers balanced search trees, graphs, graph traversal algorithms, hash tables and sets, and complexity analysis and about classes of problems that require each data type. Involves design and implementation using high quality professional code, a medium sized program, that demonstrates knowledge and use of latest language features, tools, and conventions. Additional topics may include inheritance and polymorphism; anonymous inner classes, lambda functions, performance analysis to discover and optimize critical code blocks. Introduces industry standards for writing high-quality, maintainable code."
+  },
+  "401": {
+    "skills": [],
+    "quote": ""
+  },
+  "402": {
+    "skills": [],
+    "quote": ""
+  },
+  "403": {
+    "skills": [],
+    "quote": ""
+  },
+  "407": {
+    "skills": [
+      "software_engineering",
+      "system_design"
+    ],
+    "quote": "Design and implementation of applications, systems, and services for mobile platforms"
+  },
+  "412": {
+    "skills": [
+      "math_statistics"
+    ],
+    "quote": "Interpolation, solution of linear and nonlinear systems of equations"
+  },
+  "425": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "we will study both exact methods for their solution, and approximation algorithms"
+  },
+  "435": {
+    "skills": [],
+    "quote": ""
+  },
+  "440": {
+    "skills": [
+      "programming",
+      "general_programming",
+      "ai_assisted_development",
+      "object_oriented_design",
+      "software_engineering"
+    ],
+    "quote": "Covering multiple paradigms of language design including Functional, Object Oriented, and Natural Language (AI Assisted). Develop hands on experience with JavaScript and TypeScript"
+  },
+  "471": {
+    "skills": [
+      "statistics",
+      "math_statistics"
+    ],
+    "quote": "especially as they relate to statistical inference (e.g., bootstrapping, permutation, Bayesian inference, EM algorithm, multivariate analysis)"
+  },
+  "472": {
+    "skills": [
+      "frontend",
+      "software_engineering"
+    ],
+    "quote": "design and implement websites using popular scripting languages and frameworks"
+  },
+  "475": {
+    "skills": [],
+    "quote": ""
+  },
+  "477": {
+    "skills": [
+      "algorithms",
+      "software_engineering"
+    ],
+    "quote": "Use of algorithmic techniques for solving concrete computational problems. Incorporates elements of discrete mathematics and intermediate data structures."
+  },
+  "502": {
+    "skills": [],
+    "quote": ""
+  },
+  "506": {
+    "skills": [
+      "software_engineering",
+      "system_design",
+      "object_oriented_design",
+      "testing",
+      "debugging",
+      "requirements_analysis",
+      "code_quality"
+    ],
+    "quote": "requirements and specifications; project team organization and management; software architectures; design patterns; testing and debugging"
+  },
+  "513": {
+    "skills": [
+      "math_statistics"
+    ],
+    "quote": "Direct and iterative solution of linear and nonlinear systems and of eigenproblems"
+  },
+  "514": {
+    "skills": [
+      "math_statistics"
+    ],
+    "quote": "Polynomial forms, divided differences"
+  },
+  "518": {
+    "skills": [
+      "frontend"
+    ],
+    "quote": "applications such as sensor integration, interactive textiles, and wearable user interfaces"
+  },
+  "520": {
+    "skills": [],
+    "quote": ""
+  },
+  "524": {
+    "skills": [
+      "algorithms",
+      "math_statistics"
+    ],
+    "quote": "Survey and appropriate usage of basic algorithms, data and software tools"
+  },
+  "525": {
+    "skills": [
+      "math_statistics"
+    ],
+    "quote": "Introduces optimization problems whose constraints are expressed by linear inequalities"
+  },
+  "526": {
+    "skills": [
+      "math_statistics"
+    ],
+    "quote": "Polynomial time methods for linear programming"
+  },
+  "532": {
+    "skills": [
+      "machine_learning",
+      "math_statistics",
+      "deep_learning",
+      "data_analysis",
+      "algorithms"
+    ],
+    "quote": "Linear algebraic foundations of machine learning featuring real-world applications of matrix methods from classification and clustering to denoising and data analysis."
+  },
+  "533": {
+    "skills": [],
+    "quote": ""
+  },
+  "536": {
+    "skills": [
+      "software_engineering"
+    ],
+    "quote": "Several programming projects required."
+  },
+  "537": {
+    "skills": [
+      "performance",
+      "system_design"
+    ],
+    "quote": "performance measurement and system evaluation"
+  },
+  "538": {
+    "skills": [
+      "object_oriented_design"
+    ],
+    "quote": "Design and theory of programming languages: procedural, object-oriented, functional and logic paradigms."
+  },
+  "539": {
+    "skills": [
+      "deep_learning",
+      "machine_learning"
+    ],
+    "quote": "Theory and applications of artificial neural networks: multi-layer perceptron, self-organization mapdeep neural network convolutional neural network, recurrent network, support vector machines genetic algorithm, and evolution computing."
+  },
+  "540": {
+    "skills": [
+      "machine_learning",
+      "math_statistics",
+      "algorithms"
+    ],
+    "quote": "knowledge representation using predicate logic, machine learning, probabilistic reasoning."
+  },
+  "541": {
+    "skills": [
+      "python",
+      "programming",
+      "math_statistics",
+      "statistics",
+      "algorithms",
+      "machine_learning"
+    ],
+    "quote": "Uses Python programming language."
+  },
+  "542": {
+    "skills": [
+      "security",
+      "software_engineering",
+      "system_design",
+      "testing"
+    ],
+    "quote": "methodologies for designing secure software, programming using secure programming techniques, in-depth vulnerability assessment methodologies, static and dynamic analysis tools for evaluating software security"
+  },
+  "544": {
+    "skills": [
+      "large_scale_processing",
+      "distributed_systems",
+      "data_analysis",
+      "python",
+      "programming",
+      "model_training",
+      "machine_learning",
+      "ai_infrastructure"
+    ],
+    "quote": "Deploy and use distributed systems to store and analyze large datasets."
+  },
+  "550": {
+    "skills": [
+      "algorithms",
+      "math_statistics",
+      "machine_learning",
+      "software_engineering"
+    ],
+    "quote": "Particular emphasis is placed on studying, designing, and implementing algorithms."
+  },
+  "552": {
+    "skills": [],
+    "quote": ""
+  },
+  "557": {
+    "skills": [
+      "performance",
+      "algorithms",
+      "software_engineering"
+    ],
+    "quote": "Emphasis is given on multithreaded programming, vectorization, memory hierarchy and its implications, and analysis of performance-limiting factors."
+  },
+  "559": {
+    "skills": [
+      "data_visualization"
+    ],
+    "quote": "Rendering, animation, multi-media and visualization."
+  },
+  "561": {
+    "skills": [
+      "machine_learning",
+      "math_statistics",
+      "statistics",
+      "data_analysis"
+    ],
+    "quote": "Probabilistic tools for machine learning and analysis of real-world datasets."
+  },
+  "564": {
+    "skills": [
+      "relational_sql",
+      "sql",
+      "data_modeling",
+      "software_engineering"
+    ],
+    "quote": "Hands-on experience with relational and network-based database systems."
+  },
+  "565": {
+    "skills": [
+      "data_visualization"
+    ],
+    "quote": "Gain real-world experience in designing and evaluating visualizations."
+  },
+  "566": {
+    "skills": [
+      "machine_learning"
+    ],
+    "quote": "Broad overview of various computer vision and machine learning techniques and sensing and imaging technologies used in computer vision applications. Project-based."
+  },
+  "567": {
+    "skills": [
+      "data_analysis",
+      "machine_learning"
+    ],
+    "quote": "Hands-on introduction to biological and medical image analysis techniques. Topics include medical imaging formats, segmentation, registration, image quantification, and classification."
+  },
+  "570": {
+    "skills": [
+      "frontend",
+      "requirements_analysis",
+      "system_design"
+    ],
+    "quote": "User-centered software design: (1) principles of and methods for understanding user needs; designing and prototyping interface solutions; and evaluating their usability, (2) their applications in designing multiple types of interfaces through group projects."
+  },
+  "571": {
+    "skills": [
+      "frontend",
+      "software_engineering"
+    ],
+    "quote": "software development of user interfaces (UIs)"
+  },
+  "574": {
+    "skills": [
+      "data_pipelines",
+      "data_quality",
+      "data_preparation",
+      "data_analysis",
+      "relational_sql",
+      "sql",
+      "warehousing",
+      "rag"
+    ],
+    "quote": "Work with both relational databases and Not only SQL (NoSQL) databases to organize and analyze structured, semi-structured, and unstructured data."
+  },
+  "576": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "Algorithms for computational problems in molecular biology."
+  },
+  "577": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "design and analysis of efficient algorithms"
+  },
+  "578": {
+    "skills": [
+      "algorithms",
+      "testing",
+      "software_engineering"
+    ],
+    "quote": "recognizing the applicability of known algorithms, fast coding and testing"
+  },
+  "579": {
+    "skills": [],
+    "quote": ""
+  },
+  "580": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "algorithms for robot representations, kinematics, motion planning"
+  },
+  "611": {
+    "skills": [
+      "requirements_analysis"
+    ],
+    "quote": "Conduct formative research on clients, users, use contexts and tasks."
+  },
+  "612": {
+    "skills": [],
+    "quote": ""
+  },
+  "613": {
+    "skills": [],
+    "quote": ""
+  },
+  "614": {
+    "skills": [],
+    "quote": ""
+  },
+  "620": {
+    "skills": [
+      "software_engineering",
+      "testing",
+      "debugging",
+      "system_design"
+    ],
+    "quote": "design, develop, test, debug, document, and deliver a software project"
+  },
+  "638": {
+    "skills": [],
+    "quote": ""
+  },
+  "639": {
+    "skills": [],
+    "quote": ""
+  },
+  "640": {
+    "skills": [],
+    "quote": ""
+  },
+  "642": {
+    "skills": [
+      "security"
+    ],
+    "quote": "cryptographic primitives, security protocols, system security"
+  },
+  "681": {
+    "skills": [],
+    "quote": ""
+  },
+  "682": {
+    "skills": [],
+    "quote": ""
+  },
+  "691": {
+    "skills": [],
+    "quote": ""
+  },
+  "692": {
+    "skills": [],
+    "quote": ""
+  },
+  "698": {
+    "skills": [],
+    "quote": ""
+  },
+  "699": {
+    "skills": [],
+    "quote": ""
+  },
+  "701": {
+    "skills": [],
+    "quote": ""
+  },
+  "702": {
+    "skills": [],
+    "quote": ""
+  },
+  "703": {
+    "skills": [],
+    "quote": ""
+  },
+  "704": {
+    "skills": [],
+    "quote": ""
+  },
+  "707": {
+    "skills": [],
+    "quote": ""
+  },
+  "710": {
+    "skills": [],
+    "quote": ""
+  },
+  "714": {
+    "skills": [
+      "math_statistics"
+    ],
+    "quote": "Development of finite difference methods for hyperbolic, parabolic and elliptic partial differential equations."
+  },
+  "715": {
+    "skills": [
+      "math_statistics"
+    ],
+    "quote": "Introduction to spectral methods (Fourier, Chebyshev, Fast Fourier Transform), finite element methods (Galerkin methods, energy estimates and error analysis), and mesh-free methods (Monte-Carlo, smoothed-particle hydrodynamics) for solving partial differential equations."
+  },
+  "719": {
+    "skills": [
+      "algorithms",
+      "math_statistics",
+      "statistics"
+    ],
+    "quote": "Topics include modeling uncertainty in optimization problems, risk measures, stochastic programming algorithms, approximation and sampling methods"
+  },
+  "722": {
+    "skills": [
+      "deep_learning",
+      "machine_learning",
+      "math_statistics"
+    ],
+    "quote": "linear algebra using matrix and integral operators and the computational tools to reconstruct an image, including linear inverse problems, neural networks, convex optimization"
+  },
+  "723": {
+    "skills": [
+      "algorithms",
+      "math_statistics"
+    ],
+    "quote": "General and special techniques of dynamic programming developed by means of examples. Shortest-path algorithms."
+  },
+  "726": {
+    "skills": [
+      "algorithms",
+      "math_statistics"
+    ],
+    "quote": "Theory and algorithms for nonlinear optimization, focusing on unconstrained optimization."
+  },
+  "727": {
+    "skills": [],
+    "quote": ""
+  },
+  "728": {
+    "skills": [
+      "algorithms",
+      "math_statistics"
+    ],
+    "quote": "Introduces optimization problems over integers, and surveys the theory behind the algorithms used in state-of-the-art methods for solving such problems."
+  },
+  "730": {
+    "skills": [
+      "algorithms",
+      "math_statistics"
+    ],
+    "quote": "Theory and algorithms for nonlinearly constrained optimization."
+  },
+  "736": {
+    "skills": [],
+    "quote": ""
+  },
+  "739": {
+    "skills": [
+      "distributed_systems",
+      "reliability",
+      "performance",
+      "system_design"
+    ],
+    "quote": "designing and implementing distributed systems. Topics include fault tolerance, scalability, replication, distributed storage, consensus, reliability, performance"
+  },
+  "740": {
+    "skills": [],
+    "quote": ""
+  },
+  "744": {
+    "skills": [
+      "large_scale_processing",
+      "distributed_systems",
+      "system_design"
+    ],
+    "quote": "design and implementation of big data processing systems, including: an overview of cluster architecture"
+  },
+  "750": {
+    "skills": [],
+    "quote": ""
+  },
+  "752": {
+    "skills": [],
+    "quote": ""
+  },
+  "755": {
+    "skills": [],
+    "quote": ""
+  },
+  "757": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "Parallel algorithms"
+  },
+  "758": {
+    "skills": [],
+    "quote": ""
+  },
+  "759": {
+    "skills": [],
+    "quote": ""
+  },
+  "760": {
+    "skills": [
+      "machine_learning",
+      "algorithms",
+      "model_evaluation"
+    ],
+    "quote": "Algorithms for learning. Comparison and evaluation of learning algorithms."
+  },
+  "761": {
+    "skills": [
+      "machine_learning",
+      "math_statistics",
+      "statistics",
+      "algorithms"
+    ],
+    "quote": "Mathematical foundations of machine learning theory and algorithms. Probabilistic, algebraic, and geometric models"
+  },
+  "762": {
+    "skills": [
+      "deep_learning",
+      "machine_learning",
+      "generative_ai"
+    ],
+    "quote": "methods and applications of deep learning. Covers cutting-edge topics, including neural architecture design, robustness and reliability of deep learning, learning with less supervision, lifelong machine learning, deep generative modeling"
+  },
+  "763": {
+    "skills": [
+      "machine_learning",
+      "security"
+    ],
+    "quote": "security and privacy aspects of trustworthy artificial intelligence. Three core subjects will be considered: differential privacy and algorithmic fairness; adversarial machine learning"
+  },
+  "764": {
+    "skills": [
+      "distributed_systems"
+    ],
+    "quote": "distributed database management systems"
+  },
+  "765": {
+    "skills": [
+      "data_visualization",
+      "data_analysis"
+    ],
+    "quote": "Design and evaluation of visualizations and interactive exploration tools. Introduction to relevant foundations in visual design, human perception, and data analysis."
+  },
+  "766": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "parallel algorithms"
+  },
+  "767": {
+    "skills": [
+      "machine_learning",
+      "statistics",
+      "math_statistics"
+    ],
+    "quote": "use and extension of statistical and machine learning methods"
+  },
+  "769": {
+    "skills": [
+      "algorithms",
+      "math_statistics"
+    ],
+    "quote": "Develop algorithms and mathematical models"
+  },
+  "770": {
+    "skills": [
+      "data_analysis"
+    ],
+    "quote": "qualitative and quantitative data analysis"
+  },
+  "771": {
+    "skills": [
+      "deep_learning",
+      "machine_learning",
+      "algorithms"
+    ],
+    "quote": "Introduces deep learning in the context of computer vision. Covers topics on visual recognition using deep models, such as image classification, object detection, human pose estimation, action recognition, 3D understanding, and medical image analysis. Emphasizes the design of vision and learning algorithms"
+  },
+  "772": {
+    "skills": [
+      "machine_learning",
+      "deep_learning",
+      "generative_ai",
+      "algorithms"
+    ],
+    "quote": "machine learning based synthesis and manipulation of visual data (images and videos). Both classical (e.g., nearest neighbor, filtering) and modern deep learning based (e.g., ConvNets, GANs, Diffusion Models) algorithms"
+  },
+  "774": {
+    "skills": [
+      "data_quality",
+      "data_preparation"
+    ],
+    "quote": "explore, clean, and integrate this data"
+  },
+  "775": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "use network algorithms for biological modeling, analysis, interpretation, and discovery"
+  },
+  "776": {
+    "skills": [
+      "algorithms",
+      "data_analysis"
+    ],
+    "quote": "study algorithms for problems such as: modeling sequence classes and features, phylogenetic tree construction, gene-expression data analysis"
+  },
+  "782": {
+    "skills": [
+      "security"
+    ],
+    "quote": "Security vulnerabilities, privacy threats, threats modeling, and mitigation strategies."
+  },
+  "784": {
+    "skills": [],
+    "quote": ""
+  },
+  "787": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "design and analysis of efficient algorithms"
+  },
+  "790": {
+    "skills": [],
+    "quote": ""
+  },
+  "799": {
+    "skills": [],
+    "quote": ""
+  },
+  "812": {
+    "skills": [
+      "algorithms"
+    ],
+    "quote": "Survey of algorithms and design paradigms for exact arithmetic"
+  },
+  "838": {
+    "skills": [],
+    "quote": ""
+  },
+  "839": {
+    "skills": [],
+    "quote": ""
+  },
+  "841": {
+    "skills": [
+      "machine_learning"
+    ],
+    "quote": "combining methods from cognitive science, artificial intelligence, machine learning"
+  },
+  "861": {
+    "skills": [
+      "machine_learning",
+      "math_statistics",
+      "statistics"
+    ],
+    "quote": "Advanced mathematical theory and methods of machine learning. Statistical learning theory"
+  },
+  "880": {
+    "skills": [],
+    "quote": ""
+  },
+  "899": {
+    "skills": [],
+    "quote": ""
+  },
+  "900": {
+    "skills": [],
+    "quote": ""
+  },
+  "915": {
+    "skills": [],
+    "quote": ""
+  },
+  "990": {
+    "skills": [],
+    "quote": ""
+  },
+  "999": {
+    "skills": [],
+    "quote": ""
+  }
+}

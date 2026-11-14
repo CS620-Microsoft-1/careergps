@@ -20,6 +20,10 @@ class Resource(BaseModel):
     url: str | None = None
     school: str | None = None
     alongside: bool = False
+    # School courses from the course guide: "COMP SCI 400", "3", "Fall 2025".
+    course_code: str | None = None
+    credits: str | None = None
+    last_taught: str | None = None
 
 
 class ResourceList(BaseModel):

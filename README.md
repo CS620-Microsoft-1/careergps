@@ -15,7 +15,7 @@ and turns them into an action plan.
 | Job-market data: daily ingest of public Greenhouse, Ashby and Lever job postings; job-description field extraction by a Foundry Agent | Working |
 | Skill-gap analysis: résumé evidence scored against market demand, with a demand-weighted match score | Working (runs are local JSON on the backend host) |
 | Destinations: compare one résumé against several target roles | Working |
-| Resources: courses, student orgs, certifications and projects matched to each gap | Working (static catalogs) |
+| Resources: courses, student orgs, certifications and projects matched to each gap; mark UW courses as taken | Working (catalog in the database) |
 | Action plan: saved resources in order, biggest gap first | Working (plans are local JSON on the backend host) |
 | Ask CareerGPS Copilot | Planned |
 | `plan_items` and `skill_gap_runs` tables | Migrated, not yet used by the API |
@@ -135,6 +135,8 @@ Never commit `.env` or `.env.local`.
 ```bash
 cd backend && python -m unittest discover -s tests -v   # also runs in CI
 cd frontend && npm test && npm run lint && npm run typecheck && npm run build
+cd frontend && npm run test:components   # component tests
+cd frontend && npm run test:e2e   # browser tests against a mocked API; see frontend/README.md
 ```
 
 `backend/tests/manual_resume_smoke.py` runs a live test against the Foundry Agent. It is not part of CI.

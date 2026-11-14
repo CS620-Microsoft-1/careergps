@@ -42,7 +42,7 @@ export const RESOURCE_TYPES: Record<ResourceType, { label: string; plural: strin
   school_course: { label: "Course", plural: "Courses at your school", blurb: "Plan ahead for registration", icon: GraduationCap },
   project: { label: "Project", plural: "Projects", blurb: "Proof you can show in interviews", icon: Wrench },
 };
-export const RESOURCE_TYPE_ORDER: ResourceType[] = ["student_org", "certification", "online_course", "school_course", "project"];
+export const RESOURCE_TYPE_ORDER: ResourceType[] = ["project", "certification", "online_course", "school_course", "student_org"];
 
 export function ResourceIcon({ type, className }: { type: ResourceType; className?: string }) {
   const Icon = RESOURCE_TYPES[type].icon;

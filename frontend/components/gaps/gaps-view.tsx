@@ -19,10 +19,12 @@ import {
 } from "@/components/career/route-parts";
 import { SkillEvidence } from "@/components/gaps/skill-evidence";
 import { usePlan } from "@/components/plan/plan-provider";
+import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  courseCode,
   DEMAND_LABELS,
   demandLevel,
   demandShare,
@@ -31,6 +33,8 @@ import {
   rankGaps,
   rankStrengths,
   resourcesForSkill,
+  takenCoursesFor,
+  withoutTaken,
 } from "@/lib/career";
 import { cn } from "@/lib/utils";
 import type { CoreSkillGapReport, CoreSkillResult, SkillGapRun } from "@/types/api";
@@ -104,10 +108,12 @@ function GapCard({ gap, rank, report, defaultOpen }: {
   gap: CoreSkillResult; rank: number; report: CoreSkillGapReport; defaultOpen: boolean;
 }) {
   const plan = usePlan();
+  const { taken } = useTakenCourses();
   const [open, setOpen] = useState(defaultOpen);
   const share = demandShare(gap);
   const level = demandLevel(share);
-  const ways = resourcesForSkill(plan.resources, gap.skill_id);
+  const ways = resourcesForSkill(withoutTaken(plan.resources, taken), gap.skill_id);
+  const took = takenCoursesFor(plan.resources, taken, gap.skill_id).map(courseCode);
   const shown = ways.slice(0, 3);
   const name = skillLabel(gap.skill_id);
   const panel = `gap-panel-${gap.skill_id}`;
@@ -126,6 +132,9 @@ function GapCard({ gap, rank, report, defaultOpen }: {
       </div>
       <GapBar skill={gap} className="mt-5" />
       <div className="mt-3"><GapMeta skill={gap} /></div>
+      {took.length > 0 && <p className="mt-4 rounded-lg bg-success-soft px-4 py-3 text-sm/6">
+        You took <b>{took.join(" and ")}</b>, which {took.length === 1 ? "covers" : "cover"} this. Add {took.length === 1 ? "it" : "them"} to your résumé.
+      </p>}
 
       {/* Stays mounted so it can animate; inert keeps it out of tab order and from screen readers while closed. */}
       <div id={panel} className="collapse-panel" data-open={open} inert={!open}><div>

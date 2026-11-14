@@ -5,7 +5,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import certifications, health, job_postings, me, resources, resumes, skill_gaps
+from app.api.routes import certifications, health, job_postings, me, resources, resumes, skill_gaps, student_courses
 from app.core.body_limit import BodyLimitMiddleware
 from app.core.config import get_settings
 
@@ -44,6 +44,7 @@ app.add_middleware(
 
 app.include_router(health.router)
 app.include_router(me.router)
+app.include_router(student_courses.router)
 app.include_router(resumes.router)
 app.include_router(job_postings.router)
 app.include_router(skill_gaps.router)
