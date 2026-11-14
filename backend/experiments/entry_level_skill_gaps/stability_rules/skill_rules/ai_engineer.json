@@ -1,0 +1,3022 @@
+{
+  "rule_version": "entry-level-skill-rules.v2-draft",
+  "job_family": "ai_engineer",
+  "validation_status": "draft_not_live_validated",
+  "skills": {
+    "general_programming": {
+      "skill_id": "general_programming",
+      "skill_name": "General programming",
+      "group": "foundation",
+      "core_boundary": "The applicant personally implements program logic for a stated task in an explicitly named language other than Python.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally implement program logic for a stated task in an explicitly named non-Python language; Python-only work is outside this core.",
+          "supported_when": [
+            "The applicant personally implements program logic for a stated task in an explicitly named language other than Python."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Python-only implementation, a language list, finished software use, or teammate-only work does not establish this core."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant function, control flow, data structure, or applied library operation in that non-Python implementation.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE function, control-flow step, data structure OR applied library operation in that same non-Python implementation."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check the program behavior with a test, expected-output comparison, or diagnosis of an execution problem.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check that program using an identified test case, expected-output comparison OR diagnosed execution problem."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Python-only implementation, a language list, finished software use, or teammate-only work does not establish this core."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "general_programming_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I wrote a Java service that deduplicates event IDs with a hash set. I ran it on repeated event IDs and confirmed that each ID appeared once in its output.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "general_programming_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I wrote the entire application in Python; I did not implement any code in another language.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Python-only implementation, a language list, finished software use, or teammate-only work does not establish this core."
+        },
+        {
+          "example_id": "general_programming_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I wrote a Java service that deduplicates event IDs with a hash set. I tested that same Java service, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "python": {
+      "skill_id": "python",
+      "skill_name": "Python development",
+      "group": "foundation",
+      "core_boundary": "The applicant personally implements Python logic OR personally develops a stated task using an explicitly permitted Python-library route. Personal OpenCV/PyTorch video-inference development qualifies without a separate literal Python mention unless an explicitly conflicting language rules that route out.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally implement Python logic or use an explicitly supported Python library for a stated task; do not infer Python from a finished AI tool or a teammate contribution.",
+          "supported_when": [
+            "The applicant personally implements Python logic OR personally develops a stated task using an explicitly permitted Python-library route. Personal OpenCV/PyTorch video-inference development qualifies without a separate literal Python mention unless an explicitly conflicting language rules that route out."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "A finished tool implementation language, a contribution explicitly attributed only to a teammate, bare library list, or explicitly C++-only OpenCV work does not establish personal Python practice."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant Python operation, data manipulation, function, library procedure, or integration in that implementation.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE operation or transformation on an object, procedure/function, OR concrete input-processing-output/component connection in the same implementation. OpenCV/PyTorch video-inference integration qualifies; a library name plus only data preparation, processing, analysis or automation does not."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check the Python program or data output against an expected behavior, test case, or diagnostic observation; numeric improvement is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check the same Python workload and identify an expected behavior, test example, error category, comparison, diagnostic observation OR control constraint used in that check."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "A finished tool implementation language, a contribution explicitly attributed only to a teammate, bare library list, or explicitly C++-only OpenCV work does not establish personal Python practice."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Preserve the three-skill v1.1 c1/c2 binary decisions and c3 performed-check boundary. That pilot has a recorded semantic failure; this card is not a validated gold standard.",
+        "An adjacent implementation description does not supply the criterion of a generic tested-it statement unless the source connects the check to that criterion.",
+        "Personal OpenCV/PyTorch video-inference development is the permitted library route; explicit C++-only work does not establish Python.",
+        "The generic-task-label clarification belongs to Python c2; do not transfer it to LLM input/output alternatives.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "python_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I implemented Python code that groups purchase rows by customer and computes each customer total. I tested customers with duplicate rows and compared the computed totals with manually calculated totals.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "python_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "My teammate wrote the Python parser; I only used its exported results.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "A finished tool implementation language, teammate contribution, bare library list, or explicitly C++-only OpenCV work does not establish personal Python practice."
+        },
+        {
+          "example_id": "python_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I implemented Python code that groups purchase rows by customer and computes each customer total. I checked the output of that same Python program, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        },
+        {
+          "example_id": "python_library_route",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I developed a video inference workflow with OpenCV feeding extracted frames to PyTorch and converting model detections into timestamped events.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "not_evidenced"
+          },
+          "rationale": "The permitted personal library route establishes Python and a concrete integration, but no check."
+        },
+        {
+          "example_id": "python_generic_task",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I used Python and pandas for data preparation.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Personal Python use for a task establishes c1; a task category and library name do not give an operation for c2."
+        },
+        {
+          "example_id": "python_explicit_cpp",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I implemented the whole OpenCV video-processing pipeline in C++ only.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Explicit C++-only work rules out inferring Python from OpenCV."
+        }
+      ]
+    },
+    "software_engineering": {
+      "skill_id": "software_engineering",
+      "skill_name": "Software engineering",
+      "group": "foundation",
+      "core_boundary": "The applicant personally implements, tests, debugs, maintains OR builds an API in an identified software task.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally implement, test, debug, maintain, or build an API in a concrete software context; using a finished AI product alone is insufficient.",
+          "supported_when": [
+            "The applicant personally implements, tests, debugs, maintains OR builds an API in an identified software task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Using a finished AI product or a contribution explicitly attributed only to others provides no personal software-engineering evidence."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant engineering mechanism such as module/interface organization, input/error handling, a test, or a diagnostic procedure.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE applied module/interface organization, input/error-handling step, test mechanism OR diagnostic procedure in that same task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check software behavior or an engineering change against an expected requirement, test, or failure scenario.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check software behavior or an engineering change against an identified requirement, test expectation OR failure scenario."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Using a finished AI product or a contribution explicitly attributed only to others provides no personal software-engineering evidence."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved.",
+        "Relevant team work with unresolved personal responsibility is uncertain; only explicit attribution to others without applicant contribution is a no-credit ownership case."
+      ],
+      "examples": [
+        {
+          "example_id": "software_engineering_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I built an upload API and added a request validator that rejects a missing file field. I sent a request without a file and verified that the API returned the specified validation error.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "software_engineering_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I used a finished AI writing product to prepare an email.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Using a finished AI product provides no personal software-engineering evidence."
+        },
+        {
+          "example_id": "software_engineering_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I built an upload API and added a request validator that rejects a missing file field. I tested that same upload API, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "sql": {
+      "skill_id": "sql",
+      "skill_name": "SQL",
+      "group": "foundation",
+      "core_boundary": "The applicant personally queries, designs OR accesses explicitly relational data through SQL OR a stated relational operation. Literal SQL syntax is not required when the relational operation is explicit.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally query, design, or access explicitly relational data through SQL or a stated relational operation; generic JSON is insufficient.",
+          "supported_when": [
+            "The applicant personally queries, designs OR accesses explicitly relational data through SQL OR a stated relational operation. Literal SQL syntax is not required when the relational operation is explicit."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Generic JSON, a database name, document storage, or generic data access without an established relational operation is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant query, join, aggregation, key, schema relationship, or relational access operation.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE query, join, aggregation, key, schema relationship OR relational access operation used in that same task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check the operation or returned data against expected records, counts, constraints, or the stated data task.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check that relational operation or its data against identified expected records, counts, constraints OR the stated data task."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Generic JSON, a database name, document storage, or generic data access without an established relational operation is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "sql_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I joined relational orders and customers tables by customer_id to calculate customer spending. I compared the joined row count with the expected orders count to detect duplicate matches.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "sql_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I saved each generated answer as JSON in a local file.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Generic JSON, a database name, document storage, or generic data access without an established relational operation is insufficient."
+        },
+        {
+          "example_id": "sql_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I joined relational orders and customers tables by customer_id to calculate customer spending. I checked the returned data from that same relational join, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "machine_learning": {
+      "skill_id": "machine_learning",
+      "skill_name": "Machine learning",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally applies an explicitly identified ML method OR framework to a stated modeling task with ML-specific development.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally apply an explicitly identified ML method/framework in a stated modeling task; calling a finished AI product alone is insufficient.",
+          "supported_when": [
+            "The applicant personally applies an explicitly identified ML method OR framework to a stated modeling task with ML-specific development."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Unspecified AI use, a method list, or a finished AI-product call without ML-specific development is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant modeling procedure involving inputs, model choice, fitting, prediction, or an ML-specific configuration.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE modeling input, model choice, fitting procedure, prediction procedure OR ML-specific configuration in that same task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check model behavior using relevant data, criteria, a metric, or error inspection; production deployment and improved benchmark scores are not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check model behavior using identified relevant data, a criterion, metric OR error inspection. An unfavorable result qualifies."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Unspecified AI use, a method list, or a finished AI-product call without ML-specific development is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "machine_learning_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I fitted a random-forest classifier to ticket features to predict the routing team. I measured its accuracy on held-out labeled tickets and inspected misrouted billing tickets.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "machine_learning_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I called a finished sentiment API and displayed its response without doing ML-specific development.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Unspecified AI use, a method list, or a finished AI-product call without ML-specific development is insufficient."
+        },
+        {
+          "example_id": "machine_learning_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I fitted a random-forest classifier to ticket features to predict the routing team. I evaluated that same classifier model behavior, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "deep_learning": {
+      "skill_id": "deep_learning",
+      "skill_name": "Deep learning",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally works with an explicitly identified neural/deep-learning architecture in a stated training OR inference task. Training from scratch is not required.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally work with an explicitly identified neural/deep-learning architecture in a stated training or inference task.",
+          "supported_when": [
+            "The applicant personally works with an explicitly identified neural/deep-learning architecture in a stated training OR inference task. Training from scratch is not required."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Unspecified AI, ordinary statistical modeling without a neural architecture, or a model name without personal use is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant neural-model input, architecture component, training/inference configuration, or tensor/model operation.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE neural-model input, architecture component, training/inference configuration OR tensor/model operation in that same task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check neural-model behavior, outputs, training behavior, or errors using a relevant basic evaluation; training from scratch is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check identified neural-model outputs, training behavior OR errors with a relevant evaluation case, criterion, metric or observation."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Unspecified AI, ordinary statistical modeling without a neural architecture, or a model name without personal use is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "deep_learning_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I used a convolutional neural network for defect-image inference and resized each input to its required image dimensions. I inspected predictions on labeled scratch images and recorded the false negatives.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "deep_learning_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I fitted a linear regression model for house prices; no neural model was used.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Unspecified AI, ordinary statistical modeling without a neural architecture, or a model name without personal use is insufficient."
+        },
+        {
+          "example_id": "deep_learning_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I used a convolutional neural network for defect-image inference and resized each input to its required image dimensions. I checked predictions from that same neural model, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "math_statistics": {
+      "skill_id": "math_statistics",
+      "skill_name": "Mathematics & statistics",
+      "group": "foundation",
+      "core_boundary": "Explicit study, explanation OR application of mathematical, probability OR statistical foundations is evidenced. Personal software implementation is not required.",
+      "c3_kind": "worked_concept",
+      "linkage_policy": "same_concept_independent_sources",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "knowledge",
+          "baseline_description": "Demonstrate explicit study, explanation, or application of mathematical, probability, or statistical foundations; a degree or numerical output alone is insufficient.",
+          "supported_when": [
+            "Explicit study, explanation OR application of mathematical, probability OR statistical foundations is evidenced. Personal software implementation is not required."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Explicit study, explanation or application establishes this core. A degree or unexplained number establishes none of those alternatives.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "A degree title, an unexplained number, or an umbrella field with no evidence of study, explanation or application is insufficient for c1."
+          ],
+          "uncertain_when": [
+            "A relevant study or explanation is described, but it is genuinely unclear whether it concerns the applicant knowledge or a different person/topic."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "baseline_description": "Identify a relevant mathematical/statistical concept, equation, method, or assumption rather than only an umbrella field name.",
+          "supported_when": [
+            "Identify at least ONE relevant mathematical/statistical concept, equation, method OR assumption beyond an umbrella field name."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "baseline_description": "Interpret, derive, apply, or check that concept in a worked example or actual task, including a relevant property or limitation.",
+          "supported_when": [
+            "Interpret, derive, apply OR check the identified concept in a worked example or actual task AND state a relevant property or limitation of that concept."
+          ],
+          "partial_allowed": true,
+          "partial_when": "An explicit worked example or actual application of the identified concept is described, but no relevant property or limitation is interpreted, derived or checked.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Only the field or concept name is given, without a worked example or application.",
+            "A proposed future example is not a completed worked example."
+          ],
+          "uncertain_when": [
+            "A described worked example has genuinely unresolved concept linkage or an unclear claim about what was derived or interpreted."
+          ]
+        }
+      ],
+      "exclusions": [
+        "A degree title, an unexplained number, or an umbrella field with no evidence of study, explanation or application is insufficient for c1."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Assess criteria independently from explicit study, explanation or application. Sources can differ when they concern the same concept; do not impose a project, execution check or practice c1 gate.",
+        "A field listed as an interest is not study. A specific completed course or explicitly studied topic may establish c1; a named concept can establish c2 without a worked example.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "math_statistics_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I studied conditional probability and used Bayes rule to calculate a posterior disease probability from a toy screening-test example. I explained how the low base rate limits the probability of disease even after a positive test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "math_statistics_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "My degree is in engineering; the project produced a score of 0.82.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "A degree title, an unexplained number, or an umbrella field with no evidence of study, explanation or application is insufficient for c1."
+        },
+        {
+          "example_id": "math_statistics_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I studied conditional probability and used Bayes rule to calculate a posterior disease probability from a toy screening-test example.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "Study, a named concept and a worked application are stated, but no property or limitation is explained."
+        },
+        {
+          "example_id": "math_statistics_named_study",
+          "kind": "boundary",
+          "source_kind": "listed",
+          "text": "Completed study: conditional probability and Bayes rule.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Explicit study and a named concept establish knowledge c1/c2 without software practice; no worked example establishes c3."
+        }
+      ]
+    },
+    "data_preparation": {
+      "skill_id": "data_preparation",
+      "skill_name": "Data preparation",
+      "group": "foundation",
+      "core_boundary": "The applicant personally cleans, labels, validates, structures OR prepares data for a stated ML/analytical task.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally clean, label, validate, structure, or prepare data for a stated ML/analytical task; saving model output alone is insufficient.",
+          "supported_when": [
+            "The applicant personally cleans, labels, validates, structures OR prepares data for a stated ML/analytical task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Saving model output, performing inference, or using data without personal preparation is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the relevant preparation rule or transformation and the data issue or representation it addresses.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe a preparation rule OR transformation AND the data issue OR representation it addresses in the same task."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. A specific data issue or required representation is identified for the personal preparation task, but no applied preparation rule or transformation is described.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check prepared data against expected labels, schema, ranges, consistency, leakage concerns, or another relevant quality property.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check prepared data against identified expected labels, schema, ranges, consistency, leakage concerns OR another quality property."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Saving model output, performing inference, or using data without personal preparation is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "data_preparation_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I removed duplicate customer records by customer_id to prepare a training table with one row per customer. I checked that customer_id was unique in the prepared table.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "data_preparation_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I saved model answers to a file without preparing input data.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Saving model output, performing inference, or using data without personal preparation is insufficient."
+        },
+        {
+          "example_id": "data_preparation_partial_c2",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I personally prepared a training table to address inconsistent date values; the preparation rule or transformation I applied was not described.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "partial",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Personal data preparation establishes c1 and inconsistent dates identifies the addressed issue. No preparation rule or transformation is described for full c2, and no data-quality check is stated."
+        },
+        {
+          "example_id": "data_preparation_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I removed duplicate customer records by customer_id to prepare a training table with one row per customer. I checked the quality of that prepared training table, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "data_pipelines": {
+      "skill_id": "data_pipelines",
+      "skill_name": "Data pipelines",
+      "group": "foundation",
+      "core_boundary": "The applicant personally builds OR operates a repeatable ingestion, transformation OR processing flow for data. The flow or execution context must establish repeatability.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally build or operate a repeatable ingestion, transformation, or processing flow for data; one-off loading or an inference call alone is insufficient.",
+          "supported_when": [
+            "The applicant personally builds OR operates a repeatable ingestion, transformation OR processing flow for data. The flow or execution context must establish repeatability."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "One-off loading, a standalone inference call, or a pipeline tool name does not establish a repeatable data flow."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the source/destination stages and a relevant transformation, dependency, scheduling, or loading mechanism.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe the source/destination stages AND at least ONE transformation, dependency, scheduling OR loading mechanism of that same repeatable flow."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. Source and destination stages are identified for an established repeatable flow, but no transformation, dependency, scheduling or loading mechanism is described.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check data movement, a pipeline run, data quality, or a failure case for that flow.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check data movement, a pipeline run, data quality OR a failure case and identify the relevant observation, criterion or case for that flow."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "One-off loading, a standalone inference call, or a pipeline tool name does not establish a repeatable data flow."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "data_pipelines_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I built a nightly flow that reads supplier CSV files, normalizes date columns and loads the rows into a warehouse table. I ran it with a malformed date and verified that the bad row was reported instead of silently loaded.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "data_pipelines_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I loaded one CSV file once to send its rows to a model API.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "One-off loading, a standalone inference call, or a pipeline tool name does not establish a repeatable data flow."
+        },
+        {
+          "example_id": "data_pipelines_partial_c2",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I built a repeatable data flow from supplier files to a warehouse table. No transformation, dependency, scheduling or loading mechanism is described.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "partial",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Repeatability and endpoints establish c1 and part of c2; the mechanism remains unstated. No performed check or interpreted finding is stated."
+        },
+        {
+          "example_id": "data_pipelines_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I built a nightly flow that reads supplier CSV files, normalizes date columns and loads the rows into a warehouse table. I checked execution of that same repeatable data flow, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "feature_engineering": {
+      "skill_id": "feature_engineering",
+      "skill_name": "Feature engineering",
+      "group": "foundation",
+      "core_boundary": "The applicant personally creates, selects OR transforms input features explicitly used by a model.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally create, select, or transform input features actually used by a model; formatting outputs or product features is insufficient.",
+          "supported_when": [
+            "The applicant personally creates, selects OR transforms input features explicitly used by a model."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Formatting output JSON, a product feature, or a transformed variable not established as a model input is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a feature construction, encoding, selection, transformation, or representation and its relationship to model inputs.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe a feature construction, encoding, selection, transformation OR representation AND its relationship to the same model inputs."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. A particular created, selected or transformed feature is identified as actually used by the model, but its construction/selection/transformation rule or representation is not described.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check the engineered features through value inspection, leakage/consistency checks, or a relevant model comparison.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check those engineered features through identified value inspection, leakage/consistency checks OR a relevant model comparison."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Formatting output JSON, a product feature, or a transformed variable not established as a model input is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "feature_engineering_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I encoded weekday as sine and cosine values and supplied those columns to a demand-prediction model. I inspected Sunday and Monday feature values to check continuity across the weekly boundary.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "feature_engineering_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I changed the model output from plain text to JSON for the user interface.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Formatting output JSON, a product feature, or a transformed variable not established as a model input is insufficient."
+        },
+        {
+          "example_id": "feature_engineering_partial_c2",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I created a churn-risk input feature that the classifier used, but its construction rule and representation were not described.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "partial",
+            "c3": "not_evidenced"
+          },
+          "rationale": "A personally created model input establishes c1; the feature identity is stated but its construction or representation detail is missing. No performed check or interpreted finding is stated."
+        },
+        {
+          "example_id": "feature_engineering_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I encoded weekday as sine and cosine values and supplied those columns to a demand-prediction model. I checked those same engineered feature values, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "model_training": {
+      "skill_id": "model_training",
+      "skill_name": "Model training",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally fits OR updates model parameters through an explicitly described training process.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally fit or update model parameters through an explicitly described training process; inference, API integration, and prompt editing are insufficient.",
+          "supported_when": [
+            "The applicant personally fits OR updates model parameters through an explicitly described training process."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Inference, API integration, model selection, or prompt editing without fitting/updating parameters is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant training dataset, objective, optimization step, hyperparameter, or training configuration.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE training dataset, objective, optimization step, hyperparameter OR training configuration in that process."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check training behavior or the trained model through loss monitoring, validation data, output inspection, or another relevant evaluation; gains are not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check training behavior or the trained model through identified loss monitoring, validation data, output inspection OR another relevant evaluation."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Inference, API integration, model selection, or prompt editing without fitting/updating parameters is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "model_training_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I trained a classifier by updating its weights on labeled support tickets with cross-entropy loss. I monitored validation loss each epoch and observed that it rose after epoch six.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "model_training_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I selected a hosted model and changed its prompt without updating any model parameters.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Inference, API integration, model selection, or prompt editing without fitting/updating parameters is insufficient."
+        },
+        {
+          "example_id": "model_training_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I trained a classifier by updating its weights on labeled support tickets with cross-entropy loss. I checked that same model training process, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "fine_tuning": {
+      "skill_id": "fine_tuning",
+      "skill_name": "Fine-tuning",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally adapts an explicitly pretrained model by updating its weights OR trainable adaptation parameters.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally adapt a pretrained model by updating its weights or trainable adaptation parameters; prompt editing and training from scratch alone are insufficient.",
+          "supported_when": [
+            "The applicant personally adapts an explicitly pretrained model by updating its weights OR trainable adaptation parameters."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Training from scratch, prompt editing, or retrieval configuration without pretrained-model parameter adaptation is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the adaptation data, trainable components, procedure, or configuration, such as an explicitly applied parameter-efficient technique.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE adaptation dataset, trainable component, procedure OR configuration, including an applied parameter-efficient technique where relevant."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check the adapted model or adaptation process using relevant validation data, outputs, training behavior, or a comparison; improved results are not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check the adapted model or adaptation process using identified validation data, outputs, training behavior OR a comparison. Improvement is not required."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Training from scratch, prompt editing, or retrieval configuration without pretrained-model parameter adaptation is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "fine_tuning_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I fine-tuned a pretrained language model on support responses by updating LoRA adapter parameters. I checked the adapted model on held-out support questions and noted failures to follow the required response format.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "fine_tuning_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I improved the prompt for a pretrained model but did not update its weights or adapter parameters.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Training from scratch, prompt editing, or retrieval configuration without pretrained-model parameter adaptation is insufficient."
+        },
+        {
+          "example_id": "fine_tuning_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I fine-tuned a pretrained language model on support responses by updating LoRA adapter parameters. I evaluated that same adapted model, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "model_evaluation": {
+      "skill_id": "model_evaluation",
+      "skill_name": "Model evaluation",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally evaluates model quality or behavior against explicitly stated data, criteria, metrics OR error categories.",
+      "c3_kind": "finding_interpretation",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally evaluate model quality or behavior against stated data, criteria, metrics, or error categories; successful execution alone is insufficient.",
+          "supported_when": [
+            "The applicant personally evaluates model quality or behavior against explicitly stated data, criteria, metrics OR error categories."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Successful execution, an unexplained score, or software tests unrelated to model quality is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the evaluation dataset/setup, metric, rubric, error-analysis procedure, or comparison appropriate to the model task.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE evaluation dataset/setup, metric, rubric, error-analysis procedure OR comparison appropriate to that model task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Inspect or interpret an evaluation finding or a limitation of the evaluation; a quantitative improvement is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Inspect OR interpret at least ONE identified evaluation finding OR evaluation limitation. A finding can be qualitative, negative or a direct observed result; no extra software test is required."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly inspected the results of this evaluation/comparison, but no particular finding, interpretation or limitation is stated.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "Only running or designing the evaluation/comparison, preparing setup, intended improvement, planned inspection, or uninspected output is described."
+          ],
+          "uncertain_when": [
+            "A finding/limitation has genuinely unresolved linkage to this evaluation/comparison, or it is unclear whether a claimed inspection happened."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Successful execution, an unexplained score, or software tests unrelated to model quality is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "c3 is inspection or interpretation of a finding or limitation, not a second execution check or proof of improved scores.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "model_evaluation_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I evaluated a ticket classifier on held-out labeled tickets using per-class recall. I inspected the recall results and identified that the billing class had the lowest recall.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "model_evaluation_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "The model API returned HTTP 200; I did not assess the answers or model quality.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Successful execution, an unexplained score, or software tests unrelated to model quality is insufficient."
+        },
+        {
+          "example_id": "model_evaluation_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I evaluated a ticket classifier on held-out labeled tickets using per-class recall. I inspected the results of this evaluation/comparison, but no particular finding or limitation is described.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "Result inspection for the same task is explicit, but no finding, interpretation or limitation is identified."
+        }
+      ]
+    },
+    "experimentation": {
+      "skill_id": "experimentation",
+      "skill_name": "Experimentation",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally designs OR runs an explicit controlled/comparative model experiment, ablation OR test. A described experimental design qualifies before execution.",
+      "c3_kind": "finding_interpretation",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally design or run an explicit controlled/comparative model experiment, ablation, or test; ordinary iterative implementation is insufficient.",
+          "supported_when": [
+            "The applicant personally designs OR runs an explicit controlled/comparative model experiment, ablation OR test. A described experimental design qualifies before execution."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Ordinary implementation iterations without an explicit controlled/comparative design are insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the compared conditions, changed factor, controlled setup, or outcome measure.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE compared condition, changed factor, controlled setup OR outcome measure of that experiment."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Inspect or interpret the comparison or its limitations; a favorable or statistically significant result is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Inspect OR interpret an identified comparison finding OR limitation of that experiment. A concrete design limitation can qualify before execution; an imagined favorable result cannot."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly inspected the results of this evaluation/comparison, but no particular finding, interpretation or limitation is stated.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "Only running or designing the evaluation/comparison, preparing setup, intended improvement, planned inspection, or uninspected output is described."
+          ],
+          "uncertain_when": [
+            "A finding/limitation has genuinely unresolved linkage to this evaluation/comparison, or it is unclear whether a claimed inspection happened."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Ordinary implementation iterations without an explicit controlled/comparative design are insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "A specific comparative design qualifies for c1 before execution. c3 can describe a real limitation of that design; do not invent measured results for an unrun experiment.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "experimentation_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I designed and ran an ablation comparing the same classifier with and without text normalization on one fixed evaluation set. I inspected the comparison and found equal recall in the two conditions.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "experimentation_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I repeatedly edited the application until it worked, without designing or running any comparative experiment.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Ordinary implementation iterations without an explicit controlled/comparative design are insufficient."
+        },
+        {
+          "example_id": "experimentation_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I designed and ran an ablation comparing the same classifier with and without text normalization on one fixed evaluation set. I inspected the results of this evaluation/comparison, but no particular finding or limitation is described.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "Result inspection for the same task is explicit, but no finding, interpretation or limitation is identified."
+        },
+        {
+          "example_id": "experimentation_design_only",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I designed a controlled ablation comparing the same classifier with and without normalization on a fixed evaluation set; it has not been run. I identified that the proposed set covers only one language, limiting the comparison to that language.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The baseline accepts design. A concrete limitation of that design satisfies c3 without inventing a result."
+        }
+      ]
+    },
+    "model_deployment": {
+      "skill_id": "model_deployment",
+      "skill_name": "Model deployment & serving",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally implements, configures, launches OR operates a runnable model-inference serving path or endpoint. Local serving is eligible.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally implement, configure, launch, or operate a runnable model-inference serving path or endpoint; a notebook or request to someone else model API alone is insufficient.",
+          "supported_when": [
+            "The applicant personally implements, configures, launches OR operates a runnable model-inference serving path or endpoint. Local serving is eligible."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "A notebook, framework name, answer generation without serving, or request to somebody else's model API is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe how a request/input reaches the model and produces a served response, or a relevant serving/runtime configuration; local serving can qualify.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe the input/request-to-model-to-served-response path OR at least ONE relevant serving/runtime configuration for that same path."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check the serving path with an inference request, response validation, startup/runtime check, or a relevant error case; cloud/production scale is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check that serving path with an identified inference request, response validation, startup/runtime check OR error case."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "A notebook, framework name, answer generation without serving, or request to somebody else's model API is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "model_deployment_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I launched a local prediction endpoint that parses JSON features, runs a saved classifier and returns the predicted label. I sent a request with a missing feature and verified the endpoint returned the specified validation error.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "model_deployment_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I sent a request to a hosted model API that another team operated.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "A notebook, framework name, answer generation without serving, or request to somebody else's model API is insufficient."
+        },
+        {
+          "example_id": "model_deployment_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I launched a local prediction endpoint that parses JSON features, runs a saved classifier and returns the predicted label. I checked that same model-inference serving path, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "mlops": {
+      "skill_id": "mlops",
+      "skill_name": "MLOps",
+      "group": "lifecycle",
+      "core_boundary": "The applicant personally applies an ML lifecycle operation such as model/data versioning, a reproducible ML workflow, model monitoring OR continuous model delivery.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally apply an ML lifecycle operation such as model/data versioning, a reproducible ML workflow, model monitoring, or continuous model delivery.",
+          "supported_when": [
+            "The applicant personally applies an ML lifecycle operation such as model/data versioning, a reproducible ML workflow, model monitoring OR continuous model delivery."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "An isolated training run, generic non-ML CI, or a lifecycle tool name is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the relevant artifact tracking, reproducibility, monitoring, pipeline, or delivery mechanism; an isolated training run or generic CI is insufficient.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE ML-specific artifact-tracking, reproducibility, monitoring, pipeline OR delivery mechanism in that operation."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check model artifact identity, reproducibility, lifecycle execution, monitoring behavior, or delivery state for that ML operation.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check an identified artifact identity, reproducibility property, lifecycle execution, monitoring behavior OR delivery state for that ML operation."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "An isolated training run, generic non-ML CI, or a lifecycle tool name is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "mlops_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I versioned model artifacts by training-run ID and recorded the matching training-data version in the model registry. I retrieved a registered artifact and checked that its data version matched the recorded training run.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "mlops_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I ran a generic website lint job in CI; it had no model or ML-data lifecycle operation.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "An isolated training run, generic non-ML CI, or a lifecycle tool name is insufficient."
+        },
+        {
+          "example_id": "mlops_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I versioned model artifacts by training-run ID and recorded the matching training-data version in the model registry. I checked that same model-registry versioning operation, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "ai_infrastructure": {
+      "skill_id": "ai_infrastructure",
+      "skill_name": "AI infrastructure",
+      "group": "systems",
+      "core_boundary": "The applicant personally configures OR operates cloud, compute, container, distributed OR operational infrastructure for an explicitly identified AI workload.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally configure or operate cloud, compute, container, distributed, or operational infrastructure for an explicit AI workload; a cloud AI API call alone is insufficient.",
+          "supported_when": [
+            "The applicant personally configures OR operates cloud, compute, container, distributed OR operational infrastructure for an explicitly identified AI workload."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "A cloud AI API call, generic non-AI infrastructure, or framework name without infrastructure work is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a relevant compute/resource, environment, dependency, container, execution, or infrastructure configuration for that workload.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE compute/resource, environment, dependency, container, execution OR infrastructure configuration for that workload."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check AI workload execution, resource behavior, environment setup, or infrastructure operation; large clusters and production traffic are not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check identified AI-workload execution, resource behavior, environment setup OR infrastructure operation. Local or small-scale infrastructure qualifies."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "A cloud AI API call, generic non-AI infrastructure, or framework name without infrastructure work is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "ai_infrastructure_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I configured a container with the required CUDA runtime for a neural-image inference workload. I ran an inference job inside the container and verified that it detected and used the GPU.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "ai_infrastructure_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I called a cloud text-generation API without configuring or operating its infrastructure.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "A cloud AI API call, generic non-AI infrastructure, or framework name without infrastructure work is insufficient."
+        },
+        {
+          "example_id": "ai_infrastructure_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I configured a container with the required CUDA runtime for a neural-image inference workload. I checked infrastructure operation for that same neural-inference workload, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "generative_ai": {
+      "skill_id": "generative_ai",
+      "skill_name": "Generative AI",
+      "group": "systems",
+      "core_boundary": "The applicant personally uses OR builds an explicitly generative system for a stated content-generation task.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally use or build an explicitly generative system for a stated content-generation task; unspecified AI or classification alone is insufficient.",
+          "supported_when": [
+            "The applicant personally uses OR builds an explicitly generative system for a stated content-generation task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Unspecified AI, classification-only work, or inferred coding assistance from image generation is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the actual input/output modality and a relevant generation configuration, integration, or workflow.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe the actual input/output modality AND at least ONE generation configuration, integration OR workflow for that task."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. Actual input and output modalities are identified for the established generation task, but no generation configuration, integration or workflow detail is described.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Inspect or check generated content against a stated task criterion, constraint, or quality issue; model training is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually inspect or check generated content against an identified task criterion, constraint OR quality issue. Model training is not required."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Unspecified AI, classification-only work, or inferred coding assistance from image generation is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "generative_ai_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I built a text-to-image generation workflow that sends written product descriptions to a diffusion model with a fixed negative prompt. I inspected the generated images for unwanted text against the negative-prompt constraint.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "generative_ai_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I used an image classifier that returns a fixed class label; it did not generate content.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Unspecified AI, classification-only work, or inferred coding assistance from image generation is insufficient."
+        },
+        {
+          "example_id": "generative_ai_partial_c2",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I used a generative model to create audio from written scene descriptions; the configuration, integration and workflow were not described.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "partial",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Text input and generated audio establish modalities but no configuration, integration or workflow detail. No performed check or interpreted finding is stated."
+        },
+        {
+          "example_id": "generative_ai_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I built a text-to-image generation workflow that sends written product descriptions to a diffusion model with a fixed negative prompt. I inspected generated images from that same generation workflow, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "llm": {
+      "skill_id": "llm",
+      "skill_name": "Large language models",
+      "group": "systems",
+      "core_boundary": "The applicant personally uses OR develops with an identified language model for text understanding, generation, transcription OR structured information extraction. A multimodal language model performing an explicit language function qualifies even with visual input.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally use or develop with an explicitly identified language model for a stated language task; unspecified AI work is insufficient.",
+          "supported_when": [
+            "The applicant personally uses OR develops with an identified language model for text understanding, generation, transcription OR structured information extraction. A multimodal language model performing an explicit language function qualifies even with visual input."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Unspecified AI, pure image classification, arbitrary image generation, or a model list without a personal language task is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the model input, output, prompting configuration, context handling, or application integration relevant to that task.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE relevant model input, output, prompting configuration, context-handling detail OR application integration in that task. Structured JSON extraction is an output detail; do not add the Python c2 granularity rule."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check language-model behavior or output against a stated requirement, example, or error category; this does not establish training, RAG, or agents.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check the same language-model workload against an identified requirement, test example, error category, comparison, diagnostic observation OR control constraint. A purpose such as for downstream evaluation is not a performed check."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Unspecified AI, pure image classification, arbitrary image generation, or a model list without a personal language task is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Preserve the three-skill v1.1 c1/c2 binary decisions and c3 performed-check boundary. That pilot has a recorded semantic failure; this card is not a validated gold standard.",
+        "An adjacent implementation description does not supply the criterion of a generic tested-it statement unless the source connects the check to that criterion.",
+        "A multimodal language model used for textual or structured extraction is eligible. This does not establish training, fine-tuning, RAG or Agents.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "llm_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I used a multimodal language model to extract invoice fields from images into structured JSON. I compared extracted invoice dates with source-image dates on five examples and recorded mismatches.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "llm_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I used a diffusion model to generate decorative images; no language-model task was involved.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Unspecified AI, pure image classification, arbitrary image generation, or a model list without a personal language task is insufficient."
+        },
+        {
+          "example_id": "llm_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I used a multimodal language model to extract invoice fields from images into structured JSON. I checked the extracted output from that same language-model workload, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        },
+        {
+          "example_id": "llm_purpose_only",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I used a language model to extract invoice fields into JSON for downstream evaluation.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "not_evidenced"
+          },
+          "rationale": "The output format establishes c2; downstream evaluation is a purpose, not a performed check."
+        }
+      ]
+    },
+    "rag": {
+      "skill_id": "rag",
+      "skill_name": "Retrieval-augmented generation",
+      "group": "systems",
+      "core_boundary": "The applicant personally implements OR uses a described retrieval-to-generation workflow where retrieved external context explicitly grounds generated answers.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally implement or use a described retrieval-to-generation workflow in which external retrieved context grounds generated answers; embeddings or search alone are insufficient.",
+          "supported_when": [
+            "The applicant personally implements OR uses a described retrieval-to-generation workflow where retrieved external context explicitly grounds generated answers."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Embeddings, search, a vector database, or separate retrieval and model work without an established grounding connection is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe how relevant external context is retrieved and passed into generation; identify an actual linkage rather than two unrelated tool names.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe how external context is retrieved AND how that retrieved context is passed into generation in the same workflow. A tool pair without the connection is insufficient."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. An external-context-to-generated-answer grounding connection is explicit and one side of retrieval or context transfer is described, but the other side is not described.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check retrieved context relevance, grounded-answer correctness, citations, or a retrieval/generation failure case in that workflow.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check an identified retrieved-context relevance issue, grounded-answer correctness, citation OR retrieval/generation failure case in that workflow."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Embeddings, search, a vector database, or separate retrieval and model work without an established grounding connection is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "A retrieval-to-generation grounding link is required for c1. Missing that defining link is not partial RAG: use uncertain for actual ambiguity and not_evidenced for absence.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "rag_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I built a workflow that retrieves manual passages by vector similarity and inserts those passages into the language-model context to answer maintenance questions. I checked generated citations against the retrieved passages and found a citation to a passage that did not support the answer.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "rag_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I built vector search that returns document passages to users; no generated answer uses the passages.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Embeddings, search, a vector database, or separate retrieval and model work without an established grounding connection is insufficient."
+        },
+        {
+          "example_id": "rag_partial_c2",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I implemented a retrieval-to-generation workflow using externally retrieved manual passages and inserted those passages into the answer model context; the retrieval process was not described.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "partial",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Grounding and transfer into generation are explicit, but how retrieval obtains the passages is missing. No performed check or interpreted finding is stated."
+        },
+        {
+          "example_id": "rag_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I built a workflow that retrieves manual passages by vector similarity and inserts those passages into the language-model context to answer maintenance questions. I checked that same retrieval-to-generation workflow, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        },
+        {
+          "example_id": "rag_unresolved_grounding",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I built a system containing document retrieval and language-model answers, but the description leaves unresolved whether retrieved passages ground those answers.",
+          "expected_statuses": {
+            "c1": "uncertain",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "The defining grounding connection is genuinely unresolved; partial RAG is not appropriate."
+        }
+      ]
+    },
+    "ai_agents": {
+      "skill_id": "ai_agents",
+      "skill_name": "Agents & tool use",
+      "group": "systems",
+      "core_boundary": "The applicant personally designs OR implements a model-mediated tool/action workflow AND (describes invocation OR result handling OR control flow). One bounded tool and human approval suffice; model participation in tool/action control must be established.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally design or implement a model-mediated tool/action workflow with explicit invocation, result handling, or control flow; an agent project name alone is insufficient.",
+          "supported_when": [
+            "The applicant personally designs OR implements a model-mediated tool/action workflow AND (describes invocation OR result handling OR control flow). One bounded tool and human approval suffice; model participation in tool/action control must be established."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "An agent name, plain generation, fixed retrieval, logs, retries, review, or deterministic rules without model-mediated action control is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe a concrete tool/action input, returned result, control decision, or bounded/human-reviewed execution step in that workflow.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE concrete tool/action input, returned result, control decision OR bounded/human-reviewed execution step in that same workflow."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check tool/action execution or result handling against intended behavior, an error case, or a control constraint; autonomy and multiple tools are not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check the same tool/action execution or result handling against identified intended behavior, an error case OR a control constraint. Returning an answer or abstention is ordinary behavior, not by itself a separate check."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "An agent name, plain generation, fixed retrieval, logs, retries, review, or deterministic rules without model-mediated action control is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Preserve the three-skill v1.1 c1/c2 binary decisions and c3 performed-check boundary. That pilot has a recorded semantic failure; this card is not a validated gold standard.",
+        "An adjacent implementation description does not supply the criterion of a generic tested-it statement unless the source connects the check to that criterion.",
+        "Model-mediated action control may be bounded and human-approved. Autonomy and multiple tools are not required.",
+        "Relevant decision-agent work with unresolved model mediation is uncertain; explicit fixed rules without model mediation are not_evidenced.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "ai_agents_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I implemented an assistant whose language model selects a stock-lookup tool and provides the product code as its argument; a user approves each invocation. I tested a denied approval and verified that the stock-lookup tool was not invoked.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "ai_agents_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I built a fixed-rule search script with logs and manual review; no model participated in selecting or controlling actions.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "An agent name, plain generation, fixed retrieval, logs, retries, review, or deterministic rules without model-mediated action control is insufficient."
+        },
+        {
+          "example_id": "ai_agents_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I implemented an assistant whose language model selects a stock-lookup tool and provides the product code as its argument; a user approves each invocation. I checked tool-action execution in that same model-mediated workflow, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        },
+        {
+          "example_id": "ai_agents_unresolved_mediation",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I built a decision agent with retrieval, rule checks and logs, but the description leaves unresolved whether a model selects or controls any tool action.",
+          "expected_statuses": {
+            "c1": "uncertain",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Relevant action work has unresolved defining model mediation; keep pending and suppress dependent credit."
+        }
+      ]
+    },
+    "prompt_engineering": {
+      "skill_id": "prompt_engineering",
+      "skill_name": "Prompt engineering",
+      "group": "systems",
+      "core_boundary": "The applicant personally designs, refines OR evaluates prompts for a defined model behavior.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally design, refine, or evaluate prompts for a defined model behavior; a casual question or merely saying a prompt was followed is insufficient.",
+          "supported_when": [
+            "The applicant personally designs, refines OR evaluates prompts for a defined model behavior."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "A casual question, a prompt being followed, or generic model use without deliberate prompt design/refinement/evaluation is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe an explicit prompt technique or design element, such as instructions, examples, output constraints, context organization, or a targeted revision.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE deliberate prompt design element: instructions, examples, output constraints, context organization OR targeted revision."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check the resulting behavior against examples, constraints, errors, or a defined evaluation criterion; numeric improvement is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check resulting prompted behavior against identified examples, constraints, errors OR a defined evaluation criterion."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "A casual question, a prompt being followed, or generic model use without deliberate prompt design/refinement/evaluation is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "prompt_engineering_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I designed a prompt with labeled examples and an explicit JSON-only output constraint for extracting support-ticket fields. I ran it on tickets with missing dates and checked that the output used null rather than inventing a date.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "prompt_engineering_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I asked a chatbot one casual question about the weather.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "A casual question, a prompt being followed, or generic model use without deliberate prompt design/refinement/evaluation is insufficient."
+        },
+        {
+          "example_id": "prompt_engineering_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I designed a prompt with labeled examples and an explicit JSON-only output constraint for extracting support-ticket fields. I checked the model behavior resulting from that same prompt, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    },
+    "vector_retrieval": {
+      "skill_id": "vector_retrieval",
+      "skill_name": "Vector representations & retrieval",
+      "group": "systems",
+      "core_boundary": "The applicant personally uses embeddings, similarity search, vector indexing OR vector storage for a stated retrieval/representation task.",
+      "c3_kind": "executed_check",
+      "linkage_policy": "same_personal_example",
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "baseline_description": "Personally use embeddings, similarity search, vector indexing, or vector storage for a stated retrieval/representation task; generic arrays or LLM use are insufficient.",
+          "supported_when": [
+            "The applicant personally uses embeddings, similarity search, vector indexing OR vector storage for a stated retrieval/representation task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This core requires established personal contribution, skill identity and an eligible task. An eligible alternative is supported; absent core facts are not partial capability and unresolved facts are uncertain.",
+          "not_evidenced_when": [
+            "No eligible evidence establishes the core.",
+            "Generic arrays, a relational database, or LLM use without a stated embedding/vector operation is insufficient."
+          ],
+          "uncertain_when": [
+            "A relevant described activity has unresolved ownership, skill identity or defining task linkage; simple absence is not uncertainty."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Describe the embedding, similarity, indexing, query, or vector-storage mechanism applied to that task.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Describe at least ONE embedding, similarity, indexing, query OR vector-storage mechanism applied in that task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "One relevant alternative detail satisfies the criterion. Generic labels without any eligible detail provide no distinct half-credit condition; real meaning or linkage ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor a permitted partial condition is established by the selected evidence.",
+            "c1 is not_evidenced or uncertain, or the only detail belongs to another workload.",
+            "Only unconnected tool names or generic task labels are supplied, with no criterion-specific eligible detail or partial detail."
+          ],
+          "uncertain_when": [
+            "A stated detail may be relevant, but its meaning or linkage to the assessed concept/workload is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "baseline_description": "Check retrieved matches, representation behavior, indexing/query correctness, or relevance against examples or a stated criterion; a full RAG pipeline is not required.",
+          "supported_when": [
+            "c1 is supported and this evidence is explicitly linked to the same personal example and workload.",
+            "Actually check identified retrieved matches, representation behavior, indexing/query correctness OR relevance against examples or a criterion. Full RAG is not required."
+          ],
+          "partial_allowed": true,
+          "partial_when": "c1 is supported and linkage is established. The applicant explicitly says a relevant check was actually performed on this same workload, but supplies no check-specific case, expectation, criterion, comparison, error, observation or constraint.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "c1 is not_evidenced or uncertain.",
+            "No performed check of this workload is stated, or only plans, purposes, intended improvements, a prepared test harness, ordinary output, or another workload check is described.",
+            "Adjacent intended behavior is not automatically the criterion used by a generic check statement."
+          ],
+          "uncertain_when": [
+            "There is a real ambiguity about whether a check occurred or which workload it checked; a missing check alone is not uncertain."
+          ]
+        }
+      ],
+      "exclusions": [
+        "Generic arrays, a relational database, or LLM use without a stated embedding/vector operation is insufficient."
+      ],
+      "policy_decisions": [
+        "These are draft operational definitions, not validated assessment labels or evidence of model stability.",
+        "All-job demand remains the market reference; it does not change these criterion evidence thresholds.",
+        "Accept eligible coursework, research, projects, internships and employment; do not require senior scope, production deployment or numeric improvement.",
+        "Use a personal example and link c2/c3 to that same workload. Merely being elsewhere in the same activity does not prove linkage.",
+        "If c1 is not_evidenced, dependent c2/c3 are not_evidenced. If c1 is uncertain, suppress dependent credit and keep the skill pending.",
+        "One eligible alternative satisfies an OR criterion; do not demand all alternatives. Bare lists and interests cannot establish practice.",
+        "Judge selected qualifying evidence. A weak or unrelated additional source does not cancel it; a direct contradiction about ownership, identity or linkage remains uncertain until resolved."
+      ],
+      "examples": [
+        {
+          "example_id": "vector_retrieval_qualifying",
+          "kind": "qualifying",
+          "source_kind": "claim",
+          "text": "I indexed document embeddings and used cosine similarity to retrieve passages for a search query. I inspected the top matches for a password-reset query and marked which passages answered that query.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "supported"
+          },
+          "rationale": "The source establishes an eligible core, relevant detail and the card-specific check, finding or worked-concept condition."
+        },
+        {
+          "example_id": "vector_retrieval_boundary",
+          "kind": "boundary",
+          "source_kind": "claim",
+          "text": "I stored integer counts in an array and did not use embeddings or vector retrieval.",
+          "expected_statuses": {
+            "c1": "not_evidenced",
+            "c2": "not_evidenced",
+            "c3": "not_evidenced"
+          },
+          "rationale": "Generic arrays, a relational database, or LLM use without a stated embedding/vector operation is insufficient."
+        },
+        {
+          "example_id": "vector_retrieval_partial_c3",
+          "kind": "partial",
+          "source_kind": "claim",
+          "text": "I indexed document embeddings and used cosine similarity to retrieve passages for a search query. I checked retrieved matches from that same vector-search task, but the record gives no test case, expectation, criterion, comparison, error, observation or constraint used in that test.",
+          "expected_statuses": {
+            "c1": "supported",
+            "c2": "supported",
+            "c3": "partial"
+          },
+          "rationale": "A same-workload check was performed. The implementation description does not automatically establish what that check examined."
+        }
+      ]
+    }
+  }
+}
