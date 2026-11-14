@@ -1,0 +1,1621 @@
+{
+  "rule_version": "entry-level-skill-rules.v2-draft",
+  "skills": {
+    "programming": {
+      "skill_id": "programming",
+      "skill_name": "Programming & languages",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally implemented program logic for a stated task AND explicitly named the programming language.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "A job title, degree, or teammate's implementation alone."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally implemented program logic for a stated task AND explicitly named the programming language."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a language list, degree, job title, implementation explicitly attributed only to others with no applicant involvement or intended learning is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same programming work includes at least one applied function, control-flow step, data-handling operation OR library operation.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only the language/library name or a generic statement that a program was written is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant performed a check of that program AND identified a test case, expected-output comparison OR diagnosed execution problem.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the same program was explicitly performed, but its case, comparison, observed result and diagnostic detail are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only normal execution, intended correctness, a planned test or an unrelated program check is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "algorithms": {
+      "skill_id": "algorithms",
+      "skill_name": "Algorithms & data structures",
+      "linkage_policy": "same_concept_independent_sources",
+      "core_boundary": "Explicit study OR explanation of algorithms/data structures is stated, OR the applicant personally implemented/analyzed a specified algorithmic mechanism.",
+      "c3_kind": "worked_concept",
+      "exclusions": [
+        "Using/comparing an existing component, generating records, or testing system behavior without describing algorithmic steps, operations, an invariant, complexity, or explicit relevant study/explanation."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Knowledge evidence may come from separate sources about the same mechanism; personal project ownership and software execution are not prerequisites.",
+        "An explicit relevant course counts for c1; c2 still needs a mechanism detail and c3 still needs explanation or a check. A bare complexity assertion can meet c2 while only partly meeting c3.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explicit study OR explanation of algorithms/data structures is stated, OR the applicant personally implemented/analyzed a specified algorithmic mechanism."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a degree, component name, general programming claim or interest is present."
+          ],
+          "uncertain_when": [
+            "The referenced concept/mechanism has conflicting or ambiguous identity, or the evidence meaning cannot be resolved from its actual source."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Evidence identifies relevant processing steps, data-structure operations, an invariant OR computational complexity for an identified mechanism."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a library call or mechanism name is present, with no steps, operations, invariant or complexity detail."
+          ],
+          "uncertain_when": [
+            "The referenced concept/mechanism has conflicting or ambiguous identity, or the evidence meaning cannot be resolved from its actual source."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Evidence explains OR checks correctness, a boundary case OR a time/space property for that mechanism; a worked course example is eligible."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A relevant correctness, boundary or complexity property is explicitly asserted for the identified mechanism, but no explanation, worked case or check supports that property.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a mechanism name, intended efficiency or a property unrelated to the identified mechanism is present."
+          ],
+          "uncertain_when": [
+            "The referenced concept/mechanism has conflicting or ambiguous identity, or the evidence meaning cannot be resolved from its actual source."
+          ]
+        }
+      ]
+    },
+    "object_oriented_design": {
+      "skill_id": "object_oriented_design",
+      "skill_name": "Object-oriented design",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally designed OR implemented an explicitly described object-oriented structure OR design pattern.",
+      "c3_kind": "design_reasoning",
+      "exclusions": [
+        "Using an OO-capable language, writing an endpoint/handler, or using a framework alone. Do not infer an OO design from Java/C#/Python."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "A concrete explanation of the design route can fully meet c3 without executing software. Naming a desired benefit does not equal explaining how the design achieves it.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally designed OR implemented an explicitly described object-oriented structure OR design pattern."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only an OO-capable language/framework name or an endpoint implementation is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same design identifies class responsibilities, object collaboration, encapsulation, interfaces OR polymorphic behavior.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Classes or a pattern are named without responsibilities, collaboration, encapsulation, interfaces or polymorphic detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked OR explained how that design supports a concrete behavior, substitutability, separation of concerns OR change scenario.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A completed explanation OR check of the same OO design is explicit, but no concrete supported behavior, substitution, separation-of-concerns argument or change scenario is identified.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only an intended design benefit or a future check is present; no completed explanation or check of the design is stated."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "ai_assisted_development": {
+      "skill_id": "ai_assisted_development",
+      "skill_name": "AI-assisted development",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally used an identified AI assistant to write, inspect, test OR improve software for a stated development task.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "AI image generation/moderation, general LLM use, or unrelated model evaluation."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally used an identified AI assistant to write, inspect, test OR improve software for a stated development task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only generic LLM use, image generation, unrelated AI evaluation or an assistant name is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same workflow explains how suggested output was incorporated, revised, constrained OR reviewed.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only accepting or obtaining an assistant response is stated, with no incorporation, revision, constraint or review detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked the generated/suggested code using intended behavior, an executed software test OR source-code inspection, with a stated checked detail.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the assistant-generated code was explicitly performed, but the inspected code detail, executed case, comparison and observation are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only trust in the assistant, expected usefulness, a test plan or an unrelated code check is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "relational_sql": {
+      "skill_id": "relational_sql",
+      "skill_name": "SQL & relational databases",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally queried, designed, migrated OR accessed explicitly relational data using SQL OR a stated relational mechanism.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Structured JSON outputs or an unspecified database alone."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally queried, designed, migrated OR accessed explicitly relational data using SQL OR a stated relational mechanism."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only JSON, an unspecified database or a SQL skill list is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same work identifies a query, join, aggregation, key, constraint, schema relationship OR migration operation.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a relational product name or generic data access is stated without an operation detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked the relational operation/returned data against expected records, counts, constraints OR a stated query purpose.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The same relational operation/results were explicitly checked, but the expected records, count, constraint, purpose-based criterion and observation are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only returned rows, an intended query purpose or a future comparison is present without an actual check."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "nosql_search": {
+      "skill_id": "nosql_search",
+      "skill_name": "NoSQL & search",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally used a named non-relational store OR search system for a stated data/search task.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Generic database work, local text matching, or SQL alone."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally used a named non-relational store OR search system for a stated data/search task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only generic database work, SQL, local text matching or a product list is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same task describes a document, key, index, query OR search mechanism.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a store/search product name is present without a mechanism detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked retrieved results, storage behavior, query correctness OR a stated edge case in that same system.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The same store/search operation was explicitly tested, but the result set, storage condition, query criterion, edge case and observation are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a successful call, intended search relevance or a future edge-case test is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "version_control": {
+      "skill_id": "version_control",
+      "skill_name": "Version control",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally used an explicit version-control system through commits, branches, diffs, merges OR pull requests.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "A GitHub link or configuring CI alone without a source-control claim/action."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally used an explicit version-control system through commits, branches, diffs, merges OR pull requests."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a repository link, GitHub profile, CI configuration or a tool list is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same work describes a concrete branching, comparison, conflict-resolution OR revision-management operation.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only the tool name or generic version-control use is present without an operation detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked OR reconciled the resulting history, diff, merged state OR restored revision and identifies what was checked/reconciled.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check/reconciliation of the resulting source-control state is explicit, but the relevant history, diff, merge/revision detail and finding are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only committing, intended collaboration or a future merge check is present without checking/reconciling the result."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "system_design": {
+      "skill_id": "system_design",
+      "skill_name": "System design",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally designed components OR interfaces for a stated problem AND identified component boundaries OR interactions.",
+      "c3_kind": "design_reasoning",
+      "exclusions": [
+        "Implementing a feature or publishing API documentation without describing interface/architecture design."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Design checks can be reasoned walkthroughs; neither a deployed service nor executed load testing is required. An intended requirement alone is not evidence that the design was checked against it.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally designed components OR interfaces for a stated problem AND identified component boundaries OR interactions."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only feature implementation, API publication or a generic architecture claim is present without boundaries/interactions."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same design describes an interface, data/control flow OR design choice linking the components.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Components are listed but no connecting interface, flow or design choice is described."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant completed a design check against a concrete requirement, interaction scenario OR constraint; a worked design review is sufficient.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A completed review/check of the same design is explicit, but the requirement, interaction scenario, constraint and finding used in the check are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only design intent, a future review or a requirement list without an actual design check is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "backend_apis": {
+      "skill_id": "backend_apis",
+      "skill_name": "Backend & API development",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally implemented server-side behavior, a route OR an API contract for a stated function.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Only consuming someone else's API or calling an SDK."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally implemented server-side behavior, a route OR an API contract for a stated function."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only client-side API/SDK consumption or server work explicitly attributed only to others with no applicant involvement is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same implementation describes request/response handling, data access, validation OR error handling.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a backend framework or route name is given with no relevant handling detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant exercised OR tested that backend behavior AND identified a success/failure request, integration case OR expected response.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The same backend was explicitly exercised/tested, but the request/case, expected response and observed result are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only normal operation, a planned request test or another service test is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "frontend": {
+      "skill_id": "frontend",
+      "skill_name": "Frontend development",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally implemented a user interface OR client-side behavior for a stated application.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Handing an API to a frontend teammate, producing static charts, or claiming the team's frontend work."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally implemented a user interface OR client-side behavior for a stated application."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only static analytical charts, handing off an API or an interface explicitly implemented only by others with no applicant involvement is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same implementation describes interaction, state, component, rendering, layout OR accessibility behavior.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a UI framework or page label is stated without relevant frontend behavior."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant performed a check AND identified a user interaction, rendering condition, accessibility condition OR expected client response checked.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the same frontend was explicitly performed, but its interaction/condition, expected response and observed result are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a visual mockup, intended usability or a future user study is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "code_quality": {
+      "skill_id": "code_quality",
+      "skill_name": "Code quality",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally applied an explicit maintainability practice such as refactoring, modularization, clearer contracts OR reducing code complexity.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Merely saying code was written or the system worked; do not infer separate code-review practice."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "A specific maintainability action can establish c1 before its issue-to-method explanation is complete. c2 partial is reserved for the stated issue with missing explanation, not ambiguous ownership.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally applied an explicit maintainability practice such as refactoring, modularization, clearer contracts OR reducing code complexity."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only writing code, a working system or a generic clean-code claim is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "Evidence identifies a concrete organization/interface/duplication/naming/complexity issue AND describes how the same code change addresses it.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The maintainability practice is personally applied and a concrete issue is identified, but the evidence does not say how the applied change addresses that issue.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established: no concrete maintainability issue is identified, even if a generic change method is named."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked preserved behavior, clearer usage OR maintainability of the changed code through a stated test, inspection OR concrete change scenario.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the same changed code was explicitly performed, but no preserved behavior, inspected usage, maintainability criterion or concrete change scenario is identified.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only intended maintainability, a future regression test or normal code execution is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "testing": {
+      "skill_id": "testing",
+      "skill_name": "Software testing",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally designed, implemented OR executed software tests for stated software behavior.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Unrelated model-quality evaluation or simply running the application."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Designing or implementing tests can meet c1 without executing them; c3 separately requires actual outcome inspection or verification.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally designed, implemented OR executed software tests for stated software behavior."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only unrelated model evaluation, running an application or a future intent to create tests is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same tests identify an input/setup, expected behavior, assertion OR coverage case.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a testing framework or generic test label is present without setup/expected/assertion/coverage detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant inspected test outcomes OR used executed tests to verify expected behavior/a fix, with the inspected outcome or verified behavior stated.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "Outcome inspection OR verification with the same tests is explicit, but no observed outcome or verified behavior is identified; a test specification alone does not fill that gap.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only test design, test code, a prepared harness or a future execution is present without inspecting outcomes or verifying behavior."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "debugging": {
+      "skill_id": "debugging",
+      "skill_name": "Debugging",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally reproduced, traced, isolated, diagnosed OR corrected a stated software fault.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Merely viewing failed CI runs or monitoring a status indicator without diagnostic work."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally reproduced, traced, isolated, diagnosed OR corrected a stated software fault."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a failed CI/status indicator or a diagnosis explicitly made only by others with no applicant involvement is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same fault has a diagnostic step, hypothesis, log/trace inspection OR isolation method.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a fault label or a statement that a bug was fixed is present with no diagnostic detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked the diagnosis/fix by rerunning the failing case, inspecting relevant state OR comparing actual and expected behavior.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the same diagnosis/fix was explicitly performed, but the rerun case, inspected state, comparison and observation are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only an intended fix, a normal subsequent run or a planned regression check is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "code_review": {
+      "skill_id": "code_review",
+      "skill_name": "Code review",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally reviewed source code/a proposed implementation OR explicitly participated in source-code/PR review.",
+      "c3_kind": "review_feedback",
+      "exclusions": [
+        "Reviewing CI status, reading logs, approving documents, or merging alone."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Actionable feedback can fully meet c3 without a later revision or execution check. Approval alone receives no c3 credit.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally reviewed source code/a proposed implementation OR explicitly participated in source-code/PR review."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only merging, CI-status review, logs, document approval or a PR link is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same review identifies a concrete concern OR review focus such as correctness, maintainability, security OR coverage.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only review participation is stated with no implementation concern or review focus."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant provided actionable code feedback OR responded substantively to actionable code feedback OR checked the resulting revision; the requested change, substantive response or revision finding is stated.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "Providing/responding to code feedback OR checking the resulting revision is explicit, but the feedback action, substantive response and checked revision detail are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only an approval, a future review action or unrelated feedback is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "distributed_systems": {
+      "skill_id": "distributed_systems",
+      "skill_name": "Distributed systems",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally designed, implemented OR diagnosed communication, coordination, shared state OR isolation across explicitly separate services/processes/nodes OR tenants.",
+      "c3_kind": "design_reasoning",
+      "exclusions": [
+        "A generic component or policy comparison without an explicit cross-boundary mechanism. Do not infer topology or coordination from a tool or domain."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "An explicit local multi-process prototype can qualify. Multi-tenant isolation is an alternative route; replicas, nodes and microservices are not all required.",
+        "A reasoned concrete scenario can fully meet c3 without runtime execution.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally designed, implemented OR diagnosed communication, coordination, shared state OR isolation across explicitly separate services/processes/nodes OR tenants."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only one local service, a tool name or a generic scalability claim is present without an explicit interaction/isolation boundary."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same boundary has a stated mechanism such as messages, replication, partitioning, consistency OR tenant isolation.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Separate components are named without a communication, state or isolation mechanism."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked OR reasoned through a concrete cross-boundary scenario involving failure, ordering, duplicates, consistency, isolation OR another identified interaction property.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A completed check OR reasoning exercise about the same cross-boundary behavior is explicit, but no concrete interaction scenario or conclusion is identified.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only intended reliability or a future distributed test is present, with no completed check or reasoned scenario."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "cloud": {
+      "skill_id": "cloud",
+      "skill_name": "Cloud platforms",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally used an identified cloud provider/service for a stated computing, storage, deployment OR operational task.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Docker, local deployment, or remote collaboration alone; do not infer cloud providers."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Credit only the identified provider/service; AWS does not establish Azure or Google Cloud experience.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally used an identified cloud provider/service for a stated computing, storage, deployment OR operational task."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only local deployment, Docker, remote collaboration or a cloud product list is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same task describes service configuration, permissions, resource setup OR integration.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only the provider/service name is present without task-related setup or integration detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked service access, execution, deployment behavior, resource state OR an expected result for that cloud task.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the same cloud task was explicitly performed, but the access/execution condition, inspected resource state, expected result and observation are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only the intended deployment/storage purpose, a resource being created or a future check is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "containers": {
+      "skill_id": "containers",
+      "skill_name": "Containers",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally built, configured OR ran a container OR explicitly containerized workload.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "CI use or deployment alone without an explicitly containerized workload."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Docker evidence does not establish Kubernetes. Local container work can qualify without orchestration.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally built, configured OR ran a container OR explicitly containerized workload."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only ordinary deployment, CI use or a container product list is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same workload describes an image, dependency, port, volume, environment OR orchestration configuration.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only Docker/Kubernetes naming is present without workload configuration detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked startup, application execution, connectivity, isolation OR reproducibility for that containerized workload.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the same container workload was explicitly performed, but the checked condition, execution/connectivity case and observed result are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only building an image, running a command, an intended portable environment or a future check is present without an actual workload check."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "delivery_automation": {
+      "skill_id": "delivery_automation",
+      "skill_name": "CI/CD & delivery automation",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally automated a build, test, release, infrastructure-provisioning OR configuration step.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Merely using Git, writing a script unrelated to delivery, or claiming another person's pipeline."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally automated a build, test, release, infrastructure-provisioning OR configuration step."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only Git use, an unrelated automation script or a pipeline explicitly owned and automated only by others with no applicant involvement is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same automation describes a trigger, sequence, artifact, environment OR configuration.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a CI/CD product name or generic automation claim is present without a workflow detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked an actual automated step through output, run status with diagnostic inspection, resulting artifact OR test deployment, identifying the checked detail.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of an actual run of the same automation is explicit, but output, diagnostic inspection, artifact detail and deployment result are all missing; an uninspected status indicator alone is not partial.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a green status without diagnostic inspection, intended delivery benefits, prepared workflow file or future run is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "performance": {
+      "skill_id": "performance",
+      "skill_name": "Performance analysis",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally measured, analyzed OR optimized a stated software/system latency, throughput, resource usage OR comparable performance property.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "An unexplained improvement percentage or a product-success metric unrelated to performance."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "No positive performance improvement is required. A single explicit measurement may establish both practical performance work and a performance observation when it satisfies each criterion.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally measured, analyzed OR optimized a stated software/system latency, throughput, resource usage OR comparable performance property."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only an unexplained percentage, general product-success metric or generic faster claim is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same work describes a measured workload, profiling method, bottleneck OR optimization mechanism.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a percentage or performance tool name is given without workload, method, bottleneck or mechanism."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked that performance behavior using an identified measurement OR observation; a gain is not required.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A performance check of the same workload is explicit, but the measurement, measured condition and observation are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only desired improvement, a benchmark harness or a future measurement is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "observability_operations": {
+      "skill_id": "observability_operations",
+      "skill_name": "Observability & operations",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally implemented OR used logs, metrics, traces, alerts, monitoring OR maintenance for a running software system.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Ordinary progress reports, handover documents, or one-off local tests alone."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally implemented OR used logs, metrics, traces, alerts, monitoring OR maintenance for a running software system."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only progress reports, handover documents, a planned dashboard or one-off local tests are present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same work describes an operational signal, instrumentation, alert condition OR diagnostic/maintenance workflow.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only an observability tool name or generic monitoring is present without signal/workflow detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant used that signal/workflow to check system behavior, investigate an operational issue OR verify the monitoring/maintenance action, identifying the observed issue/condition/result.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "Using the same operational signal/workflow in a completed check/investigation is explicit, but the observed condition, investigated issue and verification detail are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only collecting a signal, intended visibility or a future incident check is present without using it to check/investigate/verify."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "reliability": {
+      "skill_id": "reliability",
+      "skill_name": "Reliability",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally handled a stated software failure, recovery, load, redundancy OR scaling concern.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Simply deploying software or saying it is robust/scalable without relevant knowledge or actions."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally handled a stated software failure, recovery, load, redundancy OR scaling concern."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only deploying software, calling it robust/scalable or a reliability action explicitly performed only by others with no applicant involvement is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same work describes a relevant mechanism such as retries, recovery, limits, redundancy OR controlled scaling.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a reliability goal is stated without a relevant mechanism."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked a failure, recovery, load OR correctness scenario related to that mechanism and identifies the tested condition or finding.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A check of the same reliability mechanism is explicit, but its failure/recovery/load/correctness scenario and finding are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only intended resilience, a future load test or normal successful operation is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    },
+    "security": {
+      "skill_id": "security",
+      "skill_name": "Security",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "The applicant personally implemented OR tested an explicit software-security control such as authentication, authorization, secure access OR vulnerability mitigation.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Content moderation, ordinary data validation, or database use alone."
+      ],
+      "policy_decisions": [
+        "All examples are synthetic analyst-authored illustrations, not applicant records or validated gold labels.",
+        "A missing resume detail means not evidenced, not proof that the applicant lacks ability.",
+        "Apply no-credit predicates only when qualifying selected evidence is absent; an unrelated weak source does not cancel qualifying evidence. A directly conflicting relevant source requires review."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant personally implemented OR tested an explicit software-security control such as authentication, authorization, secure access OR vulnerability mitigation."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "The core condition is an explicit eligible action/knowledge route, not a divisible checklist. Missing required evidence receives no credit; a genuine ownership or identity ambiguity is uncertain.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only content moderation, ordinary data validation, database use or a security tool list is present."
+          ],
+          "uncertain_when": [
+            "Relevant work is described but personal ownership or the required skill identity is genuinely unresolved, including a team claim with unspecified personal contribution. Work explicitly attributed only to someone else with no applicant involvement is not_evidenced."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The same control identifies a protected resource, trust boundary, permission rule, threat OR secure mechanism.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Any one listed relevant mechanism/detail satisfies this alternative-based criterion; a generic label alone does not establish a smaller qualifying mechanism.",
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only a generic secure claim or control label is present without resource/boundary/rule/threat/mechanism detail."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The applicant checked an allowed/denied access case OR a concrete security behavior related to that control.",
+            "The detail belongs to the established personal example/workload. Separately identified source records can be combined only when linkage is explicit; a teammate action or different workload does not qualify."
+          ],
+          "partial_allowed": true,
+          "partial_when": "A test/check of the same security control is explicit, but the access case, checked security behavior and observation are all missing.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "Neither the full condition nor the permitted partial condition is established from eligible evidence. Only intended protection, ordinary input checks, a future penetration test or unrelated safety moderation is present."
+          ],
+          "uncertain_when": [
+            "A relevant detail exists but its linkage to the established personal example/workload, ownership or meaning is genuinely unresolved."
+          ]
+        }
+      ]
+    }
+  }
+}

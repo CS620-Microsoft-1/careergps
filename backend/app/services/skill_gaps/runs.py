@@ -19,6 +19,12 @@ from uuid import UUID, uuid4
 
 from app.core.config import BACKEND_ROOT, SkillGapSettings
 from app.schemas.skill_gap_web import JobFamily, SkillGapRun
+from . import entry_level, entry_level_transport
+from .entry_level_cache import ENTRY_LEVEL_BRANCH_CACHE_VERSION, EntryLevelBranchCache
+from .entry_level_report import (
+    POLICY_VERSION as ENTRY_LEVEL_POLICY, RESPONSE_PROCESSING_VERSION as ENTRY_LEVEL_PROCESSING,
+    build_report as build_entry_level_report, score_demand_coverage,
+)
 from .response import RESPONSE_PROCESSING_VERSION, calculate_web_report
 from .transport import SkillGapConfigurationError
 from .assets import ASSET_ROOT
@@ -41,7 +47,7 @@ from .skill_group_transport import (
 _ARTIFACTS = {"input.json", "reviewed_resume.json", "observed_agent.json", "agent.raw.json",
               "agent.response.json", "local_checks.json", "coverage_audit.json", "skill_gaps.json",
               "response_processing.json", "configuration_check.json", "extraction_audit.json",
-              "cache_provenance.json", "source_agent.raw.json"}
+              "cache_provenance.json", "source_agent.raw.json", "selection_diagnostics.json"}
 
 
 def _now() -> str:
@@ -59,14 +65,16 @@ def _sha(value: object) -> str:
 class SkillGapRunManager:
     def __init__(self, directory: Path | None = None, *, settings: SkillGapSettings | None = None,
                  group_invoker: Callable | None = None, group_preflight: Callable | None = None,
-                 invoker: Callable | None = None, store: JsonRunStore | None = None) -> None:
+                 invoker: Callable | None = None, store: JsonRunStore | None = None,
+                 entry_level_workflow: bool = False) -> None:
         self.directory = (directory or BACKEND_ROOT / "local_results" / "web_skill_gaps").resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
         self.store = store or JsonRunStore(self.directory)
         self.settings = (settings or SkillGapSettings()).model_copy(deep=True)
+        self._entry_level = entry_level_workflow
         self._branches = GROUPS
         self._partition_policy = PARTITION_POLICY_VERSION
-        self._selection_policy = SELECTION_POLICY_VERSION
+        self._selection_policy = entry_level.RUNTIME_VERSION if self._entry_level else SELECTION_POLICY_VERSION
         self._make_branch_payloads = make_group_payloads
         self._merge_outputs = merge_group_outputs
         self._configuration_signature = lambda settings: configuration_signature(settings)
@@ -81,10 +89,10 @@ class SkillGapRunManager:
             self._branch_invoke = lambda prepared, payload, save, on_request, timings: invoker(
                 payload, save, on_request, timings)
         else:
-            self._branch_invoke = invoke_prepared
-        self._branch_preflight = group_preflight or preflight
+            self._branch_invoke = entry_level_transport.invoke_prepared if self._entry_level else invoke_prepared
+        self._branch_preflight = group_preflight or (entry_level_transport.preflight if self._entry_level else preflight)
         self.branch_signature = configuration_signature(self.settings)
-        self._latest_versions = uses_latest(self.settings)
+        self._latest_versions = not self._entry_level and uses_latest(self.settings)
         self._prepared_runs: dict[str, dict] = {}
         # Snapshots of submitted runs the store hasn't created yet; the next _persist creates them.
         self._unsaved: dict[str, dict] = {}
@@ -95,12 +103,14 @@ class SkillGapRunManager:
         self.catalog = load(ASSET_ROOT / "core_catalog.json")
         self.market = load(ASSET_ROOT / "market_snapshot.json")
         self.core_cards = CoreSkillCards(self.catalog)
-        self.branch_cache = BranchCache(self.directory / "_branch_cache")
+        cache = EntryLevelBranchCache if self._entry_level else BranchCache
+        self.branch_cache = cache(self.directory / "_branch_cache")
         self.instructions_sha256 = _sha({
             group: self.branch_signature["branches"][group]["instructions_sha256"]
             for group in self._branches})
-        self.prompt_revision = "skill-groups.v1"
-        fingerprint = {"response_processing": RESPONSE_PROCESSING_VERSION,
+        self.prompt_revision = entry_level.RUNTIME_VERSION if self._entry_level else "skill-groups.v1"
+        self._response_processing = ENTRY_LEVEL_PROCESSING if self._entry_level else RESPONSE_PROCESSING_VERSION
+        fingerprint = {"response_processing": self._response_processing,
             "core_cards": self.core_cards.signature(), "web_instructions": self.instructions_sha256,
             "v12_assets": {name: hashlib.sha256((ASSET_ROOT / name).read_bytes()).hexdigest()
                 for name in ("core_catalog.json", "market_snapshot.json", "scoring_policy.json", "response-format.json")},
@@ -109,7 +119,21 @@ class SkillGapRunManager:
             "branch_cache_version": BRANCH_CACHE_VERSION}
         self._fingerprint_material = fingerprint
         self.fingerprint = _sha(fingerprint)
+        if self._entry_level:
+            self._entry_signatures = {family: self._entry_configuration(family) for family in self.catalog["families"]}
         self._recover()
+
+    def _entry_configuration(self, family: JobFamily) -> dict:
+        return {**entry_level_transport.configuration_signature(self.settings, family),
+                "runtime_signature": entry_level.signature()}
+
+    def _entry_identity(self, family: JobFamily) -> tuple[dict, str, str]:
+        signature = self._entry_signatures[family]
+        instruction_hash = _sha({branch: item["instructions_sha256"]
+                                 for branch, item in signature["branches"].items()})
+        material = {**self._fingerprint_material, "branch_configuration": signature,
+                    "web_instructions": instruction_hash, "branch_cache_version": ENTRY_LEVEL_BRANCH_CACHE_VERSION}
+        return signature, _sha(material), instruction_hash
 
     def _folder(self, identifier: str) -> Path:
         return run_folder(self.directory, identifier)
@@ -244,7 +268,9 @@ class SkillGapRunManager:
         resume_hash = _sha(reviewed)
         signature, fingerprint, instruction_hash = self.branch_signature, self.fingerprint, self.instructions_sha256
         prepared, configuration_artifacts = {}, {}
-        if self._latest_versions:
+        if self._entry_level:
+            signature, fingerprint, instruction_hash = self._entry_identity(job_family)
+        elif self._latest_versions:
             signature, fingerprint, instruction_hash, prepared, configuration_artifacts = self._resolve_latest(
                 reviewed, resume, job_family)
         cache_key = self._cache_key(owner, resume, resume_hash, job_family, fingerprint)
@@ -267,11 +293,13 @@ class SkillGapRunManager:
                      "calculation_fingerprint": fingerprint,
                      "prompt_revision": self.prompt_revision,
                      "instructions_sha256": instruction_hash,
-                     "response_processing_version": RESPONSE_PROCESSING_VERSION,
+                     "response_processing_version": self._response_processing,
                      "extraction_strategy": "skill_groups",
                      "branch_cache_policy": "bypass" if force else "reuse",
                      "rebuild_report": bool(rebuild_report),
                      "core_skill_cards": self.core_cards.signature(job_family)}
+            if self._entry_level:
+                state.update(policy_version=ENTRY_LEVEL_POLICY, response_schema_name=entry_level_transport.SCHEMA_NAME)
             state["branch_configuration"] = deepcopy(signature)
             state["version_selection"] = "latest_saved" if self._latest_versions else "pinned"
             state["reuse_from_run_id"] = (prior_id if prior_id and prior["status"] == "failed" else None)
@@ -314,16 +342,30 @@ class SkillGapRunManager:
     def latest(self, *, user_id: UUID, resume_id: UUID,
                reviewed_resume: dict, job_family: JobFamily) -> SkillGapRun:
         fingerprint = self.fingerprint
-        if self._latest_versions:
+        if self._entry_level:
+            _, fingerprint, _ = self._entry_identity(job_family)
+        elif self._latest_versions:
             _, fingerprint, _, _, _ = self._resolve_latest(deepcopy(reviewed_resume), str(resume_id), job_family)
-        key = self._cache_key(str(user_id), str(resume_id), _sha(reviewed_resume), job_family, fingerprint)
+        owner, resume, resume_hash = str(user_id), str(resume_id), _sha(reviewed_resume)
+        key = self._cache_key(owner, resume, resume_hash, job_family, fingerprint)
         with self._lock:
             identifier = self._keys.get(key)
+            if identifier is None and self._entry_level:
+                # Previously completed results remain readable until the same
+                # confirmed resume has a run under the revised workflow.
+                prior = max((state for state in self._states.values()
+                             if state["status"] == "completed" and state["user_id"] == owner
+                             and state["resume_id"] == resume and state["resume_hash"] == resume_hash
+                             and state["job_family"] == job_family),
+                            key=lambda state: (state["created_at"], state["id"]), default=None)
+                if prior:
+                    identifier = prior["id"]
             if identifier is None:
                 raise KeyError("No current analysis")
             return self.get(identifier, user_id=user_id)
 
-    def _reuse_branch(self, state: dict, branch: str, payload: dict, folder: Path) -> dict | None:
+    def _reuse_branch(self, state: dict, branch: str, payload: dict, folder: Path,
+                      validate: Callable) -> dict | None:
         """An explicit retry may reuse checked siblings from the same failed run.
 
         The full resume/configuration cache key is required because global evidence
@@ -345,7 +387,7 @@ class SkillGapRunManager:
             if _canonical(load(source / "input.json")) != _canonical(payload):
                 return None
             output = load(source / "agent.response.json")
-            checks = self._branch_checks(output, payload)
+            checks = validate(output, payload)
             if checks["global_errors"] or any(row["status"] != "passed" for row in checks["skills"].values()):
                 return None
             target = folder / "branches" / branch
@@ -361,7 +403,7 @@ class SkillGapRunManager:
             self._persist(state)
         return output
 
-    def _branch_cache_arguments(self, state: dict, branch: str, payload: dict) -> dict:
+    def _branch_cache_arguments(self, state: dict, branch: str, payload: dict, diagnostics: dict | None) -> dict:
         signature = state["branch_configuration"]
         return {
             "owner": state["user_id"], "resume_id": state["resume_id"],
@@ -374,9 +416,13 @@ class SkillGapRunManager:
                 "schema_sha256": signature["schema_sha256"],
                 "schema_file_sha256": signature["schema_file_sha256"],
                 "core_cards": self.core_cards.signature(payload["job_family"]),
-                "response_processing": RESPONSE_PROCESSING_VERSION,
+                "response_processing": self._response_processing,
                 "partition_policy": self._partition_policy,
                 "selection_policy": self._selection_policy,
+                **({"runtime_signature": signature["runtime_signature"],
+                    "request_hint_sha256": signature["request_hint_sha256"],
+                    "selection_diagnostics": _sha({sid: diagnostics["skills"][sid]
+                        for sid in payload["evidence_scope"]["assigned_skill_ids"]})} if diagnostics is not None else {}),
             },
         }
 
@@ -384,12 +430,12 @@ class SkillGapRunManager:
         return validate_group_output(output, payload, self.catalog)
 
     def _reuse_incremental_branch(self, state: dict, branch: str, payload: dict,
-                                  folder: Path) -> dict | None:
+                                  folder: Path, validate: Callable, diagnostics: dict | None) -> dict | None:
         if state.get("branch_cache_policy") != "reuse":
             return None
         started = time.perf_counter()
-        hit = self.branch_cache.lookup(**self._branch_cache_arguments(state, branch, payload),
-                                       validate=self._branch_checks)
+        hit = self.branch_cache.lookup(**self._branch_cache_arguments(state, branch, payload, diagnostics),
+                                       validate=validate)
         if hit is None:
             return None
         target = folder / "branches" / branch
@@ -401,13 +447,15 @@ class SkillGapRunManager:
             # This response belongs to its source run, not to a new paid call.
             save_json(target / "source_agent.raw.json", hit.artifacts["agent.raw.json"])
         save_json(target / "cache_provenance.json", {
-            "cache_version": BRANCH_CACHE_VERSION, "cache_key": hit.key,
+            "cache_version": ENTRY_LEVEL_BRANCH_CACHE_VERSION if self._entry_level else BRANCH_CACHE_VERSION,
+            "cache_key": hit.key,
             "source_run_id": hit.source_run_id,
             "source_resume_id": hit.source_resume_id,
             "original_model_calls": hit.original_model_calls,
             "current_model_calls": 0, "id_remapping": hit.id_remapping,
             "revalidated_status": hit.validation["status"],
-            "scope": "same_branch_input_with_checked_reference_remapping_not_semantic_verification",
+            "scope": ("same_exact_group_input_with_revalidated_proofs" if self._entry_level else
+                      "same_branch_input_with_checked_reference_remapping_not_semantic_verification"),
         })
         with self._lock:
             state["branches"][branch].update(
@@ -421,7 +469,7 @@ class SkillGapRunManager:
         return hit.output
 
     def _store_incremental_branch(self, state: dict, branch: str, payload: dict,
-                                  output: dict, folder: Path) -> None:
+                                  output: dict, folder: Path, validate: Callable, diagnostics: dict | None) -> None:
         """Cache transport results; partial evidence remains partial on reuse.
 
         Cache storage is an optimization, never a reason to repair evidence or
@@ -430,12 +478,12 @@ class SkillGapRunManager:
         """
         source = folder / "branches" / branch
         try:
-            checks = self._branch_checks(output, payload)
+            checks = validate(output, payload)
             artifacts = {name: load(source / name) for name in (
                 "observed_agent.json", "configuration_check.json", "agent.raw.json")
                 if (source / name).is_file()}
             stored = self.branch_cache.store(
-                **self._branch_cache_arguments(state, branch, payload),
+                **self._branch_cache_arguments(state, branch, payload, diagnostics),
                 output=output, validation=checks, source_run_id=state["id"],
                 artifacts=artifacts, original_model_calls=state["branches"][branch]["model_calls"])
         except (OSError, ValueError, TypeError, KeyError):
@@ -443,13 +491,45 @@ class SkillGapRunManager:
         with self._lock:
             state["branches"][branch]["cache_stored"] = stored
 
-    def _work_branches(self, state: dict, payload: dict, folder: Path, timings: dict) -> tuple[dict, dict]:
-        if self._configuration_signature(self.settings) != self.branch_signature:
+    def _work_branches(self, state: dict, payload: dict, folder: Path, timings: dict) -> tuple[dict, dict, dict | None]:
+        family = payload["job_family"]
+
+        def configuration_changed():
+            if self._entry_level:
+                return self._entry_configuration(family) != state["branch_configuration"]
+            return self._configuration_signature(self.settings) != self.branch_signature
+
+        if configuration_changed():
             raise SkillGapConfigurationError("local_instructions_changed",
                 "The skill-group configuration changed after the API started. Restart the API, then retry. No model call was made.")
-        payloads = self._make_branch_payloads(payload)
-        active = [branch for branch in self._branches if any(source["units"] for source in payloads[branch]["resume_sources"])]
-        outputs = {branch: absent_output(payloads[branch]) for branch in self._branches if branch not in active}
+        diagnostics = None
+        if self._entry_level:
+            payloads, diagnostics = entry_level.prepare_group_inputs(payload)
+            save_json(folder / "selection_diagnostics.json", diagnostics)
+            active = list(self._branches) if any(source["units"] for source in payload["resume_sources"]) else []
+        else:
+            payloads = self._make_branch_payloads(payload)
+            active = [branch for branch in self._branches
+                      if any(source["units"] for source in payloads[branch]["resume_sources"])]
+        absent = entry_level.absent_group_output if self._entry_level else absent_output
+        outputs = {branch: absent(payloads[branch]) for branch in self._branches if branch not in active}
+        assessed = {}
+
+        def validate(output: dict, group_input: dict) -> dict:
+            if diagnostics is None:
+                return self._branch_checks(output, group_input)
+            group = group_input["evidence_scope"]["branch"]
+            key = (group, _sha(output))
+            if key not in assessed:
+                assessed[key] = entry_level.assess(group, output, group_input, diagnostics)
+            assessment, _ = assessed[key]
+            errors = entry_level.structural_errors(assessment)
+            return {
+                "status": "failed" if errors else "partial" if assessment["unscored_skill_ids"] else "passed",
+                "global_errors": errors,
+                "skills": {row["skill_id"]: {"status": "passed" if row["entry_level_score"] is not None
+                                            else "needs_confirmation"} for row in assessment["skills"]},
+            }
         with self._lock:
             state["branches"] = {branch: {"status": "pending" if branch in active else "skipped_empty",
                 "model_calls": 0, "elapsed_seconds": 0.0, "reused": False, "error_code": None,
@@ -466,9 +546,9 @@ class SkillGapRunManager:
         for branch in self._branches:
             save_branch(branch, "input.json", payloads[branch])
         for branch in active:
-            reused = self._reuse_branch(state, branch, payloads[branch], folder)
+            reused = self._reuse_branch(state, branch, payloads[branch], folder, validate)
             if reused is None:
-                reused = self._reuse_incremental_branch(state, branch, payloads[branch], folder)
+                reused = self._reuse_incremental_branch(state, branch, payloads[branch], folder, validate, diagnostics)
             if reused is not None:
                 outputs[branch] = reused
         pending = [branch for branch in active if branch not in outputs]
@@ -479,12 +559,15 @@ class SkillGapRunManager:
                 raise SkillGapConfigurationError("resolved_versions_unavailable",
                     "This analysis has no saved version snapshot. Start a new analysis explicitly.")
             prepared = {branch: snapshot[branch] for branch in pending}
+        elif self._entry_level:
+            prepared = self._branch_preflight(pending, save_branch, settings=self.settings,
+                                               family=family) if pending else {}
         else:
             prepared = self._branch_preflight(pending, save_branch, settings=self.settings) if pending else {}
         if set(prepared) != set(pending):
             raise SkillGapConfigurationError("incomplete_branch_configuration",
                 "All required evidence Agents must pass configuration checks before analysis can start.")
-        if self._configuration_signature(self.settings) != self.branch_signature:
+        if configuration_changed():
             raise SkillGapConfigurationError("local_instructions_changed",
                 "The skill-group configuration changed during preflight. Restart the API, then retry. No model call was made.")
         with self._lock:
@@ -511,7 +594,11 @@ class SkillGapRunManager:
                 if state["branches"][branch]["model_calls"] != 1:
                     raise RuntimeError("The evidence invoker did not account for its model request")
                 save_branch(branch, "agent.response.json", output)
-                self._store_incremental_branch(state, branch, payloads[branch], output, folder)
+                if diagnostics is not None:
+                    # The entry-level assessment is required independently of
+                    # whether it can be cached.
+                    validate(output, payloads[branch])
+                self._store_incremental_branch(state, branch, payloads[branch], output, folder, validate, diagnostics)
                 with self._lock:
                     state["branches"][branch]["status"] = "completed"
                 return output
@@ -546,7 +633,36 @@ class SkillGapRunManager:
                 raise error
             raise SkillGapConfigurationError("branch_analysis_failed",
                 f"The {branch} evidence Agent could not finish. Successful branches were saved; retry explicitly to reuse them.") from None
-        return self._merge_outputs(payload["job_family"], outputs, self.catalog, payload["resume_sources"])
+        if diagnostics is None:
+            output, audit = self._merge_outputs(family, outputs, self.catalog, payload["resume_sources"])
+            return output, audit, None
+
+        assessments = {}
+        audit = {"workflow": entry_level.RUNTIME_VERSION, "job_family": family, "branches": {}, "skills": {}}
+        blocked = []
+        for branch in self._branches:
+            output = outputs[branch]
+            validate(output, payloads[branch])
+            assessment, meta = assessed[branch, _sha(output)]
+            assessments[branch] = assessment
+            review = assessment["citation_review"]
+            audit["branches"][branch] = {"validation": assessment, "response_processing": meta}
+            if review["group_blocking_errors"]:
+                blocked.append(branch)
+            for row in assessment["skills"]:
+                audit["skills"][row["skill_id"]] = {"selected_branch": branch, "review": row.get("selection_review")}
+        save_json(folder / "extraction_audit.json", audit)
+        if blocked:
+            raise SkillGapConfigurationError("entry_level_group_validation_failed",
+                f"The {blocked[0]} Agent returned evidence that could not be verified. Start a new analysis to retry.")
+        report = build_entry_level_report(family, assessments, self.catalog, self.market, payload["resume_sources"])
+        if summarize_match(report) is None:
+            audit["result_kind"] = "unscored"
+        else:
+            audit["result_kind"] = "partial" if report["unscored_skill_ids"] else "complete"
+        audit["score_demand_coverage"] = score_demand_coverage(report)
+        output = {"job_family": family, "groups": {branch: outputs[branch] for branch in self._branches}}
+        return output, audit, report
 
     def _work(self, identifier: str, reviewed: dict) -> None:
         started = time.perf_counter()
@@ -567,13 +683,14 @@ class SkillGapRunManager:
             payload = prepare(state["job_family"], reviewed, state["resume_id"], self.catalog,
                               core_cards=self.core_cards)
             save("input.json", payload)
-            output, extraction_audit = self._work_branches(state, payload, folder, timings)
+            output, extraction_audit, report = self._work_branches(state, payload, folder, timings)
             save("extraction_audit.json", extraction_audit)
             save("agent.response.json", output)
             with self._lock:
                 state.update(phase="checking", azure_phase_timings=timings)
                 self._persist(state)
-            report = calculate_web_report(state["job_family"], output, self.catalog, self.market, payload["resume_sources"])
+            if report is None:
+                report = calculate_web_report(state["job_family"], output, self.catalog, self.market, payload["resume_sources"])
             report["resume_id"] = payload["resume_id"]
             report["user_id"] = state["user_id"]
             report["database_used"] = True
@@ -620,7 +737,18 @@ _manager_lock = Lock()
 def _cached_skill_gap_run_manager() -> SkillGapRunManager:
     # The API keeps runs in the database; branch artifacts stay in local run folders.
     from app.db.session import SessionLocal
-    return SkillGapRunManager(store=DbRunStore(SessionLocal))
+    settings = SkillGapSettings()
+    configured_groups = any(
+        (getattr(settings, f"skill_gap_{group}_agent_{field}") or "").strip()
+        for group in GROUPS for field in ("name", "version")
+    )
+    use_entry_level = settings.skill_gap_workflow == "entry_level" or (
+        settings.skill_gap_workflow == "auto"
+        and not configured_groups
+        and entry_level_transport.can_use_entry_level(settings)
+    )
+    return SkillGapRunManager(store=DbRunStore(SessionLocal), settings=settings,
+                              entry_level_workflow=use_entry_level)
 
 
 def get_skill_gap_run_manager() -> SkillGapRunManager:
