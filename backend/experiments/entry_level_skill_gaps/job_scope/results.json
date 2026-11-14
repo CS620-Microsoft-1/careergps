@@ -1,0 +1,1987 @@
+{
+  "experiment": "job-seniority-demand-sensitivity",
+  "version": "1.0",
+  "historical_scope": {
+    "new_agent_calls": 0,
+    "database_access": false,
+    "runtime_files_unchanged": true,
+    "all_levels_replay_matches_runtime_snapshot": true,
+    "original_replay_seconds": 31.603
+  },
+  "source": {
+    "archive_sha256": "bfb06458c984b5fd7f76e892af95eb68ab373a9fa63fec7f81150695795fa9cd",
+    "source_parent_postings": 3715,
+    "artifact_sha256": {
+      "comparison.json": "8575ff3c2eef68cffe1fd8bd46f8d58c0f8615acb6ca538d8de5a65906b79b35",
+      "all_levels_snapshot.json": "30d4d3074d1745ed3a7e46b1ac176b151083c2ce302aaf3fd086b92d99cae41d",
+      "entry_only_snapshot.json": "5b99a0bba8b458cc170816dc0cb15901dda624e4acad19a120a049223c09b8bc",
+      "entry_plus_intern_snapshot.json": "d9ef563fd7529a03c2f3e5f17fc6607b9c5cc899c8062200aef72192f27bb497"
+    }
+  },
+  "baseline_sample_sizes": {
+    "software_engineer": 2858,
+    "ai_engineer": 566,
+    "data_analyst": 174
+  },
+  "cohort_counts": {
+    "entry_only": {
+      "levels": [
+        "new_grad",
+        "entry_level"
+      ],
+      "selected_source_parents": 82,
+      "excluded_null_family": 1,
+      "supported_families": {
+        "software_engineer": 71,
+        "ai_engineer": 8,
+        "data_analyst": 2
+      },
+      "selected_qualification_rows": 757,
+      "unresolved_requirement_review_items": 360
+    },
+    "entry_plus_intern": {
+      "levels": [
+        "new_grad",
+        "entry_level",
+        "intern"
+      ],
+      "selected_source_parents": 238,
+      "excluded_null_family": 2,
+      "supported_families": {
+        "software_engineer": 187,
+        "ai_engineer": 30,
+        "data_analyst": 19
+      },
+      "selected_qualification_rows": 2003,
+      "unresolved_requirement_review_items": 952
+    }
+  },
+  "demand_snapshots": {
+    "all_levels": {
+      "source_analysis_version": "careergps-compact-core-v3.0",
+      "source_fingerprint": "8766af4a81703dc686566d8a316e18f9e184c704a73e7da3d732b57a76eadf44",
+      "source_status": "computed_with_review_queue",
+      "source_sha256": "d47b1bafc91c7f0ae98ff5cf0c5f3f2f85f1c848ab03455de56b4bc34e7546ab",
+      "counts_recomputed": false,
+      "families": {
+        "software_engineer": {
+          "total_job_count": 2858,
+          "skills": {
+            "programming": {
+              "required_job_count": 1239,
+              "preferred_only_job_count": 227,
+              "unspecified_job_count": 220,
+              "required_ratio": 0.43352,
+              "preferred_only_ratio": 0.079426,
+              "unspecified_ratio": 0.076977
+            },
+            "algorithms": {
+              "required_job_count": 52,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 16,
+              "required_ratio": 0.018195,
+              "preferred_only_ratio": 0.00035,
+              "unspecified_ratio": 0.005598
+            },
+            "object_oriented_design": {
+              "required_job_count": 61,
+              "preferred_only_job_count": 17,
+              "unspecified_job_count": 7,
+              "required_ratio": 0.021344,
+              "preferred_only_ratio": 0.005948,
+              "unspecified_ratio": 0.002449
+            },
+            "ai_assisted_development": {
+              "required_job_count": 194,
+              "preferred_only_job_count": 19,
+              "unspecified_job_count": 15,
+              "required_ratio": 0.06788,
+              "preferred_only_ratio": 0.006648,
+              "unspecified_ratio": 0.005248
+            },
+            "system_design": {
+              "required_job_count": 174,
+              "preferred_only_job_count": 116,
+              "unspecified_job_count": 46,
+              "required_ratio": 0.060882,
+              "preferred_only_ratio": 0.040588,
+              "unspecified_ratio": 0.016095
+            },
+            "backend_apis": {
+              "required_job_count": 333,
+              "preferred_only_job_count": 85,
+              "unspecified_job_count": 64,
+              "required_ratio": 0.116515,
+              "preferred_only_ratio": 0.029741,
+              "unspecified_ratio": 0.022393
+            },
+            "frontend": {
+              "required_job_count": 141,
+              "preferred_only_job_count": 119,
+              "unspecified_job_count": 75,
+              "required_ratio": 0.049335,
+              "preferred_only_ratio": 0.041638,
+              "unspecified_ratio": 0.026242
+            },
+            "distributed_systems": {
+              "required_job_count": 570,
+              "preferred_only_job_count": 158,
+              "unspecified_job_count": 184,
+              "required_ratio": 0.19944,
+              "preferred_only_ratio": 0.055283,
+              "unspecified_ratio": 0.064381
+            },
+            "relational_sql": {
+              "required_job_count": 198,
+              "preferred_only_job_count": 209,
+              "unspecified_job_count": 62,
+              "required_ratio": 0.069279,
+              "preferred_only_ratio": 0.073128,
+              "unspecified_ratio": 0.021693
+            },
+            "nosql_search": {
+              "required_job_count": 102,
+              "preferred_only_job_count": 58,
+              "unspecified_job_count": 9,
+              "required_ratio": 0.035689,
+              "preferred_only_ratio": 0.020294,
+              "unspecified_ratio": 0.003149
+            },
+            "code_quality": {
+              "required_job_count": 188,
+              "preferred_only_job_count": 8,
+              "unspecified_job_count": 20,
+              "required_ratio": 0.06578,
+              "preferred_only_ratio": 0.002799,
+              "unspecified_ratio": 0.006998
+            },
+            "testing": {
+              "required_job_count": 55,
+              "preferred_only_job_count": 85,
+              "unspecified_job_count": 11,
+              "required_ratio": 0.019244,
+              "preferred_only_ratio": 0.029741,
+              "unspecified_ratio": 0.003849
+            },
+            "debugging": {
+              "required_job_count": 332,
+              "preferred_only_job_count": 152,
+              "unspecified_job_count": 68,
+              "required_ratio": 0.116165,
+              "preferred_only_ratio": 0.053184,
+              "unspecified_ratio": 0.023793
+            },
+            "code_review": {
+              "required_job_count": 68,
+              "preferred_only_job_count": 7,
+              "unspecified_job_count": 9,
+              "required_ratio": 0.023793,
+              "preferred_only_ratio": 0.002449,
+              "unspecified_ratio": 0.003149
+            },
+            "version_control": {
+              "required_job_count": 48,
+              "preferred_only_job_count": 202,
+              "unspecified_job_count": 8,
+              "required_ratio": 0.016795,
+              "preferred_only_ratio": 0.070679,
+              "unspecified_ratio": 0.002799
+            },
+            "cloud": {
+              "required_job_count": 236,
+              "preferred_only_job_count": 154,
+              "unspecified_job_count": 93,
+              "required_ratio": 0.082575,
+              "preferred_only_ratio": 0.053884,
+              "unspecified_ratio": 0.03254
+            },
+            "containers": {
+              "required_job_count": 187,
+              "preferred_only_job_count": 240,
+              "unspecified_job_count": 49,
+              "required_ratio": 0.06543,
+              "preferred_only_ratio": 0.083975,
+              "unspecified_ratio": 0.017145
+            },
+            "delivery_automation": {
+              "required_job_count": 260,
+              "preferred_only_job_count": 340,
+              "unspecified_job_count": 111,
+              "required_ratio": 0.090973,
+              "preferred_only_ratio": 0.118964,
+              "unspecified_ratio": 0.038838
+            },
+            "performance": {
+              "required_job_count": 49,
+              "preferred_only_job_count": 163,
+              "unspecified_job_count": 16,
+              "required_ratio": 0.017145,
+              "preferred_only_ratio": 0.057033,
+              "unspecified_ratio": 0.005598
+            },
+            "observability_operations": {
+              "required_job_count": 156,
+              "preferred_only_job_count": 133,
+              "unspecified_job_count": 42,
+              "required_ratio": 0.054584,
+              "preferred_only_ratio": 0.046536,
+              "unspecified_ratio": 0.014696
+            },
+            "reliability": {
+              "required_job_count": 27,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 2,
+              "required_ratio": 0.009447,
+              "preferred_only_ratio": 0.0007,
+              "unspecified_ratio": 0.0007
+            },
+            "security": {
+              "required_job_count": 99,
+              "preferred_only_job_count": 107,
+              "unspecified_job_count": 30,
+              "required_ratio": 0.03464,
+              "preferred_only_ratio": 0.037439,
+              "unspecified_ratio": 0.010497
+            }
+          }
+        },
+        "data_analyst": {
+          "total_job_count": 174,
+          "skills": {
+            "sql": {
+              "required_job_count": 110,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 15,
+              "required_ratio": 0.632184,
+              "preferred_only_ratio": 0.017241,
+              "unspecified_ratio": 0.086207
+            },
+            "analytical_scripting": {
+              "required_job_count": 65,
+              "preferred_only_job_count": 11,
+              "unspecified_job_count": 15,
+              "required_ratio": 0.373563,
+              "preferred_only_ratio": 0.063218,
+              "unspecified_ratio": 0.086207
+            },
+            "spreadsheets": {
+              "required_job_count": 7,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.04023,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.017241
+            },
+            "data_analysis": {
+              "required_job_count": 16,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.091954,
+              "preferred_only_ratio": 0.022989,
+              "unspecified_ratio": 0.017241
+            },
+            "business_analytics": {
+              "required_job_count": 16,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.091954,
+              "preferred_only_ratio": 0.005747,
+              "unspecified_ratio": 0.005747
+            },
+            "requirements_analysis": {
+              "required_job_count": 4,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.022989,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.005747
+            },
+            "statistics": {
+              "required_job_count": 41,
+              "preferred_only_job_count": 6,
+              "unspecified_job_count": 12,
+              "required_ratio": 0.235632,
+              "preferred_only_ratio": 0.034483,
+              "unspecified_ratio": 0.068966
+            },
+            "experimentation": {
+              "required_job_count": 12,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 2,
+              "required_ratio": 0.068966,
+              "preferred_only_ratio": 0.017241,
+              "unspecified_ratio": 0.011494
+            },
+            "causal_inference": {
+              "required_job_count": 20,
+              "preferred_only_job_count": 7,
+              "unspecified_job_count": 7,
+              "required_ratio": 0.114943,
+              "preferred_only_ratio": 0.04023,
+              "unspecified_ratio": 0.04023
+            },
+            "data_pipelines": {
+              "required_job_count": 22,
+              "preferred_only_job_count": 9,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.126437,
+              "preferred_only_ratio": 0.051724,
+              "unspecified_ratio": 0.017241
+            },
+            "data_modeling": {
+              "required_job_count": 4,
+              "preferred_only_job_count": 6,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.022989,
+              "preferred_only_ratio": 0.034483,
+              "unspecified_ratio": 0.0
+            },
+            "data_quality": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.005747,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.005747
+            },
+            "dashboarding": {
+              "required_job_count": 18,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.103448,
+              "preferred_only_ratio": 0.011494,
+              "unspecified_ratio": 0.005747
+            },
+            "data_visualization": {
+              "required_job_count": 13,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.074713,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.017241
+            },
+            "bi_tools": {
+              "required_job_count": 9,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.051724,
+              "preferred_only_ratio": 0.022989,
+              "unspecified_ratio": 0.017241
+            },
+            "warehousing": {
+              "required_job_count": 8,
+              "preferred_only_job_count": 6,
+              "unspecified_job_count": 4,
+              "required_ratio": 0.045977,
+              "preferred_only_ratio": 0.034483,
+              "unspecified_ratio": 0.022989
+            },
+            "large_scale_processing": {
+              "required_job_count": 18,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 2,
+              "required_ratio": 0.103448,
+              "preferred_only_ratio": 0.017241,
+              "unspecified_ratio": 0.011494
+            },
+            "workflow_automation": {
+              "required_job_count": 7,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.04023,
+              "preferred_only_ratio": 0.011494,
+              "unspecified_ratio": 0.005747
+            }
+          }
+        },
+        "ai_engineer": {
+          "total_job_count": 566,
+          "skills": {
+            "general_programming": {
+              "required_job_count": 56,
+              "preferred_only_job_count": 39,
+              "unspecified_job_count": 13,
+              "required_ratio": 0.09894,
+              "preferred_only_ratio": 0.068905,
+              "unspecified_ratio": 0.022968
+            },
+            "python": {
+              "required_job_count": 158,
+              "preferred_only_job_count": 23,
+              "unspecified_job_count": 40,
+              "required_ratio": 0.279152,
+              "preferred_only_ratio": 0.040636,
+              "unspecified_ratio": 0.070671
+            },
+            "software_engineering": {
+              "required_job_count": 85,
+              "preferred_only_job_count": 56,
+              "unspecified_job_count": 38,
+              "required_ratio": 0.150177,
+              "preferred_only_ratio": 0.09894,
+              "unspecified_ratio": 0.067138
+            },
+            "sql": {
+              "required_job_count": 53,
+              "preferred_only_job_count": 20,
+              "unspecified_job_count": 5,
+              "required_ratio": 0.09364,
+              "preferred_only_ratio": 0.035336,
+              "unspecified_ratio": 0.008834
+            },
+            "machine_learning": {
+              "required_job_count": 202,
+              "preferred_only_job_count": 54,
+              "unspecified_job_count": 48,
+              "required_ratio": 0.35689,
+              "preferred_only_ratio": 0.095406,
+              "unspecified_ratio": 0.084806
+            },
+            "deep_learning": {
+              "required_job_count": 48,
+              "preferred_only_job_count": 15,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.084806,
+              "preferred_only_ratio": 0.026502,
+              "unspecified_ratio": 0.0053
+            },
+            "math_statistics": {
+              "required_job_count": 45,
+              "preferred_only_job_count": 7,
+              "unspecified_job_count": 4,
+              "required_ratio": 0.079505,
+              "preferred_only_ratio": 0.012367,
+              "unspecified_ratio": 0.007067
+            },
+            "data_preparation": {
+              "required_job_count": 15,
+              "preferred_only_job_count": 6,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.026502,
+              "preferred_only_ratio": 0.010601,
+              "unspecified_ratio": 0.0
+            },
+            "data_pipelines": {
+              "required_job_count": 45,
+              "preferred_only_job_count": 47,
+              "unspecified_job_count": 5,
+              "required_ratio": 0.079505,
+              "preferred_only_ratio": 0.083039,
+              "unspecified_ratio": 0.008834
+            },
+            "feature_engineering": {
+              "required_job_count": 8,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 2,
+              "required_ratio": 0.014134,
+              "preferred_only_ratio": 0.007067,
+              "unspecified_ratio": 0.003534
+            },
+            "model_training": {
+              "required_job_count": 16,
+              "preferred_only_job_count": 6,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.028269,
+              "preferred_only_ratio": 0.010601,
+              "unspecified_ratio": 0.0053
+            },
+            "fine_tuning": {
+              "required_job_count": 23,
+              "preferred_only_job_count": 12,
+              "unspecified_job_count": 8,
+              "required_ratio": 0.040636,
+              "preferred_only_ratio": 0.021201,
+              "unspecified_ratio": 0.014134
+            },
+            "model_evaluation": {
+              "required_job_count": 16,
+              "preferred_only_job_count": 12,
+              "unspecified_job_count": 8,
+              "required_ratio": 0.028269,
+              "preferred_only_ratio": 0.021201,
+              "unspecified_ratio": 0.014134
+            },
+            "experimentation": {
+              "required_job_count": 25,
+              "preferred_only_job_count": 7,
+              "unspecified_job_count": 9,
+              "required_ratio": 0.04417,
+              "preferred_only_ratio": 0.012367,
+              "unspecified_ratio": 0.015901
+            },
+            "model_deployment": {
+              "required_job_count": 9,
+              "preferred_only_job_count": 10,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.015901,
+              "preferred_only_ratio": 0.017668,
+              "unspecified_ratio": 0.0
+            },
+            "mlops": {
+              "required_job_count": 3,
+              "preferred_only_job_count": 8,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0053,
+              "preferred_only_ratio": 0.014134,
+              "unspecified_ratio": 0.0
+            },
+            "ai_infrastructure": {
+              "required_job_count": 71,
+              "preferred_only_job_count": 64,
+              "unspecified_job_count": 10,
+              "required_ratio": 0.125442,
+              "preferred_only_ratio": 0.113074,
+              "unspecified_ratio": 0.017668
+            },
+            "generative_ai": {
+              "required_job_count": 34,
+              "preferred_only_job_count": 16,
+              "unspecified_job_count": 11,
+              "required_ratio": 0.060071,
+              "preferred_only_ratio": 0.028269,
+              "unspecified_ratio": 0.019435
+            },
+            "llm": {
+              "required_job_count": 92,
+              "preferred_only_job_count": 90,
+              "unspecified_job_count": 29,
+              "required_ratio": 0.162544,
+              "preferred_only_ratio": 0.159011,
+              "unspecified_ratio": 0.051237
+            },
+            "rag": {
+              "required_job_count": 9,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 8,
+              "required_ratio": 0.015901,
+              "preferred_only_ratio": 0.0053,
+              "unspecified_ratio": 0.014134
+            },
+            "ai_agents": {
+              "required_job_count": 31,
+              "preferred_only_job_count": 36,
+              "unspecified_job_count": 12,
+              "required_ratio": 0.05477,
+              "preferred_only_ratio": 0.063604,
+              "unspecified_ratio": 0.021201
+            },
+            "prompt_engineering": {
+              "required_job_count": 16,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.028269,
+              "preferred_only_ratio": 0.0053,
+              "unspecified_ratio": 0.001767
+            },
+            "vector_retrieval": {
+              "required_job_count": 15,
+              "preferred_only_job_count": 6,
+              "unspecified_job_count": 4,
+              "required_ratio": 0.026502,
+              "preferred_only_ratio": 0.010601,
+              "unspecified_ratio": 0.007067
+            }
+          }
+        }
+      }
+    },
+    "entry_only": {
+      "source_analysis_version": "careergps-compact-core-v3.0",
+      "source_fingerprint": "4f3202161758e66721f3a5e94b0022f6d37fdeaf07ae8770ef3e591127560f33",
+      "source_status": "computed_with_review_queue",
+      "source_sha256": "9168cca22388806f9f9e26dc6a6d0f2dbb6dcf9d2b7073a38dc9b58438801cd0",
+      "counts_recomputed": false,
+      "families": {
+        "software_engineer": {
+          "total_job_count": 71,
+          "skills": {
+            "programming": {
+              "required_job_count": 54,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 2,
+              "required_ratio": 0.760563,
+              "preferred_only_ratio": 0.014085,
+              "unspecified_ratio": 0.028169
+            },
+            "algorithms": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "object_oriented_design": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "ai_assisted_development": {
+              "required_job_count": 11,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.15493,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "system_design": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "backend_apis": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.042254,
+              "unspecified_ratio": 0.0
+            },
+            "frontend": {
+              "required_job_count": 14,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 5,
+              "required_ratio": 0.197183,
+              "preferred_only_ratio": 0.028169,
+              "unspecified_ratio": 0.070423
+            },
+            "distributed_systems": {
+              "required_job_count": 3,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.042254,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "relational_sql": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.028169,
+              "unspecified_ratio": 0.014085
+            },
+            "nosql_search": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.028169,
+              "unspecified_ratio": 0.0
+            },
+            "code_quality": {
+              "required_job_count": 20,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.28169,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "testing": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.014085
+            },
+            "debugging": {
+              "required_job_count": 8,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.112676,
+              "preferred_only_ratio": 0.028169,
+              "unspecified_ratio": 0.042254
+            },
+            "code_review": {
+              "required_job_count": 7,
+              "preferred_only_job_count": 5,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.098592,
+              "preferred_only_ratio": 0.070423,
+              "unspecified_ratio": 0.0
+            },
+            "version_control": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "cloud": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.042254,
+              "unspecified_ratio": 0.0
+            },
+            "containers": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.014085,
+              "preferred_only_ratio": 0.014085,
+              "unspecified_ratio": 0.0
+            },
+            "delivery_automation": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.014085,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.014085
+            },
+            "performance": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "observability_operations": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.028169,
+              "unspecified_ratio": 0.042254
+            },
+            "reliability": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "security": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            }
+          }
+        },
+        "data_analyst": {
+          "total_job_count": 2,
+          "skills": {
+            "sql": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.5,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "analytical_scripting": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.5,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "spreadsheets": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_analysis": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.5,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "business_analytics": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "requirements_analysis": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "statistics": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "experimentation": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "causal_inference": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_pipelines": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_modeling": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_quality": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "dashboarding": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_visualization": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "bi_tools": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "warehousing": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "large_scale_processing": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.5,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "workflow_automation": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.5,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            }
+          }
+        },
+        "ai_engineer": {
+          "total_job_count": 8,
+          "skills": {
+            "general_programming": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.125,
+              "unspecified_ratio": 0.0
+            },
+            "python": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "software_engineering": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.125,
+              "unspecified_ratio": 0.0
+            },
+            "sql": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "machine_learning": {
+              "required_job_count": 2,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 2,
+              "required_ratio": 0.25,
+              "preferred_only_ratio": 0.125,
+              "unspecified_ratio": 0.25
+            },
+            "deep_learning": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "math_statistics": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_preparation": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_pipelines": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.125,
+              "unspecified_ratio": 0.0
+            },
+            "feature_engineering": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "model_training": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "fine_tuning": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "model_evaluation": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "experimentation": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "model_deployment": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "mlops": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "ai_infrastructure": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "generative_ai": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "llm": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "rag": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "ai_agents": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "prompt_engineering": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.125,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.125
+            },
+            "vector_retrieval": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            }
+          }
+        }
+      }
+    },
+    "entry_plus_intern": {
+      "source_analysis_version": "careergps-compact-core-v3.0",
+      "source_fingerprint": "f27d67b1f224ff3e7189dd05de24edc7e4de7dacb86d4f900ac33cfd9d67d034",
+      "source_status": "computed_with_review_queue",
+      "source_sha256": "37b2ade4b9a89aa1752335af60e6fa24caab071f6db629301ab9a0a87deefdce",
+      "counts_recomputed": false,
+      "families": {
+        "software_engineer": {
+          "total_job_count": 187,
+          "skills": {
+            "programming": {
+              "required_job_count": 130,
+              "preferred_only_job_count": 6,
+              "unspecified_job_count": 9,
+              "required_ratio": 0.695187,
+              "preferred_only_ratio": 0.032086,
+              "unspecified_ratio": 0.048128
+            },
+            "algorithms": {
+              "required_job_count": 3,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.016043,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "object_oriented_design": {
+              "required_job_count": 7,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.037433,
+              "preferred_only_ratio": 0.010695,
+              "unspecified_ratio": 0.005348
+            },
+            "ai_assisted_development": {
+              "required_job_count": 18,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.096257,
+              "preferred_only_ratio": 0.010695,
+              "unspecified_ratio": 0.005348
+            },
+            "system_design": {
+              "required_job_count": 2,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.010695,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "backend_apis": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.005348,
+              "preferred_only_ratio": 0.016043,
+              "unspecified_ratio": 0.0
+            },
+            "frontend": {
+              "required_job_count": 29,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 21,
+              "required_ratio": 0.15508,
+              "preferred_only_ratio": 0.02139,
+              "unspecified_ratio": 0.112299
+            },
+            "distributed_systems": {
+              "required_job_count": 5,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.026738,
+              "preferred_only_ratio": 0.02139,
+              "unspecified_ratio": 0.0
+            },
+            "relational_sql": {
+              "required_job_count": 6,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 9,
+              "required_ratio": 0.032086,
+              "preferred_only_ratio": 0.02139,
+              "unspecified_ratio": 0.048128
+            },
+            "nosql_search": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.010695,
+              "unspecified_ratio": 0.0
+            },
+            "code_quality": {
+              "required_job_count": 36,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 2,
+              "required_ratio": 0.192513,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.010695
+            },
+            "testing": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 10,
+              "unspecified_job_count": 3,
+              "required_ratio": 0.005348,
+              "preferred_only_ratio": 0.053476,
+              "unspecified_ratio": 0.016043
+            },
+            "debugging": {
+              "required_job_count": 14,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 5,
+              "required_ratio": 0.074866,
+              "preferred_only_ratio": 0.02139,
+              "unspecified_ratio": 0.026738
+            },
+            "code_review": {
+              "required_job_count": 8,
+              "preferred_only_job_count": 5,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.042781,
+              "preferred_only_ratio": 0.026738,
+              "unspecified_ratio": 0.0
+            },
+            "version_control": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "cloud": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.005348,
+              "preferred_only_ratio": 0.016043,
+              "unspecified_ratio": 0.0
+            },
+            "containers": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.005348,
+              "preferred_only_ratio": 0.005348,
+              "unspecified_ratio": 0.0
+            },
+            "delivery_automation": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.005348,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.005348
+            },
+            "performance": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.010695,
+              "unspecified_ratio": 0.0
+            },
+            "observability_operations": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 5,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.010695,
+              "unspecified_ratio": 0.026738
+            },
+            "reliability": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "security": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            }
+          }
+        },
+        "data_analyst": {
+          "total_job_count": 19,
+          "skills": {
+            "sql": {
+              "required_job_count": 11,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.578947,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.052632
+            },
+            "analytical_scripting": {
+              "required_job_count": 9,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.473684,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "spreadsheets": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.052632,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_analysis": {
+              "required_job_count": 6,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.315789,
+              "preferred_only_ratio": 0.052632,
+              "unspecified_ratio": 0.0
+            },
+            "business_analytics": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "requirements_analysis": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "statistics": {
+              "required_job_count": 2,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.105263,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.052632
+            },
+            "experimentation": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "causal_inference": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.052632,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_pipelines": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.052632,
+              "preferred_only_ratio": 0.105263,
+              "unspecified_ratio": 0.0
+            },
+            "data_modeling": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_quality": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "dashboarding": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_visualization": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "bi_tools": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "warehousing": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "large_scale_processing": {
+              "required_job_count": 3,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.157895,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "workflow_automation": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.052632,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            }
+          }
+        },
+        "ai_engineer": {
+          "total_job_count": 30,
+          "skills": {
+            "general_programming": {
+              "required_job_count": 3,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.1,
+              "preferred_only_ratio": 0.1,
+              "unspecified_ratio": 0.0
+            },
+            "python": {
+              "required_job_count": 10,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.333333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.033333
+            },
+            "software_engineering": {
+              "required_job_count": 5,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.166667,
+              "preferred_only_ratio": 0.1,
+              "unspecified_ratio": 0.0
+            },
+            "sql": {
+              "required_job_count": 5,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.166667,
+              "preferred_only_ratio": 0.033333,
+              "unspecified_ratio": 0.0
+            },
+            "machine_learning": {
+              "required_job_count": 11,
+              "preferred_only_job_count": 2,
+              "unspecified_job_count": 4,
+              "required_ratio": 0.366667,
+              "preferred_only_ratio": 0.066667,
+              "unspecified_ratio": 0.133333
+            },
+            "deep_learning": {
+              "required_job_count": 4,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.133333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "math_statistics": {
+              "required_job_count": 4,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.133333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "data_preparation": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.033333,
+              "unspecified_ratio": 0.0
+            },
+            "data_pipelines": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 4,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.033333,
+              "preferred_only_ratio": 0.133333,
+              "unspecified_ratio": 0.0
+            },
+            "feature_engineering": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "model_training": {
+              "required_job_count": 2,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.066667,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "fine_tuning": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.033333,
+              "preferred_only_ratio": 0.033333,
+              "unspecified_ratio": 0.0
+            },
+            "model_evaluation": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 3,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.1,
+              "unspecified_ratio": 0.0
+            },
+            "experimentation": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 4,
+              "required_ratio": 0.033333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.133333
+            },
+            "model_deployment": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "mlops": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "ai_infrastructure": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.033333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "generative_ai": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.033333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "llm": {
+              "required_job_count": 2,
+              "preferred_only_job_count": 1,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.066667,
+              "preferred_only_ratio": 0.033333,
+              "unspecified_ratio": 0.0
+            },
+            "rag": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "ai_agents": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 0,
+              "required_ratio": 0.033333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.0
+            },
+            "prompt_engineering": {
+              "required_job_count": 1,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.033333,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.033333
+            },
+            "vector_retrieval": {
+              "required_job_count": 0,
+              "preferred_only_job_count": 0,
+              "unspecified_job_count": 1,
+              "required_ratio": 0.0,
+              "preferred_only_ratio": 0.0,
+              "unspecified_ratio": 0.033333
+            }
+          }
+        }
+      }
+    }
+  },
+  "case_comparisons": [
+    {
+      "case_id": "case_01",
+      "job_family": "software_engineer",
+      "cohorts": {
+        "all_levels": {
+          "match": {
+            "score": 0.4153,
+            "scored_skill_count": 20,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": 0.0,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_only": {
+          "match": {
+            "score": 0.4194,
+            "scored_skill_count": 13,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": 0.41,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_plus_intern": {
+          "match": {
+            "score": 0.4164,
+            "scored_skill_count": 18,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": 0.11,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        }
+      }
+    },
+    {
+      "case_id": "case_02",
+      "job_family": "ai_engineer",
+      "cohorts": {
+        "all_levels": {
+          "match": {
+            "score": 0.337,
+            "scored_skill_count": 22,
+            "unscored_skill_count": 1
+          },
+          "delta_percentage_points": 0.0,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_only": {
+          "match": {
+            "score": 0.3321,
+            "scored_skill_count": 11,
+            "unscored_skill_count": 1
+          },
+          "delta_percentage_points": -0.49,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_plus_intern": {
+          "match": {
+            "score": 0.3493,
+            "scored_skill_count": 17,
+            "unscored_skill_count": 1
+          },
+          "delta_percentage_points": 1.23,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        }
+      }
+    },
+    {
+      "case_id": "case_03",
+      "job_family": "data_analyst",
+      "cohorts": {
+        "all_levels": {
+          "match": {
+            "score": 0.5549,
+            "scored_skill_count": 18,
+            "unscored_skill_count": 0
+          },
+          "delta_percentage_points": 0.0,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_only": {
+          "match": {
+            "score": 0.5,
+            "scored_skill_count": 5,
+            "unscored_skill_count": 0
+          },
+          "delta_percentage_points": -5.49,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_plus_intern": {
+          "match": {
+            "score": 0.5776,
+            "scored_skill_count": 9,
+            "unscored_skill_count": 0
+          },
+          "delta_percentage_points": 2.27,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        }
+      }
+    },
+    {
+      "case_id": "case_04",
+      "job_family": "ai_engineer",
+      "cohorts": {
+        "all_levels": {
+          "match": {
+            "score": 0.4844,
+            "scored_skill_count": 19,
+            "unscored_skill_count": 4
+          },
+          "delta_percentage_points": 0.0,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_only": {
+          "match": {
+            "score": 0.475,
+            "scored_skill_count": 9,
+            "unscored_skill_count": 4
+          },
+          "delta_percentage_points": -0.94,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_plus_intern": {
+          "match": {
+            "score": 0.4638,
+            "scored_skill_count": 15,
+            "unscored_skill_count": 4
+          },
+          "delta_percentage_points": -2.06,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        }
+      }
+    },
+    {
+      "case_id": "case_05",
+      "job_family": "ai_engineer",
+      "cohorts": {
+        "all_levels": {
+          "match": {
+            "score": 0.4627,
+            "scored_skill_count": 21,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": 0.0,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_only": {
+          "match": {
+            "score": 0.4346,
+            "scored_skill_count": 10,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": -2.81,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_plus_intern": {
+          "match": {
+            "score": 0.4564,
+            "scored_skill_count": 16,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": -0.63,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        }
+      }
+    },
+    {
+      "case_id": "case_06",
+      "job_family": "ai_engineer",
+      "cohorts": {
+        "all_levels": {
+          "match": {
+            "score": 0.4134,
+            "scored_skill_count": 21,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": 0.0,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_only": {
+          "match": {
+            "score": 0.4154,
+            "scored_skill_count": 10,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": 0.2,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        },
+        "entry_plus_intern": {
+          "match": {
+            "score": 0.3979,
+            "scored_skill_count": 16,
+            "unscored_skill_count": 2
+          },
+          "delta_percentage_points": -1.55,
+          "changed_skill_grades": 0,
+          "changed_evidence_scores": 0
+        }
+      }
+    }
+  ],
+  "largest_entry_plus_intern_demand_changes": {
+    "software_engineer": [
+      {
+        "skill_id": "programming",
+        "delta_percentage_points": 21.4327,
+        "all_levels_weight": 0.5129461161651504,
+        "entry_only_weight": 0.7746478873239436,
+        "entry_plus_intern_weight": 0.7272727272727273
+      },
+      {
+        "skill_id": "distributed_systems",
+        "delta_percentage_points": -20.6595,
+        "all_levels_weight": 0.2547235829251225,
+        "entry_only_weight": 0.04225352112676056,
+        "entry_plus_intern_weight": 0.0481283422459893
+      },
+      {
+        "skill_id": "delivery_automation",
+        "delta_percentage_points": -20.4589,
+        "all_levels_weight": 0.2099370188943317,
+        "entry_only_weight": 0.014084507042253521,
+        "entry_plus_intern_weight": 0.0053475935828877
+      },
+      {
+        "skill_id": "containers",
+        "delta_percentage_points": -13.871,
+        "all_levels_weight": 0.14940517844646606,
+        "entry_only_weight": 0.028169014084507043,
+        "entry_plus_intern_weight": 0.0106951871657754
+      },
+      {
+        "skill_id": "backend_apis",
+        "delta_percentage_points": -12.4866,
+        "all_levels_weight": 0.1462561231630511,
+        "entry_only_weight": 0.04225352112676056,
+        "entry_plus_intern_weight": 0.0213903743315508
+      }
+    ],
+    "ai_engineer": [
+      {
+        "skill_id": "llm",
+        "delta_percentage_points": -22.1555,
+        "all_levels_weight": 0.3215547703180212,
+        "entry_only_weight": 0.125,
+        "entry_plus_intern_weight": 0.1
+      },
+      {
+        "skill_id": "ai_infrastructure",
+        "delta_percentage_points": -20.5183,
+        "all_levels_weight": 0.23851590106007067,
+        "entry_only_weight": 0.125,
+        "entry_plus_intern_weight": 0.03333333333333333
+      },
+      {
+        "skill_id": "ai_agents",
+        "delta_percentage_points": -8.5041,
+        "all_levels_weight": 0.11837455830388692,
+        "entry_only_weight": 0.125,
+        "entry_plus_intern_weight": 0.03333333333333333
+      },
+      {
+        "skill_id": "sql",
+        "delta_percentage_points": 7.1025,
+        "all_levels_weight": 0.12897526501766785,
+        "entry_only_weight": 0.125,
+        "entry_plus_intern_weight": 0.2
+      },
+      {
+        "skill_id": "generative_ai",
+        "delta_percentage_points": -5.5006,
+        "all_levels_weight": 0.08833922261484099,
+        "entry_only_weight": 0.0,
+        "entry_plus_intern_weight": 0.03333333333333333
+      }
+    ],
+    "data_analyst": [
+      {
+        "skill_id": "data_analysis",
+        "delta_percentage_points": 25.3479,
+        "all_levels_weight": 0.11494252873563218,
+        "entry_only_weight": 0.5,
+        "entry_plus_intern_weight": 0.3684210526315789
+      },
+      {
+        "skill_id": "statistics",
+        "delta_percentage_points": -16.4852,
+        "all_levels_weight": 0.27011494252873564,
+        "entry_only_weight": 0.0,
+        "entry_plus_intern_weight": 0.10526315789473684
+      },
+      {
+        "skill_id": "dashboarding",
+        "delta_percentage_points": -11.4943,
+        "all_levels_weight": 0.11494252873563218,
+        "entry_only_weight": 0.0,
+        "entry_plus_intern_weight": 0.0
+      },
+      {
+        "skill_id": "causal_inference",
+        "delta_percentage_points": -10.2541,
+        "all_levels_weight": 0.15517241379310345,
+        "entry_only_weight": 0.0,
+        "entry_plus_intern_weight": 0.05263157894736842
+      },
+      {
+        "skill_id": "business_analytics",
+        "delta_percentage_points": -9.7701,
+        "all_levels_weight": 0.09770114942528736,
+        "entry_only_weight": 0.0,
+        "entry_plus_intern_weight": 0.0
+      }
+    ]
+  },
+  "limitations": [
+    "No new Agent, browser, API or database run; only demand arithmetic replayed.",
+    "Job-level seniority labels and frozen requirement mappings are reused, not semantically revalidated.",
+    "Three saved AI runs are the same resume, not three independent resumes.",
+    "Existing extraction uncertainty and errors are retained. These are sensitivity examples, not accuracy claims.",
+    "Match excludes pending and zero-demand skills; changes are not hiring-probability changes.",
+    "Unknown and multiple-level jobs are excluded; entry-only AI=8 and DA=2 are very small samples.",
+    "Default package replay uses saved aggregate counts, not raw job analyses. Optional source replay needs a separately supplied archive.",
+    "Only anonymous numeric score fields are packaged; original resumes, model responses, source paths and job IDs remain local.",
+    "Packaging and arithmetic checks do not rerun Agents or establish semantic accuracy."
+  ]
+}

@@ -1,0 +1,800 @@
+{
+  "arms": {
+    "original": {
+      "mode": "original",
+      "wall_seconds": 40.15461910003796,
+      "preparation_seconds": 0.004349400056526065,
+      "preflight_seconds": 1.068845700006932,
+      "total_measured_seconds": 41.22781420010142,
+      "parallel_call_wall_seconds": 40.1138128999155,
+      "local_assessment_seconds": 0.03969200002029538,
+      "groups": {
+        "lifecycle": {
+          "group": "lifecycle",
+          "name": "skill-gap-lifecycle",
+          "version": "2",
+          "timings": {
+            "sdk_auth_configuration_seconds": 0.037,
+            "conversation_create_seconds": 0.976,
+            "inference_seconds": 30.748,
+            "conversation_delete_seconds": 0.201,
+            "group_wall_seconds": 31.96770490007475
+          },
+          "usage": {
+            "input_tokens": 7574,
+            "input_tokens_details": {
+              "cache_write_tokens": 7571,
+              "cached_tokens": 0
+            },
+            "output_tokens": 4884,
+            "output_tokens_details": {
+              "reasoning_tokens": 3646
+            },
+            "total_tokens": 12458
+          },
+          "model_requests": 1,
+          "transport": "native_invoke_prepared"
+        },
+        "foundation": {
+          "group": "foundation",
+          "name": "skill-gap-foundation",
+          "version": "2",
+          "timings": {
+            "sdk_auth_configuration_seconds": 0.037,
+            "conversation_create_seconds": 1.105,
+            "inference_seconds": 32.051,
+            "conversation_delete_seconds": 0.112,
+            "group_wall_seconds": 33.31025280011818
+          },
+          "usage": {
+            "input_tokens": 7466,
+            "input_tokens_details": {
+              "cache_write_tokens": 7463,
+              "cached_tokens": 0
+            },
+            "output_tokens": 3611,
+            "output_tokens_details": {
+              "reasoning_tokens": 3081
+            },
+            "total_tokens": 11077
+          },
+          "model_requests": 1,
+          "transport": "native_invoke_prepared"
+        },
+        "systems": {
+          "group": "systems",
+          "name": "skill-gap-systems",
+          "version": "2",
+          "timings": {
+            "sdk_auth_configuration_seconds": 0.037,
+            "conversation_create_seconds": 0.973,
+            "inference_seconds": 38.976,
+            "conversation_delete_seconds": 0.106,
+            "group_wall_seconds": 40.098694999935105
+          },
+          "usage": {
+            "input_tokens": 7548,
+            "input_tokens_details": {
+              "cache_write_tokens": 7545,
+              "cached_tokens": 0
+            },
+            "output_tokens": 4291,
+            "output_tokens_details": {
+              "reasoning_tokens": 3469
+            },
+            "total_tokens": 11839
+          },
+          "model_requests": 1,
+          "transport": "native_invoke_prepared"
+        }
+      },
+      "failed_groups": {},
+      "complete": true,
+      "scoring_calls_attempted": 3,
+      "match": {
+        "score": 0.4446,
+        "scored_skill_count": 19,
+        "unscored_skill_count": 4
+      },
+      "pending": [
+        "model_deployment",
+        "ai_agents",
+        "prompt_engineering",
+        "vector_retrieval"
+      ],
+      "fresh_conversations": true,
+      "scored_skill_count": 19,
+      "frozen_files_verified": 1329
+    },
+    "entry": {
+      "mode": "entry",
+      "wall_seconds": 41.66635930002667,
+      "preparation_seconds": 0.00876659993082285,
+      "preflight_seconds": 0.0,
+      "total_measured_seconds": 41.67512589995749,
+      "parallel_call_wall_seconds": 41.595091900089756,
+      "local_assessment_seconds": 0.06974419998005033,
+      "groups": {
+        "lifecycle": {
+          "group": "lifecycle",
+          "name": "skill-gap-experiment-entry-level-lifecycle-0bad2100",
+          "version": "4",
+          "timings": {
+            "sdk_auth_and_definition_seconds": 0.9620627998374403,
+            "conversation_create_seconds": 0.8458341001532972,
+            "inference_seconds": 22.682524199830368,
+            "conversation_delete_seconds": 0.284068499924615,
+            "group_wall_seconds": 24.778001699829474
+          },
+          "usage": {
+            "input_tokens": 13303,
+            "input_tokens_details": {
+              "cache_write_tokens": 0,
+              "cached_tokens": 13300
+            },
+            "output_tokens": 3390,
+            "output_tokens_details": {
+              "reasoning_tokens": 2588
+            },
+            "total_tokens": 16693
+          }
+        },
+        "systems": {
+          "group": "systems",
+          "name": "skill-gap-experiment-entry-level-systems-0bad2100",
+          "version": "7",
+          "timings": {
+            "sdk_auth_and_definition_seconds": 0.9508520001545548,
+            "conversation_create_seconds": 0.8496802998706698,
+            "inference_seconds": 33.26477500004694,
+            "conversation_delete_seconds": 0.12080260016955435,
+            "group_wall_seconds": 35.18970850016922
+          },
+          "usage": {
+            "input_tokens": 12227,
+            "input_tokens_details": {
+              "cache_write_tokens": 12224,
+              "cached_tokens": 0
+            },
+            "output_tokens": 4179,
+            "output_tokens_details": {
+              "reasoning_tokens": 3234
+            },
+            "total_tokens": 16406
+          }
+        },
+        "foundation": {
+          "group": "foundation",
+          "name": "skill-gap-experiment-entry-level-foundation-0bad2100",
+          "version": "3",
+          "timings": {
+            "sdk_auth_and_definition_seconds": 0.9424543001223356,
+            "conversation_create_seconds": 0.9863315001130104,
+            "inference_seconds": 39.54817650001496,
+            "conversation_delete_seconds": 0.11303310003131628,
+            "group_wall_seconds": 41.59407850005664
+          },
+          "usage": {
+            "input_tokens": 13735,
+            "input_tokens_details": {
+              "cache_write_tokens": 13732,
+              "cached_tokens": 0
+            },
+            "output_tokens": 4644,
+            "output_tokens_details": {
+              "reasoning_tokens": 3787
+            },
+            "total_tokens": 18379
+          }
+        }
+      },
+      "failed_groups": {},
+      "complete": true,
+      "scoring_calls_attempted": 3,
+      "match": {
+        "score": 0.6618,
+        "scored_skill_count": 19,
+        "unscored_skill_count": 4
+      },
+      "pending": [
+        "fine_tuning",
+        "model_deployment",
+        "rag",
+        "ai_agents"
+      ],
+      "fresh_conversations": true,
+      "scored_skill_count": 19,
+      "frozen_files_verified": 1329
+    }
+  },
+  "complete": true,
+  "isolation": {
+    "all_original_and_experimental_agents_unchanged": true,
+    "agent_mutations": 0,
+    "application_files_unchanged": true,
+    "all_job_market_unchanged": true,
+    "database_access": false,
+    "commit_performed": false,
+    "push_performed": false,
+    "frozen_files_verified": 1329
+  },
+  "job_family": "ai_engineer",
+  "skill_count": 23,
+  "all_job_count": 566,
+  "demand_snapshot_fingerprint": "8766af4a81703dc686566d8a316e18f9e184c704a73e7da3d732b57a76eadf44",
+  "common_scored_skills": [
+    "general_programming",
+    "python",
+    "software_engineering",
+    "sql",
+    "machine_learning",
+    "deep_learning",
+    "math_statistics",
+    "data_preparation",
+    "data_pipelines",
+    "feature_engineering",
+    "model_training",
+    "model_evaluation",
+    "experimentation",
+    "mlops",
+    "ai_infrastructure",
+    "generative_ai",
+    "llm"
+  ],
+  "skill_scores": [
+    {
+      "skill_id": "general_programming",
+      "skill_name": "General programming",
+      "group": "foundation",
+      "original_score": 0.2,
+      "entry_score": 0.0,
+      "original_grade": "D",
+      "entry_grade": "F",
+      "delta_points": -20.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.16784452296819788,
+      "demand": {
+        "required_job_count": 56,
+        "preferred_only_job_count": 39,
+        "unspecified_job_count": 13,
+        "required_ratio": 0.09894,
+        "preferred_only_ratio": 0.068905,
+        "unspecified_ratio": 0.022968,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "python",
+      "skill_name": "Python development",
+      "group": "foundation",
+      "original_score": 0.2,
+      "entry_score": 0.8,
+      "original_grade": "D",
+      "entry_grade": "A-",
+      "delta_points": 60.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.3197879858657244,
+      "demand": {
+        "required_job_count": 158,
+        "preferred_only_job_count": 23,
+        "unspecified_job_count": 40,
+        "required_ratio": 0.279152,
+        "preferred_only_ratio": 0.040636,
+        "unspecified_ratio": 0.070671,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "software_engineering",
+      "skill_name": "Software engineering",
+      "group": "foundation",
+      "original_score": 0.6,
+      "entry_score": 1.0,
+      "original_grade": "B",
+      "entry_grade": "A",
+      "delta_points": 40.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.24911660777385158,
+      "demand": {
+        "required_job_count": 85,
+        "preferred_only_job_count": 56,
+        "unspecified_job_count": 38,
+        "required_ratio": 0.150177,
+        "preferred_only_ratio": 0.09894,
+        "unspecified_ratio": 0.067138,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "sql",
+      "skill_name": "SQL",
+      "group": "foundation",
+      "original_score": 0.2,
+      "entry_score": 0.0,
+      "original_grade": "D",
+      "entry_grade": "F",
+      "delta_points": -20.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.12897526501766785,
+      "demand": {
+        "required_job_count": 53,
+        "preferred_only_job_count": 20,
+        "unspecified_job_count": 5,
+        "required_ratio": 0.09364,
+        "preferred_only_ratio": 0.035336,
+        "unspecified_ratio": 0.008834,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "machine_learning",
+      "skill_name": "Machine learning",
+      "group": "lifecycle",
+      "original_score": 0.5,
+      "entry_score": 0.9,
+      "original_grade": "C",
+      "entry_grade": "A",
+      "delta_points": 40.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.45229681978798586,
+      "demand": {
+        "required_job_count": 202,
+        "preferred_only_job_count": 54,
+        "unspecified_job_count": 48,
+        "required_ratio": 0.35689,
+        "preferred_only_ratio": 0.095406,
+        "unspecified_ratio": 0.084806,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "deep_learning",
+      "skill_name": "Deep learning",
+      "group": "lifecycle",
+      "original_score": 0.5,
+      "entry_score": 0.7,
+      "original_grade": "C",
+      "entry_grade": "B+",
+      "delta_points": 20.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.11130742049469965,
+      "demand": {
+        "required_job_count": 48,
+        "preferred_only_job_count": 15,
+        "unspecified_job_count": 3,
+        "required_ratio": 0.084806,
+        "preferred_only_ratio": 0.026502,
+        "unspecified_ratio": 0.0053,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "math_statistics",
+      "skill_name": "Mathematics & statistics",
+      "group": "foundation",
+      "original_score": 0.5,
+      "entry_score": 0.9,
+      "original_grade": "C",
+      "entry_grade": "A",
+      "delta_points": 40.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.09187279151943463,
+      "demand": {
+        "required_job_count": 45,
+        "preferred_only_job_count": 7,
+        "unspecified_job_count": 4,
+        "required_ratio": 0.079505,
+        "preferred_only_ratio": 0.012367,
+        "unspecified_ratio": 0.007067,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "data_preparation",
+      "skill_name": "Data preparation",
+      "group": "foundation",
+      "original_score": 0.6,
+      "entry_score": 0.65,
+      "original_grade": "B",
+      "entry_grade": "B",
+      "delta_points": 5.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.037102473498233215,
+      "demand": {
+        "required_job_count": 15,
+        "preferred_only_job_count": 6,
+        "unspecified_job_count": 0,
+        "required_ratio": 0.026502,
+        "preferred_only_ratio": 0.010601,
+        "unspecified_ratio": 0.0,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "data_pipelines",
+      "skill_name": "Data pipelines",
+      "group": "foundation",
+      "original_score": 0.6,
+      "entry_score": 0.8,
+      "original_grade": "B",
+      "entry_grade": "A-",
+      "delta_points": 20.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.1625441696113074,
+      "demand": {
+        "required_job_count": 45,
+        "preferred_only_job_count": 47,
+        "unspecified_job_count": 5,
+        "required_ratio": 0.079505,
+        "preferred_only_ratio": 0.083039,
+        "unspecified_ratio": 0.008834,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "feature_engineering",
+      "skill_name": "Feature engineering",
+      "group": "foundation",
+      "original_score": 0.6,
+      "entry_score": 0.8,
+      "original_grade": "B",
+      "entry_grade": "A-",
+      "delta_points": 20.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.02120141342756184,
+      "demand": {
+        "required_job_count": 8,
+        "preferred_only_job_count": 4,
+        "unspecified_job_count": 2,
+        "required_ratio": 0.014134,
+        "preferred_only_ratio": 0.007067,
+        "unspecified_ratio": 0.003534,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "model_training",
+      "skill_name": "Model training",
+      "group": "lifecycle",
+      "original_score": 0.55,
+      "entry_score": 0.8,
+      "original_grade": "C",
+      "entry_grade": "A-",
+      "delta_points": 25.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.038869257950530034,
+      "demand": {
+        "required_job_count": 16,
+        "preferred_only_job_count": 6,
+        "unspecified_job_count": 3,
+        "required_ratio": 0.028269,
+        "preferred_only_ratio": 0.010601,
+        "unspecified_ratio": 0.0053,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "fine_tuning",
+      "skill_name": "Fine-tuning",
+      "group": "lifecycle",
+      "original_score": 0.5,
+      "entry_score": null,
+      "original_grade": "C",
+      "entry_grade": null,
+      "delta_points": null,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [
+        "c1:criterion_uncertain",
+        "children_blocked_by_unresolved_core"
+      ],
+      "demand_weight": 0.061837455830388695,
+      "demand": {
+        "required_job_count": 23,
+        "preferred_only_job_count": 12,
+        "unspecified_job_count": 8,
+        "required_ratio": 0.040636,
+        "preferred_only_ratio": 0.021201,
+        "unspecified_ratio": 0.014134,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "model_evaluation",
+      "skill_name": "Model evaluation",
+      "group": "lifecycle",
+      "original_score": 0.6,
+      "entry_score": 0.8,
+      "original_grade": "B",
+      "entry_grade": "A-",
+      "delta_points": 20.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.04946996466431095,
+      "demand": {
+        "required_job_count": 16,
+        "preferred_only_job_count": 12,
+        "unspecified_job_count": 8,
+        "required_ratio": 0.028269,
+        "preferred_only_ratio": 0.021201,
+        "unspecified_ratio": 0.014134,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "experimentation",
+      "skill_name": "Experimentation",
+      "group": "lifecycle",
+      "original_score": 0.5,
+      "entry_score": 0.8,
+      "original_grade": "C",
+      "entry_grade": "A-",
+      "delta_points": 30.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.05653710247349823,
+      "demand": {
+        "required_job_count": 25,
+        "preferred_only_job_count": 7,
+        "unspecified_job_count": 9,
+        "required_ratio": 0.04417,
+        "preferred_only_ratio": 0.012367,
+        "unspecified_ratio": 0.015901,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "model_deployment",
+      "skill_name": "Model deployment & serving",
+      "group": "lifecycle",
+      "original_score": null,
+      "entry_score": null,
+      "original_grade": null,
+      "entry_grade": null,
+      "delta_points": null,
+      "original_pending_reason": "needs_confirmation",
+      "entry_pending_reasons": [
+        "c1:criterion_uncertain",
+        "children_blocked_by_unresolved_core"
+      ],
+      "demand_weight": 0.03356890459363958,
+      "demand": {
+        "required_job_count": 9,
+        "preferred_only_job_count": 10,
+        "unspecified_job_count": 0,
+        "required_ratio": 0.015901,
+        "preferred_only_ratio": 0.017668,
+        "unspecified_ratio": 0.0,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "mlops",
+      "skill_name": "MLOps",
+      "group": "lifecycle",
+      "original_score": 0.45,
+      "entry_score": 0.8,
+      "original_grade": "C",
+      "entry_grade": "A-",
+      "delta_points": 35.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.019434628975265017,
+      "demand": {
+        "required_job_count": 3,
+        "preferred_only_job_count": 8,
+        "unspecified_job_count": 0,
+        "required_ratio": 0.0053,
+        "preferred_only_ratio": 0.014134,
+        "unspecified_ratio": 0.0,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "ai_infrastructure",
+      "skill_name": "AI infrastructure",
+      "group": "systems",
+      "original_score": 0.5,
+      "entry_score": 0.0,
+      "original_grade": "C",
+      "entry_grade": "F",
+      "delta_points": -50.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.23851590106007067,
+      "demand": {
+        "required_job_count": 71,
+        "preferred_only_job_count": 64,
+        "unspecified_job_count": 10,
+        "required_ratio": 0.125442,
+        "preferred_only_ratio": 0.113074,
+        "unspecified_ratio": 0.017668,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "generative_ai",
+      "skill_name": "Generative AI",
+      "group": "systems",
+      "original_score": 0.5,
+      "entry_score": 1.0,
+      "original_grade": "C",
+      "entry_grade": "A",
+      "delta_points": 50.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.08833922261484099,
+      "demand": {
+        "required_job_count": 34,
+        "preferred_only_job_count": 16,
+        "unspecified_job_count": 11,
+        "required_ratio": 0.060071,
+        "preferred_only_ratio": 0.028269,
+        "unspecified_ratio": 0.019435,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "llm",
+      "skill_name": "Large language models",
+      "group": "systems",
+      "original_score": 0.45,
+      "entry_score": 0.8,
+      "original_grade": "C",
+      "entry_grade": "A-",
+      "delta_points": 35.0,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [],
+      "demand_weight": 0.3215547703180212,
+      "demand": {
+        "required_job_count": 92,
+        "preferred_only_job_count": 90,
+        "unspecified_job_count": 29,
+        "required_ratio": 0.162544,
+        "preferred_only_ratio": 0.159011,
+        "unspecified_ratio": 0.051237,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "rag",
+      "skill_name": "Retrieval-augmented generation",
+      "group": "systems",
+      "original_score": 0.6,
+      "entry_score": null,
+      "original_grade": "B",
+      "entry_grade": null,
+      "delta_points": null,
+      "original_pending_reason": null,
+      "entry_pending_reasons": [
+        "c1:criterion_uncertain",
+        "children_blocked_by_unresolved_core"
+      ],
+      "demand_weight": 0.02120141342756184,
+      "demand": {
+        "required_job_count": 9,
+        "preferred_only_job_count": 3,
+        "unspecified_job_count": 8,
+        "required_ratio": 0.015901,
+        "preferred_only_ratio": 0.0053,
+        "unspecified_ratio": 0.014134,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "ai_agents",
+      "skill_name": "Agents & tool use",
+      "group": "systems",
+      "original_score": null,
+      "entry_score": null,
+      "original_grade": null,
+      "entry_grade": null,
+      "delta_points": null,
+      "original_pending_reason": "needs_confirmation",
+      "entry_pending_reasons": [
+        "c1:criterion_uncertain",
+        "c2:criterion_uncertain",
+        "c3:criterion_uncertain"
+      ],
+      "demand_weight": 0.11837455830388692,
+      "demand": {
+        "required_job_count": 31,
+        "preferred_only_job_count": 36,
+        "unspecified_job_count": 12,
+        "required_ratio": 0.05477,
+        "preferred_only_ratio": 0.063604,
+        "unspecified_ratio": 0.021201,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "prompt_engineering",
+      "skill_name": "Prompt engineering",
+      "group": "systems",
+      "original_score": null,
+      "entry_score": 0.5,
+      "original_grade": null,
+      "entry_grade": "C",
+      "delta_points": null,
+      "original_pending_reason": "needs_confirmation",
+      "entry_pending_reasons": [],
+      "demand_weight": 0.03356890459363958,
+      "demand": {
+        "required_job_count": 16,
+        "preferred_only_job_count": 3,
+        "unspecified_job_count": 1,
+        "required_ratio": 0.028269,
+        "preferred_only_ratio": 0.0053,
+        "unspecified_ratio": 0.001767,
+        "N": 566
+      }
+    },
+    {
+      "skill_id": "vector_retrieval",
+      "skill_name": "Vector representations & retrieval",
+      "group": "systems",
+      "original_score": null,
+      "entry_score": 0.0,
+      "original_grade": null,
+      "entry_grade": "F",
+      "delta_points": null,
+      "original_pending_reason": "needs_confirmation",
+      "entry_pending_reasons": [],
+      "demand_weight": 0.037102473498233215,
+      "demand": {
+        "required_job_count": 15,
+        "preferred_only_job_count": 6,
+        "unspecified_job_count": 4,
+        "required_ratio": 0.026502,
+        "preferred_only_ratio": 0.010601,
+        "unspecified_ratio": 0.007067,
+        "N": 566
+      }
+    }
+  ],
+  "common_demand_coverage": 0.8931439159975293,
+  "common_match": {
+    "original": {
+      "score": 0.442,
+      "scored_skill_count": 17,
+      "unscored_skill_count": 0
+    },
+    "entry": {
+      "score": 0.6735,
+      "scored_skill_count": 17,
+      "unscored_skill_count": 0
+    }
+  },
+  "scored_demand_coverage": {
+    "original": 0.9221741815935763,
+    "entry": 0.9178505250154416
+  },
+  "match": {
+    "original": {
+      "score": 0.4446,
+      "scored_skill_count": 19,
+      "unscored_skill_count": 4
+    },
+    "entry": {
+      "score": 0.6618,
+      "scored_skill_count": 19,
+      "unscored_skill_count": 4
+    }
+  },
+  "limits": [
+    "Single paired observation on one previously used resume.",
+    "Original evidence strength and entry criterion coverage use different rubrics.",
+    "Original Agents receive all resume sources. Entry Agents receive the frozen selected evidence packets.",
+    "Human evidence selection, resume parsing and database time are outside the measured wall time."
+  ]
+}

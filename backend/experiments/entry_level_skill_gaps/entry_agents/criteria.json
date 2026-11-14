@@ -1,0 +1,1591 @@
+{
+  "version": "entry-level-criteria.v1",
+  "target_levels": [
+    "new_grad",
+    "entry_level"
+  ],
+  "calibration": "experimental_product_rubric_not_empirically_validated",
+  "families": {
+    "software_engineer": {
+      "programming": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement program logic for a stated task in an explicitly named programming language; a language listing alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe at least one relevant implementation mechanism, such as functions, control flow, data handling, or an applied library operation, in that programming work.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Perform a basic check of that program behavior, such as a test case, expected-output comparison, or diagnosis of an execution problem; a numeric improvement is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "algorithms": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Demonstrate explicit study or explanation of algorithms or data structures, or personal implementation/analysis of a specified mechanism; a degree or component name alone is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Identify relevant processing steps, data-structure operations, an invariant, or computational complexity; using a library without such detail is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Explain or check correctness, a boundary case, or a time/space property for that mechanism; a worked course example can qualify.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "object_oriented_design": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design or implement an explicitly described object-oriented structure or design pattern; using an OO-capable language alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe class responsibilities, object collaboration, encapsulation, interfaces, or polymorphism in that design.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check or explain how the design supports a concrete behavior, substitutability, separation of concerns, or a change scenario; organization-wide architecture is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "ai_assisted_development": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use an identified AI assistant to write, inspect, test, or improve software for a stated development task.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe how the assistant output was incorporated, revised, constrained, or reviewed in the development workflow.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check generated or suggested code against intended software behavior, tests, or source-code inspection; trusting the assistant output alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "system_design": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design software components or interfaces for a stated problem, with explicit component boundaries or interactions; implementation alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant interface, data/control flow, or design choice linking those components; a small project design can qualify.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the design against a concrete requirement, interaction scenario, or constraint; production scale and architecture ownership are not prerequisites.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "backend_apis": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement server-side behavior, a route, or an API contract for a stated function; consuming another service alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe relevant request/response handling, data access, validation, or error handling in that backend implementation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Exercise or test the backend behavior using a request, integration check, or expected response, including a stated success or failure case.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "frontend": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement a user interface or client-side behavior for a stated application; an isolated analytical chart alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe relevant interaction, state, component, rendering, layout, or accessibility behavior in that implementation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check a user interaction, rendering behavior, accessibility condition, or expected client response; formal user studies are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "distributed_systems": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design, implement, or diagnose communication, coordination, shared state, or isolation across explicitly separate services/processes/nodes or tenants.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the cross-boundary mechanism, such as messages, replication, partitioning, consistency, or tenant isolation; a tool name alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check or reason through a concrete cross-boundary scenario such as failure, ordering, duplicate delivery, consistency, or isolation; a small prototype can qualify.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "relational_sql": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally query, design, migrate, or access explicitly relational data using SQL or a stated relational mechanism; generic JSON is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant query, join, aggregation, key, constraint, schema relationship, or migration operation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the relational operation or returned data against expected records, counts, constraints, or a stated query purpose.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "nosql_search": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use a named non-relational store or search system for a stated data/search task; generic database work alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant document/key/index/query/search mechanism used in that task.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check retrieved results, storage behavior, query correctness, or a relevant edge case for that system.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "code_quality": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally apply an explicit maintainability practice such as refactoring, modularization, clearer contracts, or reducing code complexity.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the concrete code organization, interface, duplication, naming, or complexity issue addressed and how it was addressed.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check preserved behavior, clearer usage, or maintainability of the changed code through tests, inspection, or a concrete change scenario.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "testing": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design, implement, or execute software tests for stated software behavior; unrelated model evaluation is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a test input/setup, expected behavior, assertion, or coverage case relevant to that software.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Inspect test outcomes or use tests to verify expected behavior or a fix; comparative performance gains are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "debugging": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally reproduce, trace, isolate, diagnose, or correct a stated software fault; merely seeing a failed status is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a diagnostic step, hypothesis, log/trace inspection, or isolation method related to that fault.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the diagnosis or fix by rerunning the failing case, inspecting the relevant state, or comparing actual and expected behavior.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "code_review": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally review source code or a proposed implementation, or participate explicitly in source-code/PR review; merging or document review alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Identify a concrete implementation concern or review focus, such as correctness, maintainability, security, or test coverage.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Provide or respond to actionable code feedback, or check the resulting revision; approval alone without the reviewed concern is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "version_control": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use an explicit version-control system through commits, branches, diffs, merges, or pull requests; a repository link alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a concrete source-control workflow or operation such as branching, comparing changes, resolving a conflict, or managing a revision.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check or reconcile the resulting change history, diff, merged state, or restored revision; a complex enterprise workflow is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "cloud": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use an identified cloud provider/service for a stated computing, storage, deployment, or operational task.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe relevant service configuration, permissions, resource setup, or integration for that task; do not infer other providers.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check service access, execution, deployment behavior, resource state, or an expected cloud result.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "containers": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally build, configure, or run a container or explicitly containerized workload; ordinary deployment alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant image, dependency, port, volume, environment, or orchestration configuration; Docker does not imply Kubernetes.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check container startup, application execution, connectivity, isolation, or reproducibility for that workload.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "delivery_automation": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally automate a build, test, release, infrastructure-provisioning, or configuration step; ordinary Git use is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant workflow trigger, sequence, artifact, environment, or configuration in that automation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the automated step through its output, run status with diagnostic inspection, resulting artifact, or a test deployment.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "performance": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally measure, analyze, or optimize a stated software/system performance property such as latency, throughput, or resource usage.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the measured workload, profiling method, bottleneck, or optimization mechanism; an unexplained percentage is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the relevant performance behavior using a stated measurement or observation; positive improvement and production scale are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "observability_operations": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement or use logs, metrics, traces, alerts, monitoring, or maintenance for a running software system; ordinary progress reports are insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the operational signal, instrumentation, alert condition, or diagnostic/maintenance workflow used.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Use that signal or workflow to check system behavior, investigate an operational issue, or verify the monitoring/maintenance action.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "reliability": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally handle a stated software failure, recovery, load, redundancy, or scaling concern; simply calling a system robust is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the relevant mechanism, such as retries, recovery, limits, redundancy, or controlled scaling.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check a failure, recovery, load, or correctness scenario related to that mechanism; large production traffic is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "security": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement or test an explicit software-security control such as authentication, authorization, secure access, or a vulnerability mitigation.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the protected resource, trust boundary, permission rule, threat, or secure mechanism involved.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check an allowed/denied access case or relevant security behavior; content moderation and ordinary input checks alone are insufficient.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      }
+    },
+    "data_analyst": {
+      "sql": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use SQL or explicit relational querying to answer an analytical question or access relevant data.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant selection, filter, join, aggregation, or relational relationship used for that analytical task.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check query outputs against expected counts, known records, join behavior, or the analytical question.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "analytical_scripting": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally write code or scripts for a stated data-transformation or analysis task in an identified language or analytical library.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant transformation, calculation, data structure, or analytical procedure implemented.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the script output, data transformation, or analytical result against an expected property or independent calculation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "spreadsheets": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally perform a stated analytical task in a spreadsheet using formulas, pivots, or another analytical operation; a static table alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the formula, aggregation, lookup, pivot configuration, or spreadsheet workflow used.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check spreadsheet results, input ranges, formula behavior, or reconciliation with source data.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_analysis": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally inspect, compare, or interpret data to answer a stated question; collecting or displaying data alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant analytical comparison, grouping, calculation, or inspection method.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Interpret a finding or check the analysis against data quality, alternative explanations, or the original question; business impact is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "business_analytics": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally define or analyze a business/product metric or decision-relevant business question; a business title alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the metric definition, comparison, segment, or analytical procedure connecting data to that question.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Interpret or check the business meaning and a limitation of the result, or connect it to a concrete decision; realized revenue impact is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "requirements_analysis": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally elicit, clarify, analyze, or translate a stakeholder/problem requirement; receiving instructions alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a concrete ambiguity, acceptance condition, data need, metric definition, or requirement translation addressed.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the interpreted requirement with stakeholder feedback, a documented acceptance condition, or a worked scenario.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "statistics": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Demonstrate explicit study or explanation of statistical concepts/methods, or personal application of a statistical method; a degree or percentage alone is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Identify the relevant statistical method, quantity, assumption, or interpretation; a generic software name alone is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Interpret a statistical result or assess an assumption, uncertainty, or limitation in a worked example or actual analysis.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "experimentation": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design or run an experiment with explicit comparison groups, treatments, or conditions; ordinary implementation iterations are insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the comparison setup, assignment/control, outcome measure, or confounding consideration.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Evaluate or interpret the comparison, including an observed result, uncertainty, or design limitation; a positive treatment effect is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "causal_inference": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Demonstrate explicit study, explanation, or application of a causal-inference method aimed at estimating a causal effect; correlation or prediction alone is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Identify a causal identification strategy, comparison, intervention, confounder adjustment, or explicit identifying assumption.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Explain or check an identification assumption, bias risk, validity limit, or interpretation of a causal estimate in a worked example or actual analysis.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_pipelines": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally build or operate a repeatable ingestion, transformation, or ETL flow with stated source and destination stages; a one-off download is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant extraction, transformation, dependency, scheduling, or loading mechanism.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check a run, data transfer, schema, row count, or failure condition in that repeatable flow.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_modeling": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design an explicit data schema, entities/relationships, dimensions, or analytical data structure; outputting JSON alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe relevant keys, relationships, grain, dimensions, constraints, or representation choices in that model.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the model against a query/use case, data consistency condition, relationship, or analytical requirement.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_quality": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally clean, validate, reconcile, prepare, or govern a stated dataset; storing data alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the quality issue and a relevant rule or transformation, such as missing-value handling, deduplication, validation, or reconciliation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the resulting data or quality rule against expected values, counts, consistency, or documented exceptions.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "dashboarding": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally build or maintain an analytical/business dashboard with stated metrics or analytical views; an isolated chart or document is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a dashboard metric, data connection, filter, interaction, layout decision, or refresh behavior.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check a displayed metric, filter, refresh, or dashboard interaction against its data source or intended use.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_visualization": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally create or design a data visualization to communicate a stated analytical quantity or relationship.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the chart type, visual encoding, grouping, axis, or design choice appropriate to the data/question.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the displayed data or interpretability through value validation, scale/label inspection, or audience feedback.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "bi_tools": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use an explicitly identified BI platform for a stated analytical activity; a generic chart alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant BI data connection, model, measure, visual, filter, or report operation in that platform.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the resulting BI output or behavior against source data, an expected calculation, or a stated analytical requirement.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "warehousing": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Demonstrate explicit study, explanation, or personal use of data-warehouse concepts or an identified warehouse in an analytical context; an ordinary database alone is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Identify a warehouse-specific analytical structure or operation, such as fact/dimension modeling, analytical loading, partitioning, or warehouse querying.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Explain or check a warehouse query, load, grain, reconciliation, or analytical use case; a worked learning example can qualify.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "large_scale_processing": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Demonstrate explicit knowledge of large/distributed data processing or personal work with an explicitly described scale/distribution constraint; a framework name alone is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant partitioning, distributed transformation, memory/resource, shuffle, or scale-handling mechanism.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Explain or check correctness or resource behavior for the stated workload/mechanism; a bounded distributed learning example can qualify.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "workflow_automation": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally automate or orchestrate a repeatable analytical/data workflow; a one-off manually executed analysis is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the repeated steps, trigger, dependency, scheduling, or orchestration logic.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check an automated run, produced artifact, dependency, or failure-handling behavior against the intended workflow.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      }
+    },
+    "ai_engineer": {
+      "general_programming": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement program logic for a stated task in an explicitly named non-Python language; Python-only work is outside this core.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant function, control flow, data structure, or applied library operation in that non-Python implementation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the program behavior with a test, expected-output comparison, or diagnosis of an execution problem.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "python": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement Python logic or use an explicitly supported Python library for a stated task; do not infer Python from a finished AI tool or a teammate contribution.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant Python operation, data manipulation, function, library procedure, or integration in that implementation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the Python program or data output against an expected behavior, test case, or diagnostic observation; numeric improvement is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "software_engineering": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement, test, debug, maintain, or build an API in a concrete software context; using a finished AI product alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant engineering mechanism such as module/interface organization, input/error handling, a test, or a diagnostic procedure.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check software behavior or an engineering change against an expected requirement, test, or failure scenario.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "sql": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally query, design, or access explicitly relational data through SQL or a stated relational operation; generic JSON is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant query, join, aggregation, key, schema relationship, or relational access operation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the operation or returned data against expected records, counts, constraints, or the stated data task.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "machine_learning": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally apply an explicitly identified ML method/framework in a stated modeling task; calling a finished AI product alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant modeling procedure involving inputs, model choice, fitting, prediction, or an ML-specific configuration.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check model behavior using relevant data, criteria, a metric, or error inspection; production deployment and improved benchmark scores are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "deep_learning": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally work with an explicitly identified neural/deep-learning architecture in a stated training or inference task.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant neural-model input, architecture component, training/inference configuration, or tensor/model operation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check neural-model behavior, outputs, training behavior, or errors using a relevant basic evaluation; training from scratch is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "math_statistics": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Demonstrate explicit study, explanation, or application of mathematical, probability, or statistical foundations; a degree or numerical output alone is insufficient.",
+            "minimum_evidence": "knowledge",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Identify a relevant mathematical/statistical concept, equation, method, or assumption rather than only an umbrella field name.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Interpret, derive, apply, or check that concept in a worked example or actual task, including a relevant property or limitation.",
+            "minimum_evidence": "knowledge",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_preparation": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally clean, label, validate, structure, or prepare data for a stated ML/analytical task; saving model output alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the relevant preparation rule or transformation and the data issue or representation it addresses.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check prepared data against expected labels, schema, ranges, consistency, leakage concerns, or another relevant quality property.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "data_pipelines": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally build or operate a repeatable ingestion, transformation, or processing flow for data; one-off loading or an inference call alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the source/destination stages and a relevant transformation, dependency, scheduling, or loading mechanism.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check data movement, a pipeline run, data quality, or a failure case for that flow.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "feature_engineering": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally create, select, or transform input features actually used by a model; formatting outputs or product features is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a feature construction, encoding, selection, transformation, or representation and its relationship to model inputs.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the engineered features through value inspection, leakage/consistency checks, or a relevant model comparison.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "model_training": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally fit or update model parameters through an explicitly described training process; inference, API integration, and prompt editing are insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant training dataset, objective, optimization step, hyperparameter, or training configuration.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check training behavior or the trained model through loss monitoring, validation data, output inspection, or another relevant evaluation; gains are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "fine_tuning": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally adapt a pretrained model by updating its weights or trainable adaptation parameters; prompt editing and training from scratch alone are insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the adaptation data, trainable components, procedure, or configuration, such as an explicitly applied parameter-efficient technique.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the adapted model or adaptation process using relevant validation data, outputs, training behavior, or a comparison; improved results are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "model_evaluation": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally evaluate model quality or behavior against stated data, criteria, metrics, or error categories; successful execution alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the evaluation dataset/setup, metric, rubric, error-analysis procedure, or comparison appropriate to the model task.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Inspect or interpret an evaluation finding or a limitation of the evaluation; a quantitative improvement is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "experimentation": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design or run an explicit controlled/comparative model experiment, ablation, or test; ordinary iterative implementation is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the compared conditions, changed factor, controlled setup, or outcome measure.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Inspect or interpret the comparison or its limitations; a favorable or statistically significant result is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "model_deployment": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement, configure, launch, or operate a runnable model-inference serving path or endpoint; a notebook or request to someone else model API alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe how a request/input reaches the model and produces a served response, or a relevant serving/runtime configuration; local serving can qualify.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the serving path with an inference request, response validation, startup/runtime check, or a relevant error case; cloud/production scale is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "mlops": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally apply an ML lifecycle operation such as model/data versioning, a reproducible ML workflow, model monitoring, or continuous model delivery.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the relevant artifact tracking, reproducibility, monitoring, pipeline, or delivery mechanism; an isolated training run or generic CI is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check model artifact identity, reproducibility, lifecycle execution, monitoring behavior, or delivery state for that ML operation.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "ai_infrastructure": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally configure or operate cloud, compute, container, distributed, or operational infrastructure for an explicit AI workload; a cloud AI API call alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a relevant compute/resource, environment, dependency, container, execution, or infrastructure configuration for that workload.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check AI workload execution, resource behavior, environment setup, or infrastructure operation; large clusters and production traffic are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "generative_ai": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use or build an explicitly generative system for a stated content-generation task; unspecified AI or classification alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the actual input/output modality and a relevant generation configuration, integration, or workflow.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Inspect or check generated content against a stated task criterion, constraint, or quality issue; model training is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "llm": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use or develop with an explicitly identified language model for a stated language task; unspecified AI work is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the model input, output, prompting configuration, context handling, or application integration relevant to that task.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check language-model behavior or output against a stated requirement, example, or error category; this does not establish training, RAG, or agents.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "rag": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally implement or use a described retrieval-to-generation workflow in which external retrieved context grounds generated answers; embeddings or search alone are insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe how relevant external context is retrieved and passed into generation; identify an actual linkage rather than two unrelated tool names.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check retrieved context relevance, grounded-answer correctness, citations, or a retrieval/generation failure case in that workflow.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "ai_agents": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design or implement a model-mediated tool/action workflow with explicit invocation, result handling, or control flow; an agent project name alone is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe a concrete tool/action input, returned result, control decision, or bounded/human-reviewed execution step in that workflow.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check tool/action execution or result handling against intended behavior, an error case, or a control constraint; autonomy and multiple tools are not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "prompt_engineering": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally design, refine, or evaluate prompts for a defined model behavior; a casual question or merely saying a prompt was followed is insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe an explicit prompt technique or design element, such as instructions, examples, output constraints, context organization, or a targeted revision.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check the resulting behavior against examples, constraints, errors, or a defined evaluation criterion; numeric improvement is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      },
+      "vector_retrieval": {
+        "criteria": [
+          {
+            "id": "c1",
+            "description": "Personally use embeddings, similarity search, vector indexing, or vector storage for a stated retrieval/representation task; generic arrays or LLM use are insufficient.",
+            "minimum_evidence": "practice",
+            "critical": true,
+            "weight": 0.5
+          },
+          {
+            "id": "c2",
+            "description": "Describe the embedding, similarity, indexing, query, or vector-storage mechanism applied to that task.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.3
+          },
+          {
+            "id": "c3",
+            "description": "Check retrieved matches, representation behavior, indexing/query correctness, or relevance against examples or a stated criterion; a full RAG pipeline is not required.",
+            "minimum_evidence": "practice",
+            "critical": false,
+            "weight": 0.2
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,5 +1,6 @@
 from functools import lru_cache
 from pathlib import Path
+from typing import Literal
 
 from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -57,6 +58,9 @@ class SkillGapSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
 
     skill_gap_foundry_project_endpoint: str | None = None
+    # Auto uses the verified entry-level bindings on their saved Foundry
+    # project. Explicitly configured group Agents take precedence.
+    skill_gap_workflow: Literal["auto", "legacy", "entry_level"] = "auto"
     # Legacy binding is accepted for env compatibility, but extraction always
     # uses the three named skill groups below; there is no single-Agent fallback.
     skill_gap_foundry_agent_name: str | None = None
