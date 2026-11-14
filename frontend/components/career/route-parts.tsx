@@ -194,9 +194,12 @@ export function SourceNote({ children }: { children: React.ReactNode }) {
  * steps: show the analysis steps while loading too (the setup route page, so its card doesn't change shape).
  */
 export function AnalysisGate({ steps = false }: { steps?: boolean }) {
-  const { loaded, snapshot, family, run, submitting, restoring, error, elapsed, analyze } = useSkillGapAnalysis();
+  const { loaded, snapshot, family, run, submitting, restoring, error, elapsed, analyze, checkAgain } = useSkillGapAnalysis();
   if (run?.status === "completed" && run.report) return null;
-  const busy = submitting || run?.status === "queued" || run?.status === "running";
+  const active = submitting || run?.status === "queued" || run?.status === "running";
+  // A poll failed while the run is active: the server can't be reached, so stop showing progress.
+  const lost = active && !submitting && Boolean(error);
+  const busy = active && !lost;
   const loading = !loaded || restoring;
   const calculating = run?.phase === "checking" || run?.phase === "scoring";
   const failed = run?.status === "failed";
@@ -204,7 +207,11 @@ export function AnalysisGate({ steps = false }: { steps?: boolean }) {
   let title: string;
   let detail: string;
   let action: React.ReactNode = null;
-  if (loading) {
+  if (lost) {
+    title = "Lost connection to your analysis";
+    detail = "We can’t reach the server right now. We’ll keep checking, or you can try again.";
+    action = <Button size="lg" onClick={checkAgain}><RotateCcw data-icon="inline-start" />Try again</Button>;
+  } else if (loading) {
     title = "Loading your route…";
     detail = "Your confirmed résumé and saved analysis will appear in a moment.";
   } else if (!snapshot && error) {
