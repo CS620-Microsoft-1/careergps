@@ -31,7 +31,7 @@ const AUTO_ADVANCE_MS = 1500;
 const ANY_LOCATION = "Anywhere";
 const FAMILIES: JobFamily[] = ["data_analyst", "software_engineer", "ai_engineer"];
 
-type AnalysisRun = { file: File; events: TimedStepEvent[]; result?: ResumeAnalysis; error?: string };
+type AnalysisRun = { file: File; started: number; events: TimedStepEvent[]; result?: ResumeAnalysis; error?: string };
 type Goal = { family: JobFamily | null; level: ExperienceLevel | null; location: string };
 type Direction = "forward" | "back";
 
@@ -136,7 +136,7 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
     stopRun();
     const controller = new AbortController();
     runController.current = controller;
-    setRun({ file: selected, events: [] });
+    setRun({ file: selected, started: Date.now(), events: [] });
     try {
       const result = await streamResumeAnalysis(selected, (event) => {
         if (controller.signal.aborted) return;
@@ -258,7 +258,7 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
       </div>
       {run ? (
         <div className="mt-10">
-          <ResumeAnalysisProgress file={run.file} events={run.events} result={run.result} error={run.error}
+          <ResumeAnalysisProgress file={run.file} started={run.started} events={run.events} result={run.result} error={run.error}
             onCancel={() => { stopRun(); setRun(undefined); }}
             onRetry={() => void startAnalysis(run.file)}
             onChooseAnotherFile={() => { stopRun(); setRun(undefined); setFile(undefined); }} />

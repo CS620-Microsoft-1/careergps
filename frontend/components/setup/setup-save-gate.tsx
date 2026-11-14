@@ -2,9 +2,9 @@
 
 import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, LoaderCircle, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 
-import { AnalysisSteps } from "@/components/career/route-parts";
+import { AnalysisSteps, StatusCard } from "@/components/career/route-parts";
 import { Button } from "@/components/ui/button";
 import { retrySetupSave, setupSave } from "@/lib/setup-save";
 
@@ -22,19 +22,10 @@ export function SetupSaveGate({ children }: { children: React.ReactNode }) {
     <div className="mx-auto flex w-full max-w-300 flex-1 flex-col px-4 py-6 sm:px-6">
       <div className="grid flex-1 place-items-center">
         <div className="w-full max-w-3xl">
-          <div className="grid justify-items-center gap-3 rounded-2xl border border-border bg-card px-6 py-14 text-center" aria-busy={!failed}>
-            {!failed && <LoaderCircle aria-hidden className="size-7 motion-safe:animate-spin" />}
-            <div role="status" aria-live="polite" className="grid gap-1.5">
-              <h2 className="text-section">{failed ? "Couldn’t save your profile" : "Saving your profile"}</h2>
-              <p className="mx-auto max-w-lg text-muted-foreground">
-                {failed ? state.error : "Your route starts calculating as soon as your résumé is saved."}
-              </p>
-            </div>
-            {!failed && <AnalysisSteps saving />}
-            {failed && <div className="mt-2">
-              <Button size="lg" onClick={retrySetupSave}><RotateCcw data-icon="inline-start" />Try again</Button>
-            </div>}
-          </div>
+          <StatusCard busy={!failed} title={failed ? "Couldn’t save your profile" : "Saving your profile"}
+            detail={failed ? state.error : "Your route starts calculating as soon as your résumé is saved."}
+            steps={!failed && <AnalysisSteps saving />}
+            action={failed && <Button size="lg" onClick={retrySetupSave}><RotateCcw data-icon="inline-start" />Try again</Button>} />
         </div>
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">

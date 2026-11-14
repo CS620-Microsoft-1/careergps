@@ -191,18 +191,20 @@ export function SourceNote({ children }: { children: React.ReactNode }) {
 /**
  * Shown in place of results until the analysis for the selected role is ready: loading, running,
  * failed, or never run. Returns null once there is a completed report.
+ * steps: show the analysis steps while loading too (the setup route page, so its card doesn't change shape).
  */
-export function AnalysisGate({ children }: { children?: React.ReactNode }) {
+export function AnalysisGate({ steps = false }: { steps?: boolean }) {
   const { loaded, snapshot, family, run, submitting, restoring, error, elapsed, analyze } = useSkillGapAnalysis();
   if (run?.status === "completed" && run.report) return null;
   const busy = submitting || run?.status === "queued" || run?.status === "running";
+  const loading = !loaded || restoring;
   const calculating = run?.phase === "checking" || run?.phase === "scoring";
   const failed = run?.status === "failed";
 
   let title: string;
   let detail: string;
   let action: React.ReactNode = null;
-  if (!loaded || restoring) {
+  if (loading) {
     title = "Loading your route…";
     detail = "Your confirmed résumé and saved analysis will appear in a moment.";
   } else if (!snapshot && error) {
@@ -233,28 +235,40 @@ export function AnalysisGate({ children }: { children?: React.ReactNode }) {
     action = <Button size="lg" onClick={() => void analyze(false)}>Calculate my route</Button>;
   }
   return (
+    <StatusCard title={title} detail={detail} busy={busy || loading} action={action}
+      steps={(busy || (steps && loading)) && <AnalysisSteps calculating={calculating} />} />
+  );
+}
+
+/** The card every loading, failed and retry state uses: setup's résumé reading, saving, and the route. */
+export function StatusCard({ title, detail, busy, steps, action }: {
+  title: string; detail: React.ReactNode; busy: boolean; steps?: React.ReactNode; action?: React.ReactNode;
+}) {
+  return (
     <div className="grid justify-items-center gap-3 rounded-2xl border border-border bg-card px-6 py-14 text-center" aria-busy={busy}>
-      {(busy || !loaded || restoring) && <LoaderCircle aria-hidden className="size-7 motion-safe:animate-spin" />}
+      {busy && <LoaderCircle aria-hidden className="size-7 motion-safe:animate-spin" />}
       <div role="status" aria-live="polite" className="grid gap-1.5">
         <h2 className="text-section">{title}</h2>
         <p className="mx-auto max-w-lg text-muted-foreground">{detail}</p>
       </div>
-      {busy && <AnalysisSteps calculating={calculating} />}
-      {action && <div className="mt-2">{action}</div>}
-      {children}
+      {steps}
+      {action && <div className="mt-2 flex flex-wrap justify-center gap-3">{action}</div>}
     </div>
   );
 }
 
 /** saving: the end of setup, while the confirmed résumé is still being saved. */
 export function AnalysisSteps({ calculating = false, saving = false }: { calculating?: boolean; saving?: boolean }) {
-  const steps = [
+  return <StepList label="Analysis steps" steps={[
     saving ? { label: "Saving your résumé", done: false, active: true } : { label: "Résumé confirmed", done: true, active: false },
     { label: "Read skill evidence", done: calculating, active: !saving && !calculating },
     { label: "Calculate gaps", done: false, active: calculating },
-  ];
+  ]} />;
+}
+
+export function StepList({ label, steps }: { label: string; steps: { label: string; done: boolean; active: boolean }[] }) {
   return (
-    <ol aria-label="Analysis steps" className="mt-2 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
+    <ol aria-label={label} className="mt-2 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
       {steps.map((step, index) => (
         <li key={step.label} aria-current={step.active ? "step" : undefined}
           className={cn("flex items-center gap-2", !step.done && !step.active && "text-muted-foreground")}>
