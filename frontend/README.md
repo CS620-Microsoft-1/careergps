@@ -54,6 +54,46 @@ to the existing placeholder dashboard. Refreshing during Review also discards th
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Generate route types and run the TypeScript compiler |
 
+## Tests
+
+| Command | What it runs |
+| --- | --- |
+| `npm test` | Unit tests for `lib/` (Node test runner) |
+| `npm run test:components` | Component tests (Vitest and Testing Library); `npm run test:components:watch` reruns on save |
+| `npm run test:e2e` | End-to-end tests (Playwright); `npm run test:e2e:ui` opens the Playwright UI |
+
+Pull requests to `dev` that touch `frontend/` run all of these, plus lint, typecheck and build
+(`.github/workflows/frontend-tests.yml`).
+
+## End-to-end tests
+
+Playwright drives the real pages in a headless browser. The API is mocked by
+`e2e/support/mock-api.ts` through `page.route()`, so the tests need no backend and no Agent call.
+Login is real: `playwright.config.ts` reads the Supabase settings from `.env.e2e`, `.env.local` or
+`.env`, builds the app and starts it on port 3000. A server already on port 3000 (`npm run dev`)
+is reused on your machine.
+
+- `e2e/public.spec.ts` covers the signed-out pages and needs no account.
+- `e2e/signed-in/` starts from a session that `e2e/auth.setup.ts` saves by logging in once. Set
+  `E2E_EMAIL` and `E2E_PASSWORD` to a Supabase test account with a confirmed email (see
+  `.env.example`); without them these tests are skipped. Never use a real student's account.
+  - `route.spec.ts`: Home, Gaps, saving a resource to the plan, the gap filter, Destinations.
+  - `resources-taken.spec.ts`: marking a UW course taken on Resources (Undo is off until the
+    course is saved), "Not now" on a résumé suggestion, and showing taken courses again.
+  - `gaps-taken.spec.ts`: the "You took …" reminder on a Gaps card.
+
+`mockApi(page, options)` answers from `test/fixtures.ts`. Options change what one test sees:
+`planItems`, `resources` (the taken-course specs pass `e2e/support/uw-courses.ts`, which adds
+three UW–Madison courses), `takenCourses` and `resumeCourseMatches`. It returns the recorded
+`calls`, the `taken` course ids, and `holdCourseSaves()` to keep a course save unanswered.
+
+```bash
+npx playwright install chromium   # once; downloads the browser (about 100 MB)
+npm run test:e2e                  # builds and starts the app, or reuses a server on port 3000
+npx playwright test --headed      # watch it run
+npx playwright show-report        # after a failure
+```
+
 ## Structure
 
 ```text

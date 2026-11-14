@@ -9,6 +9,10 @@ import { resources, resume, run, user } from "@/test/fixtures";
 
 vi.mock("@/components/plan/plan-provider", () => ({ usePlan: vi.fn() }));
 vi.mock("@/components/skill-gaps/skill-gap-provider", () => ({ useSkillGapAnalysis: vi.fn() }));
+// No course is marked taken, so every resource in the fixtures stays in the lists.
+vi.mock("@/components/plan/taken-courses-provider", () => ({
+  useTakenCourses: () => ({ taken: new Set<string>(), pending: new Set<string>(), mark: vi.fn(), unmark: vi.fn(), noteTaken: vi.fn() }),
+}));
 
 type Analysis = ReturnType<typeof useSkillGapAnalysis>;
 
