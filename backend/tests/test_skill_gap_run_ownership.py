@@ -228,7 +228,7 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
     def test_concurrent_first_requests_construct_one_shared_manager(self):
         barrier = Barrier(6)
         sentinel = object()
-        def construct():
+        def construct(**options):
             time.sleep(.05)  # Make simultaneous cold misses observable.
             return sentinel
         def request():
@@ -239,7 +239,8 @@ class SkillGapRunOwnershipTests(unittest.TestCase):
             with patch.object(runs, "SkillGapRunManager", side_effect=construct) as constructor:
                 with ThreadPoolExecutor(max_workers=6) as executor:
                     managers = list(executor.map(lambda _: request(), range(6)))
-                constructor.assert_called_once_with()
+                constructor.assert_called_once()
+                self.assertIsInstance(constructor.call_args.kwargs["store"], runs.DbRunStore)
                 self.assertTrue(all(manager is sentinel for manager in managers))
         finally:
             runs._cached_skill_gap_run_manager.cache_clear()
