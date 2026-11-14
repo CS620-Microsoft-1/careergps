@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import NumberFlow from "@number-flow/react";
 import {
   Award,
   Bookmark,
@@ -51,9 +53,29 @@ export function ResourceIcon({ type, className }: { type: ResourceType; classNam
   );
 }
 
-/** Progress ring with the match percent in the middle. value is 0–1, or null while unknown. */
-export function MatchRing({ value, size = 160, stroke = 14, label = "match", className }: {
-  value: number | null; size?: number; stroke?: number; label?: string | null; className?: string;
+/** NumberFlow timings. Its defaults run past the 300ms budget for UI. */
+export const numberTiming = (duration: number) => {
+  const timing = { duration, easing: "cubic-bezier(0.23, 1, 0.32, 1)" };
+  return { transformTiming: timing, spinTiming: timing, opacityTiming: timing };
+};
+
+/** Counts up from 0 once it has mounted, in step with a ring's arc or a bar's fill. */
+export function RevealPercent({ value }: { value: number }) {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setShown(value));
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
+  return <NumberFlow value={Math.round(shown * 100)} suffix="%" {...numberTiming(600)} />;
+}
+
+/**
+ * Progress ring with the match percent in the middle. value is 0–1, or null while unknown.
+ * reveal draws the arc and counts up on mount: only for the first result, as the ring is on pages
+ * students revisit.
+ */
+export function MatchRing({ value, size = 160, stroke = 14, label = "match", reveal = false, className }: {
+  value: number | null; size?: number; stroke?: number; label?: string | null; reveal?: boolean; className?: string;
 }) {
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -64,12 +86,14 @@ export function MatchRing({ value, size = 160, stroke = 14, label = "match", cla
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--sunken)" strokeWidth={stroke} />
         {value !== null && (
           <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="var(--foreground)" strokeWidth={stroke}
-            strokeLinecap="round" strokeDasharray={`${shown * circumference} ${circumference}`} />
+            strokeLinecap="round" strokeDasharray={`${shown * circumference} ${circumference}`}
+            className={cn("transition-[stroke-dasharray] duration-[280ms] ease-out", reveal && "ring-reveal")}
+            style={{ "--ring-length": circumference } as React.CSSProperties} />
         )}
       </svg>
       <div className="absolute text-center">
         <p className="font-extrabold tracking-[-0.02em]" style={{ fontSize: Math.max(14, size * 0.22), lineHeight: 1.1 }}>
-          {value === null ? "—" : percent(value)}
+          {value === null ? "—" : reveal ? <RevealPercent value={value} /> : percent(value)}
         </p>
         {label && size >= 96 && <p className="text-sm text-muted-foreground">{label}</p>}
       </div>
@@ -118,7 +142,7 @@ export function GapLegend() {
 export function SaveButton({ resourceId, tone = "card", className }: {
   resourceId: string; tone?: "card" | "tile"; className?: string;
 }) {
-  const { saved, pending, toggleSaved } = usePlan();
+  const { saved, pending, justSaved, toggleSaved } = usePlan();
   const item = saved.get(resourceId);
   const busy = pending.has(resourceId);
   if (item?.status === "done") {
@@ -129,7 +153,8 @@ export function SaveButton({ resourceId, tone = "card", className }: {
     <Button type="button" size="sm" variant={item ? "accent" : tone === "tile" ? "raised" : "secondary"}
       aria-pressed={Boolean(item)} disabled={busy} onClick={() => void toggleSaved(resourceId)} className={className}>
       {busy ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />
-        : item ? <BookmarkCheck data-icon="inline-start" /> : <Bookmark data-icon="inline-start" />}
+        : item ? <BookmarkCheck data-icon="inline-start" className={cn(justSaved === resourceId && "entrance-pop")} />
+        : <Bookmark data-icon="inline-start" />}
       {item ? "Saved to plan" : "Save to plan"}
     </Button>
   );
@@ -197,9 +222,14 @@ export function AnalysisGate({ children }: { children?: React.ReactNode }) {
     title = "The analysis couldn’t finish";
     detail = run?.error ?? "Your confirmed résumé is safe. Try again in a moment.";
     action = <Button size="lg" onClick={() => void analyze(true)}><RotateCcw data-icon="inline-start" />Try again</Button>;
+  } else if (error) {
+    // Loading the saved analysis failed: say so instead of offering a first calculation.
+    title = "Couldn’t load your route";
+    detail = error;
+    action = <Button size="lg" onClick={() => void analyze(false)}><RotateCcw data-icon="inline-start" />Try again</Button>;
   } else {
     title = `No route to ${ROLE_NAMES[family]} yet`;
-    detail = error ?? `Compare your confirmed résumé with ${ROLE_NAMES[family].toLowerCase()} postings to see your match and gaps.`;
+    detail = `Compare your confirmed résumé with ${ROLE_NAMES[family].toLowerCase()} postings to see your match and gaps.`;
     action = <Button size="lg" onClick={() => void analyze(false)}>Calculate my route</Button>;
   }
   return (
@@ -216,10 +246,11 @@ export function AnalysisGate({ children }: { children?: React.ReactNode }) {
   );
 }
 
-function AnalysisSteps({ calculating }: { calculating: boolean }) {
+/** saving: the end of setup, while the confirmed résumé is still being saved. */
+export function AnalysisSteps({ calculating = false, saving = false }: { calculating?: boolean; saving?: boolean }) {
   const steps = [
-    { label: "Résumé confirmed", done: true, active: false },
-    { label: "Read skill evidence", done: calculating, active: !calculating },
+    saving ? { label: "Saving your résumé", done: false, active: true } : { label: "Résumé confirmed", done: true, active: false },
+    { label: "Read skill evidence", done: calculating, active: !saving && !calculating },
     { label: "Calculate gaps", done: false, active: calculating },
   ];
   return (
@@ -229,7 +260,8 @@ function AnalysisSteps({ calculating }: { calculating: boolean }) {
           className={cn("flex items-center gap-2", !step.done && !step.active && "text-muted-foreground")}>
           <span className={cn("grid size-6 place-items-center rounded-full text-xs font-bold",
             step.done ? "bg-foreground text-background" : step.active ? "bg-accent" : "bg-sunken")}>
-            {step.done ? <Check aria-hidden className="size-3.5" /> : index + 1}
+            {/* The first step is already done on arrival, so it has no change to show. */}
+            {step.done ? <Check aria-hidden className={cn("size-3.5", index > 0 && "entrance-pop")} /> : index + 1}
           </span>
           {step.label}
           <span className="sr-only">{step.done ? ": done" : step.active ? ": in progress" : ": waiting"}</span>

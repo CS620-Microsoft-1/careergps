@@ -10,6 +10,10 @@ export type SkillGapSessionState = {
   restoring: boolean;
   error?: string;
   elapsed: number;
+  /** A profile setup just saved, not loaded yet: until it is, what's shown belongs to the old one. */
+  awaiting: SkillGapProfile | null;
+  /** Loading the awaited profile failed, or found a different one. */
+  awaitError?: string;
 };
 export type SkillGapSessionDependencies = {
   /** The destination's role and résumé: the account's target role, or `family` when switching. */
@@ -26,11 +30,11 @@ export type SkillGapSessionDependencies = {
 };
 const INITIAL_STATE: SkillGapSessionState = {
   loaded: false, snapshot: null, family: "software_engineer", run: null,
-  submitting: false, restoring: false, elapsed: 0,
+  submitting: false, restoring: false, elapsed: 0, awaiting: null,
 };
 export const isActiveSkillGapRun = (run: SkillGapRun | null) =>
   run?.status === "queued" || run?.status === "running";
-const sameProfile = (a: SkillGapProfile | null, b: SkillGapProfile | null) => a === b
+export const sameProfile = (a: SkillGapProfile | null, b: SkillGapProfile | null) => a === b
   || (a !== null && b !== null && a.user_id === b.user_id && a.resume_id === b.resume_id && a.job_family === b.job_family);
 
 /** Shared authenticated state. Restoring/polling only GET; POST needs a save intent or a click. */
@@ -42,7 +46,9 @@ export class SkillGapSession {
   private reloading: Promise<void> | null = null;
   private loadFailed = false;
   private switches = 0;
-  private connected = false;
+  /** Mounted providers using this session; one shared session can be shown by more than one. */
+  private connections = 0;
+  private get connected() { return this.connections > 0; }
   private generation = 0;
   private pollInFlight = false;
   private pollTimer: ReturnType<typeof setTimeout> | undefined;
@@ -55,21 +61,37 @@ export class SkillGapSession {
     return () => { this.listeners.delete(listener); };
   };
   connect = () => {
-    this.connected = true;
+    this.connections++;
     // Shown again after the first load (the router hides the app while /onboarding is open): pick up a
     // new résumé or role, or recover from a failed load. An unchanged profile keeps its run.
-    if (this.state.loaded && !this.reloading) {
+    if (this.state.loaded) this.reload();
+    else void this.initialize();
+    this.scheduleTimers();
+    let open = true;
+    return () => {
+      if (!open) return;
+      open = false;
+      this.connections--;
+      if (!this.connected) this.stopTimers();
+    };
+  };
+  /** Setup saved this profile: show it, not the one loaded before, once it loads. */
+  expect = (profile: SkillGapProfile) => {
+    this.update({ awaiting: profile, awaitError: undefined });
+  };
+  /** Load the account's destination again; a new one replaces the run shown. */
+  reload = () => {
+    if (!this.reloading) {
       this.initialization = this.reloading = this.reloadProfile().finally(() => { this.reloading = null; });
     }
     void this.initialize();
-    this.scheduleTimers();
-    return () => { this.connected = false; this.stopTimers(); };
   };
   initialize = async (): Promise<void> => {
     this.initialization ??= this.loadInitialProfile();
     await this.initialization;
     const snapshot = this.state.snapshot;
-    if (snapshot && this.connected) {
+    // Not the profile setup just saved: restoring it would use up the saved analysis intent.
+    if (snapshot && this.connected && !this.state.awaiting) {
       this.initialRestoration ??= this.restore(snapshot, snapshot.job_family, this.deps.consumeIntent(snapshot));
       await this.initialRestoration;
     }
@@ -81,26 +103,42 @@ export class SkillGapSession {
   private async loadInitialProfile() {
     try {
       const snapshot = await this.deps.loadProfile();
-      this.update({ snapshot, ...(snapshot ? { family: snapshot.job_family } : {}), loaded: true });
+      this.update({ snapshot, ...(snapshot ? { family: snapshot.job_family } : {}), loaded: true, ...this.awaited(snapshot) });
     } catch (error) {
       this.loadFailed = true;
-      this.update({ loaded: true, restoring: false, error: this.deps.errorMessage(error) });
+      const message = this.deps.errorMessage(error);
+      this.update({ loaded: true, restoring: false, error: message, ...(this.state.awaiting ? { awaitError: message } : {}) });
     }
+  }
+  /** Clears the awaited profile once loaded, or reports that a different one loaded instead. */
+  private awaited(snapshot: SkillGapProfile | null): Partial<SkillGapSessionState> {
+    const { awaiting } = this.state;
+    if (!awaiting) return {};
+    return sameProfile(snapshot, awaiting) ? { awaiting: null, awaitError: undefined }
+      : { awaitError: "Your new destination hasn’t loaded yet. Try again in a moment." };
   }
   /** Replaces the destination only when it changed; a failed reload keeps what is shown. */
   private async reloadProfile() {
     const switches = this.switches;
     let snapshot: SkillGapProfile | null;
-    try { snapshot = await this.deps.loadProfile(); } catch { return; }
+    this.update({ awaitError: undefined });
+    try { snapshot = await this.deps.loadProfile(); } catch (error) {
+      // What's shown stays, but a profile setup just saved still hasn't loaded.
+      if (this.state.awaiting) this.update({ awaitError: this.deps.errorMessage(error) });
+      return;
+    }
     // The student switched destination meanwhile: that choice wins.
-    if (switches !== this.switches || (!this.loadFailed && sameProfile(snapshot, this.state.snapshot))) return;
+    if (switches !== this.switches) return;
+    // Another profile than setup saved: keep it hidden rather than show it as the new route.
+    if (this.state.awaiting && !sameProfile(snapshot, this.state.awaiting)) { this.update(this.awaited(snapshot)); return; }
+    if (!this.loadFailed && sameProfile(snapshot, this.state.snapshot)) { this.update(this.awaited(snapshot)); return; }
     this.generation++;
     this.loadFailed = false;
     this.stopTimers();
     // initialize() then restores the new destination's run, starting a queued analysis.
     this.initialRestoration = null;
     this.update({ snapshot, ...(snapshot ? { family: snapshot.job_family } : {}), run: null, error: undefined,
-      elapsed: 0, submitting: false, restoring: false });
+      elapsed: 0, submitting: false, restoring: false, ...this.awaited(snapshot) });
   }
   private accept(run: SkillGapRun, snapshot: SkillGapProfile, family: JobFamily, expectedId?: string) {
     if (run.user_id !== snapshot.user_id || run.resume_id !== snapshot.resume_id || run.job_family !== family

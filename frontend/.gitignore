@@ -12,6 +12,12 @@
 
 # testing
 /coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+# Saved test-account session from e2e/auth.setup.ts
+/e2e/.auth/
 
 # next.js
 /.next/
