@@ -12,6 +12,7 @@
 
 # testing
 /coverage
+# playwright (npm run test:e2e)
 /test-results/
 /playwright-report/
 /blob-report/

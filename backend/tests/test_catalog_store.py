@@ -132,8 +132,10 @@ class WriteValidationTests(unittest.TestCase):
     def test_school_resource_values(self) -> None:
         self.assertNotIn("alongside", catalog_writes.school_resource_values("school_course", self.course))
         self.assertTrue(catalog_writes.school_resource_values("student_org", self.org)["alongside"])
+        # A course may close no skill (seminars, research); a student org may not.
+        self.assertEqual([], catalog_writes.school_resource_values("school_course", {**self.course, "skills": []})["skills"])
         for kind, data in [("school_course", {**self.course, "skills": ["no_such_skill"]}),
-                           ("school_course", {**self.course, "skills": []}),
+                           ("student_org", {**self.org, "skills": []}),
                            ("school_course", self.org),  # wrong type
                            ("school_course", {**self.course, "type": None, "alongside": True}),
                            ("student_org", {**self.org, "extra": 1})]:

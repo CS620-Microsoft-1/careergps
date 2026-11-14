@@ -115,4 +115,22 @@ export function resourcesForSkill(resources: Resource[], skill: string) {
       || TYPE_ORDER[a.type] - TYPE_ORDER[b.type] || a.title.localeCompare(b.title));
 }
 
+/** "COMP SCI 400", from the course guide or the start of a hand-written title ("STAT 240: …"). */
+export function courseCode(resource: Resource) {
+  return resource.course_code ?? resource.title.split(":")[0];
+}
+
+const isTaken = (resource: Resource, taken: ReadonlySet<string>) =>
+  resource.type === "school_course" && taken.has(resource.id);
+
+/** Resources without the school courses the student has taken; those stay out of every list. */
+export function withoutTaken(resources: Resource[], taken: ReadonlySet<string>) {
+  return resources.filter((resource) => !isTaken(resource, taken));
+}
+
+/** Taken school courses that cover a skill, for "You took X, which covers this". */
+export function takenCoursesFor(resources: Resource[], taken: ReadonlySet<string>, skill: string) {
+  return resources.filter((resource) => isTaken(resource, taken) && resource.skills.includes(skill));
+}
+
 export const percent = (ratio: number) => `${Math.round(ratio * 100)}%`;

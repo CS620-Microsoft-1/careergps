@@ -18,10 +18,11 @@ import {
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
 import { useSwitchRoute } from "@/components/layout/use-switch-route";
 import { usePlan } from "@/components/plan/plan-provider";
+import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { orderPlan, percent, rankGaps, rankStrengths, resourcesForSkill, type PlanStep } from "@/lib/career";
+import { orderPlan, percent, rankGaps, rankStrengths, resourcesForSkill, withoutTaken, type PlanStep } from "@/lib/career";
 import { cn } from "@/lib/utils";
 
 /** Resource snapshot rows: a saved row leaves, the rest slide up, and the next one fades in behind them. */
@@ -202,7 +203,9 @@ function PlanLine({ step, alongside = false }: { step: PlanStep; alongside?: boo
 
 function ResourceSnapshot({ gaps }: { gaps: string[] }) {
   const plan = usePlan();
-  const forGaps = new Map(gaps.flatMap((gap) => resourcesForSkill(plan.resources, gap)).map((r) => [r.id, r]));
+  const { taken } = useTakenCourses();
+  const listed = withoutTaken(plan.resources, taken);
+  const forGaps = new Map(gaps.flatMap((gap) => resourcesForSkill(listed, gap)).map((r) => [r.id, r]));
   const unsaved = [...forGaps.values()].filter((resource) => !plan.saved.has(resource.id));
   return (
     <section aria-labelledby="ressnap" className="rounded-2xl border border-border bg-card p-6 shadow-card">

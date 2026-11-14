@@ -7,7 +7,11 @@ import type {
   Plan,
   PlanItem,
   ProjectRecommendations,
+  Resource,
+  ResumeCourseMatches,
   ResumeSummary,
+  TakenCourse,
+  TakenCourseList,
 } from "../../types/api";
 
 /** Where the app sends API calls; the same default as lib/api/client.ts. */
@@ -16,13 +20,28 @@ export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:800
 type Call = { method: string; path: string; body: unknown };
 type Reply = { status: number; json?: unknown };
 
+type Options = {
+  planItems?: PlanItem[];
+  /** What GET /resources lists; the shared fixtures when left out. */
+  resources?: Resource[];
+  /** School course ids the student has already marked taken. */
+  takenCourses?: string[];
+  /** School course ids GET /me/courses/resume-matches finds in the résumé. */
+  resumeCourseMatches?: string[];
+};
+
+const takenCourse = (course_id: string): TakenCourse => ({ course_id, source: "manual", created_at: "2026-10-02T00:00:00Z" });
+
 /**
  * Answers every FastAPI call from the browser with the shared fixtures, so the end-to-end tests
  * don't need the backend, the database or Azure. Supabase sign-in stays real.
- * Plan items live in memory for the test, so a save shows up when the plan is loaded again.
+ * Plan items and taken courses live in memory for the test, so a change shows up when they are loaded again.
  */
-export async function mockApi(page: Page, options: { planItems?: PlanItem[] } = {}) {
+export async function mockApi(page: Page, options: Options = {}) {
   const items = [...(options.planItems ?? [])];
+  const listed = options.resources ?? resources;
+  const taken = new Set(options.takenCourses ?? []);
+  let held: Promise<void> = Promise.resolve();
   const calls: Call[] = [];
   const basePath = new URL(API_URL).pathname.replace(/\/+$/, "");
 
@@ -48,7 +67,22 @@ export async function mockApi(page: Page, options: { planItems?: PlanItem[] } = 
     if (method === "GET" && (match = path.match(/^\/skill-gaps\/market\/(\w+)$/))) {
       return ok({ ...market, job_family: match[1] as JobFamily });
     }
-    if (method === "GET" && path === "/resources") return ok({ job_family: family, resources });
+    if (method === "GET" && path === "/resources") return ok({ job_family: family, resources: listed });
+    if (method === "GET" && path === "/me/courses") {
+      return ok({ courses: [...taken].map(takenCourse) } satisfies TakenCourseList);
+    }
+    if (method === "GET" && path === "/me/courses/resume-matches") {
+      return ok({ course_ids: options.resumeCourseMatches ?? [] } satisfies ResumeCourseMatches);
+    }
+    if (method === "PUT" && (match = path.match(/^\/me\/courses\/([^/]+)$/))) {
+      const id = decodeURIComponent(match[1]);
+      taken.add(id);
+      return ok(takenCourse(id));
+    }
+    if (method === "DELETE" && (match = path.match(/^\/me\/courses\/([^/]+)$/))) {
+      taken.delete(decodeURIComponent(match[1]));
+      return { status: 204 };
+    }
     if (method === "GET" && path === "/plan") return ok({ job_family: family, items } satisfies Plan);
     if (method === "PUT" && (match = path.match(/^\/plan\/items\/(.+)$/))) {
       const item = planItem(decodeURIComponent(match[1]), (body as { status: PlanItem["status"] }).status);
@@ -84,9 +118,18 @@ export async function mockApi(page: Page, options: { planItems?: PlanItem[] } = 
     const path = url.pathname.slice(basePath.length);
     const body = request.postData() ? request.postDataJSON() : undefined;
     calls.push({ method: request.method(), path, body });
+    // Recorded above, answered only once a test that is holding course saves lets go.
+    if (request.method() === "PUT" && path.startsWith("/me/courses/")) await held;
     const { status, json } = reply(request.method(), path, url.searchParams, body);
     return json === undefined ? route.fulfill({ status, headers }) : route.fulfill({ status, headers, json });
   });
 
-  return { items, calls };
+  /** Keep PUT /me/courses/{id} unanswered until the returned function is called. */
+  const holdCourseSaves = () => {
+    let release = () => {};
+    held = new Promise<void>((resolve) => { release = resolve; });
+    return release;
+  };
+
+  return { items, calls, taken, holdCourseSaves };
 }

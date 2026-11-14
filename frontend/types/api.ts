@@ -264,8 +264,19 @@ export type Resource = {
   url: string | null;
   school: string | null;
   alongside: boolean;
+  /** School courses from the course guide: "COMP SCI 400", "3", "Fall 2025". Missing for the rest. */
+  course_code?: string | null;
+  credits?: string | null;
+  last_taught?: string | null;
 };
 export type ResourceList = { job_family: JobFamily; resources: Resource[] };
+
+/** GET /me/courses: school courses the student marked taken (Taken button, résumé match, or plan done). */
+export type TakenCourseSource = "manual" | "resume" | "plan";
+export type TakenCourse = { course_id: string; source: TakenCourseSource; created_at: string };
+export type TakenCourseList = { courses: TakenCourse[] };
+/** GET /me/courses/resume-matches: course ids found in the role's résumé, not marked taken yet. */
+export type ResumeCourseMatches = { course_ids: string[] };
 
 /** POST /certifications/recommendations. reason is null when source is "rules". */
 export type CertificationRecommendations = {
