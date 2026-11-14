@@ -58,6 +58,15 @@ RLS is enabled on `public.users`, but the initial migration does not create user
 | DB-021 | Insert the same skill twice from the same source (e.g. listed) | Second insert rejected by `uq_resume_skills_evidence` (NULLs count as equal) | NOT RUN — runnable now that résumés have skill rows |
 | DB-022 | Insert a skill whose source link doesn't match `source` (e.g. `project` without `source_project_id`) | Rejected by `ck_resume_skills_source_link` | NOT RUN — runnable now that résumés have skill rows |
 | DB-023 | Run `python -m scripts.backfill_resume_children`, then compare each résumé's child rows with its `confirmed_data` | Every résumé reports `ok`; `listed` skills = Technical Skills without duplicates; one project/experience/education/achievement row per non-blank entry | NOT RUN — dry run passed for 6/6 résumés (2026-10-29) |
+| DB-024 | Alembic after applying `df5726089a8e` (Skill Gap branches and results) | `alembic current` shows `df5726089a8e (head)`; `alembic check` reports no new operations | PASS (2026-11-13) |
+| DB-025 | Inspect RLS on `skill_gap_runs`, `skill_gap_run_branches`, `skill_gap_results` | RLS is enabled on all three | PASS (2026-11-13) |
+| DB-026 | Insert a completed v3 run without `scored_skill_count`, `unscored_skill_count` or `extraction_audit` | Rejected by `ck_skill_gap_runs_v3_completed` | PASS (2026-11-13) |
+| DB-027 | Insert a queued or running run with a `match_score` | Rejected by `ck_skill_gap_runs_match_when_completed` | PASS (2026-11-13) |
+| DB-028 | Insert a branch row with `model_calls = 2` or a branch other than foundation/lifecycle/systems | Rejected by `ck_skill_gap_run_branches_model_calls` / `ck_skill_gap_run_branches_branch` | PASS (2026-11-13) |
+| DB-029 | Insert a `scored` result without a grade, or a `needs_confirmation` result with a `priority_rank` | Rejected by `ck_skill_gap_results_scored_values` | PASS (2026-11-13) |
+| DB-030 | Insert a result whose `user_id` or `job_family` differs from its run's | Rejected by `fk_skill_gap_results_run` | PASS (2026-11-13) |
+| DB-031 | Delete a résumé that has a Skill Gap run | The run, its branches and its results are deleted (cascade) | PASS (2026-11-13) |
+| DB-032 | Run one Skill Gap analysis through the app, then query its rows | 1 completed `skill_gap_runs` row with `report` and `match_score`; 3 `skill_gap_run_branches` rows with raw answers and tokens; one `skill_gap_results` row per core skill, with evidence for practice and knowledge skills | PASS (2026-11-13) |
 
 ## Baseline automation
 
@@ -195,3 +204,29 @@ When a database-related PR changes the schema or security model:
 - `--dry-run` sent every row to the shared database and rolled back: 6/6 résumés passed all constraints (264 skills, 11 projects, 23 experiences, 7 educations, 3 achievements). The tables still had 0 rows afterwards.
 - `tests/test_accounts_postgres.py` passed 12/12 against a throwaway Postgres 17 container with every migration applied.
 - Only ids and counts were printed; no résumé content was read into logs. Added DB-023.
+
+### 2026-11-13 — Skill Gap result tables (schema only)
+
+- Branch `feat/skill-gap-db-storage` from `dev` (`bb2eb31`). Migration `df5726089a8e` extends `skill_gap_runs` (applied earlier by `6d7e2b9a4c15`, 0 rows on the shared database) with the storage v3 columns and adds `skill_gap_run_branches` and `skill_gap_results`; models in `app/models/skill_gap.py`. Contract: `docs/contracts/skill-gap-run-storage.schema.json` v3.
+- On a throwaway Postgres 17 container: `upgrade head`, `downgrade -1` (restores the original 26 `skill_gap_runs` columns) and `upgrade head` again passed. RLS is enabled on all three tables. `alembic check` and a model comparison reported no differences; CHECK constraint names match the models (19, 7 and 13).
+- A SQL script ran DB-026 to DB-031 on that container: every invalid row was rejected by the intended constraint, and deleting the résumé removed the run, its branches and its results. Only synthetic rows were used.
+- Not applied to the shared database yet; DB-024 to DB-031 stay NOT RUN there until the database owner applies it after merge. The application still writes runs to local JSON until the persistence change lands.
+
+### 2026-11-13 — Skill Gap result tables applied to the shared database
+
+- `dev` at `5b254e1` (PR #49 merged). Before: shared database at `c9413046949c`, `skill_gap_runs` 0 rows and 26 columns, new tables absent; the `upgrade --sql` output matched the reviewed preview and contained no DROP, DELETE or TRUNCATE statements.
+- `alembic upgrade head` applied `df5726089a8e`; `alembic current` shows `df5726089a8e (head)` and `alembic check` reports no new operations (DB-024). RLS is enabled on all three tables (DB-025).
+- DB-026 to DB-031 ran in one transaction that was rolled back. Test rows referenced an existing résumé and user only by id; nothing was printed or kept. Each invalid row was rejected by the intended constraint, and deleting the résumé inside a savepoint removed the run, its branch and its result. Afterwards the three tables had 0 rows and the résumé was unchanged.
+
+### 2026-11-13 — Skill Gap runs saved through the API (before the live run)
+
+- Branch `feat/skill-gap-db-persistence` from `dev` (`5b254e1`). `get_skill_gap_run_manager()` now uses `DbRunStore`: the API creates, updates and completes Skill Gap runs in the three tables; branch artifacts and the branch cache stay local.
+- `tests/test_skill_gap_store_postgres.py` passed 12/12 and `tests/test_accounts_postgres.py` 12/12 on a throwaway Postgres 17 with every migration applied: one active run per configuration, progress and branch upserts, a single completion transaction (rolled back whole on a constraint error), SQL NULLs for a skipped branch, history and cascade on résumé delete, and the real manager with synthetic Agents surviving a restart (completed run found by `latest`, interrupted run failed).
+- No model call and no write to the shared database were made. Added DB-032 for the live run.
+
+### 2026-11-13 — Live Skill Gap run saved in the shared database (DB-032)
+
+- Branch `feat/skill-gap-db-persistence` (draft PR #50) run locally against the shared database at `df5726089a8e`; before the run the three Skill Gap tables had 0 rows.
+- One Software Engineer analysis started from the app (3 Foundry calls, model `gpt-6-luna`, medium reasoning) completed in 51 s. Supabase then held 1 run (`completed`, storage v3, `match_score` 0.338, 22 scored / 0 unscored), 3 branch rows (each 1 model call, raw answer, input hash, tokens, validation `passed`) and 22 result rows (all ranked; 12 practice, 6 knowledge, 4 absent; 38 quotes; no practice or knowledge skill without evidence). State, gap and grade matched the stored report for every skill.
+- After restarting the API, reloading the page served the same run from the database (`GET /skill-gaps/runs/latest` 200) without starting a new analysis; still 1 run, 3 branches, 22 results.
+- Only ids, counts, statuses and timings were read; no résumé content was printed. The run is the tester's own account and stays as history.

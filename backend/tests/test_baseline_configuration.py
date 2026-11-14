@@ -205,6 +205,22 @@ class BackendConfigurationTests(unittest.TestCase):
             with self.subTest(table=table):
                 self.assertIn(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY", migration_text())
 
+    def test_skill_gap_tables_are_registered_and_belong_to_their_run(self) -> None:
+        runs = Base.metadata.tables["skill_gap_runs"]
+        self.assertTrue({"user_id", "resume_id", "report", "match_score", "storage_schema_version"} <= set(runs.columns.keys()))
+        for table in ("skill_gap_run_branches", "skill_gap_results"):
+            with self.subTest(table=table):
+                columns = Base.metadata.tables[table].columns
+                self.assertIn("run_id", columns)
+                self.assertTrue(columns["run_id"].primary_key)
+        self.assertIn("evidence", Base.metadata.tables["skill_gap_results"].columns)
+        self.assertIn("raw_output", Base.metadata.tables["skill_gap_run_branches"].columns)
+
+    def test_skill_gap_migrations_enable_rls(self) -> None:
+        for table in ("skill_gap_runs", "skill_gap_run_branches", "skill_gap_results"):
+            with self.subTest(table=table):
+                self.assertIn(f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY", migration_text())
+
 
 if __name__ == "__main__":
     unittest.main()

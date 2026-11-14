@@ -28,7 +28,7 @@ def include_object(obj, name, type_, reflected, compare_to) -> bool:
     """
     if type_ == "foreign_key_constraint" and obj.referred_table.schema == "auth":
         return False
-    # Some tables (plan_items, skill_gap_runs) exist only in migrations. Never propose dropping a
+    # Some tables (plan_items) exist only in migrations. Never propose dropping a
     # table just because it has no model; write table drops by hand.
     if type_ == "table" and reflected and compare_to is None:
         return False
