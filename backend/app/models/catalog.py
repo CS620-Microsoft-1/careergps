@@ -75,6 +75,12 @@ class SchoolCourse(_SchoolResource, Base):
         Index("ix_school_courses_school_active", "school", "active"),
     )
 
+    # From the course guide; None for courses added by hand. Prerequisites are not stored.
+    # "COMP SCI 400", or the cross-listed form "COMP SCI/E C E 552".
+    course_code: Mapped[str | None] = mapped_column(Text)
+    credits: Mapped[str | None] = mapped_column(Text)  # "3", "1-3"
+    last_taught: Mapped[str | None] = mapped_column(Text)  # "Fall 2025"
+
 
 class StudentOrg(_SchoolResource, Base):
     __tablename__ = "student_orgs"

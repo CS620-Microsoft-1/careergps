@@ -117,7 +117,8 @@ summary, not a hiring probability. Common responsibilities are not yet computed.
 Saved resources (the action plan) use the same local-JSON approach, one file per
 user under `local_results/plans`. The resource catalog is `data/resources.yaml`, except
 certifications, school courses and clubs, which come from the database once it is seeded
-(see "Catalog tables" in `backend/README.md`).
+(see "Catalog tables" in `backend/README.md`). Courses a student marks taken are stored in
+`student_courses` (see "Taken courses" there).
 
 ## Endpoints
 

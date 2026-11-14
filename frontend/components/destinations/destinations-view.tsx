@@ -1,9 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { FileText, LoaderCircle, Plus, RotateCcw, TrendingUp, Upload } from "lucide-react";
 
-import { AnalysisGate, ROLE_NAMES, RoutePageHeader, SourceNote, skillLabel } from "@/components/career/route-parts";
+import { AnalysisGate, ROLE_NAMES, RevealPercent, RoutePageHeader, SourceNote, skillLabel } from "@/components/career/route-parts";
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
 import { useAccount } from "@/components/layout/account-provider";
 import { useSwitchRoute } from "@/components/layout/use-switch-route";
@@ -31,6 +32,15 @@ export function DestinationsView() {
   const market = useMarketDemand(snapshot ? family : null);
   const report = run?.status === "completed" ? run.report : null;
   const role = ROLE_NAMES[family];
+  /** Set by picking a role, so the market fades in after a switch but not on arrival. */
+  const [switched, setSwitched] = useState(false);
+  /** Roles seen mid-analysis on this visit: their score counts up when it lands, not when the page loads. */
+  const [waited, setWaited] = useState<ReadonlySet<JobFamily>>(new Set());
+  const analyzing = explored.filter((key) => {
+    const latest = runs[key].run;
+    return latest && latest.status !== "completed" && latest.status !== "failed";
+  });
+  if (analyzing.some((key) => !waited.has(key))) setWaited(new Set([...waited, ...analyzing]));
 
   return <>
     <RoutePageHeader title="Your destinations"
@@ -43,19 +53,23 @@ export function DestinationsView() {
         const value = done ? latest.match?.score ?? null : null;
         const gaps = done ? rankGaps(latest.report!).length : null;
         const selected = key === family;
+        const arrived = value !== null && waited.has(key);
         return (
-          <button key={key} type="button" aria-pressed={selected} disabled={locked && !selected} onClick={() => void switchTo(key)}
-            className={cn("grid gap-4 rounded-2xl border border-border bg-card p-6 text-left shadow-card transition-colors hover:bg-background disabled:opacity-60",
+          <button key={key} type="button" aria-pressed={selected} disabled={locked && !selected}
+            onClick={() => { setSwitched(true); void switchTo(key); }}
+            className={cn("grid gap-4 rounded-2xl border border-border bg-card p-6 text-left shadow-card pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60",
               selected && "border-2 border-foreground")}>
             <span className="flex items-baseline justify-between gap-3">
               <span className="text-title">{ROLE_NAMES[key]}</span>
-              <span className="font-mono text-xl">{value === null ? "—" : percent(value)}</span>
+              <span className="font-mono text-xl">{value === null ? "—" : arrived ? <RevealPercent value={value} /> : percent(value)}</span>
             </span>
             <span className="-mt-3 truncate text-sm text-muted-foreground">
               {resumes[key]?.original_filename ?? (selected ? snapshot?.filename : undefined) ?? "Your résumé"}{user?.preferred_location ? ` · ${user.preferred_location}` : ""}
             </span>
-            <span aria-hidden className="h-2 rounded-full bg-sunken">
-              <span className="block h-full rounded-full bg-foreground" style={{ width: `${(value ?? 0) * 100}%` }} />
+            {/* Slid by transform, not sized by width, so it fills in step with the count-up. */}
+            <span aria-hidden className="h-2 overflow-hidden rounded-full bg-sunken">
+              <span className={cn("block h-full rounded-full bg-foreground", arrived && "transition-transform duration-[600ms] ease-out")}
+                style={{ transform: `translateX(-${(1 - (value ?? 0)) * 100}%)` }} />
             </span>
             <span className="flex justify-between gap-3 text-sm">
               <span className="text-muted-foreground">
@@ -68,7 +82,7 @@ export function DestinationsView() {
       })}
       {snapshot && explored.length < FAMILIES.length && (
         <Link href={ADD_DESTINATION_HREF}
-          className="grid min-h-40 place-content-center justify-items-center gap-2 rounded-2xl border border-dashed border-line-strong p-6 text-center transition-colors hover:bg-card">
+          className="grid min-h-40 place-content-center justify-items-center gap-2 rounded-2xl border border-dashed border-line-strong p-6 text-center pressable hover:bg-card motion-safe:active:scale-[0.98]">
           <span aria-hidden className="grid size-10 place-items-center rounded-full bg-accent"><Plus className="size-5" /></span>
           <span className="text-title">Add a destination</span>
           <span className="text-sm text-muted-foreground">Compare your résumé with another role</span>
@@ -92,7 +106,9 @@ export function DestinationsView() {
         <p className="flex-1">{market.error}</p>
         <Button size="sm" variant="raised" onClick={market.reload}><RotateCcw data-icon="inline-start" />Try again</Button>
       </div>
-      : market.data && <Market data={market.data} report={report} family={family} />}
+      : market.data && <div className={cn(switched && "entrance-rise [--enter-ms:200ms]")}>
+        <Market data={market.data} report={report} family={family} />
+      </div>}
 
     {!report && snapshot && <div className="mt-6"><AnalysisGate /></div>}
   </>;
@@ -138,7 +154,7 @@ function Market({ data, report, family }: { data: MarketDemandSnapshot; report: 
           })}
         </ul>
         <p className="mt-5 text-sm text-muted-foreground">Bars show the share of postings that require or prefer each skill.</p>
-        <details className="mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
+        <details className="details-smooth mt-4 border-t border-border pt-4 text-sm text-muted-foreground">
           <summary className="cursor-pointer font-bold text-foreground">About this data</summary>
           <p className="mt-2">{data.source_description}</p>
           {data.coverage_limitations.length > 0 && <ul className="mt-2 list-disc pl-5">{data.coverage_limitations.map((item) => <li key={item}>{item}</li>)}</ul>}

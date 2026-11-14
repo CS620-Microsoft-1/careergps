@@ -19,10 +19,12 @@ import {
 } from "@/components/career/route-parts";
 import { SkillEvidence } from "@/components/gaps/skill-evidence";
 import { usePlan } from "@/components/plan/plan-provider";
+import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  courseCode,
   DEMAND_LABELS,
   demandLevel,
   demandShare,
@@ -31,6 +33,8 @@ import {
   rankGaps,
   rankStrengths,
   resourcesForSkill,
+  takenCoursesFor,
+  withoutTaken,
 } from "@/lib/career";
 import { cn } from "@/lib/utils";
 import type { CoreSkillGapReport, CoreSkillResult, SkillGapRun } from "@/types/api";
@@ -86,7 +90,7 @@ export function GapsView() {
           <p className="mt-1 text-sm">We couldn’t read the evidence for these clearly, so they don’t count either way yet.</p>
           <ul className="mt-3 grid gap-3">
             {review.map((skill) => <li key={skill.skill_id}>
-              <details>
+              <details className="details-smooth">
                 <summary className="cursor-pointer font-bold">{skillLabel(skill.skill_id)}</summary>
                 <div className="mt-3 rounded-lg bg-card p-3"><SkillEvidence skill={skill} report={report} /></div>
               </details>
@@ -104,10 +108,12 @@ function GapCard({ gap, rank, report, defaultOpen }: {
   gap: CoreSkillResult; rank: number; report: CoreSkillGapReport; defaultOpen: boolean;
 }) {
   const plan = usePlan();
+  const { taken } = useTakenCourses();
   const [open, setOpen] = useState(defaultOpen);
   const share = demandShare(gap);
   const level = demandLevel(share);
-  const ways = resourcesForSkill(plan.resources, gap.skill_id);
+  const ways = resourcesForSkill(withoutTaken(plan.resources, taken), gap.skill_id);
+  const took = takenCoursesFor(plan.resources, taken, gap.skill_id).map(courseCode);
   const shown = ways.slice(0, 3);
   const name = skillLabel(gap.skill_id);
   const panel = `gap-panel-${gap.skill_id}`;
@@ -126,8 +132,12 @@ function GapCard({ gap, rank, report, defaultOpen }: {
       </div>
       <GapBar skill={gap} className="mt-5" />
       <div className="mt-3"><GapMeta skill={gap} /></div>
+      {took.length > 0 && <p className="mt-4 rounded-lg bg-success-soft px-4 py-3 text-sm/6">
+        You took <b>{took.join(" and ")}</b>, which {took.length === 1 ? "covers" : "cover"} this. Add {took.length === 1 ? "it" : "them"} to your résumé.
+      </p>}
 
-      {open ? <div id={panel}>
+      {/* Stays mounted so it can animate; inert keeps it out of tab order and from screen readers while closed. */}
+      <div id={panel} className="collapse-panel" data-open={open} inert={!open}><div>
         <p className="eyebrow mt-6 mb-3">Ways to close it</p>
         {plan.status === "loading" ? <p className="text-muted-foreground">Loading resources…</p>
           : shown.length === 0 ? <p className="text-muted-foreground">No resources for this skill yet.</p>
@@ -145,18 +155,19 @@ function GapCard({ gap, rank, report, defaultOpen }: {
             Browse all {ways.length} resources for this skill<ChevronRight aria-hidden className="size-4" />
           </Link>
         </div>
-        <details className="group mt-4 border-t border-border pt-4">
+        <details className="details-smooth group mt-4 border-t border-border pt-4">
           <summary className="flex cursor-pointer list-none items-center gap-1 text-sm font-bold [&::-webkit-details-marker]:hidden">
             Why this rating<ChevronDown aria-hidden className="size-4 transition-transform group-open:rotate-180" />
           </summary>
           <div className="mt-4"><SkillEvidence skill={gap} report={report} /></div>
         </details>
-      </div> : (
+      </div></div>
+      <div className="collapse-panel" data-open={!open} inert={open}><div>
         <button type="button" aria-expanded={false} aria-controls={panel} onClick={() => setOpen(true)}
           className="mt-4 inline-flex items-center gap-1 text-sm font-bold hover:underline">
           Show {ways.length} ways to close it<ChevronDown aria-hidden className="size-4" />
         </button>
-      )}
+      </div></div>
     </section>
   );
 }

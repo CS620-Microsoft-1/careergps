@@ -193,7 +193,7 @@ function StepIcon({ status }: { status: RowStatus }) {
   const base = "mt-0.5 size-4 shrink-0";
   if (status === "done") {
     return (
-      <span className={cn(base, "grid place-items-center rounded-full bg-success text-white")}>
+      <span className={cn(base, "entrance-pop grid place-items-center rounded-full bg-success text-white")}>
         <Check aria-hidden className="size-3" strokeWidth={3} />
       </span>
     );

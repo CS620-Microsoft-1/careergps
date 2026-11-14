@@ -31,6 +31,8 @@ CACHE_SECONDS = 300
 RETRY_SECONDS = 30
 # resources.yaml entry types that now live in the database; online courses are still read from the file.
 DATABASE_TYPES = ("school_course", "student_org")
+# school_courses columns from the course guide; in an entry only when set.
+COURSE_FIELDS = ("course_code", "credits", "last_taught")
 
 
 @dataclass(frozen=True)
@@ -118,6 +120,8 @@ def _school_resource(row, kind: str) -> dict:
              "description": row.description, "skills": list(row.skills), "school": row.school}
     if kind == "student_org":
         entry["alongside"] = row.alongside
+    else:
+        entry.update({field: getattr(row, field) for field in COURSE_FIELDS if getattr(row, field) is not None})
     if row.url is not None:
         entry["url"] = row.url
     return entry

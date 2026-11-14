@@ -7,6 +7,8 @@
 # student_org and school_course entries are the seed for the student_orgs and school_courses tables
 #   (python -m scripts.seed_catalog); the app reads them from the database once it is seeded. Editing
 #   them here changes the database only through `seed_catalog --update`.
+# UW–Madison COMP SCI courses are not here: they come from the course guide (data/uw_courses,
+#   app/services/uw_courses.py). Only courses from other subjects are listed by hand below.
 # school: only shown to students whose account lists this university.
 # alongside: true for ongoing commitments (clubs, meetups) that run next to the main plan.
 #
@@ -321,93 +323,3 @@ resources:
     skills: [statistics, causal_inference, math_statistics]
     school: University of Wisconsin–Madison
     url: https://guide.wisc.edu/courses/stat/
-  - id: uw-cs-320
-    type: school_course
-    title: "COMP SCI 320: Data Science Programming II"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Python for larger data projects, including pandas, plotting, web data and the cloud.
-    skills: [analytical_scripting, python, data_visualization, data_pipelines, general_programming]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-400
-    type: school_course
-    title: "COMP SCI 400: Programming III"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Data structures, object-oriented design and team projects in Java.
-    skills: [programming, algorithms, object_oriented_design, testing, version_control]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-506
-    type: school_course
-    title: "COMP SCI 506: Software Engineering"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Requirements, design, testing and teamwork on a semester-long software project.
-    skills: [software_engineering, testing, code_review, requirements_analysis, code_quality]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-537
-    type: school_course
-    title: "COMP SCI 537: Introduction to Operating Systems"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Processes, concurrency, memory and file systems, with projects in C.
-    skills: [performance, debugging, distributed_systems]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-540
-    type: school_course
-    title: "COMP SCI 540: Introduction to Artificial Intelligence"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Search, probabilistic reasoning, machine learning and neural networks.
-    skills: [machine_learning, deep_learning, math_statistics]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-544
-    type: school_course
-    title: "COMP SCI 544: Introduction to Big Data Systems"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Distributed storage and processing with tools like Spark, Kafka and cloud warehouses.
-    skills: [large_scale_processing, distributed_systems, data_pipelines, cloud, containers, warehousing]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-564
-    type: school_course
-    title: "COMP SCI 564: Database Management Systems"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Relational design, SQL and how database engines store and query data.
-    skills: [sql, relational_sql, data_modeling]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-571
-    type: school_course
-    title: "COMP SCI 571: Building User Interfaces"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Design and build web and mobile interfaces with React and user testing.
-    skills: [frontend]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-577
-    type: school_course
-    title: "COMP SCI 577: Introduction to Algorithms"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Divide and conquer, dynamic programming, graphs and complexity.
-    skills: [algorithms]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/
-  - id: uw-cs-642
-    type: school_course
-    title: "COMP SCI 642: Introduction to Information Security"
-    provider: UW–Madison course
-    meta: Check the course guide for terms
-    description: Cryptography, software and network security, and how systems are attacked.
-    skills: [security]
-    school: University of Wisconsin–Madison
-    url: https://guide.wisc.edu/courses/comp_sci/

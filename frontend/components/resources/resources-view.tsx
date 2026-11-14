@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import NumberFlow from "@number-flow/react";
 import { BookmarkCheck, Check, ChevronDown, ChevronRight, ExternalLink, Layers, LoaderCircle } from "lucide-react";
 
 import {
@@ -11,15 +12,18 @@ import {
   ResourceIcon,
   RoutePageHeader,
   SaveButton,
+  numberTiming,
   skillLabel,
 } from "@/components/career/route-parts";
 import { useAccount } from "@/components/layout/account-provider";
 import { usePlan } from "@/components/plan/plan-provider";
+import { useTakenCourses } from "@/components/plan/taken-courses-provider";
+import { ResumeCourseMatches, TakenButton, TakenUndo } from "@/components/resources/taken-courses";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCertificationPicks, getProjectPicks } from "@/lib/api/resources";
-import { rankGaps } from "@/lib/career";
+import { rankGaps, withoutTaken } from "@/lib/career";
 import { cn } from "@/lib/utils";
 import type { JobFamily, Resource, ResourceType } from "@/types/api";
 
@@ -31,13 +35,18 @@ export function ResourcesView() {
   const { user } = useAccount();
   const plan = usePlan();
   const [type, setType] = useState<ResourceType | "all">("all");
+  const { taken } = useTakenCourses();
+  const [showTaken, setShowTaken] = useState(false);
+  const [justTaken, setJustTaken] = useState<Resource | null>(null);
+  // Courses the student has taken stay out of the lists unless they ask to see them.
+  const listed = withoutTaken(plan.resources, taken);
 
   const report = run?.status === "completed" ? run.report : null;
   const { byId: picks, projectsPending } = usePicks(family, report ? run!.id : null);
   const pickOrder = [...picks.keys()];
   const gaps = report ? rankGaps(report).map((gap) => gap.skill_id) : [];
   const requestedGap = params.get("gap");
-  const gap = requestedGap && plan.resources.some((r) => r.skills.includes(requestedGap)) ? requestedGap : null;
+  const gap = requestedGap && listed.some((r) => r.skills.includes(requestedGap)) ? requestedGap : null;
   // Ranked order, so choosing a gap never moves it. A gap linked from elsewhere that isn't in the
   // top six goes at the end.
   const topGaps = gaps.slice(0, 6);
@@ -49,8 +58,10 @@ export function ResourcesView() {
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
-  const byGap = gap ? plan.resources.filter((r) => r.skills.includes(gap)) : plan.resources;
+  const byGap = gap ? listed.filter((r) => r.skills.includes(gap)) : listed;
   const visible = type === "all" ? byGap : byGap.filter((r) => r.type === type);
+  const takenShown = plan.resources.filter((r) => r.type === "school_course" && taken.has(r.id)
+    && (!gap || r.skills.includes(gap)));
   const school = plan.resources.find((r) => r.school)?.school ?? null;
 
   return <>
@@ -58,7 +69,8 @@ export function ResourcesView() {
       description="Save the ones you’ll actually do. We’ll put them in your action plan in the best order."
       aside={<div className="flex items-center gap-3 rounded-full border border-border bg-card py-1.5 pr-1.5 pl-4 shadow-card">
         <BookmarkCheck aria-hidden className="size-4.5 text-success" />
-        <span className="font-bold">{plan.items.length} saved</span>
+        {/* Keyed so it mounts at the loaded count instead of rolling up from 0 on every visit. */}
+        <span className="font-bold"><NumberFlow key={plan.status} value={plan.items.length} {...numberTiming(280)} /> saved</span>
         <Button asChild variant="outline" size="sm"><Link href="/plan">View action plan<ChevronRight data-icon="inline-end" /></Link></Button>
       </div>} />
 
@@ -78,9 +90,9 @@ export function ResourcesView() {
         <div className="grid items-start gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
           <aside className="grid gap-5">
             <FilterGroup title="Gap" options={[
-              { key: null, label: "All gaps", count: plan.resources.length },
+              { key: null, label: "All gaps", count: listed.length },
               ...gapOptions.map((skill) => ({ key: skill, label: skillLabel(skill),
-                count: plan.resources.filter((r) => r.skills.includes(skill)).length })),
+                count: listed.filter((r) => r.skills.includes(skill)).length })),
             ]} value={gap} onChange={setGap} />
             <FilterGroup title="Type" options={[
               { key: "all" as const, label: "All types", count: byGap.length },
@@ -100,9 +112,13 @@ export function ResourcesView() {
           <div className="grid gap-10">
             {RESOURCE_TYPE_ORDER.map((key) => {
               // Recommended ones first, in the order they were picked; the rest keep catalog order.
-              const group = visible.filter((r) => r.type === key)
-                .sort((a, b) => rank(pickOrder, a.id) - rank(pickOrder, b.id));
-              if (!group.length) return null;
+              const courses = key === "school_course" && (type === "all" || type === key);
+              const hiddenTaken = courses ? takenShown : [];
+              const group = [...visible.filter((r) => r.type === key), ...(showTaken ? hiddenTaken : [])]
+                .sort((a, b) => rank(pickOrder, a.id) - rank(pickOrder, b.id)
+                  // Courses by code ("COMP SCI 200" before "COMP SCI 300"), whatever order they were added in.
+                  || (key === "school_course" ? a.title.localeCompare(b.title, "en", { numeric: true }) : 0));
+              if (!group.length && !hiddenTaken.length) return null;
               // Projects: the agent's top picks up front, every other project under "More projects".
               const split = key === "project" ? splitProjects(group, picks, gaps, projectsPending) : null;
               const shown = split ? split.top : group;
@@ -112,16 +128,21 @@ export function ResourcesView() {
                     <h2 id={`type-${key}`} className="text-section">{typeHeading(key, school)}</h2>
                     <span className="font-mono text-sm">{group.length}</span>
                     <span className="text-sm text-muted-foreground">{RESOURCE_TYPES[key].blurb}</span>
+                    {hiddenTaken.length > 0 && <Button size="sm" variant="ghost" className="ml-auto" aria-pressed={showTaken}
+                      onClick={() => setShowTaken(!showTaken)}>{showTaken ? "Hide taken" : `Show ${hiddenTaken.length} taken`}</Button>}
                   </div>
+                  {courses && <ResumeCourseMatches family={family} courses={plan.resources} />}
+                  {courses && justTaken && taken.has(justTaken.id) && <TakenUndo resource={justTaken} onClose={() => setJustTaken(null)} />}
                   {split && projectsPending && !split.top.length && (
                     <p role="status" className="flex items-center gap-2 rounded-2xl border border-border bg-card p-5 text-muted-foreground">
                       <LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Picking your top {TOP_PROJECTS} projects…
                     </p>
                   )}
                   {shown.length > 0 && <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {shown.map((resource) => <ResourceCard key={resource.id} resource={resource} gaps={gaps} pick={picks.get(resource.id)} />)}
+                    {shown.map((resource) => <ResourceCard key={resource.id}
+                      resource={resource} gaps={gaps} pick={picks.get(resource.id)} onTaken={setJustTaken} />)}
                   </div>}
-                  {split && split.more.length > 0 && <MoreProjects resources={split.more} gaps={gaps} picks={picks} />}
+                  {split && split.more.length > 0 && <MoreProjects resources={split.more} gaps={gaps} picks={picks} onTaken={setJustTaken} />}
                 </section>
               );
             })}
@@ -133,7 +154,9 @@ export function ResourcesView() {
 }
 
 /** pick: undefined when not recommended, otherwise the reason (null when the rule ranking chose it). */
-function ResourceCard({ resource, gaps, pick }: { resource: Resource; gaps: string[]; pick?: string | null }) {
+function ResourceCard({ resource, gaps, pick, onTaken }: {
+  resource: Resource; gaps: string[]; pick?: string | null; onTaken: (resource: Resource) => void;
+}) {
   // Only skills that are gaps, in gap order; strengths it also practices aren't "closed".
   const closes = resource.skills.filter((skill) => gaps.includes(skill))
     .sort((a, b) => rank(gaps, a) - rank(gaps, b)).slice(0, 2);
@@ -141,12 +164,16 @@ function ResourceCard({ resource, gaps, pick }: { resource: Resource; gaps: stri
     <article className="flex flex-col rounded-2xl border border-border bg-card p-5 shadow-card">
       <div className="flex items-center gap-3">
         <ResourceIcon type={resource.type} className="bg-sunken" />
-        <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{resource.provider}</p>
+        {/* The section heading already names the school; the Taken button needs the room. */}
+        <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{resource.type === "school_course" ? null : resource.provider}</p>
         {pick !== undefined && <Badge variant="brand">Recommended</Badge>}
+        {resource.type === "school_course" && <TakenButton resource={resource} onMarked={onTaken} />}
       </div>
       <h3 className="mt-4 text-title">{resource.title}</h3>
       <p className="mt-1 font-mono text-[0.8125rem] text-muted-foreground">{resource.meta}</p>
-      {resource.description && <p className="mt-3 text-sm/6 text-muted-foreground">{resource.description}</p>}
+      {resource.description && <p className={cn("mt-3 text-sm/6 text-muted-foreground",
+        // Course guide descriptions run long; the full text is one click away.
+        resource.type === "school_course" && "line-clamp-4")}>{resource.description}</p>}
       {pick && <p className="mt-3 rounded-lg bg-accent px-3 py-2 text-sm/6">{pick}</p>}
       {closes.length > 0 && <p className="mt-auto pt-4 text-sm">Closes: <b>{closes.map(skillLabel).join(", ")}</b></p>}
       <div className={cn("flex items-center gap-2", closes.length ? "mt-4" : "mt-auto pt-4")}>
@@ -169,7 +196,7 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
       <div className="grid gap-1">
         {options.map((option) => (
           <button key={option.key ?? "all"} type="button" aria-pressed={option.key === value} onClick={() => onChange(option.key)}
-            className={cn("flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-background",
+            className={cn("flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left pressable hover:bg-background motion-safe:active:scale-[0.98]",
               option.key === value && "bg-accent font-bold hover:bg-accent")}>
             <span>{option.label}</span><span className="font-mono text-sm">{option.count}</span>
           </button>
@@ -180,7 +207,9 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
 }
 
 /** Every project not on top, in a collapsed list whose cards are only built once it's opened. */
-function MoreProjects({ resources, gaps, picks }: { resources: Resource[]; gaps: string[]; picks: Map<string, string | null> }) {
+function MoreProjects({ resources, gaps, picks, onTaken }: {
+  resources: Resource[]; gaps: string[]; picks: Map<string, string | null>; onTaken: (resource: Resource) => void;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <details className="group mt-4 rounded-2xl border border-border bg-card shadow-card"
@@ -191,7 +220,8 @@ function MoreProjects({ resources, gaps, picks }: { resources: Resource[]; gaps:
       </summary>
       {open && (
         <div className="grid gap-4 border-t border-border p-4 sm:grid-cols-2 xl:grid-cols-3">
-          {resources.map((resource) => <ResourceCard key={resource.id} resource={resource} gaps={gaps} pick={picks.get(resource.id)} />)}
+          {resources.map((resource) => <ResourceCard key={resource.id}
+            resource={resource} gaps={gaps} pick={picks.get(resource.id)} onTaken={onTaken} />)}
         </div>
       )}
     </details>
