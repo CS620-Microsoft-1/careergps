@@ -20,6 +20,10 @@ type PlanContextValue = PlanState & {
   saved: Map<string, PlanItem>;
   /** Resource ids with a save or removal in flight. */
   pending: Set<string>;
+  /** The step marked done a moment ago, so only its check animates and not every done step on load. */
+  justCompleted: string | null;
+  /** The resource saved a moment ago, so only its save button confirms it. */
+  justSaved: string | null;
   setStatus: (resourceId: string, status: PlanStatus) => Promise<void>;
   remove: (resourceId: string) => Promise<void>;
   toggleSaved: (resourceId: string) => Promise<void>;
@@ -27,6 +31,9 @@ type PlanContextValue = PlanState & {
 };
 
 const PlanContext = createContext<PlanContextValue | null>(null);
+
+/** Long enough for an icon's entrance to finish. */
+const JUST_CHANGED_MS = 400;
 
 /** Resources and saved plan items for the selected role, shared by every page that shows them. */
 export function PlanProvider({ children }: { children: React.ReactNode }) {
@@ -36,6 +43,8 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const [pending, setPending] = useState<Set<string>>(new Set());
   const [actionError, setActionError] = useState<string>();
   const { noteTaken } = useTakenCourses();
+  const [justCompleted, setJustCompleted] = useState<string | null>(null);
+  const [justSaved, setJustSaved] = useState<string | null>(null);
 
   useEffect(() => {
     if (!activeFamily) return;
@@ -79,6 +88,10 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     if (status === "done" && state.resources.some((r) => r.id === resourceId && r.type === "school_course")) {
       noteTaken(resourceId);
     }
+    const flag = status === "done" ? setJustCompleted : setJustSaved;
+    flag(resourceId);
+    // Cleared so coming back to the page later doesn't replay it.
+    setTimeout(() => flag((current) => current === resourceId ? null : current), JUST_CHANGED_MS);
   }), [noteTaken, state.family, state.resources, track]);
 
   const remove = useCallback((resourceId: string) => track(resourceId, async () => {
@@ -97,7 +110,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   const current = state.family === activeFamily ? state
     : { family: activeFamily, status: activeFamily ? "loading" as const : "idle" as const, resources: [], items: [] };
   return (
-    <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, setStatus, remove,
+    <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, justCompleted, justSaved, setStatus, remove,
       toggleSaved, actionError }}>
       {children}
     </PlanContext>

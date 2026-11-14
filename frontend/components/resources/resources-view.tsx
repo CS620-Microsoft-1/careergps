@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import NumberFlow from "@number-flow/react";
 import { BookmarkCheck, Check, ChevronRight, ExternalLink, Layers, LoaderCircle } from "lucide-react";
 
 import {
@@ -11,6 +12,7 @@ import {
   ResourceIcon,
   RoutePageHeader,
   SaveButton,
+  numberTiming,
   skillLabel,
 } from "@/components/career/route-parts";
 import { useAccount } from "@/components/layout/account-provider";
@@ -67,7 +69,8 @@ export function ResourcesView() {
       description="Save the ones you’ll actually do. We’ll put them in your action plan in the best order."
       aside={<div className="flex items-center gap-3 rounded-full border border-border bg-card py-1.5 pr-1.5 pl-4 shadow-card">
         <BookmarkCheck aria-hidden className="size-4.5 text-success" />
-        <span className="font-bold">{plan.items.length} saved</span>
+        {/* Keyed so it mounts at the loaded count instead of rolling up from 0 on every visit. */}
+        <span className="font-bold"><NumberFlow key={plan.status} value={plan.items.length} {...numberTiming(280)} /> saved</span>
         <Button asChild variant="outline" size="sm"><Link href="/plan">View action plan<ChevronRight data-icon="inline-end" /></Link></Button>
       </div>} />
 
@@ -184,7 +187,7 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
       <div className="grid gap-1">
         {options.map((option) => (
           <button key={option.key ?? "all"} type="button" aria-pressed={option.key === value} onClick={() => onChange(option.key)}
-            className={cn("flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-background",
+            className={cn("flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left pressable hover:bg-background motion-safe:active:scale-[0.98]",
               option.key === value && "bg-accent font-bold hover:bg-accent")}>
             <span>{option.label}</span><span className="font-mono text-sm">{option.count}</span>
           </button>

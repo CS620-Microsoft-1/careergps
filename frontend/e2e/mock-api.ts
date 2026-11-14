@@ -4,7 +4,9 @@ import type {
   CertificationRecommendations, Plan, ProjectRecommendations, Resource, ResourceList, SavedResume, SkillGapRun,
   TakenCourse, TakenCourseList, User,
 } from "../types/api";
-import { API_PREFIX } from "../playwright.config";
+
+/** Path on the app's own origin that these tests expect NEXT_PUBLIC_API_URL to point at. */
+const API_PREFIX = "/api-mock";
 
 /**
  * The backend, answered from fixed data for one data-analyst student at UW–Madison.

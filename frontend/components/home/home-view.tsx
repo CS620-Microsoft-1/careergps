@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import NumberFlow from "@number-flow/react";
 import { ArrowRight, Bookmark, CircleDashed, Flag, LoaderCircle, MapPin } from "lucide-react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
 
 import {
   AnalysisGate,
@@ -10,6 +12,7 @@ import {
   MatchRing,
   RESOURCE_TYPES,
   ROLE_NAMES,
+  numberTiming,
   skillLabel,
 } from "@/components/career/route-parts";
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
@@ -21,6 +24,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { orderPlan, percent, rankGaps, rankStrengths, resourcesForSkill, withoutTaken, type PlanStep } from "@/lib/career";
 import { cn } from "@/lib/utils";
+
+/** Resource snapshot rows: a saved row leaves, the rest slide up, and the next one fades in behind them. */
+const ROW_EXIT = { duration: 0.16, ease: [0.23, 1, 0.32, 1] } as const;
+const ROW_ENTER = { duration: 0.2, ease: [0.23, 1, 0.32, 1] } as const;
+const ROW_MOVE = { duration: 0.28, ease: [0.77, 0, 0.175, 1] } as const;
 
 export function HomeView() {
   const { snapshot, run } = useSkillGapAnalysis();
@@ -205,18 +213,24 @@ function ResourceSnapshot({ gaps }: { gaps: string[] }) {
         <h2 id="ressnap" className="text-title">Resources</h2>
         <Link href="/resources" className="text-sm font-bold hover:underline">Browse all</Link>
       </div>
+      {/* Counters keyed so they mount at the loaded counts instead of rolling up from 0 on every visit. */}
       <div className="mt-4 grid grid-cols-2 gap-3">
         <div className="rounded-lg bg-accent px-4 py-3.5">
-          <p className="font-mono text-xl font-medium">{plan.items.length}</p><p className="text-sm">saved to plan</p>
+          <p className="font-mono text-xl font-medium"><NumberFlow key={plan.status} value={plan.items.length} {...numberTiming(280)} /></p>
+          <p className="text-sm">saved to plan</p>
         </div>
         <div className="rounded-lg bg-sunken px-4 py-3.5">
-          <p className="font-mono text-xl font-medium">{unsaved.length}</p><p className="text-sm text-muted-foreground">more for your top gaps</p>
+          <p className="font-mono text-xl font-medium"><NumberFlow key={plan.status} value={unsaved.length} {...numberTiming(280)} /></p>
+          <p className="text-sm text-muted-foreground">more for your top gaps</p>
         </div>
       </div>
       {plan.status === "error" && <p role="alert" className="mt-3 text-sm text-destructive">{plan.error}</p>}
-      <ul className="mt-3 grid gap-3">
-        {unsaved.slice(0, 2).map((resource) => (
-          <li key={resource.id} className="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3">
+      {/* Mounted only once loaded, with initial={false}, so rows animate when a save changes them and not on load. */}
+      {plan.status === "ready" && <MotionConfig reducedMotion="user"><ul className="relative mt-3 grid gap-3">
+        <AnimatePresence initial={false} mode="popLayout">{unsaved.slice(0, 2).map((resource) => (
+          <motion.li key={resource.id} layout="position" initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1, transition: ROW_ENTER }} exit={{ opacity: 0, scale: 0.97, transition: ROW_EXIT }}
+            transition={ROW_MOVE} className="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3">
             <div className="min-w-0 flex-1">
               <p className="truncate font-bold">{resource.title}</p>
               <p className="truncate text-sm text-muted-foreground">{resource.provider} · {skillLabel(resource.skills.find((s) => gaps.includes(s)) ?? resource.skills[0])}</p>
@@ -225,9 +239,9 @@ function ResourceSnapshot({ gaps }: { gaps: string[] }) {
               disabled={plan.pending.has(resource.id)} onClick={() => void plan.setStatus(resource.id, "saved")}>
               {plan.pending.has(resource.id) ? <LoaderCircle className="motion-safe:animate-spin" /> : <Bookmark />}
             </Button>
-          </li>
-        ))}
-      </ul>
+          </motion.li>
+        ))}</AnimatePresence>
+      </ul></MotionConfig>}
     </section>
   );
 }
@@ -248,7 +262,7 @@ function Destinations() {
           return (
             <button key={key} type="button" disabled={locked && key !== family} onClick={() => void switchTo(key)}
               aria-pressed={key === family}
-              className={cn("grid gap-1 rounded-xl border border-border px-4 py-3.5 text-left transition-colors hover:bg-background disabled:opacity-60",
+              className={cn("grid gap-1 rounded-xl border border-border px-4 py-3.5 text-left pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60",
                 key === family && "border-2 border-foreground")}>
               <span className="flex items-baseline justify-between gap-2">
                 <b>{ROLE_NAMES[key]}</b>
@@ -263,7 +277,7 @@ function Destinations() {
         })}
         {families.length < FAMILIES.length && (
           <Link href={ADD_DESTINATION_HREF}
-            className="grid place-content-center rounded-xl border border-dashed border-line-strong px-4 py-3.5 text-center font-bold transition-colors hover:bg-background">
+            className="grid place-content-center rounded-xl border border-dashed border-line-strong px-4 py-3.5 text-center font-bold pressable hover:bg-background motion-safe:active:scale-[0.98]">
             + Add a destination
           </Link>
         )}
