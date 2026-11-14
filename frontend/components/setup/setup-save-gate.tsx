@@ -6,7 +6,7 @@ import { ArrowRight, RotateCcw } from "lucide-react";
 
 import { AnalysisSteps, StatusCard } from "@/components/career/route-parts";
 import { Button } from "@/components/ui/button";
-import { retrySetupSave, setupSave } from "@/lib/setup-save";
+import { retrySetupSave, returnToSetup, setupSave } from "@/lib/setup-save";
 
 /**
  * The route page opens as soon as setup's last step is submitted. Until the profile is saved, show
@@ -29,7 +29,7 @@ export function SetupSaveGate({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        <Button variant="ghost" size="lg" onClick={() => router.back()}>Back</Button>
+        <Button variant="ghost" size="lg" onClick={() => { returnToSetup(); router.back(); }}>Back</Button>
         {/* Matches the route page; home opens once the route is ready. */}
         <Button size="lg" disabled>Go to my home page<ArrowRight data-icon="inline-end" /></Button>
       </div>

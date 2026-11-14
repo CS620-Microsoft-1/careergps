@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Check, FileText, Search, Upload, X } from "lucide-react";
 
@@ -20,7 +20,7 @@ import { acceptedTerms, type SignupMetadata } from "@/lib/auth/account";
 import { DEFAULT_UNIVERSITY, EXPERIENCE_LEVELS, RESUME_ACCEPT, RESUME_MAX_BYTES, RESUME_MIME_TYPES, type ExperienceLevel } from "@/lib/options";
 import { FAMILY_LABELS, profileForAnalysis, queueSkillGapAnalysis } from "@/lib/skill-gap-profile";
 import { text } from "@/lib/resume-format";
-import { setupSave, startSetupSave, type SetupSaveStep } from "@/lib/setup-save";
+import { setupSave, startSetupSave, takeSetupReturn, type SetupSaveStep } from "@/lib/setup-save";
 import { getSupabase } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 import type { JobFamily, MarketDemandSnapshot, ResumeAnalysis, ResumeClassification, SavedResume, User } from "@/types/api";
@@ -44,9 +44,15 @@ type Direction = "forward" | "back";
 export function SetupFlow({ graduationYears }: { graduationYears: string[] }) {
   const addRole = useSearchParams().get("step") === "role";
   const [visit, setVisit] = useState(0);
-  // The router keeps this page mounted but hidden after leaving it, and runs effect cleanups when it
-  // hides it: start over (step, "Saving…", the picked résumé) each time setup is opened again.
-  useEffect(() => () => setVisit((count) => count + 1), []);
+  const shown = useRef(false);
+  // The router keeps this page mounted but hidden after leaving it, and runs effects again when it
+  // shows it: start over each time setup is opened again, except from the route page's Back.
+  // A layout effect, so the old screen never paints before the reset.
+  useLayoutEffect(() => {
+    const back = takeSetupReturn();
+    if (shown.current && !back) setVisit((count) => count + 1);
+    shown.current = true;
+  }, []);
   return <Steps key={`${visit}:${addRole}`} addRole={addRole} graduationYears={graduationYears} />;
 }
 
@@ -74,6 +80,9 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
   const [current, setCurrent] = useState<SavedResume>();
   /** addRole: roles already among the destinations, which can't be added again. */
   const [explored, setExplored] = useState<JobFamily[]>([]);
+  /** The résumé this visit saved, and the review it was saved from: submitting it again unchanged
+   * (after Back from the route page) reuses it instead of adding a duplicate version. */
+  const saved = useRef<{ classification: ResumeClassification; family: JobFamily; id?: string }>(null);
 
   // A returning student uploading a new version: start from what the account already has.
   // A new one: from the name and school given at sign-up.
@@ -177,6 +186,20 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
     const resume = { original_filename: analysis.filename, parser: analysis.extraction.parser,
       ocr_pages: analysis.extraction.ocr_pages, agent_name: analysis.agent.name, classification };
     const family = goal.family;
+    const previous = saved.current;
+    if (previous?.classification === classification) {
+      const persist: SetupSaveStep[] = [
+        async () => {
+          const id = previous.id ?? (await getSavedResume(previous.family))?.id;
+          if (!id) throw new Error("Your saved résumé couldn’t be found. Upload it again.");
+          await setDestinationResume(family, id);
+        },
+        async () => { await updateAccount({ ...details, ...goals }); },
+        showSavedRoute,
+      ];
+      if (startSetupSave(persist, (error) => errorMessage(error, "Couldn’t save your profile. Try again."))) router.push("/onboarding/route");
+      return;
+    }
     // Separate steps, so a retry repeats only the one that failed: never a second résumé upload.
     let returning = false;
     const persist: SetupSaveStep[] = [
@@ -185,13 +208,15 @@ function Steps({ addRole, graduationYears }: { addRole: boolean; graduationYears
         if (returning) {
           // A new résumé for this role (adding the destination if new), then select the role: one after
           // the other, so a failed upload leaves the account on its old role.
-          await addResume({ ...resume, job_family: family });
+          const { id } = await addResume({ ...resume, job_family: family });
+          saved.current = { classification, family, id };
           return;
         }
         // First time: this creates the account, with the terms consent given at sign-up.
         const { data } = await getSupabase().auth.getUser();
         if (!data.user) throw new Error("Not logged in");
         await createAccount({ ...details, ...goals, accept_terms: acceptedTerms(data.user), resume });
+        saved.current = { classification, family };
       },
       async () => { if (returning) await updateAccount({ ...details, ...goals }); },
       showSavedRoute,

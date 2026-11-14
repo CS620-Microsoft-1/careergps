@@ -8,6 +8,7 @@ import { AnalysisGate, AnalysisSteps, GapBar, GapLegend, GapMeta, MatchRing, ROL
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Button } from "@/components/ui/button";
 import { percent, rankGaps, rankStrengths } from "@/lib/career";
+import { returnToSetup } from "@/lib/setup-save";
 import { cn } from "@/lib/utils";
 
 const NEXT_STEPS = [
@@ -36,8 +37,8 @@ export function RouteResult() {
         </div></div>
       ) : <ReadyRoute role={role} />}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        {/* Back to the setup step that led here: the résumé review, or Add a destination. */}
-        <Button variant="ghost" size="lg" onClick={() => router.back()}>Back</Button>
+        {/* Back to the setup step that led here (the target role), with what was entered kept. */}
+        <Button variant="ghost" size="lg" onClick={() => { returnToSetup(); router.back(); }}>Back</Button>
         {loading
           ? <Button size="lg" disabled>Go to my home page<ArrowRight data-icon="inline-end" /></Button>
           : <Button asChild size="lg"><Link href="/dashboard">Go to my home page<ArrowRight data-icon="inline-end" /></Link></Button>}
