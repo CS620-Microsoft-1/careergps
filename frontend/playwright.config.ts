@@ -1,12 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// Also loads the env files (.env.e2e, .env.local, .env) before anything reads them.
 import { AUTH_FILE } from "./e2e/support/account";
-
-// Same env files as the app: Supabase settings, the API URL, and E2E_EMAIL / E2E_PASSWORD.
-// The first file to set a variable wins, as with Next.js (.env.local over .env).
-for (const file of [".env.e2e", ".env.local", ".env"]) {
-  try { process.loadEnvFile(file); } catch { /* not every file exists */ }
-}
 
 const BASE_URL = "http://localhost:3000";
 
