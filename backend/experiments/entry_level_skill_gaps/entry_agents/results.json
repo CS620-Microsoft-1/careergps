@@ -1,0 +1,327 @@
+{
+  "provenance": "Historical isolated experiments; only aggregate metrics are included. No new live calls were performed during packaging.",
+  "job_family": "ai_engineer",
+  "real_resume_count": 1,
+  "all_seniority_job_count": 566,
+  "criteria_scope": "Criteria cover three job families; historical live runs cover AI Engineer only.",
+  "entry_v1": {
+    "scope": "One confirmed AI Engineer resume, three repetitions per condition, all-job demand unchanged.",
+    "formal_model_calls": 18,
+    "instrumentation_pilot_model_calls": 3,
+    "total_model_calls": 21,
+    "timing_scope": "Client/auth, conversation creation, model calls, cleanup and local scoring; preflight/provisioning excluded. No report-cache reuse.",
+    "stats": {
+      "baseline": {
+        "wall_seconds": [
+          51.819,
+          51.969,
+          63.243
+        ],
+        "mean_wall_seconds": 55.677,
+        "median_wall_seconds": 51.969,
+        "last_two_rounds_mean_wall_seconds": 57.606,
+        "original_evidence_matches": [
+          {
+            "score": 0.4332,
+            "scored_skill_count": 20,
+            "unscored_skill_count": 3
+          },
+          {
+            "score": 0.4184,
+            "scored_skill_count": 19,
+            "unscored_skill_count": 4
+          },
+          {
+            "score": 0.4477,
+            "scored_skill_count": 19,
+            "unscored_skill_count": 4
+          }
+        ],
+        "entry_matches": [
+          null,
+          null,
+          null
+        ],
+        "pending": [
+          [
+            "ai_infrastructure",
+            "prompt_engineering",
+            "vector_retrieval"
+          ],
+          [
+            "experimentation",
+            "ai_infrastructure",
+            "ai_agents",
+            "prompt_engineering"
+          ],
+          [
+            "experimentation",
+            "model_deployment",
+            "ai_agents",
+            "prompt_engineering"
+          ]
+        ],
+        "group_mean_wall_seconds": {
+          "lifecycle": 29.362,
+          "foundation": 31.269,
+          "systems": 55.6
+        },
+        "mean_input_tokens": 22588,
+        "mean_output_tokens": 13121.7,
+        "mean_total_tokens": 35709.7,
+        "cached_input_tokens_by_round": [
+          22579,
+          22579,
+          22579
+        ]
+      },
+      "entry": {
+        "wall_seconds": [
+          105.472,
+          72.348,
+          83.413
+        ],
+        "mean_wall_seconds": 87.078,
+        "median_wall_seconds": 83.413,
+        "last_two_rounds_mean_wall_seconds": 77.88,
+        "original_evidence_matches": [
+          {
+            "score": 0.4378,
+            "scored_skill_count": 18,
+            "unscored_skill_count": 5
+          },
+          {
+            "score": 0.5114,
+            "scored_skill_count": 18,
+            "unscored_skill_count": 5
+          },
+          {
+            "score": 0.4904,
+            "scored_skill_count": 21,
+            "unscored_skill_count": 2
+          }
+        ],
+        "entry_matches": [
+          {
+            "score": 0.7002,
+            "scored_skill_count": 16,
+            "unscored_skill_count": 7
+          },
+          {
+            "score": 0.7728,
+            "scored_skill_count": 17,
+            "unscored_skill_count": 6
+          },
+          {
+            "score": 0.7627,
+            "scored_skill_count": 20,
+            "unscored_skill_count": 3
+          }
+        ],
+        "pending": [
+          [
+            "python",
+            "feature_engineering",
+            "experimentation",
+            "model_deployment",
+            "ai_infrastructure",
+            "prompt_engineering",
+            "vector_retrieval"
+          ],
+          [
+            "feature_engineering",
+            "model_deployment",
+            "ai_infrastructure",
+            "ai_agents",
+            "prompt_engineering",
+            "vector_retrieval"
+          ],
+          [
+            "llm",
+            "ai_agents",
+            "prompt_engineering"
+          ]
+        ],
+        "group_mean_wall_seconds": {
+          "lifecycle": 47.433,
+          "foundation": 67.467,
+          "systems": 83.24
+        },
+        "mean_input_tokens": 40135,
+        "mean_output_tokens": 20145.3,
+        "mean_total_tokens": 60280.3,
+        "cached_input_tokens_by_round": [
+          0,
+          40126,
+          40126
+        ]
+      }
+    },
+    "mean_wall_change_seconds": 31.401,
+    "mean_wall_ratio": 1.564,
+    "limitations": [
+      "Experimental uncalibrated criterion rubric; a higher grade is not improved ability or verified accuracy.",
+      "Original evidence grades and entry-level requirement coverage grades have different meanings.",
+      "The new-response original-rubric vs entry-rubric comparison also changes the evidence representation: criterion proofs can use additional sources; it is not a perfectly isolated numeric-rubric effect.",
+      "Pending skills excluded from displayed weighted matches; common-skill comparisons provided separately.",
+      "Same AI resume repeated; not 3 independent resumes, and SE/DA not live-tested.",
+      "New prompts/schema/criteria/scorer changed together; timing measures the full experimental configuration.",
+      "Service prompt cache and load vary; input-cache token counts reported. No guarantee on other resumes.",
+      "First baseline pilot used 3 completed calls but was excluded due to overly strict metadata assertion. No Agent modification was involved."
+    ],
+    "offline_contract_tests_passed": 13,
+    "semantic_quality_fully_accepted": false
+  },
+  "compact_v2": {
+    "scope": "Same confirmed AI Engineer resume; old entry v1 vs compact entry v2; 3 fresh rounds each, 3 parallel groups per round.",
+    "model_calls": 18,
+    "criteria_and_numeric_policy_unchanged": true,
+    "all_job_demand_unchanged": true,
+    "validation_changed": "No legacy record required; compact basis/proofs checked directly, with stronger same-activity links across practical criteria.",
+    "timing_scope": "Client/auth+conversation+inference+cleanup+local scoring, not provisioning/preflight. No report cache reuse.",
+    "stats": {
+      "v1": {
+        "wall_seconds": [
+          50.783,
+          72.575,
+          60.134
+        ],
+        "mean_wall_seconds": 61.164,
+        "median_wall_seconds": 60.134,
+        "last_two_mean_wall_seconds": 66.355,
+        "matches": [
+          {
+            "score": 0.7745,
+            "scored_skill_count": 16,
+            "unscored_skill_count": 7
+          },
+          {
+            "score": 0.7362,
+            "scored_skill_count": 19,
+            "unscored_skill_count": 4
+          },
+          {
+            "score": 0.7186,
+            "scored_skill_count": 15,
+            "unscored_skill_count": 8
+          }
+        ],
+        "pending": [
+          [
+            "data_pipelines",
+            "feature_engineering",
+            "model_deployment",
+            "ai_infrastructure",
+            "rag",
+            "ai_agents",
+            "vector_retrieval"
+          ],
+          [
+            "model_deployment",
+            "ai_agents",
+            "prompt_engineering",
+            "vector_retrieval"
+          ],
+          [
+            "math_statistics",
+            "feature_engineering",
+            "model_deployment",
+            "ai_infrastructure",
+            "llm",
+            "rag",
+            "ai_agents",
+            "prompt_engineering"
+          ]
+        ],
+        "mean_group_wall_seconds": {
+          "lifecycle": 46.641,
+          "systems": 54.012,
+          "foundation": 54.859
+        },
+        "cached_input_tokens_by_round": [
+          0,
+          40126,
+          40126
+        ],
+        "mean_input_tokens": 40135,
+        "mean_output_tokens": 18390.7,
+        "mean_total_tokens": 58525.7,
+        "mean_reasoning_tokens": 12801,
+        "mean_visible_output_tokens": 5589.7
+      },
+      "v2": {
+        "wall_seconds": [
+          33.981,
+          37.007,
+          37.056
+        ],
+        "mean_wall_seconds": 36.015,
+        "median_wall_seconds": 37.007,
+        "last_two_mean_wall_seconds": 37.031,
+        "matches": [
+          {
+            "score": 0.6229,
+            "scored_skill_count": 22,
+            "unscored_skill_count": 1
+          },
+          {
+            "score": 0.7893,
+            "scored_skill_count": 20,
+            "unscored_skill_count": 3
+          },
+          {
+            "score": 0.7332,
+            "scored_skill_count": 21,
+            "unscored_skill_count": 2
+          }
+        ],
+        "pending": [
+          [
+            "ai_agents"
+          ],
+          [
+            "model_deployment",
+            "rag",
+            "ai_agents"
+          ],
+          [
+            "model_deployment",
+            "ai_agents"
+          ]
+        ],
+        "mean_group_wall_seconds": {
+          "foundation": 25.561,
+          "systems": 33.789,
+          "lifecycle": 35.982
+        },
+        "cached_input_tokens_by_round": [
+          0,
+          23812,
+          23812
+        ],
+        "mean_input_tokens": 23821,
+        "mean_output_tokens": 11657.3,
+        "mean_total_tokens": 35478.3,
+        "mean_reasoning_tokens": 8976.3,
+        "mean_visible_output_tokens": 2681.0
+      }
+    },
+    "mean_time_saved_seconds": 25.149,
+    "mean_time_reduction_pct": 41.12,
+    "limitations": [
+      "One resume only; other resumes and SE/DA not live-tested.",
+      "Experimental uncalibrated readiness rubric; no proven accuracy or hiring probability.",
+      "Scores exclude pending items; compare common scored subsets and pending counts.",
+      "Compact prompt/schema/validation changed together; any score changes are not solely output-length effects.",
+      "Cloud prompt cache and request variability affect timings; warm-repeat figures shown separately."
+    ]
+  },
+  "interpretation": [
+    "Higher readiness scores do not establish improved ability or accuracy.",
+    "Pending skills are excluded from displayed weighted matches.",
+    "The compact intervention changed prompt, schema and validation together; it was not a pure output-length experiment.",
+    "Different experiment batches had different request/cache conditions; compare paired controls within each batch.",
+    "The three formal repetitions used the same resume, not three independent applicants."
+  ],
+  "deployment_status": "Not promoted; original Agents and application routing were unchanged."
+}
