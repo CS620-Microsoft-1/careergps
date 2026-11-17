@@ -1,0 +1,237 @@
+{
+  "type": "json_schema",
+  "name": "entry_fixed_software_engineer_lifecycle_v1",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "task": {
+        "type": "string",
+        "enum": [
+          "assess_entry_level_readiness"
+        ]
+      },
+      "proofs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/Proof"
+        },
+        "maxItems": 42
+      },
+      "result": {
+        "type": "object",
+        "properties": {
+          "job_family": {
+            "type": "string",
+            "enum": [
+              "software_engineer"
+            ]
+          },
+          "system_design": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "backend_apis": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "frontend": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "code_quality": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "testing": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "debugging": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "code_review": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "job_family",
+          "system_design",
+          "backend_apis",
+          "frontend",
+          "code_quality",
+          "testing",
+          "debugging",
+          "code_review"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "task",
+      "proofs",
+      "result"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "Proof": {
+        "type": "object",
+        "properties": {
+          "proof_id": {
+            "type": "string"
+          },
+          "unit_id": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "proof_id",
+          "unit_id",
+          "quote"
+        ],
+        "additionalProperties": false
+      },
+      "Criterion": {
+        "type": "object",
+        "properties": {
+          "criterion_id": {
+            "type": "string",
+            "enum": [
+              "c1",
+              "c2",
+              "c3"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "partial",
+              "not_evidenced",
+              "uncertain"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "knowledge",
+              "unclear",
+              "none"
+            ]
+          },
+          "proof_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "criterion_id",
+          "status",
+          "basis",
+          "proof_ids"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "strict": true
+}

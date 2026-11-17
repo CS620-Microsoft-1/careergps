@@ -1047,10 +1047,160 @@ scores don't change.
 
 Review confirmation saves the resume through the account API, opens Dashboard
 and starts Skill Gap analysis. The authenticated backend reads the user's active
-`resumes.confirmed_data`; analysis results remain local JSON. The normal
+`resumes.confirmed_data`; the normal API stores runs and reports in PostgreSQL,
+with branch artifacts and caches in local run folders. The normal
 `app.main` entry point serves these endpoints. See the
 [setup, usage and offline tests](../docs/testing/SKILL_GAP_WEB_LOCAL.md) and
 [demand snapshot provenance](../docs/testing/SKILL_GAP_DEMAND_SOURCE.md).
+
+### Choose a scoring workflow
+
+Set `SKILL_GAP_WORKFLOW` in `backend/.env`, then restart the API. The example
+configuration explicitly selects `entry_level` and leaves the legacy bindings
+commented out. Environment variables take precedence over `.env`.
+
+| Mode | Selected workflow |
+| --- | --- |
+| `entry_level` | Use the pinned entry-level Agents for the selected occupation. Every required remote definition must pass preflight before inference. |
+| `legacy` | Use the existing Foundation/Lifecycle/Systems bindings configured in the legacy group environment variables. |
+| `auto` | Use entry-level only when the endpoint matches the previously approved project's normalized endpoint hash and no legacy group name **or version** is configured. Otherwise use legacy. |
+
+The settings default to `auto` when the variable is absent. Even a version-only
+legacy setting such as `SKILL_GAP_FOUNDATION_AGENT_VERSION=latest` makes `auto`
+choose legacy. Empty or whitespace-only group settings do not. The approved
+endpoint check performs no network request; it selects the workflow, while
+preflight verifies the actual saved Agent definitions before a model call.
+
+For a project provisioned with the entry-level Agents, select it explicitly:
+
+```dotenv
+SKILL_GAP_WORKFLOW=entry_level
+SKILL_GAP_FOUNDRY_PROJECT_ENDPOINT=https://<resource-name>.services.ai.azure.com/api/projects/<project-name>
+```
+
+Explicit `entry_level` works with a newly provisioned project and does not depend
+on the `auto` endpoint hash. It uses its manifest's family/group bindings rather
+than the legacy group variables. Missing or mismatched remote definitions fail
+the request; they do not silently fall back to a different scoring method.
+
+When the API first constructs the run manager, the `app.services.skill_gaps.runs`
+logger emits an INFO record with `requested`, `effective`, and `reason`. Each
+new run also writes these three fields to
+`local_results/web_skill_gaps/<run-id>/workflow_selection.json`, including when
+the run itself is stored in PostgreSQL. Reasons distinguish explicit selection,
+legacy bindings in `auto`, an approved project, and an unapproved/missing project.
+Directly constructed test or script managers record `manager_override` because
+their constructor explicitly chooses a workflow. Reusing a saved run retains
+the original run's artifacts.
+
+### Recreate the nine entry-level Agents
+
+The checked-in definitions live in `app/prompts/skill_gaps/entry_level/`: exact
+instructions, JSON response formats, complete Agent definitions, and a manifest
+recording the model, reasoning effort, saved bindings, and configuration hashes.
+The response formats must match `entry_level.build_format()` in production. A hash detects drift;
+the accompanying instructions and definitions make recreation possible.
+
+There are three groups per occupation. A fresh analysis calls only the three
+groups assigned to the selected occupation, in parallel.
+
+| Occupation | Foundation | Lifecycle | Systems |
+| --- | --- | --- | --- |
+| AI Engineer | `careergps-entry-level-ai-foundation` | `careergps-entry-level-ai-lifecycle` | `careergps-entry-level-ai-systems` |
+| Software Engineer | `careergps-entry-level-se-foundation` | `careergps-entry-level-se-lifecycle` | `careergps-entry-level-se-systems` |
+| Data Analyst | `careergps-entry-level-da-foundation` | `careergps-entry-level-da-lifecycle` | `careergps-entry-level-da-systems` |
+
+All nine formal names are pinned to saved version `1`. They were created with
+the same reviewed definitions as the corresponding experiment-named Agents;
+the old Agents remain available for historical runs. This migration creates
+new named Agents rather than renaming or deleting the old ones.
+
+From `backend/`, first check the packaged definitions offline:
+
+```bash
+python scripts/manage_entry_level_agents.py check
+```
+
+After authenticating with `az login`, provision and verify the target project:
+
+```bash
+python scripts/manage_entry_level_agents.py create --endpoint https://<resource-name>.services.ai.azure.com/api/projects/<project-name>
+python scripts/manage_entry_level_agents.py verify --endpoint https://<resource-name>.services.ai.azure.com/api/projects/<project-name>
+```
+
+The endpoint defaults to `SKILL_GAP_FOUNDRY_PROJECT_ENDPOINT` from the environment
+or `backend/.env` when omitted. `create` checks existing names and reuses an exact
+matching pinned saved version. A configuration mismatch stops creation rather
+than overwriting an Agent.
+`verify` checks the pinned saved versions. These commands manage definitions;
+normal analysis does not recreate Agents. The target project must have the
+configured model deployment available. After provisioning, select
+`SKILL_GAP_WORKFLOW=entry_level` and restart the API.
+
+### Evidence scores and demand weights
+
+The Agent selects exact resume quotations and judges their meaning, including
+whether evidence supports each criterion. Python validates source IDs, exact
+quotation text, criterion permissions and rule constraints, then computes the
+numeric score. Citation integrity does not independently establish semantic
+correctness. Fully supported criteria contribute 50, 30 and 20 points; partial
+credit follows the specific skill rule. Citation failures that can be localized
+leave the affected skill pending rather than silently assigning zero.
+
+Individual evidence criteria are entry-level. Overall match and gap priority
+use demand from **all seniority levels** of the occupation. In the recorded
+job-scope comparison, the samples were:
+
+| Occupation | All levels | Entry-level/new-grad only |
+| --- | ---: | ---: |
+| Software Engineer | 2,858 | 71 |
+| AI Engineer | 566 | 8 |
+| Data Analyst | 174 | 2 |
+
+We retain all levels because entry-only demand estimates would rely on very
+small samples, especially for AI Engineer and Data Analyst. Demand therefore
+describes broader occupational skill prevalence, not an estimate of entry-level
+hiring demand or hiring probability. Seniority labels were reused without
+independent semantic revalidation. The detailed
+[job-scope comparison](https://github.com/CS620-Microsoft-1/careergps/blob/test/entry_level_experiments/backend/experiments/entry_level_skill_gaps/job_scope/README.md)
+is maintained on the separate experimental branch for review.
+
+Limitations:
+
+- The approved definitions pin `gpt-6-luna` with `medium` reasoning. Changing the
+  model, deployment identifier, instructions or format requires a deliberately
+  updated and validated definition; arbitrary model substitutions are not covered
+  by the existing evaluation.
+- The revised selector comparison used 10 synthetic resumes. It is a small
+  regression study, not broad validation on independently annotated student
+  resumes, a fairness study, or proof of model stability.
+- Evidence meaning still depends on Agent judgments. Exact citations and
+  deterministic arithmetic make a decision inspectable, not necessarily correct.
+- A previous legacy report remains readable until the student reruns analysis.
+  A score change across `policy_version` values can reflect a method change and
+  should not be interpreted as a change in the student's ability.
+
+### Offline checks
+
+The production rule, selector, transport and run tests live under `tests/` and
+are discovered by the backend CI command:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+On Windows with a non-UTF-8 default encoding, use
+`python -X utf8 -m unittest discover -s tests -v`; some existing fixtures contain
+UTF-8 text. PostgreSQL-dependent tests are skipped when their test database is
+not configured.
+
+The entry-level experiment scripts, historical results and experimental tests
+are reviewed separately on
+[`test/entry_level_experiments`](https://github.com/CS620-Microsoft-1/careergps/tree/test/entry_level_experiments/backend/experiments/entry_level_skill_gaps).
+They are not required to run the app or recreate its nine Agents. The production
+regression tests inject fixed Agent responses and do not require Azure. Record the tested
+commit, command, total tests, failures and skips when updating PR validation;
+the total reported by `unittest` includes skipped tests.
 
 ## Troubleshooting
 
