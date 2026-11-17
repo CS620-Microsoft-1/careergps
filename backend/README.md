@@ -1161,8 +1161,9 @@ We retain all levels because entry-only demand estimates would rely on very
 small samples, especially for AI Engineer and Data Analyst. Demand therefore
 describes broader occupational skill prevalence, not an estimate of entry-level
 hiring demand or hiring probability. Seniority labels were reused without
-independent semantic revalidation. See the
-[job-scope comparison](experiments/entry_level_skill_gaps/job_scope/README.md).
+independent semantic revalidation. The detailed
+[job-scope comparison](https://github.com/CS620-Microsoft-1/careergps/blob/test/entry_level_experiments/backend/experiments/entry_level_skill_gaps/job_scope/README.md)
+is maintained on the separate experimental branch for review.
 
 Limitations:
 
@@ -1193,14 +1194,11 @@ On Windows with a non-UTF-8 default encoding, use
 UTF-8 text. PostgreSQL-dependent tests are skipped when their test database is
 not configured.
 
-The job-scope replay is separate and can be run from `backend/`:
-
-```bash
-python -m unittest experiments.entry_level_skill_gaps.job_scope.test_scope -v
-```
-
-It also supports the discovery command documented in its own README. Regression
-tests inject fixed Agent responses and do not require Azure. Record the tested
+The entry-level experiment scripts, historical results and experimental tests
+are reviewed separately on
+[`test/entry_level_experiments`](https://github.com/CS620-Microsoft-1/careergps/tree/test/entry_level_experiments/backend/experiments/entry_level_skill_gaps).
+They are not required to run the app or recreate its nine Agents. The production
+regression tests inject fixed Agent responses and do not require Azure. Record the tested
 commit, command, total tests, failures and skips when updating PR validation;
 the total reported by `unittest` includes skipped tests.
 
