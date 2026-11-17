@@ -1,0 +1,453 @@
+{
+  "type": "json_schema",
+  "name": "entry_lifecycle_core_facts_ai_engineer_v1",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "task": {
+        "type": "string",
+        "enum": [
+          "assess_entry_level_readiness"
+        ]
+      },
+      "result": {
+        "type": "object",
+        "properties": {
+          "job_family": {
+            "type": "string",
+            "enum": [
+              "ai_engineer"
+            ]
+          },
+          "machine_learning": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "deep_learning": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "model_training": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "fine_tuning": {
+            "type": "object",
+            "properties": {
+              "core_facts": {
+                "type": "object",
+                "properties": {
+                  "execution": {
+                    "type": "string",
+                    "enum": [
+                      "performed",
+                      "planned",
+                      "prepared",
+                      "absent",
+                      "unclear"
+                    ]
+                  },
+                  "ownership": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "others_only",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "workload_link": {
+                    "type": "string",
+                    "enum": [
+                      "same",
+                      "other",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "proof_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 2
+                  },
+                  "pretrained_origin": {
+                    "type": "string",
+                    "enum": [
+                      "explicit",
+                      "from_scratch",
+                      "not_stated",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "parameter_update": {
+                    "type": "string",
+                    "enum": [
+                      "weights",
+                      "adapters",
+                      "weights_and_adapters",
+                      "explicitly_none",
+                      "not_stated",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  }
+                },
+                "required": [
+                  "execution",
+                  "ownership",
+                  "workload_link",
+                  "proof_ids",
+                  "pretrained_origin",
+                  "parameter_update"
+                ],
+                "additionalProperties": false
+              },
+              "children": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "c2": {
+                        "$ref": "#/$defs/Child"
+                      },
+                      "c3": {
+                        "$ref": "#/$defs/Child"
+                      }
+                    },
+                    "required": [
+                      "c2",
+                      "c3"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "core_facts",
+              "children"
+            ],
+            "additionalProperties": false
+          },
+          "model_evaluation": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "experimentation": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "model_deployment": {
+            "type": "object",
+            "properties": {
+              "core_facts": {
+                "type": "object",
+                "properties": {
+                  "execution": {
+                    "type": "string",
+                    "enum": [
+                      "performed",
+                      "planned",
+                      "prepared",
+                      "absent",
+                      "unclear"
+                    ]
+                  },
+                  "ownership": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "others_only",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "workload_link": {
+                    "type": "string",
+                    "enum": [
+                      "same",
+                      "other",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "proof_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 2
+                  },
+                  "serving_identity": {
+                    "type": "string",
+                    "enum": [
+                      "runnable_model_serving",
+                      "external_api_only",
+                      "not_serving",
+                      "not_stated",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  }
+                },
+                "required": [
+                  "execution",
+                  "ownership",
+                  "workload_link",
+                  "proof_ids",
+                  "serving_identity"
+                ],
+                "additionalProperties": false
+              },
+              "children": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "c2": {
+                        "$ref": "#/$defs/Child"
+                      },
+                      "c3": {
+                        "$ref": "#/$defs/Child"
+                      }
+                    },
+                    "required": [
+                      "c2",
+                      "c3"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "core_facts",
+              "children"
+            ],
+            "additionalProperties": false
+          },
+          "mlops": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "job_family",
+          "machine_learning",
+          "deep_learning",
+          "model_training",
+          "fine_tuning",
+          "model_evaluation",
+          "experimentation",
+          "model_deployment",
+          "mlops"
+        ],
+        "additionalProperties": false
+      },
+      "proofs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/Proof"
+        },
+        "maxItems": 48
+      }
+    },
+    "required": [
+      "task",
+      "result",
+      "proofs"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "Proof": {
+        "type": "object",
+        "properties": {
+          "proof_id": {
+            "type": "string"
+          },
+          "unit_id": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "proof_id",
+          "unit_id",
+          "quote"
+        ],
+        "additionalProperties": false
+      },
+      "Criterion": {
+        "type": "object",
+        "properties": {
+          "criterion_id": {
+            "type": "string",
+            "enum": [
+              "c1",
+              "c2",
+              "c3"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "partial",
+              "not_evidenced",
+              "uncertain"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "knowledge",
+              "unclear",
+              "none"
+            ]
+          },
+          "proof_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "criterion_id",
+          "status",
+          "basis",
+          "proof_ids"
+        ],
+        "additionalProperties": false
+      },
+      "Child": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "partial",
+              "not_evidenced",
+              "uncertain"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "knowledge",
+              "unclear",
+              "none"
+            ]
+          },
+          "proof_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "status",
+          "basis",
+          "proof_ids"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "strict": true
+}

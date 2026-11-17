@@ -1,5 +1,7 @@
 """Exercise the revised workflow through the normal Skill Gap run manager."""
 
+import json
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import monotonic, sleep
@@ -7,6 +9,8 @@ from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 from uuid import uuid4
+
+os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://tester:placeholder@localhost:5432/test")
 
 from app.core.config import SkillGapSettings
 from app.services.skill_gaps import entry_level, entry_level_transport, runs
@@ -118,6 +122,50 @@ class EntryLevelRunTests(unittest.TestCase):
         result = self.completed(manager, self.submit(manager, resume={}))
         self.assertEqual((result.model_calls, self.preflights), (0, []))
 
+    def test_each_run_records_the_actual_workflow_without_changing_the_report(self):
+        manager = self.manager()
+        result = self.completed(manager, self.submit(manager, resume={}))
+        artifact = json.loads((self.root / result.id / "workflow_selection.json").read_text(encoding="utf-8"))
+        self.assertEqual(artifact, {
+            "requested": "auto", "effective": "entry_level", "reason": "manager_override",
+        })
+        self.assertNotIn("workflow_selection", result.report)
+
+    def test_workflow_selection_explains_explicit_modes_and_auto_fallbacks(self):
+        cases = [
+            ({"skill_gap_workflow": "legacy"}, True, "legacy", "explicit_legacy"),
+            ({"skill_gap_workflow": "entry_level"}, False, "entry_level", "explicit_entry_level"),
+            ({"skill_gap_workflow": "entry_level", "skill_gap_foundation_agent_name": "legacy-name"},
+             False, "entry_level", "explicit_entry_level"),
+            ({}, True, "entry_level", "auto_approved_project"),
+            ({}, False, "legacy", "auto_project_not_approved"),
+            ({"skill_gap_foundry_project_endpoint": None}, False, "legacy", "auto_project_not_approved"),
+            ({"skill_gap_systems_agent_name": "legacy-name"}, True, "legacy", "auto_legacy_group_bindings"),
+            ({"skill_gap_lifecycle_agent_version": "latest"}, True, "legacy", "auto_legacy_group_bindings"),
+            ({"skill_gap_foundation_agent_version": "1"}, True, "legacy", "auto_legacy_group_bindings"),
+            ({"skill_gap_foundation_agent_name": "  ", "skill_gap_systems_agent_version": "\t"},
+             True, "entry_level", "auto_approved_project"),
+        ]
+        for changes, approved, effective, reason in cases:
+            settings = self.settings.model_copy(update=changes)
+            with self.subTest(changes=changes, approved=approved), patch.object(
+                entry_level_transport, "can_use_entry_level", return_value=approved,
+            ):
+                self.assertEqual(runs._workflow_selection(settings), {
+                    "requested": settings.skill_gap_workflow, "effective": effective, "reason": reason,
+                })
+
+    def test_example_environment_selects_entry_level_without_legacy_bindings(self):
+        example = Path(__file__).resolve().parents[1] / ".env.example"
+        with patch.dict(os.environ, {}, clear=True):
+            settings = SkillGapSettings(_env_file=example)
+        self.assertEqual(runs._workflow_selection(settings), {
+            "requested": "entry_level", "effective": "entry_level", "reason": "explicit_entry_level",
+        })
+        for group in GROUPS:
+            for field in ("name", "version"):
+                self.assertIsNone(getattr(settings, f"skill_gap_{group}_agent_{field}"))
+
     def test_authenticated_api_can_submit_and_poll_the_revised_workflow(self):
         from fastapi.testclient import TestClient
 
@@ -155,9 +203,15 @@ class EntryLevelRunTests(unittest.TestCase):
                     patch.object(entry_level_transport, "can_use_entry_level", return_value=True), \
                     patch.object(runs, "SkillGapRunManager") as constructor:
                 try:
-                    runs._cached_skill_gap_run_manager.__wrapped__()
+                    with self.assertLogs(runs.logger, level="INFO") as logs:
+                        runs._cached_skill_gap_run_manager.__wrapped__()
                     constructor.assert_called_once()
                     self.assertEqual(constructor.call_args.kwargs["settings"], settings)
                     self.assertEqual(constructor.call_args.kwargs["entry_level_workflow"], revised)
+                    selection = constructor.call_args.kwargs["workflow_selection"]
+                    self.assertEqual(selection, runs._workflow_selection(settings))
+                    self.assertIn(f"requested={selection['requested']}", logs.output[0])
+                    self.assertIn(f"effective={selection['effective']}", logs.output[0])
+                    self.assertIn(f"reason={selection['reason']}", logs.output[0])
                 finally:
                     runs._cached_skill_gap_run_manager.cache_clear()

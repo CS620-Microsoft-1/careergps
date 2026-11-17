@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from functools import lru_cache
 import hashlib
 import json
+import logging
 from pathlib import Path
 from threading import Lock, RLock
 import time
@@ -49,6 +50,26 @@ _ARTIFACTS = {"input.json", "reviewed_resume.json", "observed_agent.json", "agen
               "response_processing.json", "configuration_check.json", "extraction_audit.json",
               "cache_provenance.json", "source_agent.raw.json", "selection_diagnostics.json"}
 
+logger = logging.getLogger(__name__)
+
+
+def _workflow_selection(settings: SkillGapSettings) -> dict[str, str]:
+    """Explain routing without reading credentials or making an Azure request."""
+    requested = settings.skill_gap_workflow
+    if requested in {"legacy", "entry_level"}:
+        return {"requested": requested, "effective": requested, "reason": f"explicit_{requested}"}
+    configured_groups = any(
+        (getattr(settings, f"skill_gap_{group}_agent_{field}") or "").strip()
+        for group in GROUPS for field in ("name", "version")
+    )
+    if configured_groups:
+        effective, reason = "legacy", "auto_legacy_group_bindings"
+    elif entry_level_transport.can_use_entry_level(settings):
+        effective, reason = "entry_level", "auto_approved_project"
+    else:
+        effective, reason = "legacy", "auto_project_not_approved"
+    return {"requested": requested, "effective": effective, "reason": reason}
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -66,12 +87,18 @@ class SkillGapRunManager:
     def __init__(self, directory: Path | None = None, *, settings: SkillGapSettings | None = None,
                  group_invoker: Callable | None = None, group_preflight: Callable | None = None,
                  invoker: Callable | None = None, store: JsonRunStore | None = None,
-                 entry_level_workflow: bool = False) -> None:
+                 entry_level_workflow: bool = False, workflow_selection: dict[str, str] | None = None) -> None:
         self.directory = (directory or BACKEND_ROOT / "local_results" / "web_skill_gaps").resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
         self.store = store or JsonRunStore(self.directory)
         self.settings = (settings or SkillGapSettings()).model_copy(deep=True)
         self._entry_level = entry_level_workflow
+        effective = "entry_level" if self._entry_level else "legacy"
+        self.workflow_selection = deepcopy(workflow_selection) if workflow_selection is not None else {
+            "requested": self.settings.skill_gap_workflow, "effective": effective, "reason": "manager_override",
+        }
+        if self.workflow_selection.get("effective") != effective:
+            raise ValueError("Workflow diagnostics must match the manager's selected workflow")
         self._branches = GROUPS
         self._partition_policy = PARTITION_POLICY_VERSION
         self._selection_policy = entry_level.RUNTIME_VERSION if self._entry_level else SELECTION_POLICY_VERSION
@@ -309,6 +336,7 @@ class SkillGapRunManager:
                 "user_id": owner, "resume_id": resume, "resume_source": "resumes.confirmed_data",
                 "confirmed_at": confirmed_at.isoformat(), "filename": filename,
                 "resume_hash": resume_hash, "job_family": job_family, "reviewed_resume": reviewed})
+            save_json(folder / "workflow_selection.json", self.workflow_selection)
             self._states[identifier] = state
             self._keys[cache_key] = identifier
             try:
@@ -738,17 +766,14 @@ def _cached_skill_gap_run_manager() -> SkillGapRunManager:
     # The API keeps runs in the database; branch artifacts stay in local run folders.
     from app.db.session import SessionLocal
     settings = SkillGapSettings()
-    configured_groups = any(
-        (getattr(settings, f"skill_gap_{group}_agent_{field}") or "").strip()
-        for group in GROUPS for field in ("name", "version")
-    )
-    use_entry_level = settings.skill_gap_workflow == "entry_level" or (
-        settings.skill_gap_workflow == "auto"
-        and not configured_groups
-        and entry_level_transport.can_use_entry_level(settings)
+    selection = _workflow_selection(settings)
+    logger.info(
+        "Skill Gap workflow: requested=%s effective=%s reason=%s",
+        selection["requested"], selection["effective"], selection["reason"],
     )
     return SkillGapRunManager(store=DbRunStore(SessionLocal), settings=settings,
-                              entry_level_workflow=use_entry_level)
+                             entry_level_workflow=selection["effective"] == "entry_level",
+                             workflow_selection=selection)
 
 
 def get_skill_gap_run_manager() -> SkillGapRunManager:

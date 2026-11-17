@@ -10,16 +10,17 @@ from urllib.parse import urlsplit, urlunsplit
 from app.core.config import SkillGapSettings
 from .assets import ASSET_ROOT
 from .entry_level import build_format, validate_payload
+from .entry_level_agents import (
+    AgentBundleError, AgentDefinition, MODEL, REASONING_EFFORT, load_bundle,
+)
 from .skill_group_transport import PreparedGroup, _definition, _digest, _fail, _field, _file_digest, _groups, _text
 from .skill_groups import PARTITION_POLICY_VERSION
 from .sources import build_index
 from .transport import SkillGapConfigurationError, create_response
 
 
-TRANSPORT_VERSION = "entry-level-skill-groups.v1"
+TRANSPORT_VERSION = "entry-level-skill-groups.v2"
 SCHEMA_NAME = "entry-level-skill-group-formats"
-MODEL = "gpt-6-luna"
-REASONING_EFFORT = "medium"
 REQUEST_HINT = (
     "Before returning JSON, verify every proof against its skill and criterion's "
     "criterion_unit_ids, even when a source is visible elsewhere. Copy one exact continuous "
@@ -31,52 +32,6 @@ REQUEST_HINT = (
 # Agent versions were benchmarked. The endpoint and credentials are supplied
 # by the caller's existing application settings.
 APPROVED_PROJECT_SHA256 = "22be093e60863a8a335da8876e22f52617d7d6eb68d7bf49cc28123c36cd3d97"
-_NAME_SUFFIX = "0bad2100"
-
-
-@dataclass(frozen=True)
-class AgentPin:
-    name: str
-    version: str
-    definition_sha256: str
-    instructions_sha256: str
-
-
-_PINS = {
-    "ai_engineer": {
-        "foundation": AgentPin(f"skill-gap-experiment-entry-level-foundation-{_NAME_SUFFIX}", "3",
-            "fd05fdc5bfa7ae1e1a0d725cf9c779fea402dc62bb271129d7b0a5787f538c3a",
-            "83050749738bc9d1eed2c138ed67b4a2d7769160c15af8357a64c924e5c2fc0e"),
-        "lifecycle": AgentPin(f"skill-gap-experiment-entry-level-lifecycle-{_NAME_SUFFIX}", "4",
-            "de4266c24d0936ca6fe5912d9eb7cca6307ea854ef3fda16bdb9ad9da904d7fa",
-            "2bc766d88647fc480961e3ba996f9e029d660102600eca9b9eaa92e7ffe32be8"),
-        "systems": AgentPin(f"skill-gap-experiment-systems-partial-core-{_NAME_SUFFIX}", "1",
-            "5c9573e8c450c6c74f95facca85a522c8586037d32f63fff5a5eb3c4504fad25",
-            "ccf687e647756c32aca6ec32d858fef78cf85498b8539140f96f0f2313603c6c"),
-    },
-    "software_engineer": {
-        "foundation": AgentPin(f"skill-gap-experiment-entry-level-se-foundation-{_NAME_SUFFIX}", "1",
-            "f0842436ebb543db89329931d74b9663bf7537e0595298375634294205f09012",
-            "6bb95fdcbb9d40506a1d090dc4c73cacf9a81d6388aa65ea43d73647fbbc024e"),
-        "lifecycle": AgentPin(f"skill-gap-experiment-entry-level-se-lifecycle-{_NAME_SUFFIX}", "1",
-            "948142373abd2ea05c7b984c5ead546b02e920cdf04eb42e7c780b953a853d01",
-            "7d757be4b8d1757bc5ff6003d45ababaabe9510e6ab789fdfe86bab108a6200c"),
-        "systems": AgentPin(f"skill-gap-experiment-entry-level-se-systems-{_NAME_SUFFIX}", "1",
-            "e2e5e112323b076d853e0dc346d37a1a6276dea9a3a4589ea56fea9d037fd0d5",
-            "318f39542c75a7c0cea08ef3f1bfb4ef9ee149e0a20deeb9a72b7b45049ce586"),
-    },
-    "data_analyst": {
-        "foundation": AgentPin(f"skill-gap-experiment-entry-level-da-foundation-{_NAME_SUFFIX}", "1",
-            "9f1bb94e6f3820c6c9c3ae737eda5ed7c22d575a30eb085d56e9790cabaf26d4",
-            "f8f48d066e418b8962bb95811d4c4f84582bfcf0b7148705e8bf0fd5e1ebafe7"),
-        "lifecycle": AgentPin(f"skill-gap-experiment-entry-level-da-lifecycle-{_NAME_SUFFIX}", "1",
-            "5a3bf1623c414652f892c280438ed9b0db34c6631ddd4bde9ccff3e23a94512f",
-            "2b173c56e6cde66b662cec25f80f70db54267ce72f27798ef294e32a6138283c"),
-        "systems": AgentPin(f"skill-gap-experiment-entry-level-da-systems-{_NAME_SUFFIX}", "1",
-            "3837950c2ab13f270fe480d229ee075da92dc0990be1f28f62513c27e956f209",
-            "e7162570fbdcce982fe3daf66a6c1deca1bb02991da603fc2085dae326766bf5"),
-    },
-}
 
 
 @dataclass(frozen=True)
@@ -102,11 +57,15 @@ def can_use_entry_level(settings: SkillGapSettings) -> bool:
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest() == APPROVED_PROJECT_SHA256
 
 
-def _bindings(family: str) -> dict[str, AgentPin]:
+def _bindings(family: str) -> dict[str, AgentDefinition]:
+    if family not in ("ai_engineer", "software_engineer", "data_analyst"):
+        raise SkillGapConfigurationError("entry_level_family_unsupported", "The job family has no approved Skill Gap Agents.")
     try:
-        return _PINS[family]
-    except (KeyError, TypeError):
-        raise SkillGapConfigurationError("entry_level_family_unsupported", "The job family has no approved Skill Gap Agents.") from None
+        bundle = load_bundle()
+    except AgentBundleError:
+        raise SkillGapConfigurationError("entry_level_bundle_invalid",
+            "The repository Agent bundle is missing or differs from the approved configuration. Run the offline Agent check.") from None
+    return {group: entry for (entry_family, group), entry in bundle.items() if entry_family == family}
 
 
 def configuration_signature(settings: SkillGapSettings, family: str) -> dict:
@@ -119,7 +78,7 @@ def configuration_signature(settings: SkillGapSettings, family: str) -> dict:
             "agent_version": pin.version,
             "definition_sha256": pin.definition_sha256,
             "instructions_sha256": pin.instructions_sha256,
-            "instructions_source": "approved_saved_agent",
+            "instructions_source": "repository_bundle",
             "schema_name": fmt["name"],
             "schema_sha256": _digest(fmt["schema"]),
         }
@@ -175,6 +134,9 @@ def preflight(
                         draft = _field(saved, "is_draft")
                     definition = _definition(_field(saved, "definition"))
                     definition_hash = _digest(definition)
+                    instructions = definition.get("instructions")
+                    instructions_hash = (hashlib.sha256(instructions.encode("utf-8")).hexdigest()
+                                         if isinstance(instructions, str) else None)
                     format_ = _field(definition.get("text"), "format")
                     reasoning = _field(definition.get("reasoning"), "effort")
                     check = {
@@ -186,13 +148,16 @@ def preflight(
                         "definition_sha256": definition_hash,
                         "approved_definition_sha256": pin.definition_sha256,
                         "definition_match": definition_hash == pin.definition_sha256,
+                        "instructions_sha256": instructions_hash,
+                        "approved_instructions_sha256": pin.instructions_sha256,
+                        "instructions_match": instructions_hash == pin.instructions_sha256,
                         "schema_name": expected_format["name"],
                         "schema_match": _matches_format(format_, expected_format),
                         "model_match": definition.get("model") == MODEL,
                         "reasoning_match": reasoning == REASONING_EFFORT,
                     }
                     if not all(check[key] for key in (
-                        "pinned_version_match", "definition_match", "schema_match", "model_match", "reasoning_match",
+                        "pinned_version_match", "definition_match", "instructions_match", "schema_match", "model_match", "reasoning_match",
                     )):
                         _fail(group, "entry_level_binding_mismatch",
                               "The saved Agent differs from the approved entry-level binding. No model call was made.",

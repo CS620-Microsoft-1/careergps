@@ -484,7 +484,7 @@ def _select_criteria(base_input):
     return packet, diagnostics
 
 
-SELECTOR_VERSION = "entry-level-criterion-activity-recall.v1"
+SELECTOR_VERSION = "entry-level-criterion-activity-recall.v2"
 MAX_ACTIVITIES = 3
 _FUTURE_OR_NEGATED = re.compile(
     r"\b(?:plan(?:ned|s)? to|planning to|intend(?:ed|s)? to|prepared to|will|would|"
@@ -600,7 +600,7 @@ def _extend_permission(approvals, cid, candidates, source):
     approvals[cid] = [unit["id"] for unit in source["units"] if unit["id"] in allowed]
 
 
-def _recover_pipelines(item, detail, sources):
+def _recover_pipelines(item, detail, sources, *, family):
     approved = detail["criterion_unit_ids_by_activity"]
     direct = {source["id"]: _matches(source, _workflow_core) for source in sources}
     direct = {aid: ids for aid, ids in direct.items() if ids}
@@ -608,10 +608,20 @@ def _recover_pipelines(item, detail, sources):
     addition = next((aid for aid in direct if aid not in approved), None)
     if addition and len(approved) < MAX_ACTIVITIES:
         approved[addition] = {"c1": [], "c2": [], "c3": []}
+    rule = rubric._rule_document(family)["skills"]["data_pipelines"]
+    profile = _profile(rubric._catalog(family)["data_pipelines"], rule,
+                       [_terms(concept)[0] for concept in _DOMAIN_CONCEPTS])
     for source in sources:
         aid = source["id"]
         if aid in approved and aid in direct:
             _extend_permission(approved[aid], "c1", direct[aid], source)
+            # A recovered personal core also opens its activity's child scope.
+            # Apply the normal criterion filters, including to separate bullets;
+            # core recall alone is not evidence of a method or an executed check.
+            for cid in ("c2", "c3"):
+                candidates = [unit["id"] for unit in source["units"]
+                              if unit["kind"] == "claim" and _candidate(unit, cid, rule, profile)]
+                _extend_permission(approved[aid], cid, candidates, source)
     omitted = set(detail["omitted_plausible_activity_ids"]).union(direct) - approved.keys()
     if omitted:
         detail.update(omitted_plausible_activity_ids=sorted(omitted), search_incomplete=True,
@@ -642,8 +652,10 @@ def select(base_input):
     """Return the same packet contract, with focused pipeline and LLM recall."""
     packet, diagnostics = _select_criteria(base_input)
     sources = base_input["resume_sources"]
-    for skill, recover in (("data_pipelines", _recover_pipelines), ("llm", _recover_llm)):
-        if skill in packet["skills"]:
-            recover(packet["skills"][skill], diagnostics["skills"][skill], sources)
+    if "data_pipelines" in packet["skills"]:
+        _recover_pipelines(packet["skills"]["data_pipelines"], diagnostics["skills"]["data_pipelines"],
+                           sources, family=base_input["job_family"])
+    if "llm" in packet["skills"]:
+        _recover_llm(packet["skills"]["llm"], diagnostics["skills"]["llm"], sources)
     diagnostics["version"] = SELECTOR_VERSION
     return packet, diagnostics

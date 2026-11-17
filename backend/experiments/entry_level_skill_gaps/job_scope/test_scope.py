@@ -2,7 +2,11 @@
 from copy import deepcopy
 import unittest
 
-from run_comparison import COHORTS, ROOT, compare, filter_cohort, load, reweight, summarize_match
+if __package__:
+    from .run_comparison import COHORTS, ROOT, compare, filter_cohort, load, reweight, summarize_match
+else:
+    # unittest discovery may load this file directly from its own directory.
+    from run_comparison import COHORTS, ROOT, compare, filter_cohort, load, reweight, summarize_match
 
 
 class JobScopeTests(unittest.TestCase):
