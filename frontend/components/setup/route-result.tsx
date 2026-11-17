@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, LoaderCircle, RotateCcw } from "lucide-react";
+import { ArrowRight, RotateCcw } from "lucide-react";
 
-import { AnalysisGate, GapBar, GapLegend, GapMeta, MatchRing, ROLE_NAMES, SourceNote, skillLabel } from "@/components/career/route-parts";
+import { AnalysisGate, AnalysisSteps, GapBar, GapLegend, GapMeta, MatchRing, ROLE_NAMES, SourceNote, StatusCard, skillLabel } from "@/components/career/route-parts";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Button } from "@/components/ui/button";
 import { percent, rankGaps, rankStrengths } from "@/lib/career";
+import { returnToSetup } from "@/lib/setup-save";
 import { cn } from "@/lib/utils";
 
 const NEXT_STEPS = [
@@ -32,12 +33,12 @@ export function RouteResult() {
     <div className="mx-auto flex w-full max-w-300 flex-1 flex-col px-4 py-6 sm:px-6">
       {!report ? (
         <div className="grid flex-1 place-items-center"><div className="w-full max-w-3xl">
-          {awaiting ? <AwaitingRoute error={awaitError} onRetry={reload} /> : <AnalysisGate />}
+          {awaiting ? <AwaitingRoute error={awaitError} onRetry={reload} /> : <AnalysisGate steps />}
         </div></div>
       ) : <ReadyRoute role={role} />}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
-        {/* Back to the setup step that led here: the résumé review, or Add a destination. */}
-        <Button variant="ghost" size="lg" onClick={() => router.back()}>Back</Button>
+        {/* Back to the setup step that led here (the target role), with what was entered kept. */}
+        <Button variant="ghost" size="lg" onClick={() => { returnToSetup(); router.back(); }}>Back</Button>
         {loading
           ? <Button size="lg" disabled>Go to my home page<ArrowRight data-icon="inline-end" /></Button>
           : <Button asChild size="lg"><Link href="/dashboard">Go to my home page<ArrowRight data-icon="inline-end" /></Link></Button>}
@@ -48,20 +49,10 @@ export function RouteResult() {
 
 /** The new destination is saved but not loaded yet, or loading it failed. */
 function AwaitingRoute({ error, onRetry }: { error?: string; onRetry: () => void }) {
-  return (
-    <div className="grid justify-items-center gap-3 rounded-2xl border border-border bg-card px-6 py-14 text-center" aria-busy={!error}>
-      {!error && <LoaderCircle aria-hidden className="size-7 motion-safe:animate-spin" />}
-      <div role="status" aria-live="polite" className="grid gap-1.5">
-        <h2 className="text-section">{error ? "Couldn’t load your route" : "Loading your route…"}</h2>
-        <p className="mx-auto max-w-lg text-muted-foreground">
-          {error ?? "Your saved résumé and destination will appear in a moment."}
-        </p>
-      </div>
-      {error && <div className="mt-2">
-        <Button size="lg" onClick={onRetry}><RotateCcw data-icon="inline-start" />Try again</Button>
-      </div>}
-    </div>
-  );
+  return <StatusCard busy={!error} title={error ? "Couldn’t load your route" : "Loading your route…"}
+    detail={error ?? "Your saved résumé and destination will appear in a moment."}
+    steps={!error && <AnalysisSteps />}
+    action={error && <Button size="lg" onClick={onRetry}><RotateCcw data-icon="inline-start" />Try again</Button>} />;
 }
 
 function ReadyRoute({ role }: { role: string }) {
