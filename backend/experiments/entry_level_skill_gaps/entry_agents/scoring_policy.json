@@ -1,0 +1,13 @@
+{
+  "policy_version": "entry-level-criterion-coverage.v1",
+  "calibration_status": "experimental_product_rubric_not_empirically_validated",
+  "criterion_points": {
+    "supported": 1.0,
+    "partial": 0.5,
+    "not_evidenced": 0.0
+  },
+  "critical_incomplete_cap": 0.6,
+  "uncertainty_policy": "any_uncertain_or_invalid_scoring_criterion_leaves_skill_pending",
+  "bonus_policy": "all_supplied_criteria_are_required_no_bonus_items",
+  "market_policy": "unchanged_all_seniority_demand_weights"
+}

@@ -1,0 +1,845 @@
+{
+  "version": "anonymous-frozen-evidence.v1",
+  "cases": [
+    {
+      "case_id": "case_01",
+      "job_family": "software_engineer",
+      "sample_group": "historical_fixture_01",
+      "provenance": "historical test fixture; not an independent accuracy benchmark",
+      "skills": [
+        {
+          "skill_id": "programming",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "algorithms",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "object_oriented_design",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "ai_assisted_development",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "system_design",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "backend_apis",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "frontend",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "distributed_systems",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "relational_sql",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "nosql_search",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "code_quality",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "testing",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "debugging",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "code_review",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "version_control",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "cloud",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "containers",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "delivery_automation",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "performance",
+          "evidence_strength": 0.8,
+          "gap": 0.2,
+          "grade": "A-"
+        },
+        {
+          "skill_id": "observability_operations",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "reliability",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "security",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        }
+      ]
+    },
+    {
+      "case_id": "case_02",
+      "job_family": "ai_engineer",
+      "sample_group": "historical_fixture_02",
+      "provenance": "historical test fixture; not an independent accuracy benchmark",
+      "skills": [
+        {
+          "skill_id": "general_programming",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "python",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "software_engineering",
+          "evidence_strength": 0.75,
+          "gap": 0.25,
+          "grade": "B+"
+        },
+        {
+          "skill_id": "sql",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "machine_learning",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "deep_learning",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "math_statistics",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "data_preparation",
+          "evidence_strength": 0.75,
+          "gap": 0.25,
+          "grade": "B+"
+        },
+        {
+          "skill_id": "data_pipelines",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "feature_engineering",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "model_training",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "fine_tuning",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "model_evaluation",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "experimentation",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "model_deployment",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "mlops",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "ai_infrastructure",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "generative_ai",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "llm",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "rag",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "ai_agents",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "vector_retrieval",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        }
+      ]
+    },
+    {
+      "case_id": "case_03",
+      "job_family": "data_analyst",
+      "sample_group": "historical_fixture_03",
+      "provenance": "historical test fixture; not an independent accuracy benchmark",
+      "skills": [
+        {
+          "skill_id": "sql",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "analytical_scripting",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "spreadsheets",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "data_analysis",
+          "evidence_strength": 0.75,
+          "gap": 0.25,
+          "grade": "B+"
+        },
+        {
+          "skill_id": "business_analytics",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "requirements_analysis",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "statistics",
+          "evidence_strength": 0.55,
+          "gap": 0.45,
+          "grade": "C"
+        },
+        {
+          "skill_id": "experimentation",
+          "evidence_strength": 0.55,
+          "gap": 0.45,
+          "grade": "C"
+        },
+        {
+          "skill_id": "causal_inference",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "data_pipelines",
+          "evidence_strength": 0.55,
+          "gap": 0.45,
+          "grade": "C"
+        },
+        {
+          "skill_id": "data_modeling",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "data_quality",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "dashboarding",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "data_visualization",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "bi_tools",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "warehousing",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "large_scale_processing",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "workflow_automation",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        }
+      ]
+    },
+    {
+      "case_id": "case_04",
+      "job_family": "ai_engineer",
+      "sample_group": "confirmed_resume_01",
+      "provenance": "historical assessment of one confirmed resume; repeated outputs are not independent resumes",
+      "skills": [
+        {
+          "skill_id": "general_programming",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "python",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "software_engineering",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "sql",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "machine_learning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "deep_learning",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "math_statistics",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "data_preparation",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "data_pipelines",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "feature_engineering",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "model_training",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "fine_tuning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "model_evaluation",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "experimentation",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "model_deployment",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "mlops",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "ai_infrastructure",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "generative_ai",
+          "evidence_strength": 0.65,
+          "gap": 0.35,
+          "grade": "B"
+        },
+        {
+          "skill_id": "llm",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "rag",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "ai_agents",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "vector_retrieval",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        }
+      ]
+    },
+    {
+      "case_id": "case_05",
+      "job_family": "ai_engineer",
+      "sample_group": "confirmed_resume_01",
+      "provenance": "historical assessment of one confirmed resume; repeated outputs are not independent resumes",
+      "skills": [
+        {
+          "skill_id": "general_programming",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "python",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "software_engineering",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "sql",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "machine_learning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "deep_learning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "math_statistics",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "data_preparation",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "data_pipelines",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "feature_engineering",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "model_training",
+          "evidence_strength": 0.75,
+          "gap": 0.25,
+          "grade": "B+"
+        },
+        {
+          "skill_id": "fine_tuning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "model_evaluation",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "experimentation",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "model_deployment",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "mlops",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "ai_infrastructure",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "generative_ai",
+          "evidence_strength": 0.55,
+          "gap": 0.45,
+          "grade": "C"
+        },
+        {
+          "skill_id": "llm",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "rag",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "ai_agents",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        },
+        {
+          "skill_id": "vector_retrieval",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        }
+      ]
+    },
+    {
+      "case_id": "case_06",
+      "job_family": "ai_engineer",
+      "sample_group": "confirmed_resume_01",
+      "provenance": "historical assessment of one confirmed resume; repeated outputs are not independent resumes",
+      "skills": [
+        {
+          "skill_id": "general_programming",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "python",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "software_engineering",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "sql",
+          "evidence_strength": 0.2,
+          "gap": 0.8,
+          "grade": "D"
+        },
+        {
+          "skill_id": "machine_learning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "deep_learning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "math_statistics",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "data_preparation",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "data_pipelines",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "feature_engineering",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "model_training",
+          "evidence_strength": 0.55,
+          "gap": 0.45,
+          "grade": "C"
+        },
+        {
+          "skill_id": "fine_tuning",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "model_evaluation",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "experimentation",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "model_deployment",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "mlops",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "ai_infrastructure",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "generative_ai",
+          "evidence_strength": 0.5,
+          "gap": 0.5,
+          "grade": "C"
+        },
+        {
+          "skill_id": "llm",
+          "evidence_strength": 0.45,
+          "gap": 0.55,
+          "grade": "C"
+        },
+        {
+          "skill_id": "rag",
+          "evidence_strength": 0.6,
+          "gap": 0.4,
+          "grade": "B"
+        },
+        {
+          "skill_id": "ai_agents",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "prompt_engineering",
+          "evidence_strength": null,
+          "gap": null,
+          "grade": null
+        },
+        {
+          "skill_id": "vector_retrieval",
+          "evidence_strength": 0.0,
+          "gap": 1.0,
+          "grade": "F"
+        }
+      ]
+    }
+  ]
+}
