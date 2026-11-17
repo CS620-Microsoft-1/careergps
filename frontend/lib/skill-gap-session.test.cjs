@@ -102,6 +102,17 @@ test("polling failure keeps the selected run without restarting it", async () =>
   assert.equal(f.session.getSnapshot().run.id, "run-a"); assert.equal(f.starts.length, 0);
   assert.match(f.session.getSnapshot().error, /not been restarted/); f.disconnect();
 });
+test("Try again after a polling failure checks the run now and clears the error once it answers", async () => {
+  let offline = true;
+  const f = fixture({ latestRun: run({ status: "running", phase: "extracting" }),
+    deps: { getRun: async () => { if (offline) throw new Error("offline"); return run({ status: "failed", error: "stopped" }); } } });
+  await f.session.initialize();
+  f.timers.values().next().value(); await flush();
+  assert.match(f.session.getSnapshot().error, /not been restarted/);
+  offline = false; f.session.checkAgain(); await flush();
+  assert.equal(f.session.getSnapshot().run.status, "failed"); assert.equal(f.session.getSnapshot().error, undefined);
+  assert.equal(f.starts.length, 0); f.disconnect();
+});
 test("disconnect while loading cannot submit; reconnect finishes the one-time restoration", async () => {
   let resolve; const pending = new Promise((yes) => { resolve = yes; });
   const f = fixture({ intent: true, latestError: missing, deps: { loadProfile: () => pending } });

@@ -8,7 +8,7 @@ import { getLatestSkillGapRun, getSkillGapRun, startSkillGapRun } from "@/lib/ap
 import { consumeSkillGapIntent, profileForAnalysis, type SkillGapProfile } from "@/lib/skill-gap-profile";
 import { SkillGapSession, type SkillGapSessionState } from "@/lib/skill-gap-session";
 
-type SkillGapContextValue = SkillGapSessionState & Pick<SkillGapSession, "analyze" | "changeFamily" | "reload">;
+type SkillGapContextValue = SkillGapSessionState & Pick<SkillGapSession, "analyze" | "changeFamily" | "reload" | "checkAgain">;
 const SkillGapContext = createContext<SkillGapContextValue | null>(null);
 
 function createSession() {
@@ -47,7 +47,7 @@ export function SkillGapProvider({ children }: { children: React.ReactNode }) {
   const [session] = useState(getSession);
   const state = useSyncExternalStore(session.subscribe, session.getSnapshot, session.getServerSnapshot);
   useEffect(() => session.connect(), [session]);
-  return <SkillGapContext value={{ ...state, analyze: session.analyze, changeFamily: session.changeFamily, reload: session.reload }}>{children}</SkillGapContext>;
+  return <SkillGapContext value={{ ...state, analyze: session.analyze, changeFamily: session.changeFamily, reload: session.reload, checkAgain: session.checkAgain }}>{children}</SkillGapContext>;
 }
 
 export function useSkillGapAnalysis() {
