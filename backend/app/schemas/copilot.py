@@ -1,12 +1,12 @@
-"""Bounded public chat input and structured, evidence-linked Agent output."""
-from typing import Literal
+"""Bounded v9 conversation inputs, tool arguments and chat replies."""
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-SAMPLE_ANALYSIS_ID = "sample-swe-v1"
+from app.schemas.skill_gap_web import JobFamily
+
 MAX_CONTEXT_CHARACTERS = 24_000
-SkillId = Literal["sql", "deployment", "testing"]
-Intent = Literal["explain_gap", "learning_advice", "clarify", "general", "unsupported_action", "tool_error"]
+ResumeSection = Literal["technical_skills", "education", "work_experience", "research_experience", "projects"]
 
 
 class Contract(BaseModel):
@@ -18,9 +18,18 @@ class ChatTurn(Contract):
     text: str = Field(min_length=1, max_length=8000)
 
 
+class CopilotSource(Contract):
+    id: str = Field(min_length=1, max_length=200)
+    label: str = Field(min_length=1, max_length=200)
+    excerpt: str = Field(min_length=1, max_length=4000)
+
+
 class CopilotRequest(Contract):
     question: str = Field(min_length=1, max_length=2000)
     history: list[ChatTurn] = Field(default_factory=list, max_length=20)
+    jobFamily: JobFamily
+    # Untrusted UI selector only; the reader rechecks owner, direction and current resume/hash.
+    reportId: Annotated[str, Field(pattern=r"^[0-9a-f]{32}$")] | None = None
 
     @model_validator(mode="after")
     def bounded_context(self):
@@ -29,39 +38,31 @@ class CopilotRequest(Contract):
         return self
 
 
-class CopilotSource(Contract):
-    id: str = Field(min_length=1, max_length=200)
-    label: str = Field(min_length=1, max_length=200)
-    excerpt: str = Field(min_length=1, max_length=4000)
-
-
-class AgentAnswer(Contract):
-    intent: Intent
+class ReadOnlyAgentAnswer(Contract):
     text: str = Field(min_length=1, max_length=8000)
-    source_ids: list[str] = Field(max_length=10)
+    source_ids: list[Annotated[str, Field(min_length=1, max_length=200)]] = Field(max_length=8)
+
+
+class ResumeReadArguments(Contract):
+    sections: list[ResumeSection] = Field(min_length=1, max_length=5)
+
+    @model_validator(mode="after")
+    def unique_sections(self):
+        if len(set(self.sections)) != len(self.sections):
+            raise ValueError("Choose each resume section only once.")
+        return self
+
+
+class ReportReadArguments(Contract):
+    pass
+
+
+class CopilotCapabilities(Contract):
+    dataReadsEnabled: bool
 
 
 class CopilotReply(Contract):
-    text: str
-    sources: list[CopilotSource]
-    intent: Intent
-    mode: Literal["foundry_mock"] = "foundry_mock"
-    analysisId: Literal["sample-swe-v1"] = SAMPLE_ANALYSIS_ID
-
-
-class GapArguments(Contract):
-    skill_id: SkillId | None
-
-
-class SuggestionArguments(Contract):
-    skill_id: SkillId
-    available_hours: int | None = Field(ge=1, le=40, strict=True)
-
-
-class ToolResult(Contract):
-    status: Literal["ok", "not_found", "invalid_arguments", "unsupported_tool", "unavailable"]
-    data: dict | None
-    sources: list[CopilotSource] = Field(default_factory=list)
-    error: str | None = None
-    analysis_id: Literal["sample-swe-v1"] = SAMPLE_ANALYSIS_ID
-    data_mode: Literal["mock"] = "mock"
+    text: str = Field(min_length=1, max_length=8000)
+    sources: list[CopilotSource] = Field(default_factory=list, max_length=8)
+    mode: Literal["foundry_chat"] = "foundry_chat"
+    jobFamily: JobFamily

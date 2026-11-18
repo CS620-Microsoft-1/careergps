@@ -10,8 +10,8 @@ export type SignupMetadata = { accept_terms: true; full_name?: string; universit
  * Where a logged-in user goes next: /onboarding until it is finished (the account row is created
  * at its end), otherwise `next` or the dashboard.
  */
-export async function homeFor(next: string | null): Promise<string> {
-  const { user } = await getMe();
+export async function homeFor(next: string | null, expectedUserId?: string): Promise<string> {
+  const { user } = await getMe(expectedUserId);
   return user ? (next ?? "/dashboard") : "/onboarding";
 }
 

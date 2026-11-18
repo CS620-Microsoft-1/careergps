@@ -84,4 +84,13 @@ class CopilotSettings(BaseSettings):
     orchestrator_foundry_project_endpoint: str | None = None
     orchestrator_foundry_agent_name: str = "orchestrator-chatbot"
     orchestrator_foundry_agent_version: str | None = None
-    copilot_timeout_seconds: float = Field(default=60.0, ge=5, le=120, allow_inf_nan=False)
+    # Enable only after a matching read-only main Agent version has been synchronized and pinned.
+    copilot_readonly_enabled: bool = False
+    copilot_timeout_seconds: float = Field(default=60.0, ge=20, le=120, allow_inf_nan=False)
+
+    @property
+    def is_configured(self) -> bool:
+        """The local binding is concrete; saved cloud definitions are checked on each turn."""
+        values = (self.orchestrator_foundry_project_endpoint, self.orchestrator_foundry_agent_name,
+                  self.orchestrator_foundry_agent_version)
+        return all(value and value.strip() for value in values) and self.orchestrator_foundry_agent_version != "latest"

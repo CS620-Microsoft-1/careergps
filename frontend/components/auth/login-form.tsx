@@ -27,20 +27,19 @@ export function LoginForm() {
 
   async function onSubmit(values: LoginValues) {
     setSubmitError(null);
-    const { error } = await getSupabase().auth.signInWithPassword({
+    const { data, error } = await getSupabase().auth.signInWithPassword({
       email: values.email,
       password: values.password,
     });
     if (error) return setSubmitError(authErrorMessage(error));
 
     try {
-      // Back to the page that sent them here (?next=, set by proxy.ts or a 401), except that
+      // Back to the page that sent them here (?next=, set by proxy.ts), except that
       // users who haven't finished onboarding go there first. Read at submit time so /login stays static.
       const next = safeNextPath(new URLSearchParams(window.location.search).get("next"));
-      router.replace(await homeFor(next));
+      router.replace(await homeFor(next, data.user.id));
     } catch (accountError) {
-      // Don't leave a session behind that the app can't use; the user can simply log in again.
-      await getSupabase().auth.signOut({ scope: "local" }).catch(() => {});
+      // A delayed account error must not clear a newer login established in another tab.
       setSubmitError(errorMessage(accountError));
     }
   }

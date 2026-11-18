@@ -4,15 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDown, ArrowLeft, ArrowUp, FileText, LoaderCircle, RotateCcw, Sparkles, Square, X } from "lucide-react";
 import { useCopilot } from "@/components/copilot/copilot-provider";
 import { Button } from "@/components/ui/button";
-import { MAX_COPILOT_INPUT, type CopilotMessage } from "@/lib/copilot-session";
-import { LOCAL_COPILOT } from "@/lib/api/copilot";
+import { MAX_COPILOT_INPUT, SAMPLE_ANALYSIS_ID, type CopilotMessage } from "@/lib/copilot-session";
 import { cn } from "@/lib/utils";
+import { renderCopilotText } from "@/lib/copilot-text";
 
-const QUESTIONS = ["Why is SQL a gap?", "Which project should I build first?", "I already used SQL. What evidence helps?"];
+const READ_QUESTIONS = ["What skills are listed in my saved résumé?", "Summarize my existing skill gap report.", "Summarize the projects in my saved résumé."];
+const FAMILY_LABELS = { software_engineer: "Software Engineer", data_analyst: "Data Analyst", ai_engineer: "AI Engineer" };
 const STATUS = { failed: "The reply failed. Your message is saved.", cancelled: "Reply stopped.", interrupted: "The previous reply was interrupted. Your message is saved." };
 
 export function CopilotPanel() {
-  const { session, state, sessionOnly } = useCopilot();
+  const { session, state, sessionOnly, dataReadsEnabled } = useCopilot();
   const viewport = useRef<HTMLDivElement>(null);
   const followLatest = useRef(true);
   const clearButton = useRef<HTMLButtonElement>(null);
@@ -39,6 +40,7 @@ export function CopilotPanel() {
   }
   const [showLatest, setShowLatest] = useState(false);
   const [firstVisible, setFirstVisible] = useState(() => Math.max(0, state.messages.length - 40));
+  const canSend = state.loaded && dataReadsEnabled && !!state.resumeContext;
   const last = state.messages.at(-1);
   const retryable = last?.role === "user" && last.replyState && last.replyState in STATUS;
   function toLatest() {
@@ -52,6 +54,7 @@ export function CopilotPanel() {
     if (element && followLatest.current) element.scrollTop = element.scrollHeight;
   }, [state.messages, state.pendingId]);
   function submit(question?: string) {
+    if (!canSend) return;
     followLatest.current = true;
     setShowLatest(false);
     void session.send(question);
@@ -68,8 +71,8 @@ export function CopilotPanel() {
       <Button variant="ghost" size="icon-sm" onClick={close} aria-label="Close Copilot"><X /></Button>
     </header>
     <div className="shrink-0 border-b bg-background px-5 py-3">
-      <div className="flex flex-wrap items-center justify-between gap-1 text-xs"><span className="font-bold">{LOCAL_COPILOT ? "Sample data · Local demo" : "Sample data · Foundry Agent"}</span><span className="font-mono text-muted-foreground">REPORT V1</span></div>
-      <p className="mt-1 text-xs text-muted-foreground">Fictional SWE profile · SQL, deployment & testing.<br />Replies do not use your résumé or the report on the left.</p>
+      <div className="flex flex-wrap items-center justify-between gap-1 text-xs"><span className="font-bold">Career conversation</span><span className="font-mono text-muted-foreground">{state.resumeContext ? "SELECTED ROLE" : "SIGN IN"}</span></div>
+      <p className="mt-1 text-xs text-muted-foreground">{state.resumeContext ? `${FAMILY_LABELS[state.resumeContext.jobFamily]} · ${dataReadsEnabled ? "Ask about your saved résumé or existing skill gap report. CareerGPS data is read-only." : "Copilot is currently unavailable. Please try again later."}` : state.unavailableReason}</p>
       <button type="button" className="mt-2 flex min-h-9 items-center gap-1 text-xs font-bold underline lg:hidden"
         onClick={() => document.getElementById("career-report")?.focus()}><ArrowLeft aria-hidden className="size-3" />Back to report</button>
     </div>
@@ -95,28 +98,28 @@ export function CopilotPanel() {
       {!state.messages.length && <div className="pb-5 pt-3">
         <p className="eyebrow">A little clarity goes a long way</p>
         <h3 className="mt-3 text-section">Let’s work through<br />your next step.</h3>
-        <p className="mt-3 text-sm/6 text-muted-foreground">Explore a sample skill gap, find evidence, or turn an idea into a small project.</p>
-        <div className="mt-5 grid gap-2">{QUESTIONS.map(question => <button key={question} type="button" onClick={() => submit(question)}
+        <p className="mt-3 text-sm/6 text-muted-foreground">{dataReadsEnabled ? "Ask a question about your saved résumé or an existing skill gap report, or share wording to rephrase. Your saved data stays unchanged." : "Copilot is currently unavailable. Please try again later."}</p>
+        <div className="mt-5 grid gap-2">{READ_QUESTIONS.map(question => <button key={question} type="button" disabled={!canSend} onClick={() => submit(question)}
           className="flex min-h-11 items-center justify-between gap-3 rounded-xl border bg-background px-3 py-3 text-left text-sm hover:border-foreground">
           {question}<ArrowUp aria-hidden className="size-4 shrink-0 rotate-45" />
         </button>)}</div>
         <p className="mt-5 text-xs/5 text-muted-foreground">One ongoing conversation. Come back anytime to continue where you left off.</p>
       </div>}
       <div className="space-y-5">{state.messages.slice(firstVisible).map(message => <Message key={message.id} message={message} />)}</div>
-      {state.pendingId && <p role="status" className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><LoaderCircle aria-hidden className="size-4 animate-spin" />{LOCAL_COPILOT ? "Preparing sample reply…" : "Working on your question…"}</p>}
+      {state.pendingId && <p role="status" className="mt-5 flex items-center gap-2 text-sm text-muted-foreground"><LoaderCircle aria-hidden className="size-4 animate-spin" />Working on your message…</p>}
       {retryable && <div role="status" className="mt-4 rounded-xl bg-secondary p-3 text-sm">
         <p>{STATUS[last.replyState as keyof typeof STATUS]}</p>
-        <Button variant="outline" size="sm" className="mt-2" onClick={() => void session.retry()}>Retry reply</Button>
+        <Button variant="outline" size="sm" className="mt-2" disabled={!canSend} onClick={() => void session.retry()}>Retry reply</Button>
       </div>}
     </div>
-    <div role="status" aria-live="polite" className="sr-only">{last?.role === "assistant" && !state.pendingId ? `Copilot: ${last.text}` : ""}</div>
+    <div role="status" aria-live="polite" className="sr-only">{last?.role === "assistant" && !state.pendingId ? <>Copilot: {last.resumeContext && last.mode !== "foundry_chat" ? last.text : renderCopilotText(last.text)}</> : ""}</div>
     {showLatest && <button type="button" onClick={toLatest} className="mx-auto mb-2 flex min-h-9 shrink-0 items-center gap-1 rounded-full border bg-background px-3 text-xs font-bold"><ArrowDown aria-hidden className="size-3" />Latest messages</button>}
     <footer className="shrink-0 border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
       {state.error && <p role="alert" className="mb-2 text-sm text-danger">{state.error}</p>}
       <form onSubmit={event => { event.preventDefault(); submit(); }} className="rounded-2xl border border-line-strong bg-background p-3 focus-within:ring-2 focus-within:ring-ring/20">
         <label htmlFor="copilot-input" className="sr-only">Message CareerGPS Copilot</label>
         <textarea id="copilot-input" rows={2} maxLength={MAX_COPILOT_INPUT} value={state.draft}
-          placeholder="Ask about a gap or your next step…" onChange={event => session.setDraft(event.target.value)}
+          placeholder="Ask a question or share text to rephrase…" onChange={event => session.setDraft(event.target.value)}
           onKeyDown={event => {
             if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing && event.keyCode !== 229) {
               event.preventDefault();
@@ -127,10 +130,10 @@ export function CopilotPanel() {
         <div className="mt-1 flex items-center justify-between gap-2">
           <span id="copilot-input-hint" className="text-[0.6875rem] text-muted-foreground">{state.draft.length > 1800 ? `${state.draft.length} / ${MAX_COPILOT_INPUT}` : "Enter to send · Shift + Enter for a new line"}</span>
           {state.pendingId ? <Button type="button" size="icon-sm" onClick={session.cancel} aria-label="Stop reply"><Square className="size-3.5" /></Button>
-            : <Button type="submit" size="icon-sm" disabled={!state.loaded || !state.draft.trim()} aria-label="Send message"><ArrowUp /></Button>}
+            : <Button type="submit" size="icon-sm" disabled={!canSend || !state.draft.trim()} aria-label="Send message"><ArrowUp /></Button>}
         </div>
       </form>
-      <p className="mt-2 text-center text-[0.6875rem] text-muted-foreground">{state.storageWarning || sessionOnly ? "History is not being saved" : "History saved in this browser"} · {LOCAL_COPILOT ? "Scripted replies" : "AI replies may be inaccurate"}</p>
+      <p className="mt-2 text-center text-[0.6875rem] text-muted-foreground">{state.storageWarning || sessionOnly ? "History is not being saved" : "History saved in this browser"} · Read-only résumé & reports</p>
       <div className="mt-2 flex justify-center">
         <Button ref={clearButton} type="button" variant="ghost" size="sm"
           disabled={!state.loaded || confirmClear || (!state.messages.length && !state.draft && !state.storageWarning)}
@@ -153,12 +156,15 @@ export function CopilotPanel() {
 
 function Message({ message }: { message: CopilotMessage }) {
   const user = message.role === "user";
-  return <article aria-label={user ? "Your message" : "Copilot sample reply"} className={cn("min-w-0", user && "ml-7")}>
-    <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold">{!user && <Sparkles aria-hidden className="size-3.5" />}{user ? "You" : "Copilot · Sample reply"}</p>
+  const sample = message.analysisId === SAMPLE_ANALYSIS_ID;
+  const resume = message.resumeContext;
+  const chat = message.mode === "foundry_chat";
+  return <article aria-label={user ? "Your message" : chat ? "Copilot reply" : sample ? "Copilot sample reply" : resume ? "Copilot confirmed résumé reply" : "Copilot report reply"} className={cn("min-w-0", user && "ml-7")}>
+    <p className="mb-1.5 flex items-center gap-1.5 text-xs font-bold">{!user && <Sparkles aria-hidden className="size-3.5" />}{user ? "You" : chat ? "Copilot" : sample ? "Copilot · Sample reply" : resume ? `Copilot · ${FAMILY_LABELS[resume.jobFamily]} résumé${resume.resumeId ? ` ${resume.resumeId.slice(0, 8)}` : ""}` : `Copilot · Report ${message.analysisId?.slice(0, 8)}`}</p>
     <div className={cn("rounded-2xl p-3.5", user ? "rounded-tr-sm bg-deep text-deep-foreground" : "rounded-tl-sm border bg-background")}>
-      <p className="text-sm/6 whitespace-pre-wrap [overflow-wrap:anywhere]">{message.text}</p>
+      <p className="text-sm/6 whitespace-pre-wrap [overflow-wrap:anywhere]">{user || (resume && !chat) ? message.text : renderCopilotText(message.text)}</p>
       {!!message.sources?.length && <details className="mt-3 border-t pt-3">
-        <summary className="cursor-pointer text-xs font-bold">Sample evidence ({message.sources.length})</summary>
+        <summary className="cursor-pointer text-xs font-bold">{chat ? "Evidence" : sample ? "Sample evidence" : "Report evidence"} ({message.sources.length})</summary>
         <ul className="mt-3 grid gap-3">{message.sources.map(source => <li key={source.id} className="text-xs/5 [overflow-wrap:anywhere]">
           <p className="flex items-center gap-1 font-bold"><FileText aria-hidden className="size-3 shrink-0" />{source.label}</p>
           <p className="mt-1 text-muted-foreground">{source.excerpt}</p>

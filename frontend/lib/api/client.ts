@@ -12,24 +12,27 @@ export const API_BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhos
 const DEFAULT_TIMEOUT_MS = 5000;
 
 type AccessTokenGetter = () => Promise<string | null>;
+export type AuthSessionSnapshot = { accessToken: string | null; userId: string | null };
+type AuthSessionGetter = () => Promise<AuthSessionSnapshot>;
 
-let getAccessToken: AccessTokenGetter = async () => null;
-let onUnauthorized: () => void = () => {};
+let getAuthSession: AuthSessionGetter = async () => ({ accessToken: null, userId: null });
 
 /**
  * Where requests get the logged-in user's Supabase access token. The Supabase session code
  * registers this once; every request then sends it as "Authorization: Bearer <token>".
  */
 export function setAccessTokenGetter(getter: AccessTokenGetter) {
-  getAccessToken = getter;
+  getAuthSession = async () => ({ accessToken: await getter(), userId: null });
 }
 
-/** What to do when the API answers 401 (no valid token). The Supabase session code sends the user to /login. */
-export function setUnauthorizedHandler(handler: () => void) {
-  onUnauthorized = handler;
+/** Read token and owner from the same Supabase session, never from a decoded JWT. */
+export function setAuthSessionGetter(getter: AuthSessionGetter) {
+  getAuthSession = getter;
 }
 
 type RequestOptions = {
+  /** Bind a request and its response to the conversation/account that initiated it. */
+  expectedUserId?: string;
   /** JSON request body. */
   json?: unknown;
   /** Multipart body, e.g. a file upload. */
@@ -61,15 +64,22 @@ export class ApiError extends Error {
 /** GETs in flight by path. Several providers (and StrictMode's second effect run) ask for the same data at once. */
 const pendingGets = new Map<string, Promise<unknown>>();
 
+/** Old-account reads must not be shared with a newly mounted account subtree. */
+export function clearPendingApiGets() {
+  pendingGets.clear();
+}
+
 /**
  * GET a JSON endpoint, e.g. apiGet<DatabaseHealthResponse>("/health/db"). Identical GETs that overlap
  * share one request; each caller gets its own copy. A caller with its own signal or timeout is never shared.
  */
 export function apiGet<T>(path: string, options?: RequestOptions): Promise<T> {
-  if (options?.signal || options?.timeoutMs !== undefined) return apiRequest<T>("GET", path, options);
+  if (options?.signal || options?.timeoutMs !== undefined || options?.expectedUserId !== undefined) return apiRequest<T>("GET", path, options);
   let pending = pendingGets.get(path);
   if (!pending) {
-    pending = apiRequest<T>("GET", path).finally(() => pendingGets.delete(path));
+    pending = apiRequest<T>("GET", path).finally(() => {
+      if (pendingGets.get(path) === pending) pendingGets.delete(path);
+    });
     pendingGets.set(path, pending);
   }
   return pending.then((value) => structuredClone(value) as T);
@@ -94,19 +104,38 @@ export async function apiDelete(path: string, options?: RequestOptions): Promise
 
 async function apiRequest<T>(method: string, path: string, options?: RequestOptions): Promise<T> {
   const response = await sendRequest(method, path, options);
-  return (await response.json()) as T;
+  const result = (await response.json()) as T;
+  // Reading a streamed JSON body can finish after another tab changes the account.
+  if (options?.expectedUserId !== undefined) await requireCurrentUser(options.expectedUserId);
+  options?.signal?.throwIfAborted();
+  return result;
+}
+
+function accountChanged(): ApiError {
+  return new ApiError(409, "Account changed", "Your signed-in account changed. Please try again from the current account.");
+}
+
+async function requireCurrentUser(expectedUserId: string): Promise<AuthSessionSnapshot> {
+  let session: AuthSessionSnapshot;
+  try { session = await getAuthSession(); }
+  catch { throw accountChanged(); }
+  if (!session.accessToken || session.userId !== expectedUserId) throw accountChanged();
+  return session;
 }
 
 /** Send the request with the access token; throw ApiError unless the response is 2xx. */
 async function sendRequest(
   method: string,
   path: string,
-  { json, form, timeoutMs = DEFAULT_TIMEOUT_MS, signal }: RequestOptions = {},
+  { json, form, timeoutMs = DEFAULT_TIMEOUT_MS, signal, expectedUserId }: RequestOptions = {},
 ): Promise<Response> {
   const url = `${API_BASE_URL}${path}`;
   const headers = new Headers();
-  const token = await getAccessToken();
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  signal?.throwIfAborted();
+  const session = expectedUserId !== undefined ? await requireCurrentUser(expectedUserId) : await getAuthSession();
+  signal?.throwIfAborted();
+  const requestOwner = expectedUserId ?? session.userId;
+  if (session.accessToken) headers.set("Authorization", `Bearer ${session.accessToken}`);
   if (json !== undefined) headers.set("Content-Type", "application/json");
 
   let response: Response;
@@ -124,9 +153,17 @@ async function sendRequest(
     throw new ApiError(0, `Couldn't reach the API at ${API_BASE_URL}`);
   }
 
+  signal?.throwIfAborted();
+  if (requestOwner) await requireCurrentUser(requestOwner);
   if (!response.ok) {
     const detail = await readDetail(response);
-    if (response.status === 401) onUnauthorized();
+    // Reject a stale token's 401 without changing the shared Supabase session.
+    // A backend response must never sign out a newer login in another tab.
+    if (response.status === 401) {
+      const latest = await getAuthSession();
+      if ((requestOwner && (!latest.accessToken || latest.userId !== requestOwner))
+        || latest.accessToken !== session.accessToken) throw accountChanged();
+    }
     throw new ApiError(response.status, `${method} ${path} failed with ${response.status}`, detail);
   }
   return response;

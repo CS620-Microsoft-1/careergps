@@ -182,11 +182,11 @@ class AccountService:
         return resume
 
     def get_resume(self, user: User, job_family: JobFamily | None) -> Resume | None:
-        """The résumé a destination uses, or None if the student hasn't added that role."""
+        """Read the selected destination's confirmed résumé, only if this user owns it."""
         if job_family is None:
             return None
         destination = self.db.get(Destination, (user.id, job_family))
-        return self.db.get(Resume, destination.resume_id) if destination else None
+        return self.get_owned_resume(user, destination.resume_id) if destination else None
 
     def get_owned_resume(self, user: User, resume_id: uuid.UUID) -> Resume | None:
         resume = self.db.get(Resume, resume_id)

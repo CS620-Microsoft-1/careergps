@@ -120,11 +120,10 @@ test("cancelling an active stream propagates AbortError without restarting it", 
   } finally { global.fetch = prior; }
 });
 
-test("HTTP 401 uses the shared unauthorized handler before reading a stream", async () => {
+test("HTTP 401 rejects before reading a stream", async () => {
   const { api, client } = clients();
   const prior = global.fetch;
-  let calls = 0, unauthorized = 0, steps = 0;
-  client.setUnauthorizedHandler(() => { unauthorized++; });
+  let calls = 0, steps = 0;
   global.fetch = async () => { calls++; return new Response(JSON.stringify({ detail: "Not authenticated" }),
     { status: 401, headers: { "Content-Type": "application/json" } }); };
   try {
@@ -133,7 +132,6 @@ test("HTTP 401 uses the shared unauthorized handler before reading a stream", as
       assert.equal(error.status, 401);
       return true;
     });
-    assert.equal(unauthorized, 1);
     assert.equal(steps, 0);
     assert.equal(calls, 1);
   } finally { global.fetch = prior; }

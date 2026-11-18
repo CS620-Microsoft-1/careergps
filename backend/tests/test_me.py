@@ -225,6 +225,56 @@ class DestinationUpsertTests(unittest.TestCase):
         db.commit.assert_called_once_with()
 
 
+class ConfirmedResumeReadTests(unittest.TestCase):
+    """Exercise the production reader, independent of the API's fake account service."""
+
+    def setUp(self) -> None:
+        from sqlalchemy.orm import Session
+
+        self.db = mock.MagicMock(spec=Session)
+        self.rows = {}
+        self.db.get.side_effect = lambda model, key: self.rows.get((model, key))
+        self.service = accounts.AccountService(self.db)
+        self.user = User(id=uuid.uuid4())
+
+    def tearDown(self) -> None:
+        for operation in ("add", "add_all", "flush", "commit", "execute", "delete"):
+            getattr(self.db, operation).assert_not_called()
+
+    def bind_resume(self, family, *, owner=None):
+        resume = accounts.new_resume(owner or self.user.id, ResumeSubmit.model_validate(resume_body()))
+        self.rows[Resume, resume.id] = resume
+        self.rows[Destination, (self.user.id, family)] = Destination(
+            user_id=self.user.id, job_family=family, resume_id=resume.id)
+        return resume
+
+    def test_reads_the_direction_binding_and_exact_confirmed_data(self):
+        current = self.bind_resume("ai_engineer")
+        other_direction = self.bind_resume("data_analyst")
+        # A later version exists, but the selected direction still points at current.
+        newer = accounts.new_resume(self.user.id, ResumeSubmit.model_validate(resume_body(original_filename="newer.pdf")))
+        self.rows[Resume, newer.id] = newer
+        snapshot = copy.deepcopy(current.confirmed_data)
+
+        result = self.service.get_resume(self.user, "ai_engineer")
+        self.assertIs(result, current)
+        self.assertEqual(snapshot, result.confirmed_data)
+        self.assertIs(self.service.get_resume(self.user, "data_analyst"), other_direction)
+
+    def test_missing_direction_or_resume_returns_none(self):
+        self.assertIsNone(self.service.get_resume(self.user, None))
+        self.db.get.assert_not_called()
+        self.assertIsNone(self.service.get_resume(self.user, "software_engineer"))
+        missing = self.bind_resume("ai_engineer")
+        del self.rows[Resume, missing.id]
+        self.assertIsNone(self.service.get_resume(self.user, "ai_engineer"))
+
+    def test_other_accounts_resume_cannot_be_read(self):
+        self.bind_resume("ai_engineer", owner=uuid.uuid4())
+        self.assertIsNone(self.service.get_resume(self.user, "ai_engineer"))
+        self.assertIsNone(self.service.get_resume(User(id=uuid.uuid4()), "ai_engineer"))
+
+
 class MeApiTests(unittest.TestCase):
     def setUp(self) -> None:
         self.key = new_signing_key()

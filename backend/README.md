@@ -852,6 +852,17 @@ The unrelated existing résumé tests are unchanged.
 - A student keeps every résumé version. `destinations` has one row per (user, role) with the
   `resume_id` that role is matched against; several roles can use the same résumé, and a résumé in
   use can't be deleted. `users.target_role` selects the destination the app shows.
+- `GET /me/resume?job_family=ai_engineer` is the existing read-only endpoint for the confirmed
+  résumé used by that direction. The bearer token identifies the account; the backend resolves
+  `destinations(user_id, job_family)` and checks ownership of the referenced résumé. The response's
+  `classification` is validated from `resumes.confirmed_data`, not from browser data, derived
+  child tables or a local skill-gap report. It needs no analysis report and calls no Agent.
+  A missing/invalid token returns 401, an account without onboarding returns 403, and a missing
+  or inaccessible résumé returns 404. An omitted `job_family` uses the account's target role;
+  callers testing another selected direction must pass it explicitly.
+  Run `python -m unittest tests.test_me -v` for authentication, direction and ownership coverage.
+  Those tests use synthetic data; checking a real Supabase record is a separate read-only
+  comparison. Never run `test_accounts_postgres` against Supabase: it requires a disposable DB.
 - The `users.id → auth.users` foreign key exists only in the migration; `migrations/env.py` stops
   autogenerate from proposing to drop it. It also never proposes dropping a table that has no model
   (`plan_items` and `skill_gap_runs` exist only in migrations): write table drops by hand.
@@ -908,105 +919,100 @@ and starts Skill Gap analysis. The authenticated backend reads the user's active
 | Foundry Agent returned an invalid result             | Synchronize the checked-in Agent prompt and retry with the same résumé   |
 
 
-## Copilot orchestrator with mock tools
+## Copilot
 
-`POST /copilot/chat` currently enables one local, read-only mock tool on the Foundry Agent:
-`get_skill_gap_analysis`. The recommendation fixture is reserved for a later phase and is
-not registered or callable by the Agent. The fictional SWE profile covers
-SQL, deployment and testing. No real résumé, database result, external learning catalog,
-profile update, new analysis or other Agent is accessed. The UI continues to label sample data.
+Copilot uses one pinned `orchestrator-chatbot` for conversation, rewriting and read-only
+questions about the caller's confirmed resume or existing skill-gap report. The current
+configuration is v9 with `gpt-6-luna`. The local definition matches that saved cloud contract;
+cleanup does not update or delete cloud versions. Earlier main versions and `copilot-chatbot`
+remain in Foundry, but this runtime has no v8 or two-Agent execution branch.
 
-### Configure your own Foundry project
+### Configuration
 
-1. In your Azure subscription, create or select your own Foundry resource/project and deploy
-   a model that supports function calling and structured JSON output. Record the **deployment
-   name**, not just the model family. Copy the project endpoint from the project overview.
-2. Log in to the account that can access your project with `az login`, select the intended
-   subscription with `az account set --subscription YOUR_SUBSCRIPTION_ID`, and verify your
-   account has permission to create Agent versions and invoke the model.
-3. Set `ORCHESTRATOR_FOUNDRY_PROJECT_ENDPOINT` in `backend/.env` to **your** project endpoint.
-   Set `ORCHESTRATOR_FOUNDRY_AGENT_NAME=orchestrator-chatbot` (or a new name you own).
-   There is deliberately no fallback to `FOUNDRY_PROJECT_ENDPOINT` or other team projects.
-4. From `backend`, activate the existing virtual environment and run:
+Set `ORCHESTRATOR_FOUNDRY_PROJECT_ENDPOINT`, `ORCHESTRATOR_FOUNDRY_AGENT_NAME`, a concrete
+`ORCHESTRATOR_FOUNDRY_AGENT_VERSION`, and `COPILOT_READONLY_ENABLED=true` in private `.env`.
+The enable flag defaults to false and disables Copilot; it does not select a legacy mode.
+The sole prompt is `app/prompts/copilot/Instructions.md`, whose content is unchanged from v9.
 
-   ```sh
-   python -m scripts.setup_copilot_agent --model YOUR_MODEL_DEPLOYMENT
-   ```
+Preview the definition without cloud access:
 
-   This explicit command creates a version with the checked-in instructions, the single
-   `get_skill_gap_analysis` function definition and JSON response schema. An identical existing version is reused. It does
-   not deploy a model, create an account, change other Agents, or run inference. Do not run
-   it against a shared project unless you intend to create an Agent there.
-5. Copy the printed `ORCHESTRATOR_FOUNDRY_AGENT_NAME` and `ORCHESTRATOR_FOUNDRY_AGENT_VERSION` into
-   `backend/.env`. Use a concrete version; `latest` is rejected. Restart the backend.
-6. Keep `NEXT_PUBLIC_COPILOT_MODE=foundry` in the frontend, restart Next.js, sign in, and open
-   the existing Copilot panel. Chat calls consume your project's model quota. Missing
-   configuration returns HTTP 503 without attempting another project's Agent.
-
-Changing instructions, tools or the response schema requires rerunning setup and pinning
-its resulting version. Runtime preflight rejects a version whose contract differs from the
-local code. Azure credentials and project settings stay on the backend.
-
-Microsoft references: [function calling](https://learn.microsoft.com/en-us/azure/foundry/agents/how-to/tools/function-calling)
-and [runtime components](https://learn.microsoft.com/en-us/azure/foundry/agents/concepts/runtime-components).
-
-### Request and execution contract
-
-Request: `{ "question": "Why is SQL a gap?", "history": [{ "role": "user", "text": "..." }] }`.
-Response: `{ "text": "...", "sources": [{ "id": "...", "label": "...", "excerpt": "..." }],
-"intent": "explain_gap", "mode": "foundry_mock", "analysisId": "sample-swe-v1" }`.
-
-Supabase authentication supplies the server-owned user ID. Request-supplied account IDs,
-system roles, unknown fields and excessive input are rejected. The mock fixtures are shared
-fictional data; replacing them with database tools must enforce ownership using `ToolContext`.
-History is untrusted context, including old assistant replies. Only successful tool results
-from the current request can supply citations; source text is resolved by the backend.
-Learning/project requests are unsupported in this phase. Structural and source checks do not guarantee
-that every generated sentence is semantically accurate; review live answers before release.
-
-The orchestrator allows at most four model rounds and four tool calls. Individual response
-calls have a maximum 30-second transport timeout; the default orchestration budget is 60
-seconds, checked between calls (SDK credential acquisition may add overhead). No automatic
-model retries run. Errors are sanitized. Calls use `store=False` and pass required reasoning
-items only within the request; there is no cloud conversation or cross-request response ID.
-This does not promise that Azure retains no service/security logs. Browser history remains
-account-scoped localStorage. Clear/restart sends empty history next time. Browser cancellation
-discards late results but does not guarantee cancellation of work already running on Azure.
-
-### Tool-call logs
-
-Each dispatched tool produces one INFO line in the Uvicorn backend terminal, for example:
-
-```text
-Copilot tool=get_skill_gap_analysis status=ok duration_ms=0.12
+```sh
+.venv/bin/python -B -m scripts.setup_copilot_agent --model gpt-6-luna --dry-run
 ```
 
-Only the registered tool name, result status and elapsed tool-execution time are recorded.
-This duration excludes model inference and is not the total chat response time. Unregistered
-names are replaced with `unregistered`; unexpected tool exceptions use status `error` without
-exception details. Questions, history, arguments, results and user identifiers are not included.
-These logs use the `uvicorn.error.copilot.tools` logger and are visible at Uvicorn's default
-INFO level. A response that does not dispatch a tool produces no tool-call line.
+Removing `--dry-run` creates/reuses a main version and requires explicit cloud authorization.
+The script does not update `.env` or run inference. Local cleanup needs no cloud update.
+Each chat turn checks the pinned saved instructions, tools and output schema before inference.
 
-### Validation and acceptance scenarios
+### Authentication and data access
 
-Offline: from `backend`, run `python -m unittest tests.test_copilot -v`. From `frontend`, run
-`npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`. These checks need no Azure
-calls. The focused tests cover authentication, identity spoofing, input bounds, tool allowlists,
-disabled recommendation calls, evidence validation, loop limits, stateless requests,
-response validation, cancellation and failure propagation.
+CareerGPS login is reused in the existing dashboard. `POST /copilot/chat` accepts the question,
+bounded recent text history, `jobFamily` and an optional `reportId`. Identity comes from the
+verified bearer token. The report ID is only an untrusted selector; the backend independently
+checks its owner, direction, current resume ID and canonical content hash. No browser-supplied
+identity or saved-data payload is accepted. `GET /copilot/capabilities` exposes local enablement
+and binding readiness without a model call. The intermediate `GET /copilot/resume` debugging
+endpoint has been removed; product testing takes place in chat.
 
-After configuring your own project, manually check:
+Resume queries use a new private PostgreSQL transaction set to `READ ONLY`. Fixed SELECTs
+check user, direction and resume ownership; raw SQL, writes, locking queries, commit and
+flush are blocked. The transaction is rolled back and closed before model work continues.
+The reader never borrows a write-capable AccountService. Existing account-edit features and
+the shared database role remain unchanged.
 
-- “Why is SQL a gap?” retrieves sample evidence and distinguishes missing evidence from missing skill.
-- “What evidence is missing for that?” resolves the follow-up and queries the same sample skill.
-- “Which project would help with that?” explains that recommendations are not enabled yet.
-- “Help me with that” in an empty conversation asks for clarification.
-- “Save this plan and rerun my analysis” reports unsupported actions without claiming execution.
-- Requests to ignore instructions or use another person's profile cannot access other tools or real data.
-- Clear/restart during a reply discards the late answer and sends no old history next time.
-- Missing Agent configuration or an unavailable backend produces a retryable error, never a scripted fallback.
+The resume tool projects only requested technical skills, education, work/research experience
+and projects. Saved contact details are not sent in that projection. Report tools read existing
+local JSON under `local_results/web_skill_gaps`; they never create directories, recover jobs,
+recompute scores, start analysis or resolve cloud versions. Missing, stale, unfinished and
+failed reports are explicit. Saved report time and version do not certify today's algorithm
+or live market data. Pending/unscored results remain pending, not zero or proof of inability.
 
-Live Agent behavior must be verified in your project; offline tests do not validate model
-routing or Azure deployment compatibility. No production request quotas or distributed
-conversation persistence are introduced in this phase.
+Reports have one document-level citation and resumes at most five section citations, so a
+turn offers at most six valid source IDs. Full report data is preserved; only the displayed
+excerpt is bounded. Unknown, duplicate and missing citations are rejected. The frontend
+accepts at most eight sources and retains its Evidence view. The previous per-skill citation
+design caused a confirmed HTTP 502 when more than eight IDs were returned; the 23-skill and
+six-citation regressions prevent recurrence.
+
+### Conversation and identity isolation
+
+The browser subscribes to login changes and separates localStorage by account. Owner changes
+invalidate old profile loads and cancel the prior conversation's pending request. A same-user
+token refresh preserves the conversation and draft. Copilot requests also check the actual
+session user before sending and before accepting a reply; a stale tab cannot send old-owner
+history under a new token or store new-owner data in old-owner history. Backend 401s return
+the existing frontend sign-in error and do not automatically sign out the shared session;
+explicit Sign out remains available. This prevents a late old-token error from clearing a
+new login while the SDK is asynchronously signing out.
+
+Existing version-1 chat history and old sample/report/resume messages remain readable under
+their original keys. New messages are authenticated `foundry_chat` only. Legacy messages and
+failed/cancelled questions are excluded from completed model history. Stop, retry and confirmed
+clear behavior remain; clear affects only this account's local chat. No browser history is
+migrated or deleted during cleanup.
+
+### Limits and verification
+
+Main chooses whether to read. Greetings and supplied-text rewriting normally need one model
+request and no tool. A data answer normally needs two requests to the same Agent. A turn
+allows two reads and three responses; the last disables tools. Identical reads reuse their
+result. There are no automatic retries, parallel tool execution, specialists or write tools.
+The 60-second default shared deadline, 30-second per-response cap and 2,500-token output cap
+are retained. Answers are not artificially shortened. Stateless requests use `store=False`
+and replay encrypted reasoning/tool items; this is not a cloud-retention policy guarantee.
+Sanitized diagnostics record only stage/status and masked validation categories.
+
+Run offline checks with fake settings and network blocked:
+
+```sh
+.venv/bin/python -B -m unittest tests.test_copilot tests.test_copilot_readonly tests.test_copilot_sources tests.test_copilot_tools tests.test_me tests.test_skill_gap_run_ownership -v
+```
+
+Run the frontend unit suite, TypeScript and relevant ESLint after changes to shared auth/API
+code. Tests use synthetic rows, temp reports and mocked sessions/SDK calls; they do not replace
+browser acceptance or prove a latency target. See the [current test record](../docs/testing/COPILOT_READONLY_CHAT.md)
+for observed manual behavior and remaining checks. The earlier two-Agent experiment was
+retired because of observed latency; its full notes are archived locally outside this repo.
+
+Commits and pushes are performed manually by the user after review. Readiness approval alone
+does not authorize the assistant to stage, commit, push or create a PR.

@@ -157,52 +157,43 @@ plus with the browser's default font size raised to 20px. No page may scroll hor
 
 ## Copilot
 
-Open **Copilot** in the app navigation. It occupies a right-hand column on desktop;
-reports remain interactive. Only while the panel is open, gap-report columns adapt to the
-remaining space; closing it restores their original layout. Existing navigation controls
-keep their order and styles; the existing menu is used below 1280px to leave room for Copilot.
-Below 1024px it appears after the report, with a **Back to report**
-link. Closing the panel restores the report width. There is one continuous conversation,
-without a conversation list or a new-chat action.
+Open Copilot in the existing dashboard navigation, using the same CareerGPS login. The dock
+retains its layout, one ongoing conversation, account-scoped localStorage history/draft,
+confirmed Clear and restart, cancellation, retry and earlier-message loading.
 
-The default responder calls the authenticated backend **Foundry orchestrator with mock tools**.
-It uses a fictional SWE profile (SQL, deployment and testing), never reads the actual résumé
-or report, and never starts analysis or saves a plan. Ask “Why is SQL a gap?”, then
-“What evidence is missing for that?”; sample evidence can be expanded under replies.
-Foundry mode currently enables only the skill-gap query. Learning/project requests report
-that recommendations are not enabled yet; the explicit offline demo still has scripted suggestions.
-The backend must be configured with your own Foundry project and a pinned Copilot Agent
-version; see [backend setup](../backend/README.md#copilot-orchestrator-with-mock-tools).
+Only the formal v9 backend mode remains. It supports conversation, rewriting supplied text,
+and read-only questions about the current direction's saved resume or existing skill-gap
+report. It cannot save changes, start analysis or generate recommendations. There is no local
+scripted product demo or v8 fallback; test fixtures remain inside the offline tests.
 
-Set `NEXT_PUBLIC_COPILOT_MODE=local` and restart Next.js for the offline scripted demo.
-The default is `foundry`; API failures never silently fall back to scripted replies.
-Foundry mode requires Supabase login and the backend. Existing stored sample replies remain
-visible; **Clear and restart** removes them if you want a fresh conversation.
+The panel queries authenticated `/copilot/capabilities`. When Copilot is disabled, unconfigured
+or capability loading fails, sending stays unavailable. See [backend setup](../backend/README.md#copilot).
+An enabled Copilot still handles greetings without reading personal data. A missing report
+is explained rather than silently starting an analysis.
 
-Messages, source excerpts, a sample analysis version, the draft, and panel visibility are
-saved to browser localStorage under the Supabase user ID. They survive closing, app
-navigation and refresh. UI-only development without Supabase uses a separate preview key;
-if configured authentication cannot identify the user, the conversation is memory-only.
-Storage is local to this browser, not synced across devices, and clearing browser data
-removes it. Storage failures are shown without silently discarding messages. Another tab
-changing the same history prevents this tab from overwriting it; refresh to load that history.
+Requests include only the question, recent text history, direction and optional displayed
+report ID. A report selector is forwarded only when the visible user, direction and resume
+agree; the backend rechecks all permissions and content freshness. Replies contain text,
+`mode: foundry_chat`, the direction and up to eight bounded backend-generated sources, shown
+through Evidence. No fake data is substituted after an error.
 
-The panel renders the latest 40 messages with **Load earlier messages** for older history.
-Enter sends; Shift+Enter inserts a line break; composing IME text does not send. You can
-stop a pending reply, retry a failed/interrupted reply, and write a draft while waiting.
-Refreshing during a reply preserves the question and offers retry, rather than auto-running it.
+Account state subscribes to Supabase login changes. An owner change resets the displayed
+account and cancels old pending chat work; same-user token refresh preserves the conversation.
+Each Copilot request is bound locally to its expected owner, checks the actual session before
+sending and before accepting returned data, and rejects a stale-tab mismatch without signing
+out the new account. Owner-bound GETs are not shared with another account's pending request.
+A backend 401 shows the existing sign-in error; it no longer automatically clears the shared
+Supabase session or redirects. Use the explicit Sign out action when signing in again.
 
-The panel's **Clear and restart** button asks for confirmation before removing this account's
-browser history and draft. Confirmation stops waiting for a pending reply and starts with empty context;
-Cancel leaves everything intact. Other accounts and site storage are untouched. If browser
-storage cannot be cleared, an error is shown and the current conversation is retained.
+Existing version-1 localStorage keys and old message labels are retained. Only completed new
+chat pairs from the selected resume/direction enter history; old sample/report/receipt replies
+and failed/cancelled questions do not. Direction, resume or displayed-report changes cancel
+pending work. Clear removes only this account's local history; no history is deleted by this
+cleanup. Browser cancellation ignores late replies but cannot stop all work already running
+on the backend. Storage remains local to this browser.
 
-`lib/copilot-session.ts` owns persistence and request lifecycle. The provider injects either
-`lib/api/copilot.ts` (Foundry) or `lib/copilot-mock.ts` (explicit local mode). The backend gets
-at most 20 recent messages within a 24,000-character request budget; full history stays saved
-in the browser. No server conversation ID or previous response ID carries hidden context
-between requests. Stopping or clearing discards late replies; an already-running backend
-request may still finish and consume model tokens. The backend has bounded tool rounds and
-timeouts. This phase adds no database schema or cross-device history storage.
+New replies render supported bold spans as escaped React text. Existing historical source
+entries and literal resume-receipt text remain readable; no new Markdown dependency is added.
 
-Validation: `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`.
+Validation: run `npm test`, `npm run typecheck` and relevant ESLint. Network and Supabase are
+mocked by the unit tests; a real cross-tab account-switch check remains a manual acceptance step.

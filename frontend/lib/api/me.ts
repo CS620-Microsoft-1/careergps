@@ -15,8 +15,8 @@ import type {
 // backend: app/api/routes/me.py
 
 /** The logged-in student's account; user is null until onboarding is finished. */
-export function getMe() {
-  return apiGet<MeResponse>("/me");
+export function getMe(expectedUserId?: string) {
+  return apiGet<MeResponse>("/me", { expectedUserId });
 }
 
 /** Finish onboarding: creates the account and its first résumé. Throws ApiError 409 if already done. */
@@ -25,8 +25,8 @@ export function createAccount(body: AccountCreateRequest) {
 }
 
 /** Change the name, university or career goal; only the fields sent change. */
-export function updateAccount(body: Partial<Goals & PersonalDetails>) {
-  return apiPatch<User>("/me", { json: body });
+export function updateAccount(body: Partial<Goals & PersonalDetails>, expectedUserId?: string) {
+  return apiPatch<User>("/me", { json: body, expectedUserId });
 }
 
 /** Save a confirmed résumé; the destination for job_family uses it from now on (added if new). */

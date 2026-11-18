@@ -1,22 +1,28 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { CopilotSession, copilotStorageKey, createCopilotStorage, SAMPLE_ANALYSIS_ID } from "./copilot-session.ts";
-import { sampleCopilotReply, respondToMockCopilot, type CopilotReply, type CopilotRequest, type CopilotResponder } from "./copilot-mock.ts";
+import type { CopilotReply, CopilotRequest, CopilotResponder } from "./copilot-types.ts";
+import { ApiError } from "./api/client.ts";
 
-const answer = { text: "Sample response", sources: [] };
+const answer: CopilotReply = { text: "Test response", sources: [], mode: "foundry_chat" };
+function initialize(session: CopilotSession) {
+  session.initialize();
+  session.setResumeContext(firstResume);
+}
+
 function deferred() {
   let resolve!: (reply: CopilotReply) => void;
   const promise = new Promise<CopilotReply>(r => { resolve = r; });
   return { promise, resolve };
 }
-function setup(respond: CopilotResponder = async () => answer) {
-  let saved: string | null = null;
+function setup(respond: CopilotResponder = async () => answer, initialSaved: string | null = null) {
+  let saved = initialSaved;
   let nextId = 0;
   const deps = { read: () => saved, write: (value: string) => { saved = value; }, clear: () => { saved = null; }, respond,
     id: () => `id-${nextId++}`, now: () => "2026-11-10T12:00:00.000Z" };
   const session = new CopilotSession(deps);
-  session.initialize();
-  return { session, restore: () => { const s = new CopilotSession(deps); s.initialize(); return s; } };
+  initialize(session);
+  return { session, restore: () => { const s = new CopilotSession(deps); initialize(s); return s; } };
 }
 
 test("continuous conversation survives close, refresh, and follow-up with its draft", async () => {
@@ -34,7 +40,7 @@ test("continuous conversation survives close, refresh, and follow-up with its dr
   await loaded.send();
   assert.equal(loaded.getSnapshot().messages.length, 4);
   assert.equal(loaded.getSnapshot().conversationId, id);
-  assert.ok(loaded.getSnapshot().messages.every(m => m.analysisId === SAMPLE_ANALYSIS_ID));
+  assert.ok(loaded.getSnapshot().messages.every(m => m.mode === "foundry_chat" && !m.analysisId));
 });
 
 test("duplicate sends are blocked and drafts typed while waiting survive", async () => {
@@ -61,7 +67,7 @@ test("cancel ignores late results even if the responder ignores AbortSignal", as
   await session.retry();
   d.resolve({ text: "Stale answer", sources: [] });
   await pending;
-  assert.deepEqual(session.getSnapshot().messages.map(m => m.text), ["Question", "Sample response"]);
+  assert.deepEqual(session.getSnapshot().messages.map(m => m.text), ["Question", "Test response"]);
 });
 
 test("refresh marks a pending reply interrupted without auto-running it", async () => {
@@ -88,7 +94,7 @@ test("malformed replies fail safely and retry does not duplicate the question", 
 
 test("storage failure keeps live messages usable", async () => {
   const session = new CopilotSession({ read: () => null, write: () => { throw new Error("Quota"); }, clear: () => {}, respond: async () => answer });
-  session.initialize(); await session.send("Question");
+  initialize(session); await session.send("Question");
   assert.equal(session.getSnapshot().messages.length, 2);
   assert.match(session.getSnapshot().storageWarning!, /could not be saved/);
 });
@@ -96,12 +102,12 @@ test("storage failure keeps live messages usable", async () => {
 test("corrupt stored history is not overwritten", async () => {
   let writes = 0;
   const session = new CopilotSession({ read: () => '{"version":1}', write: () => { writes++; }, clear: () => {}, respond: async () => answer });
-  session.initialize(); await session.send("Question");
+  initialize(session); await session.send("Question");
   assert.equal(writes, 0);
   assert.match(session.getSnapshot().storageWarning!, /could not be loaded/);
 });
 
-test("keys separate accounts and the local preview", () => {
+test("keys separate accounts and legacy storage owners", () => {
   assert.notEqual(copilotStorageKey("user:alice"), copilotStorageKey("user:bob"));
   assert.notEqual(copilotStorageKey("user:local-preview"), copilotStorageKey("local-preview"));
 });
@@ -119,23 +125,6 @@ test("empty or oversized input does not send", async () => {
   await session.send("  "); await session.send("a".repeat(2001));
   assert.equal(session.getSnapshot().messages.length, 0);
   assert.ok(session.getSnapshot().error);
-});
-
-test("mock carries forward topic and declines unsupported actions", () => {
-  const reply = sampleCopilotReply({ question: "Which project should I build first?", history: [{ role: "user", text: "Why is deployment a gap?" }] });
-  assert.match(reply.text, /Deploy the task tracker/);
-  assert.ok(reply.sources.every(s => s.id.endsWith("deployment")));
-  const action = sampleCopilotReply({ question: "Save this plan and rerun analysis", history: [] });
-  assert.match(action.text, /haven’t changed/);
-  assert.equal(action.sources.length, 0);
-  assert.match(sampleCopilotReply({ question: "What is the weather?", history: [] }).text, /scripted examples/);
-});
-
-test("mock adapter honors abort", async () => {
-  const controller = new AbortController();
-  const pending = respondToMockCopilot({ question: "Why SQL?", history: [] }, controller.signal);
-  controller.abort();
-  await assert.rejects(pending, { name: "AbortError" });
 });
 
 test("clear removes messages and draft across refresh and starts with empty responder context", async () => {
@@ -183,7 +172,7 @@ test("browser adapter clears only the selected account, preserving other account
   storage.setItem("unrelated-setting", "keep");
   const alice = new CopilotSession({ ...createCopilotStorage("user:alice", () => storage), respond: async () => answer });
   const bob = new CopilotSession({ ...createCopilotStorage("user:bob", () => storage), respond: async () => answer });
-  alice.initialize(); bob.initialize();
+  initialize(alice); initialize(bob);
   await alice.send("Alice question"); await bob.send("Bob question");
   alice.setDraft("Alice draft"); bob.setDraft("Bob draft");
   const beforeBob = storage.getItem(copilotStorageKey("user:bob"));
@@ -209,7 +198,7 @@ test("failed deletion retains the conversation and draft and reports failure", a
   const storage = memoryStorage();
   const session = new CopilotSession({ ...createCopilotStorage("user:alice", () => ({ ...storage,
     removeItem: () => { throw new Error("Storage blocked"); } })), respond: async () => answer });
-  session.initialize(); await session.send("Keep this question"); session.setDraft("Keep this draft");
+  initialize(session); await session.send("Keep this question"); session.setDraft("Keep this draft");
   const before = session.getSnapshot();
   const saved = storage.getItem(copilotStorageKey("user:alice"));
   assert.equal(session.clear(), false);
@@ -225,12 +214,247 @@ test("confirmed clear can recover from corrupt saved history", async () => {
   storage.setItem(copilotStorageKey("user:alice"), "corrupt");
   const deps = { ...createCopilotStorage("user:alice", () => storage), respond: async () => answer };
   const session = new CopilotSession(deps);
-  session.initialize();
+  initialize(session);
   assert.ok(session.getSnapshot().storageWarning);
   assert.equal(session.clear(), true);
   assert.equal(session.getSnapshot().storageWarning, null);
   await session.send("Fresh question");
   const restored = new CopilotSession({ ...createCopilotStorage("user:alice", () => storage), respond: async () => answer });
-  restored.initialize();
+  initialize(restored);
   assert.deepEqual(restored.getSnapshot().messages.map(m => m.text), ["Fresh question", answer.text]);
+});
+
+const firstResume = { jobFamily: "software_engineer" as const, resumeId: "bca169cb-5f2c-4c4d-9133-c9a2edf408cb", confirmedAt: "2026-11-13T12:00:00.000Z" };
+const secondResume = { jobFamily: "ai_engineer" as const, resumeId: "f60ca650-9a77-4013-8705-020d68236ff3", confirmedAt: "2026-11-13T13:00:00.000Z" };
+const chatReply: CopilotReply = { text: "Here is a shorter version of your sentence.", sources: [], mode: "foundry_chat" };
+
+const setupChat = (respond: CopilotResponder = async () => chatReply, initialSaved: string | null = null) => setup(respond, initialSaved);
+
+test("read-only chat accepts and restores backend sources while follow-up history remains conversation text", async () => {
+  const source = { id: "resume:confirmed:technical_skills", label: "Saved résumé · Technical skills", excerpt: "Python, SQL" };
+  const calls: CopilotRequest[] = [];
+  const reportId = "a".repeat(32);
+  const readReply = { text: "Your saved résumé lists Python and SQL.", sources: [source], mode: "foundry_chat" as const };
+  const { session, restore } = setupChat(async request => { calls.push(request); return readReply; });
+  session.setResumeContext({ ...firstResume, reportId });
+  await session.send("What skills are on my saved résumé?");
+  assert.equal(session.getSnapshot().error, null);
+  assert.equal(session.getSnapshot().messages[0].replyState, "completed");
+  assert.deepEqual(session.getSnapshot().messages[1].sources, [source]);
+  assert.deepEqual(restore().getSnapshot().messages[1].sources, [source]);
+  assert.equal(restore().getSnapshot().messages[1].resumeContext?.reportId, reportId);
+  assert.equal(calls[0].reportId, reportId);
+  await session.send("Summarize that");
+  assert.deepEqual(calls[1].history, [
+    { role: "user", text: "What skills are on my saved résumé?" },
+    { role: "assistant", text: readReply.text },
+  ]);
+  assert.equal(JSON.stringify(calls[1].history).includes(source.id), false);
+});
+
+test("authenticated chat still rejects missing mode and malformed or excessive evidence", async () => {
+  const source = { id: "report:source", label: "Skill gap report", excerpt: "Saved result" };
+  for (const invalid of [
+    { text: "Missing chat mode", sources: [] },
+    { ...chatReply, sources: [{ ...source, id: "" }] },
+    { ...chatReply, sources: [{ ...source, excerpt: "x".repeat(4001) }] },
+    { ...chatReply, sources: [{ ...source, invented: true }] },
+    { ...chatReply, sources: Array.from({ length: 9 }, () => source) },
+  ]) {
+    const { session } = setupChat(async () => invalid);
+    session.setResumeContext(firstResume);
+    await session.send("Read my report");
+    assert.equal(session.getSnapshot().messages.length, 1);
+    assert.equal(session.getSnapshot().messages[0].replyState, "failed");
+    assert.ok(session.getSnapshot().error);
+  }
+});
+
+test("changing the displayed report cancels stale work and preserves one conversation with the new selector", async () => {
+  const d = deferred();
+  const calls: CopilotRequest[] = [];
+  let oldSignal: AbortSignal | undefined;
+  const { session, restore } = setupChat(async (request, signal) => {
+    calls.push(request);
+    if (calls.length === 2) { oldSignal = signal; return d.promise; }
+    return chatReply;
+  });
+  session.setResumeContext({ ...firstResume, reportId: "a".repeat(32) });
+  const conversationId = session.getSnapshot().conversationId;
+  await session.send("Hello");
+  const pending = session.send("Summarize my report");
+  session.setDraft("Keep my draft");
+  session.setResumeContext({ ...firstResume, reportId: "b".repeat(32) });
+  assert.equal(oldSignal?.aborted, true);
+  assert.equal(session.getSnapshot().messages[2].replyState, "cancelled");
+  d.resolve({ ...chatReply, text: "Stale report response" });
+  await pending;
+  assert.equal(session.getSnapshot().messages.length, 3);
+  await session.retry();
+  assert.equal(calls[2].reportId, "b".repeat(32));
+  assert.deepEqual(calls[2].history, [{ role: "user", text: "Hello" }, { role: "assistant", text: chatReply.text }]);
+  assert.equal(session.getSnapshot().conversationId, conversationId);
+  assert.equal(session.getSnapshot().messages[2].replyState, "completed");
+  assert.equal(session.getSnapshot().draft, "Keep my draft");
+  assert.equal(restore().getSnapshot().messages[3].resumeContext?.reportId, "b".repeat(32));
+});
+
+test("new conversations preserve legacy messages and drafts without sending old sample, report or résumé receipts", async () => {
+  const calls: CopilotRequest[] = [];
+  const legacyMessages = [
+    { id: "legacy-sample", role: "assistant", text: "Old sample reply", createdAt: "2026-11-10T12:00:00.000Z", analysisId: SAMPLE_ANALYSIS_ID },
+    { id: "legacy-report", role: "assistant", text: "Old report reply", createdAt: "2026-11-10T12:00:00.000Z", analysisId: "a".repeat(32) },
+    { id: "legacy-question", role: "user", text: "Read my résumé", createdAt: "2026-11-10T12:00:00.000Z", resumeContext: firstResume, replyState: "completed" },
+    { id: "legacy-resume", role: "assistant", text: "Old fixed résumé receipt: SQL", createdAt: "2026-11-10T12:00:00.000Z", resumeContext: firstResume, sources: [] },
+  ];
+  const saved = JSON.stringify({ version: 1, open: true, conversationId: "old-conversation", createdAt: "2026-11-10T12:00:00.000Z",
+    draft: "Existing draft", messages: legacyMessages });
+  const { session, restore } = setupChat(async request => { calls.push(request); return chatReply; }, saved);
+  assert.equal(session.getSnapshot().draft, "Existing draft");
+  assert.deepEqual(session.getSnapshot().messages, legacyMessages);
+  session.setResumeContext(firstResume);
+  await session.send("Please shorten this sentence: I built a useful application.");
+  assert.deepEqual(calls[0], { question: "Please shorten this sentence: I built a useful application.", history: [], jobFamily: firstResume.jobFamily });
+  await session.send("Make it even shorter");
+  assert.equal(calls[1].history.length, 2);
+  assert.equal(calls[1].history[1].text, chatReply.text);
+  assert.ok(!calls[1].history.some(turn => /Old|Read my résumé/.test(turn.text)));
+  session.setResumeContext(secondResume);
+  await session.send("Hello in this direction");
+  assert.deepEqual(calls[2].history, []);
+  session.setDraft("Keep this draft");
+  const restored = restore();
+  assert.equal(restored.getSnapshot().messages.length, 10);
+  assert.equal(restored.getSnapshot().draft, "Keep this draft");
+  assert.equal(restored.getSnapshot().conversationId, "old-conversation");
+  assert.deepEqual(restored.getSnapshot().messages.slice(0, 4), legacyMessages);
+  assert.ok(restored.getSnapshot().messages.slice(4).every(message => message.mode === "foundry_chat"));
+  restored.setResumeContext(firstResume);
+  await restored.send("Continue rewriting");
+  assert.equal(calls[3].history.length, 4);
+  assert.ok(!calls[3].history.some(turn => /Old|Read my résumé|this direction/.test(turn.text)));
+});
+
+test("switching directions or known résumé contexts cancels pending replies and rejects old retries", async () => {
+  for (const next of [secondResume, { ...firstResume, resumeId: secondResume.resumeId },
+    { ...firstResume, confirmedAt: "2026-11-14T12:00:00.000Z" }]) {
+    const d = deferred();
+    let calls = 0;
+    let signal: AbortSignal | undefined;
+    const { session } = setupChat(async (_, requestSignal) => { calls++; signal = requestSignal; return d.promise; });
+    session.setResumeContext(firstResume);
+    const pending = session.send("Hello");
+    session.setDraft("Next draft");
+    session.setResumeContext(next);
+    assert.equal(signal?.aborted, true);
+    assert.equal(session.getSnapshot().messages[0].replyState, "cancelled");
+    await session.retry();
+    assert.match(session.getSnapshot().error!, /another résumé or direction/);
+    d.resolve(chatReply);
+    await pending;
+    assert.equal(calls, 1);
+    assert.equal(session.getSnapshot().messages.length, 1);
+    assert.equal(session.getSnapshot().draft, "Next draft");
+  }
+});
+
+test("real mode without an account or selected direction retains its draft", async () => {
+  let calls = 0;
+  const { session } = setupChat(async () => { calls++; return chatReply; });
+  session.setResumeContext(null, "Sign in to use Copilot.");
+  session.setDraft("Hello");
+  await session.send();
+  assert.equal(calls, 0);
+  assert.equal(session.getSnapshot().messages.length, 0);
+  assert.equal(session.getSnapshot().draft, "Hello");
+  assert.equal(session.getSnapshot().error, "Sign in to use Copilot.");
+});
+
+test("a new conversation needs no saved résumé and never labels its reply as a read", async () => {
+  const calls: CopilotRequest[] = [];
+  const { session, restore } = setupChat(async request => { calls.push(request); return chatReply; });
+  session.setResumeContext({ jobFamily: firstResume.jobFamily });
+  await session.send("Hello");
+  assert.deepEqual(calls[0], { question: "Hello", history: [], jobFamily: firstResume.jobFamily });
+  assert.deepEqual(session.getSnapshot().resumeContext, { jobFamily: firstResume.jobFamily });
+  const reply = session.getSnapshot().messages[1];
+  assert.equal(reply.text, chatReply.text);
+  assert.equal(reply.mode, "foundry_chat");
+  assert.equal(reply.analysisId, undefined);
+  assert.equal(reply.resumeContext?.resumeId, undefined);
+  assert.deepEqual(reply.sources, []);
+  assert.equal(restore().getSnapshot().messages[1].mode, "foundry_chat");
+  await session.send("Please rephrase that");
+  assert.equal(calls[1].history.length, 2);
+});
+
+test("equivalent context timestamps do not interrupt a new conversation", async () => {
+  const calls: CopilotRequest[] = [];
+  const { session } = setupChat(async request => { calls.push(request); return chatReply; });
+  session.setResumeContext(firstResume);
+  await session.send("Hello");
+  session.setResumeContext({ ...firstResume, confirmedAt: "2026-11-13T12:00:00+00:00" });
+  await session.send("Continue");
+  assert.equal(calls[1].history.length, 2);
+});
+
+test("failed and cancelled questions stay visible but are excluded from completed conversation history", async () => {
+  const calls: CopilotRequest[] = [];
+  const d = deferred();
+  const { session } = setupChat(async request => {
+    calls.push(request);
+    if (calls.length === 1) throw new ApiError(429, "Rate limited", "Please wait before sending another message.");
+    if (calls.length === 3) return d.promise;
+    return chatReply;
+  });
+  session.setResumeContext(firstResume);
+  await session.send("Failed question");
+  assert.equal(session.getSnapshot().error, "Please wait before sending another message.");
+  assert.equal(session.getSnapshot().messages.length, 1);
+  await session.send("Completed question");
+  assert.deepEqual(calls[1].history, []);
+  const pending = session.send("Cancelled question");
+  session.cancel();
+  d.resolve(chatReply); await pending;
+  await session.send("New question");
+  assert.deepEqual(calls[3].history, [{ role: "user", text: "Completed question" }, { role: "assistant", text: chatReply.text }]);
+  assert.equal(session.getSnapshot().messages[0].replyState, "failed");
+  assert.equal(session.getSnapshot().messages[3].replyState, "cancelled");
+});
+
+test("manual retry makes a new conversation request without duplicating the saved question", async () => {
+  const calls: CopilotRequest[] = [];
+  const { session } = setupChat(async request => {
+    calls.push(request);
+    if (calls.length === 1) throw new Error("Temporary failure");
+    return chatReply;
+  });
+  session.setResumeContext(firstResume);
+  await session.send("Hello");
+  await session.retry();
+  assert.equal(calls.length, 2);
+  assert.deepEqual(calls[1], calls[0]);
+  assert.equal(session.getSnapshot().messages.length, 2);
+  assert.equal(session.getSnapshot().messages[0].replyState, "completed");
+});
+
+test("replacing an account conversation discards its late reply and preserves separate drafts", async () => {
+  const storage = memoryStorage();
+  const d = deferred();
+  const alice = new CopilotSession({ ...createCopilotStorage("user:alice", () => storage), respond: async () => d.promise });
+  initialize(alice); alice.setResumeContext(firstResume);
+  const pending = alice.send("Alice's question");
+  alice.setDraft("Alice's draft");
+  // Provider cleanup cancels the old instance when its account key changes.
+  alice.cancel();
+  const bob = new CopilotSession({ ...createCopilotStorage("user:bob", () => storage), respond: async () => chatReply });
+  initialize(bob); bob.setResumeContext(firstResume); bob.setDraft("Bob's draft");
+  d.resolve(chatReply); await pending;
+  assert.equal(alice.getSnapshot().messages.length, 1);
+  assert.equal(alice.getSnapshot().messages[0].replyState, "cancelled");
+  assert.deepEqual(bob.getSnapshot().messages, []);
+  assert.equal(bob.getSnapshot().draft, "Bob's draft");
+  const restoredAlice = new CopilotSession({ ...createCopilotStorage("user:alice", () => storage), respond: async () => answer });
+  initialize(restoredAlice);
+  assert.equal(restoredAlice.getSnapshot().draft, "Alice's draft");
 });

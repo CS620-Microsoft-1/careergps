@@ -1,191 +1,125 @@
-"""Offline contract, authentication and bounded-tool-loop tests; no Azure calls or database."""
+"""Offline v9 configuration, authentication and pinned-service checks."""
 import json
+from io import StringIO
 import os
-import unittest
-from time import monotonic
+from copy import deepcopy
 from types import SimpleNamespace
-from unittest.mock import Mock, patch
+import unittest
+from unittest.mock import MagicMock, Mock, patch
 from uuid import UUID
 
 os.environ.setdefault("DATABASE_URL", "postgresql+psycopg://tester:fake@localhost:5432/test")
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
-from app.api.deps import get_token_verifier
-from app.api.routes.copilot import get_copilot_service, router
+from app.api.deps import get_account_service, get_token_verifier
+from app.api.routes.copilot import get_copilot_service, get_readonly_resume_source, get_readonly_report_source, router
 from app.core.config import CopilotSettings
 from app.core.security import AuthenticatedUser, AuthError
-from app.schemas.copilot import CopilotReply, CopilotRequest, SuggestionArguments
+from app.schemas.copilot import ReadOnlyAgentAnswer, CopilotReply, CopilotRequest
 from app.services.copilot.agent import (
-    CopilotError, FoundryCopilotService, agent_definition, matches_contract, run_orchestrator,
+    ChatContext, CopilotError, FoundryCopilotService, agent_definition,
+    matches_contract,
 )
-from app.services.copilot.tools import MockCopilotTools, ToolContext
+from app.services.skill_gaps.runs import get_skill_gap_run_manager
 
 USER_ID = UUID("00000000-0000-0000-0000-000000000001")
+MAIN_REFERENCE = {"type": "agent_reference", "name": "fixture-main", "version": "3"}
 
 
-def call(name="get_skill_gap_analysis", args=None, call_id="call-1"):
-    return {"type": "function_call", "call_id": call_id, "name": name,
-            "arguments": json.dumps(args or {"skill_id": "sql"})}
+def chat_request(**changes):
+    return CopilotRequest(**{"question": "Hello", "jobFamily": "ai_engineer", **changes})
 
 
-def response(*calls, intent="explain_gap", sources=None, text="The sample resume has no explicit SQL evidence.", status="completed"):
-    return SimpleNamespace(status=status, output=[Mock(model_dump=Mock(return_value=item)) for item in calls],
-        output_text=json.dumps({"intent": intent, "text": text,
-                                "source_ids": ["sample-report-sql"] if sources is None else sources}))
+def model_response():
+    output_text = json.dumps({"text": "Hello", "source_ids": []})
+    message = {"type": "message", "role": "assistant", "content": [
+        {"type": "output_text", "text": output_text}]}
+    return SimpleNamespace(status="completed", output_text=output_text,
+        output=[Mock(model_dump=Mock(return_value=message))])
 
 
-class CopilotTests(unittest.TestCase):
-    def setUp(self):
-        self.tools = MockCopilotTools(ToolContext(USER_ID))
-        self.client = SimpleNamespace(responses=Mock())
+def chat_settings(**changes):
+    return CopilotSettings(_env_file=None, **{
+        "orchestrator_foundry_project_endpoint": "https://fixture.invalid/api/projects/test",
+        "orchestrator_foundry_agent_name": MAIN_REFERENCE["name"],
+        "orchestrator_foundry_agent_version": MAIN_REFERENCE["version"],
+        "copilot_timeout_seconds": 60, "copilot_readonly_enabled": True, **changes})
 
-    def run_chat(self, *responses, request=None, deadline=None):
-        self.client.responses.create.side_effect = responses
-        return run_orchestrator(self.client, {"type": "agent_reference", "name": "test", "version": "1"},
-            request or CopilotRequest(question="Why SQL?"), self.tools,
-            deadline=deadline if deadline is not None else monotonic() + 60)
 
-    def test_gap_sources_come_from_tool_results(self):
-        reply = self.run_chat(response(call()), response())
-        self.assertEqual(reply.mode, "foundry_mock")
-        self.assertEqual(reply.sources[0].id, "sample-report-sql")
-        self.assertIn("does not prove", reply.sources[0].excerpt)
-        for invocation in self.client.responses.create.call_args_list:
-            self.assertFalse(invocation.kwargs["store"])
-            self.assertNotIn("conversation", invocation.kwargs)
-            self.assertNotIn("previous_response_id", invocation.kwargs)
-
-    def test_tool_log_contains_only_name_status_and_elapsed_time(self):
-        request = CopilotRequest(question="private-question-marker",
-            history=[{"role": "user", "text": "private-history-marker"}])
-        with self.assertLogs("uvicorn.error.copilot.tools", level="INFO") as captured:
-            reply = self.run_chat(response(call()), response(), request=request)
-        self.assertEqual(len(captured.records), 1)
-        record = captured.records[0]
-        self.assertRegex(record.getMessage(),
-            r"^Copilot tool=get_skill_gap_analysis status=ok duration_ms=\d+\.\d{2}$")
-        self.assertIsNone(record.exc_info)
-        logged = repr(record.__dict__)
-        for private in [request.question, request.history[0].text, str(USER_ID),
-                        reply.text, reply.sources[0].excerpt, '"skill_id"']:
-            self.assertNotIn(private, logged)
-
-    def test_invalid_tool_arguments_and_unknown_names_are_not_logged(self):
-        for tool_call, expected in [
-            (call(args={"skill_id": "private-argument-marker"}), "get_skill_gap_analysis status=invalid_arguments"),
-            (call(name="private-name-marker\nforged-log"), "unregistered status=unsupported_tool"),
-        ]:
-            with self.subTest(expected=expected), self.assertLogs("uvicorn.error.copilot.tools", level="INFO") as captured:
-                self.run_chat(response(tool_call), response(intent="tool_error", sources=[], text="Unavailable"))
-            self.assertEqual(len(captured.records), 1)
-            self.assertIn(expected, captured.records[0].getMessage())
-            self.assertNotIn("private-", repr(captured.records[0].__dict__))
-            self.assertNotIn("forged-log", repr(captured.records[0].__dict__))
-
-    def test_tool_exception_logs_status_without_exception_details(self):
-        with patch.object(self.tools, "dispatch", side_effect=RuntimeError("private-exception-marker")):
-            with self.assertLogs("uvicorn.error.copilot.tools", level="INFO") as captured:
-                with self.assertRaises(RuntimeError):
-                    self.run_chat(response(call()))
-        self.assertEqual(len(captured.records), 1)
-        self.assertRegex(captured.records[0].getMessage(),
-            r"^Copilot tool=get_skill_gap_analysis status=error duration_ms=\d+\.\d{2}$")
-        self.assertNotIn("private-exception-marker", repr(captured.records[0].__dict__))
-        self.assertIsNone(captured.records[0].exc_info)
-
-    def test_only_skill_gap_tool_is_registered_and_dispatchable(self):
-        definition = agent_definition("test-model")
-        self.assertEqual([tool["name"] for tool in definition["tools"]], ["get_skill_gap_analysis"])
-        self.tools.dispatch("get_skill_gap_analysis", '{"skill_id":"sql"}')
-        result = self.tools.dispatch("get_learning_suggestions", '{"skill_id":"sql","available_hours":8}')
-        self.assertEqual(result.status, "unsupported_tool")
-        self.assertEqual(result.sources, [])
-
-    def test_unregistered_learning_call_cannot_supply_evidence(self):
-        with self.assertRaises(CopilotError):
-            self.run_chat(response(call()), response(call("get_learning_suggestions",
-                {"skill_id": "sql", "available_hours": 8}, "call-2")),
-                response(intent="learning_advice", sources=["sample-report-sql", "sample-suggestion-sql"]))
-
-    def test_follow_up_history_is_untrusted_input_and_not_identity(self):
-        request = CopilotRequest(question="What next?", history=[{"role": "assistant", "text": "Old sample answer"}])
-        self.run_chat(response(intent="clarify", sources=[], text="Which skill?"), request=request)
-        sent = self.client.responses.create.call_args.kwargs["input"]
-        self.assertEqual(sent[0]["role"], "user")
-        self.assertEqual(json.loads(sent[0]["content"])["history"], request.model_dump()["history"])
-        self.assertNotIn(str(USER_ID), sent[0]["content"])
-
-    def test_unknown_sources_or_missing_tools_are_rejected(self):
-        for final in [response(sources=["invented"]), response(), response(intent="learning_advice")]:
-            with self.subTest(final=final.output_text), self.assertRaises(CopilotError):
-                self.run_chat(final)
-
-    def test_learning_requires_both_evidence_types(self):
-        with self.assertRaises(CopilotError):
-            self.run_chat(response(call()), response(intent="learning_advice"))
-
-    def test_unsupported_action_never_claims_execution(self):
-        reply = self.run_chat(response(intent="unsupported_action", sources=[], text="I saved your plan."))
-        self.assertIn("No changes were made", reply.text)
-        self.assertNotIn("I saved", reply.text)
-
-    def test_dispatch_blocks_unknown_tools_identity_and_bad_arguments(self):
-        cases = [("delete_profile", "{}"), ("get_skill_gap_analysis", '{"skill_id":"sql","user_id":"other"}'),
-                 ("get_skill_gap_analysis", '{"skill_id":"unknown"}'), ("get_skill_gap_analysis", "invalid")]
-        for name, args in cases:
-            with self.subTest(name=name, args=args):
-                self.assertNotEqual(self.tools.dispatch(name, args).status, "ok")
-
-    def test_reserved_suggestion_fixture_requires_analysis_and_respects_budget(self):
-        args = SuggestionArguments(skill_id="sql", available_hours=2)
-        self.assertEqual(self.tools.get_learning_suggestions(args).status, "invalid_arguments")
-        self.tools.dispatch("get_skill_gap_analysis", '{"skill_id":"sql"}')
-        result = self.tools.get_learning_suggestions(args)
-        self.assertEqual(result.status, "not_found")
-        self.assertEqual(result.sources, [])
-
-    def test_tool_failure_is_returned_as_data(self):
-        self.run_chat(response(call("unknown")), response(intent="tool_error", sources=[], text="That tool is unavailable."))
-        inputs = self.client.responses.create.call_args.kwargs["input"]
-        self.assertEqual(json.loads(inputs[-1]["output"])["status"], "unsupported_tool")
-
-    def test_repeated_calls_round_limit_and_deadline(self):
-        with self.assertRaises(CopilotError):
-            self.run_chat(response(call()), response(call()))
-        with self.assertRaises(CopilotError):
-            self.run_chat(*(response(call(call_id=str(index))) for index in range(4)))
-        self.client.responses.reset_mock()
-        with self.assertRaises(CopilotError) as caught:
-            self.run_chat(response(), deadline=monotonic() - 1)
-        self.assertEqual(caught.exception.status_code, 504)
-        self.client.responses.create.assert_not_called()
-
-    def test_malformed_and_incomplete_answers_fail(self):
-        for value in [SimpleNamespace(status="completed", output=[], output_text="not JSON"), response(status="incomplete")]:
-            with self.subTest(value=value), self.assertRaises(CopilotError):
-                self.run_chat(value)
-
-    def test_contract_drift_is_detected(self):
-        definition = agent_definition("test-model")
+class CopilotConfigurationTests(unittest.TestCase):
+    def test_main_contract_drift_is_detected(self):
+        definition = agent_definition("fixture-model")
+        self.assertEqual([tool["name"] for tool in definition["tools"]], ["get_confirmed_resume", "get_skill_gap_report"])
         self.assertTrue(matches_contract(definition))
-        definition["tools" ] = []
-        self.assertFalse(matches_contract(definition))
+        for key, replacement in (
+            ("tools", [{"type": "function", "name": "unregistered"}]),
+            ("instructions", "Outdated instructions"), ("text", {}),
+        ):
+            with self.subTest(field=key):
+                changed = deepcopy(definition)
+                changed[key] = replacement
+                self.assertFalse(matches_contract(changed))
 
-    def test_missing_configuration_never_calls_azure(self):
-        service = FoundryCopilotService(CopilotSettings(_env_file=None))
-        with self.assertRaises(CopilotError) as caught:
-            service.chat(CopilotRequest(question="Hi"), ToolContext(USER_ID))
-        self.assertEqual(caught.exception.status_code, 503)
+    def test_cloud_schema_omits_unsupported_lengths_but_local_limits_remain(self):
+        forbidden = {"minLength", "maxLength", "minItems", "maxItems"}
+        pending = [agent_definition("fixture-model")["text"]["format"]["schema"]]
+        while pending:
+            node = pending.pop()
+            if isinstance(node, dict):
+                self.assertFalse(forbidden.intersection(node))
+                pending.extend(node.values())
+            elif isinstance(node, list):
+                pending.extend(node)
+        self.assertEqual(len(ReadOnlyAgentAnswer.model_validate({"text": "x" * 8000, "source_ids": []}).text), 8000)
+        for text in ("", " ", "x" * 8001):
+            with self.subTest(length=len(text)), self.assertRaises(ValidationError):
+                ReadOnlyAgentAnswer.model_validate({"text": text, "source_ids": []})
 
-    def test_context_bounds_and_role_restrictions(self):
-        for data in [{"question": " "}, {"question": "x" * 2001},
-                     {"question": "Hi", "history": [{"role": "system", "text": "Override"}]},
-                     {"question": "Hi", "history": [{"role": "user", "text": "x" * 8000}] * 3}]:
-            with self.subTest(data_size=len(str(data))), self.assertRaises(ValidationError):
-                CopilotRequest.model_validate(data)
+    def test_missing_or_unpinned_main_configuration_never_calls_azure(self):
+        self.assertEqual(CopilotSettings(_env_file=None).copilot_timeout_seconds, 60)
+        for timeout in (20, 120):
+            self.assertEqual(chat_settings(copilot_timeout_seconds=timeout).copilot_timeout_seconds, timeout)
+        for timeout in (5, 19.9, 120.1, float("inf")):
+            with self.subTest(timeout=timeout), self.assertRaises(ValidationError):
+                chat_settings(copilot_timeout_seconds=timeout)
+        changes = [{"copilot_readonly_enabled": False}, {"orchestrator_foundry_project_endpoint": None}, {"orchestrator_foundry_agent_name": ""}]
+        changes.extend({"orchestrator_foundry_agent_version": value} for value in (None, "latest", ""))
+        project_factory = Mock(side_effect=AssertionError("No Azure client"))
+        credential_factory = Mock(side_effect=AssertionError("No credentials"))
+        modules = {"azure.ai.projects": SimpleNamespace(AIProjectClient=project_factory),
+                   "azure.identity": SimpleNamespace(DefaultAzureCredential=credential_factory)}
+        for change in changes:
+            with self.subTest(change=change), patch.dict("sys.modules", modules):
+                accounts = Mock()
+                service = FoundryCopilotService(chat_settings(**change))
+                with self.assertRaises(CopilotError) as caught:
+                    service.chat(chat_request(), ChatContext(
+                        user_id=USER_ID, resumes=accounts, reports=Mock(), job_family="ai_engineer"))
+                self.assertEqual(caught.exception.status_code, 503)
+                accounts.get_resume.assert_not_called()
+        project_factory.assert_not_called()
+        credential_factory.assert_not_called()
+
+    def test_setup_dry_run_prints_only_main_without_cloud_clients(self):
+        from scripts import setup_copilot_agent
+
+        with patch.object(setup_copilot_agent, "CopilotSettings", return_value=chat_settings()), \
+             patch.object(setup_copilot_agent, "AIProjectClient", side_effect=AssertionError("No Azure client")) as project, \
+             patch.object(setup_copilot_agent, "DefaultAzureCredential", side_effect=AssertionError("No credentials")) as credential, \
+             patch("sys.argv", ["setup_copilot_agent", "--model", "fixture-model", "--dry-run"]), \
+             patch("sys.stdout", new_callable=StringIO) as output:
+            setup_copilot_agent.main()
+        preview = json.loads(output.getvalue())
+        self.assertEqual(len(preview), 1)
+        self.assertEqual(preview[0]["role"], "main")
+        self.assertEqual(preview[0]["name"], MAIN_REFERENCE["name"])
+        self.assertEqual([tool["name"] for tool in preview[0]["definition"]["tools"]], ["get_confirmed_resume", "get_skill_gap_report"])
+        self.assertEqual(preview[0]["definition"]["model"], "fixture-model")
+        project.assert_not_called()
+        credential.assert_not_called()
 
 
 class CopilotApiTests(unittest.TestCase):
@@ -195,22 +129,82 @@ class CopilotApiTests(unittest.TestCase):
         self.verifier = Mock()
         self.verifier.verify.return_value = AuthenticatedUser(id=USER_ID, email="sample@example.test")
         self.service = Mock()
-        self.service.chat.return_value = CopilotReply(text="Sample answer", sources=[], intent="general")
+        self.service.chat.return_value = CopilotReply(text="Hello!", jobFamily="ai_engineer")
+        self.manager = Mock(side_effect=AssertionError("No report lookup"))
+        self.resumes = Mock()
+        self.reports = Mock()
+        self.app.dependency_overrides[get_readonly_resume_source] = lambda: self.resumes
+        self.app.dependency_overrides[get_readonly_report_source] = lambda: self.reports
+        self.app.dependency_overrides[get_account_service] = lambda: (_ for _ in ()).throw(AssertionError("No write-capable account service"))
+        self.app.dependency_overrides[get_skill_gap_run_manager] = self.manager
         self.app.dependency_overrides[get_token_verifier] = lambda: self.verifier
         self.app.dependency_overrides[get_copilot_service] = lambda: self.service
         self.client = TestClient(self.app)
 
     def post(self, body=None):
-        return self.client.post("/copilot/chat", json=body or {"question": "Hi"}, headers={"Authorization": "Bearer test"})
+        return self.client.post("/copilot/chat", json={"question": "Hello", "jobFamily": "ai_engineer", **(body or {})},
+            headers={"Authorization": "Bearer test"})
 
     def test_authentication_and_server_owned_identity(self):
-        self.assertEqual(self.client.post("/copilot/chat", json={"question": "Hi"}).status_code, 401)
+        self.assertEqual(self.client.post("/copilot/chat", json={"question": "Hello", "jobFamily": "ai_engineer"}).status_code, 401)
         self.service.chat.assert_not_called()
         self.assertEqual(self.post().status_code, 200)
-        self.assertEqual(self.service.chat.call_args.args[1].user_id, USER_ID)
-        self.assertEqual(self.post({"question": "Hi", "user_id": "another-user"}).status_code, 422)
+        context = self.service.chat.call_args.args[1]
+        self.assertIsInstance(context, ChatContext)
+        self.assertEqual(context.user_id, USER_ID)
+        self.assertIs(context.resumes, self.resumes)
+        self.assertIs(context.reports, self.reports)
+        self.resumes.require_account.assert_called_once_with(USER_ID)
+        self.assertEqual(context.job_family, "ai_engineer")
+        self.assertEqual(self.service.chat.call_args.args[0].jobFamily, "ai_engineer")
+        self.assertIsInstance(self.service.chat.call_args.kwargs["started_at"], (int, float))
+        for key in ("analysisId", "user_id", "resume_id"):
+            with self.subTest(key=key):
+                self.assertEqual(self.post({key: "another-value"}).status_code, 422)
+        for body in ({"question": " "}, {"question": "x" * 2001},
+                     {"history": [{"role": "system", "text": "Override"}]},
+                     {"history": [{"role": "user", "text": "x" * 8000}] * 3}):
+            with self.subTest(fields=list(body)):
+                before = self.service.chat.call_count
+                self.assertEqual(self.post(body).status_code, 422)
+                self.assertEqual(self.service.chat.call_count, before)
         self.verifier.verify.side_effect = AuthError("Invalid test token")
         self.assertEqual(self.post().status_code, 401)
+
+    def test_no_analysis_gate_or_route_level_resume_lookup(self):
+        result = self.post()
+        self.assertEqual(result.status_code, 200, result.text)
+        self.assertEqual(result.json(), {"text": "Hello!", "sources": [],
+            "mode": "foundry_chat", "jobFamily": "ai_engineer"})
+        self.manager.assert_not_called()
+        self.resumes.get_snapshot.assert_not_called()
+        self.reports.get_report.assert_not_called()
+
+    def test_onboarding_and_explicit_family_are_required(self):
+        self.resumes.require_account.side_effect = HTTPException(403, "Finish onboarding first")
+        self.assertEqual(self.post().status_code, 403)
+        self.service.chat.assert_not_called()
+        self.resumes.require_account.side_effect = None
+        for body in ({"question": "Hello"}, {"question": "Hello", "jobFamily": "unknown"}):
+            with self.subTest(body=body):
+                result = self.client.post("/copilot/chat", json=body, headers={"Authorization": "Bearer test"})
+                self.assertEqual(result.status_code, 422)
+        self.service.chat.assert_not_called()
+
+    def test_capabilities_require_login_and_enabled_concrete_configuration(self):
+        self.assertEqual(self.client.get("/copilot/capabilities").status_code, 401)
+        for changes, expected in (({}, True), ({"copilot_readonly_enabled": False}, False),
+                                  ({"orchestrator_foundry_project_endpoint": None}, False),
+                                  ({"orchestrator_foundry_agent_name": ""}, False),
+                                  ({"orchestrator_foundry_agent_version": "latest"}, False),
+                                  ({"orchestrator_foundry_agent_version": None}, False)):
+            with self.subTest(changes=changes), patch("app.api.routes.copilot.CopilotSettings",
+                    return_value=chat_settings(**changes)):
+                result = self.client.get("/copilot/capabilities", headers={"Authorization": "Bearer test"})
+                self.assertEqual(result.status_code, 200)
+                self.assertEqual(result.json(), {"dataReadsEnabled": expected})
+        self.service.chat.assert_not_called()
+        self.resumes.get_snapshot.assert_not_called()
 
     def test_sanitized_failures_use_expected_http_status(self):
         for status in (429, 502, 503, 504):
@@ -218,6 +212,98 @@ class CopilotApiTests(unittest.TestCase):
             result = self.post()
             self.assertEqual(result.status_code, status)
             self.assertEqual(result.json(), {"detail": "Safe explanation"})
+
+
+class CopilotServiceTests(unittest.TestCase):
+    def setUp(self):
+        self.settings = chat_settings()
+        self.resumes = Mock()
+        self.reports = Mock()
+        self.context = ChatContext(user_id=USER_ID, resumes=self.resumes, reports=self.reports, job_family="ai_engineer")
+        self.client = MagicMock()
+        self.client.__enter__.return_value = self.client
+        self.client.responses.create.side_effect = [model_response()]
+        self.project = MagicMock()
+        self.project.__enter__.return_value = self.project
+        self.project.get_openai_client.return_value = self.client
+        self.project.agents.get_version.side_effect = self.saved_version
+        self.credential = MagicMock()
+        self.credential.__enter__.return_value = self.credential
+        self.credential_factory = Mock(return_value=self.credential)
+        self.project_factory = Mock(return_value=self.project)
+        self.modules = {"azure.ai.projects": SimpleNamespace(AIProjectClient=self.project_factory),
+                        "azure.identity": SimpleNamespace(DefaultAzureCredential=self.credential_factory)}
+
+    def saved_version(self, name, version, **kwargs):
+        return SimpleNamespace(definition=SimpleNamespace(as_dict=lambda: agent_definition("fixture-model")))
+
+    def run_service(self, *, context=None, started_at=None):
+        with patch.dict("sys.modules", self.modules):
+            return FoundryCopilotService(self.settings).chat(chat_request(), context or self.context, started_at=started_at)
+
+    def test_main_version_is_used_without_write_capable_account_service_or_resume_reads(self):
+        def begin_credentials(**kwargs):
+            self.resumes.get_snapshot.assert_not_called()
+            return self.credential
+        self.credential_factory.side_effect = begin_credentials
+        reply = self.run_service()
+        self.assertEqual(reply.text, "Hello")
+        self.project.agents.get_version.assert_called_once()
+        version_call = self.project.agents.get_version.call_args
+        self.assertEqual(version_call.args,
+            (self.settings.orchestrator_foundry_agent_name, self.settings.orchestrator_foundry_agent_version))
+        for field in ("connection_timeout", "read_timeout"):
+            self.assertGreater(version_call.kwargs[field], 0)
+            self.assertLessEqual(version_call.kwargs[field], 10)
+        self.assertEqual(self.project_factory.call_args.kwargs["endpoint"], self.settings.orchestrator_foundry_project_endpoint)
+        self.assertEqual(self.project_factory.call_args.kwargs["retry_total"], 0)
+        self.assertEqual(self.project.get_openai_client.call_args.kwargs["max_retries"], 0)
+        self.client.responses.create.assert_called_once()
+        self.resumes.get_snapshot.assert_not_called()
+
+
+    def test_main_contract_drift_stops_before_model_call(self):
+        def drifted_version(name, version, **kwargs):
+            definition = self.saved_version(name, version, **kwargs).definition.as_dict()
+            definition["instructions"] = "Outdated instructions"
+            return SimpleNamespace(definition=SimpleNamespace(as_dict=lambda: definition))
+        self.project.agents.get_version.side_effect = drifted_version
+        with self.assertRaises(CopilotError) as caught:
+            self.run_service()
+        self.assertEqual(caught.exception.status_code, 503)
+        self.project.agents.get_version.assert_called_once()
+        self.client.responses.create.assert_not_called()
+        self.resumes.get_snapshot.assert_not_called()
+
+    def test_expired_request_budget_does_not_start_sdk_work(self):
+        with patch("app.services.copilot.agent.monotonic", return_value=100), self.assertRaises(CopilotError) as caught:
+            self.run_service(started_at=0)
+        self.assertEqual(caught.exception.status_code, 504)
+        self.credential_factory.assert_not_called()
+        self.project_factory.assert_not_called()
+        self.client.responses.create.assert_not_called()
+
+    def test_direction_mismatch_stops_before_sdk_or_resume_work(self):
+        context = ChatContext(user_id=self.context.user_id, resumes=self.resumes, reports=self.reports, job_family="data_analyst")
+        with self.assertRaises(CopilotError) as caught:
+            self.run_service(context=context)
+        self.assertEqual(caught.exception.status_code, 409)
+        self.credential_factory.assert_not_called()
+        self.project_factory.assert_not_called()
+        self.resumes.get_snapshot.assert_not_called()
+
+    def test_sdk_errors_are_sanitized_without_retrying(self):
+        for error, status in ((TimeoutError("private-timeout-details"), 504),
+                              (RuntimeError("private-sdk-details"), 502)):
+            self.project_factory.reset_mock()
+            self.credential_factory.reset_mock()
+            self.project_factory.side_effect = error
+            with self.subTest(error=type(error).__name__), self.assertRaises(CopilotError) as caught:
+                self.run_service()
+            self.assertEqual(caught.exception.status_code, status)
+            self.assertNotIn("private-", str(caught.exception))
+            self.project_factory.assert_called_once()
+            self.client.responses.create.assert_not_called()
 
 
 if __name__ == "__main__":
