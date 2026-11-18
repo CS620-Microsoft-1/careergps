@@ -57,9 +57,9 @@ def unmark_course_taken(course_id: str, user: User = Depends(get_current_db_user
 def resume_course_matches(job_family: JobFamily, user: User = Depends(get_current_db_user),
                           accounts: AccountService = Depends(get_account_service),
                           db: Session = Depends(get_db)) -> ResumeCourseMatches:
-    """Listed courses whose name appears where the role's résumé lists courses and that aren't
-    marked taken yet. Only a suggestion: nothing is written until the student confirms (PUT for
-    each course)."""
+    """Listed courses whose name or code appears where the role's résumé lists courses and that
+    aren't marked taken yet. Only a suggestion: nothing is written until the student confirms (PUT
+    for each course)."""
     resume = accounts.get_resume(user, job_family)
     if resume is None:
         return ResumeCourseMatches(course_ids=[])

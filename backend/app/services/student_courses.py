@@ -3,8 +3,8 @@
 A taken course stays in /resources (the plan needs it) and the browser hides it from the lists;
 skill-gap scores don't change. The résumé match is plain regex, no model call: it only suggests
 courses, and the student confirms before anything is written. Courses are found by name
-("Operating Systems"), and only where the résumé lists courses, because many names are also
-everyday phrases ("Machine Learning"). Course codes ("CS 400") are not looked for.
+("Operating Systems") or by code ("CS 400"), and only where the résumé lists courses, because
+many names are also everyday phrases ("Machine Learning").
 """
 from collections.abc import Iterable, Iterator
 import logging
@@ -26,6 +26,11 @@ logger = logging.getLogger(__name__)
 _COURSE_LIST = re.compile(r"\b(?:coursework|courses)\b", re.IGNORECASE)
 # Students drop it: "Operating Systems" for "Introduction to Operating Systems".
 _INTRO = re.compile(r"^introduction to ")
+# Other ways students write a subject code (after removing spaces and dots).
+_SUBJECT_ALIASES = {"COMPSCI": ("CS", "CMPSCI", "COMPSCI"), "STAT": ("STATS", "STATISTICS"), "ECE": ("ECE",)}
+_NUMBER = r"(?<!\d)\d{3}(?!\d)"
+# "COMP SCI 400, 540 and 577" → 400, 540, 577
+_LIST_TAIL = rf"(?:\s*(?:,|/|&|\band\b|\bor\b)\s*{_NUMBER})*"
 
 
 def list_taken(session: Session, user_id: uuid.UUID) -> list[StudentCourse]:
@@ -122,20 +127,60 @@ def _number(course: dict) -> tuple[int, str]:
     return (int(match.group(1)) if match else 10**6), course["id"]
 
 
+def _key(text: str) -> str:
+    return re.sub(r"[\s.]", "", text.upper())
+
+
+def _subject_pattern(subject: str) -> str:
+    """"COMP SCI" → a regex that also matches "COMPSCI", "Comp. Sci." and the aliases."""
+    key = _key(subject)
+    spelled = r"[\s.]*".join(re.escape(char) for char in key)
+    aliases = [re.escape(alias) for alias in _SUBJECT_ALIASES.get(key, ()) if alias != key]
+    return "|".join([spelled, *aliases])
+
+
+def _codes(course: dict) -> Iterator[tuple[str, str]]:
+    """(subject, number) for each listing: "COMP SCI/E C E 552" → ("COMP SCI", "552"), ("E C E", "552")."""
+    # Courses added by hand have no course_code; their title starts with it ("STAT 240: …").
+    code = course.get("course_code") or course.get("title", "").split(":")[0]
+    match = re.fullmatch(r"\s*(.+?)\s+(\d{3})\s*", code)
+    if match:
+        for subject in match.group(1).split("/"):
+            yield subject.strip(), match.group(2)
+
+
+def _code_matches(course_lists: list[str], courses: list[dict]) -> set[str]:
+    """Ids of the courses whose code appears in the course lists: "CS 400", "Comp. Sci. 400, 540"."""
+    by_code: dict[tuple[str, str], set[str]] = {}
+    patterns: dict[str, str] = {}
+    for course in courses:
+        for subject, number in _codes(course):
+            by_code.setdefault((_key(subject), number), set()).add(course["id"])
+            patterns[_key(subject)] = _subject_pattern(subject)
+    found: set[str] = set()
+    text = "\n".join(course_lists)
+    for subject, pattern in patterns.items():
+        for match in re.finditer(rf"(?<![A-Za-z])(?:{pattern})[\s.]*({_NUMBER}{_LIST_TAIL})", text, re.IGNORECASE):
+            for number in re.findall(_NUMBER, match.group(1)):
+                found |= by_code.get((subject, number), set())
+    return found
+
+
 def match_courses(course_lists: Iterable[str], courses: Iterable[dict]) -> list[dict]:
-    """Courses whose name appears in the course lists (course_list_strings), in course order.
+    """Courses whose name or code appears in the course lists (course_list_strings), in course
+    order. A code is any way students write it ("CS 400", "COMP SCI 400, 540 and 577"). A name:
 
     - Whole words only, inside one list item. A one-word name ("Algorithms") must be the whole item.
     - A name inside a longer matched name doesn't count: "Matrix Methods in Machine Learning" is
       not also "Machine Learning".
     - A name several courses share ("Computer Vision": 566 and 766) gives the lowest-numbered one.
     """
-    courses = list(courses)
+    courses, course_lists = list(courses), list(course_lists)
     by_name: dict[str, list[dict]] = {}
     for course in courses:
         for name in _names(course):
             by_name.setdefault(name, []).append(course)
-    found: set[str] = set()
+    found = _code_matches(course_lists, courses)
     for text in course_lists:
         key = _name_key(text)
         spans = []

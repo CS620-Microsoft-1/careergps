@@ -275,7 +275,7 @@ app/
     ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
     ├── catalog_writes.py    # writes them: seed script and catalog refresh
     ├── course_listing.py    # hides school courses not taught in the last four semesters
-    ├── student_courses.py   # taken courses + finding course codes in a résumé
+    ├── student_courses.py   # taken courses + finding course names and codes in a résumé
     ├── uw_courses.py        # UW–Madison course guide data (data/uw_courses) as catalog entries
     ├── resume_children.py   # builds the résumé child table rows from confirmed_data
     └── postings/            # job board adapters (Greenhouse, Ashby, Lever) and daily ingest
@@ -1016,21 +1016,22 @@ scores don't change.
 - `GET /me/courses`, `PUT /me/courses/{course_id}` (`{"source": "manual" | "resume"}`, optional),
   `DELETE /me/courses/{course_id}`. `PUT` answers 404 for a course that isn't in `school_courses`
   or that belongs to another school than the student's university.
-- `GET /me/courses/resume-matches?job_family=…`: listed courses whose name appears where that
-  role's résumé lists courses, not taken yet. A regex, no model call; nothing is saved until the
-  student confirms. "Not now" is remembered in the browser only (`localStorage`, one list per
-  account), so the question comes back on another device.
+- `GET /me/courses/resume-matches?job_family=…`: listed courses whose name or code appears where
+  that role's résumé lists courses, not taken yet. A regex, no model call; nothing is saved until
+  the student confirms. "Not now" is remembered in the browser only (`localStorage`, one list
+  per account), so the question comes back on another device.
   - Where: the text under an education entry, and any other text that says "coursework" or
     "courses". Many names are everyday phrases ("Machine Learning"), so the skills and project
     sections are not searched.
+  - Codes: "CS 400", "COMP SCI 400", "Comp. Sci. 400, 540 and 577", in the same text.
   - How names compare: case and punctuation don't matter, a leading "Introduction to" / "Intro
     to" may be left out, and the part before a colon is enough ("Database Management Systems").
     A one-word name ("Algorithms") must be a whole list item. A name inside a longer matched
     name doesn't count ("Matrix Methods in Machine Learning" is not also "Machine Learning"). A
     name two courses share ("Computer Vision": 566 and 766) gives the lowest-numbered one.
-  - Not found: course codes ("CS 400") and shortened names ("Databases", "Data Structures"). A
-    sentence under an education entry that uses a course name ("built a machine learning model")
-    is found by mistake; the student answers "Not now".
+  - Not found: shortened names ("Databases", "Data Structures"). A sentence under an education
+    entry that uses a course name ("built a machine learning model") is found by mistake; the
+    student answers "Not now".
 
 ## Changing the schema
 

@@ -1,4 +1,4 @@
-"""Taken courses: the résumé course name match, the /me/courses API and the plan "done" hook.
+"""Taken courses: the résumé course name and code match, the /me/courses API and the plan "done" hook.
 No database: the student_courses storage functions are replaced with an in-memory dict
 (tests/test_student_courses_postgres.py covers the real table)."""
 from datetime import UTC, datetime
@@ -80,9 +80,56 @@ class MatchCourseNamesTests(unittest.TestCase):
         self.assertEqual(["Operating Systems", "Relevant Coursework: Database Management Systems"],
                          list(course_list_strings(data)))
         found = match_courses(course_list_strings(data), NAMED)
-        # Not the names in the major, the skills or the project, and not the course code.
+        # Not the names in the major or the skills, and neither the name nor the code in the project.
         self.assertEqual(["uw-cs-537", "uw-cs-564"], [course["id"] for course in found])
         self.assertEqual([], list(course_list_strings(None)))
+
+
+def _coded(course_id, code=None, title=None):
+    return {"id": course_id, "course_code": code, "title": title or f"{code}: A course"}
+
+
+CODED = [
+    _coded("uw-cs-400", "COMP SCI 400"),
+    _coded("uw-cs-540", "COMP SCI 540"),
+    _coded("uw-cs-552", "COMP SCI/E C E 552"),
+    _coded("uw-cs-577", "COMP SCI 577", "COMP SCI 577: Introduction to Algorithms"),
+    _coded("uw-stat-240", title="STAT 240: Data Science Modeling I"),
+]
+
+
+class MatchCourseCodesTests(unittest.TestCase):
+    def ids(self, *course_lists):
+        return [course["id"] for course in match_courses(course_lists, CODED)]
+
+    def test_matches_the_ways_students_write_codes(self) -> None:
+        self.assertEqual(["uw-cs-400", "uw-cs-540", "uw-cs-577"], self.ids("Coursework: CS 400, CS 540, CS 577"))
+        self.assertEqual(["uw-cs-400"], self.ids("Relevant coursework: COMP SCI 400"))
+        self.assertEqual(["uw-cs-400"], self.ids("CS400 (Programming III)"))
+        self.assertEqual(["uw-cs-400"], self.ids("Comp. Sci. 400"))
+        self.assertEqual(["uw-cs-400"], self.ids("compsci 400"))
+        self.assertEqual(["uw-cs-552"], self.ids("ECE 552 Computer Architecture"))
+        self.assertEqual(["uw-stat-240"], self.ids("Stat 240"))
+
+    def test_matches_lists_after_one_subject(self) -> None:
+        self.assertEqual(["uw-cs-400", "uw-cs-540", "uw-cs-577"], self.ids("CS 400, 540 and 577"))
+        self.assertEqual(["uw-cs-400", "uw-cs-540"], self.ids("COMP SCI 540/400"))
+
+    def test_ignores_other_numbers_and_words(self) -> None:
+        self.assertEqual([], self.ids("GPA 3.400", "Class of 2027", "Physics 400", "CS 4000", "ABCS 400"))
+        self.assertEqual([], self.ids("CS 999"))
+
+    def test_codes_and_names_combine(self) -> None:
+        self.assertEqual(["uw-cs-400", "uw-cs-577", "uw-stat-240"],
+                         self.ids("Coursework: CS 400, Algorithms", "COMP SCI 577: Introduction to Algorithms",
+                                  "Data Science Modeling I"))
+
+    def test_codes_count_only_in_course_lists(self) -> None:
+        data = {"education": [{"institution": "UW", "content": ["Coursework: CS 577"]}], "technical_skills": ["Python"],
+                "projects": [{"content": ["Built a compiler for COMP SCI 540"]}],
+                "other": ["Coursework: CS 400"]}
+        self.assertEqual(["uw-cs-400", "uw-cs-577"],
+                         [course["id"] for course in match_courses(course_list_strings(data), CODED)])
 
 
 class _TakenStore:
@@ -127,7 +174,7 @@ class TakenCoursesApiTests(unittest.TestCase):
         self.user_id = uuid.uuid4()
         self.headers = {"Authorization": f"Bearer {make_token(key, sub=str(self.user_id), email='ada@example.com')}"}
         body = onboarding_body()
-        body["resume"]["classification"]["education"][0]["content"] = ["Relevant coursework: Database Management Systems, Programming III"]
+        body["resume"]["classification"]["education"][0]["content"] = ["Relevant coursework: Database Management Systems, CS 400"]
         self.assertEqual(201, self.client.post("/me", json=body, headers=self.headers).status_code)
 
     def tearDown(self) -> None:
@@ -173,7 +220,7 @@ class TakenCoursesApiTests(unittest.TestCase):
             self.assertEqual(200, response.status_code, response.text)
             return response.json()["course_ids"]
 
-        # Programming III (COMP SCI 400) closes no data analyst skill, so only COMP SCI 564 is listed for this role.
+        # COMP SCI 400 closes no data analyst skill, so only COMP SCI 564 is listed for this role.
         self.assertEqual(["uw-cs-564"], matches())
         self.client.put("/me/courses/uw-cs-564", json={"source": "resume"}, headers=self.headers)
         self.assertEqual([], matches())
