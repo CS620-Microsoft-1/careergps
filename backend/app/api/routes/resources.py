@@ -57,7 +57,8 @@ def save_plan_item(resource_id: str, data: PlanItemUpdate, user: User = Depends(
     if entry is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found for this role")
     try:
-        item = PlanItem.model_validate(store.set_status(user.id, data.job_family, resource_id, data.status))
+        item = PlanItem.model_validate(store.set_status(user.id, data.job_family, resource_id, data.status,
+                                                        data.position))
     except OSError:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Plan storage is unavailable") from None
     if data.status == "done" and entry["type"] == "school_course":

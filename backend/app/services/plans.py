@@ -36,13 +36,17 @@ class LocalPlanStore:
             saved = self._read(user_id)["families"].get(family, {})
         return [{"resource_id": key, **value} for key, value in saved.items()]
 
-    def set_status(self, user_id: UUID, family: str, resource_id: str, status: str) -> dict:
+    def set_status(self, user_id: UUID, family: str, resource_id: str, status: str,
+                   position: int | None = None) -> dict:
+        """Save or update an item. position (from a suggested action plan) is kept until replaced."""
         with self._lock:
             data = self._read(user_id)
             saved = data["families"].setdefault(family, {})
             item = saved.get(resource_id) or {"saved_at": _now()}
             item["status"] = status
             item["done_at"] = (item.get("done_at") or _now()) if status == "done" else None
+            if position is not None:
+                item["position"] = position
             saved[resource_id] = item
             save_json(self._path(user_id), data)
         return {"resource_id": resource_id, **item}

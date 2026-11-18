@@ -36,10 +36,12 @@ class PlanItem(BaseModel):
     status: PlanStatus
     saved_at: str
     done_at: str | None = None
+    # Place in a suggested action plan (1 = first step). None: ordered by the gap ranking.
+    position: int | None = None
 
 
 class Plan(BaseModel):
-    """Saved resources for one role. The order is chosen in the browser from the gap ranking."""
+    """Saved resources for one role. The browser orders them by position when set, else by the gap ranking."""
 
     job_family: JobFamily
     items: list[PlanItem]
@@ -50,6 +52,8 @@ class PlanItemUpdate(BaseModel):
 
     job_family: JobFamily
     status: PlanStatus = "saved"
+    # Set when saving a suggested action plan; omitted keeps the item's current position.
+    position: int | None = Field(default=None, ge=1)
 
 
 # Project recommendations from the resources agent (app/services/resources_agent.py).
