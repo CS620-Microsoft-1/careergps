@@ -95,7 +95,7 @@ export async function mockApi(page: Page, options: Options = {}) {
       return { status: 204 };
     }
     if (method === "POST" && path === "/certifications/recommendations") {
-      return ok({ job_family: family, skill_gap_run_id: run.id, source: "rules", generated_at: run.created_at,
+      return ok({ job_family: family, skill_gap_run_id: run.id, generated_at: run.created_at,
         recommendations: [] } satisfies CertificationRecommendations);
     }
     if (method === "POST" && path === "/resources/projects/from-skill-gap") {

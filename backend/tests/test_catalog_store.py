@@ -2,8 +2,6 @@
 catalog. No database: sources are fakes or the data files."""
 from datetime import date
 import json
-from pathlib import Path
-import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -103,13 +101,12 @@ class RecommenderCatalogTests(unittest.TestCase):
         catalog_store.use_source(FileCatalogSource())
 
     def test_reads_the_current_catalog_unless_one_is_given(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            recommender = CertificationRecommender(Path(directory))
-            self.assertEqual(get_catalog()["version"], recommender.catalog["version"])
-            catalog_store.use_source(_Source(_snapshot("v-new")))
-            self.assertEqual("v-new", recommender.catalog["version"])
-            fixed = {"version": "fixed", "certifications": []}
-            self.assertIs(fixed, CertificationRecommender(Path(directory), catalog=fixed).catalog)
+        recommender = CertificationRecommender()
+        self.assertEqual(get_catalog()["version"], recommender.catalog["version"])
+        catalog_store.use_source(_Source(_snapshot("v-new")))
+        self.assertEqual("v-new", recommender.catalog["version"])
+        fixed = {"version": "fixed", "certifications": []}
+        self.assertIs(fixed, CertificationRecommender(catalog=fixed).catalog)
 
 
 class WriteValidationTests(unittest.TestCase):

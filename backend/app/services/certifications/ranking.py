@@ -1,8 +1,9 @@
-"""Pick the gap skills worth covering and rank certifications without a model call."""
+"""Pick the gap skills worth covering and rank certifications by the gap skills they cover."""
 from app.schemas.certifications import Certification, CertificationRecommendation
 
 MAX_GAPS = 8
-MAX_RECOMMENDATIONS = 5
+# One row on the Resources page; the rest of the catalog sits under "More certifications".
+MAX_RECOMMENDATIONS = 3
 
 
 def top_gaps(report: dict, limit: int = MAX_GAPS) -> list[dict]:
@@ -29,7 +30,7 @@ def rank(certifications: list[Certification], family: str, gaps: list[dict],
         if gain(best) <= 0:
             break
         skill_ids = [skill for skill in best.skills[family] if skill in priority]
-        picks.append(CertificationRecommendation(certification_id=best.id, skill_ids=skill_ids, reason=None))
+        picks.append(CertificationRecommendation(certification_id=best.id, skill_ids=skill_ids))
         covered.update(skill_ids)
         remaining.remove(best)
     return picks

@@ -982,9 +982,13 @@ Certifications, school courses and student organizations live in the `certificat
   (`app/services/course_listing.py`). The four semesters are counted back from the day the guide
   data was retrieved (`"retrieved"` in `data/uw_courses/comp_sci.json`), not from today: see
   "UW–Madison courses" below.
-- `catalog_versions` holds the certification catalog version. Cached certification recommendations
-  are reused only while it is unchanged; it changes only when a field the recommendations use
-  (name, provider, url, cost, level, skills, active) changes.
+- `catalog_versions` holds the certification catalog version, which `GET /certifications/catalog/{family}`
+  returns. It changes only when a field the recommendations use (name, provider, url, cost, level,
+  skills, active) changes.
+- Certification recommendations (`POST /certifications/recommendations`) use no Agent and no cache:
+  `app/services/certifications/ranking.py` matches each certification's skills to the run's scored
+  gaps and picks up to three, each adding the most gap priority not covered by an earlier pick. The
+  Resources page shows those three first and the rest of the catalog under "More certifications".
 - The API caches what it reads for 5 minutes (`app/services/catalog_store.py`). While the tables are
   missing or all three are empty, it reads `data/certifications.json` and `data/resources.yaml`
   instead and logs a warning. On other database errors it keeps the last catalog it read, or answers

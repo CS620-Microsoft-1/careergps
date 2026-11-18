@@ -42,8 +42,8 @@ export function ResourcesView() {
   const listed = withoutTaken(plan.resources, taken);
 
   const report = run?.status === "completed" ? run.report : null;
-  const { byId: picks, projectsPending } = usePicks(family, report ? run!.id : null);
-  const pickOrder = [...picks.keys()];
+  const { picks, projectsPending } = usePicks(family, report ? run!.id : null);
+  const pickOrder = [...picks];
   const gaps = report ? rankGaps(report).map((gap) => gap.skill_id) : [];
   const requestedGap = params.get("gap");
   const gap = requestedGap && listed.some((r) => r.skills.includes(requestedGap)) ? requestedGap : null;
@@ -140,7 +140,7 @@ export function ResourcesView() {
                   )}
                   {shown.length > 0 && <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {shown.map((resource) => <ResourceCard key={resource.id}
-                      resource={resource} gaps={gaps} pick={picks.get(resource.id)} onTaken={setJustTaken} />)}
+                      resource={resource} gaps={gaps} recommended={picks.has(resource.id)} onTaken={setJustTaken} />)}
                   </div>}
                   {split && split.more.length > 0 && <MoreProjects resources={split.more} gaps={gaps} picks={picks} onTaken={setJustTaken} />}
                 </section>
@@ -153,9 +153,8 @@ export function ResourcesView() {
   </>;
 }
 
-/** pick: undefined when not recommended, otherwise the reason (null when the rule ranking chose it). */
-function ResourceCard({ resource, gaps, pick, onTaken }: {
-  resource: Resource; gaps: string[]; pick?: string | null; onTaken: (resource: Resource) => void;
+function ResourceCard({ resource, gaps, recommended, onTaken }: {
+  resource: Resource; gaps: string[]; recommended: boolean; onTaken: (resource: Resource) => void;
 }) {
   // Only skills that are gaps, in gap order; strengths it also practices aren't "closed".
   const closes = resource.skills.filter((skill) => gaps.includes(skill))
@@ -166,7 +165,7 @@ function ResourceCard({ resource, gaps, pick, onTaken }: {
         <ResourceIcon type={resource.type} className="bg-sunken" />
         {/* The section heading already names the school; the Taken button needs the room. */}
         <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{resource.type === "school_course" ? null : resource.provider}</p>
-        {pick !== undefined && <Badge variant="brand">Recommended</Badge>}
+        {recommended && <Badge variant="brand">Recommended</Badge>}
         {resource.type === "school_course" && <TakenButton resource={resource} onMarked={onTaken} />}
       </div>
       <h3 className="mt-4 text-title">{resource.title}</h3>
@@ -174,7 +173,6 @@ function ResourceCard({ resource, gaps, pick, onTaken }: {
       {resource.description && <p className={cn("mt-3 text-sm/6 text-muted-foreground",
         // Course guide descriptions run long; the full text is one click away.
         resource.type === "school_course" && "line-clamp-4")}>{resource.description}</p>}
-      {pick && <p className="mt-3 rounded-lg bg-accent px-3 py-2 text-sm/6">{pick}</p>}
       {closes.length > 0 && <p className="mt-auto pt-4 text-sm">Closes: <b>{closes.map(skillLabel).join(", ")}</b></p>}
       <div className={cn("flex items-center gap-2", closes.length ? "mt-4" : "mt-auto pt-4")}>
         <SaveButton resourceId={resource.id} />
@@ -208,7 +206,7 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
 
 /** Every project not on top, in a collapsed list whose cards are only built once it's opened. */
 function MoreProjects({ resources, gaps, picks, onTaken }: {
-  resources: Resource[]; gaps: string[]; picks: Map<string, string | null>; onTaken: (resource: Resource) => void;
+  resources: Resource[]; gaps: string[]; picks: ReadonlySet<string>; onTaken: (resource: Resource) => void;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -221,14 +219,14 @@ function MoreProjects({ resources, gaps, picks, onTaken }: {
       {open && (
         <div className="grid gap-4 border-t border-border p-4 sm:grid-cols-2 xl:grid-cols-3">
           {resources.map((resource) => <ResourceCard key={resource.id}
-            resource={resource} gaps={gaps} pick={picks.get(resource.id)} onTaken={onTaken} />)}
+            resource={resource} gaps={gaps} recommended={picks.has(resource.id)} onTaken={onTaken} />)}
         </div>
       )}
     </details>
   );
 }
 
-const NO_PICKS = new Map<string, string | null>();
+const NO_PICKS: ReadonlySet<string> = new Set();
 /** How many projects show before "More projects"; the agent recommends at most this many. */
 const TOP_PROJECTS = 3;
 
@@ -238,7 +236,7 @@ const TOP_PROJECTS = 3;
  * failed, or a gap filter hides them) the projects that close the most gaps go on top instead;
  * while picks are still loading, nothing does, so the top doesn't jump when they arrive.
  */
-function splitProjects(projects: Resource[], picks: Map<string, string | null>, gaps: string[], pending: boolean) {
+function splitProjects(projects: Resource[], picks: ReadonlySet<string>, gaps: string[], pending: boolean) {
   const closed = (resource: Resource) => resource.skills.filter((skill) => gaps.includes(skill)).length;
   const byCoverage = (list: Resource[]) => list
     .map((resource, index) => ({ resource, index }))
@@ -251,11 +249,11 @@ function splitProjects(projects: Resource[], picks: Map<string, string | null>, 
 }
 
 /**
- * Certification and project picks for the role's analysis: resource id → reason, in pick order.
+ * Ids of the certifications and projects picked for the role's analysis, in pick order.
  * projectsPending is true until the project picks for this analysis have come back (or failed).
  */
 function usePicks(family: JobFamily, runId: string | null) {
-  type Loaded = { key: string; byId: Map<string, string | null> };
+  type Loaded = { key: string; ids: string[] };
   const [certifications, setCertifications] = useState<Loaded | null>(null);
   const [projects, setProjects] = useState<Loaded | null>(null);
   const key = `${family}:${runId}`;
@@ -264,26 +262,26 @@ function usePicks(family: JobFamily, runId: string | null) {
     let active = true;
     // Each list loads on its own, so slow certification picks don't hold up the project picks.
     // Either can fail on its own (it then counts as loaded with no picks); the catalog still shows everything.
-    const load = (request: Promise<Map<string, string | null>>, set: (loaded: Loaded) => void) => {
+    const load = (request: Promise<string[]>, set: (loaded: Loaded) => void) => {
       void request.then(
-        (byId) => { if (active) set({ key, byId }); },
-        () => { if (active) set({ key, byId: new Map() }); },
+        (ids) => { if (active) set({ key, ids }); },
+        () => { if (active) set({ key, ids: [] }); },
       );
     };
     load(getCertificationPicks(family).then((response) =>
-      new Map(response.recommendations.map((pick) => [pick.certification_id, pick.reason]))), setCertifications);
-    // A project pick's reason only restates the skills the card already lists under Closes.
+      response.recommendations.map((pick) => pick.certification_id)), setCertifications);
+    // A project pick's reason only restates the skills the card already lists under Closes, so it isn't kept.
     load(getProjectPicks(runId).then((response) =>
-      new Map(response.recommendations.map((pick) => [pick.project_id, null]))), setProjects);
+      response.recommendations.map((pick) => pick.project_id)), setProjects);
     return () => { active = false; };
   }, [family, runId, key]);
-  const certificationPicks = certifications?.key === key ? certifications.byId : null;
-  const projectPicks = projects?.key === key ? projects.byId : null;
-  const byId = useMemo(
-    () => (certificationPicks || projectPicks ? new Map([...(certificationPicks ?? []), ...(projectPicks ?? [])]) : NO_PICKS),
+  const certificationPicks = certifications?.key === key ? certifications.ids : null;
+  const projectPicks = projects?.key === key ? projects.ids : null;
+  const picks = useMemo(
+    () => (certificationPicks || projectPicks ? new Set([...(certificationPicks ?? []), ...(projectPicks ?? [])]) : NO_PICKS),
     [certificationPicks, projectPicks],
   );
-  return { byId, projectsPending: runId !== null && projectPicks === null };
+  return { picks, projectsPending: runId !== null && projectPicks === null };
 }
 
 const rank = (order: string[], key: string) => {

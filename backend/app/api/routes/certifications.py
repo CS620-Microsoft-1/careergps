@@ -45,7 +45,4 @@ def recommendations(request: CertificationRecommendationRequest,
         raise HTTPException(status_code=409, detail="The latest skill gap analysis failed. Run it again")
     if run.status != "completed":
         raise HTTPException(status_code=409, detail="The skill gap analysis has not finished yet")
-    try:
-        return recommender.recommend(run)
-    except OSError:
-        raise HTTPException(status_code=503, detail="Recommendations are unavailable") from None
+    return recommender.recommend(run)
