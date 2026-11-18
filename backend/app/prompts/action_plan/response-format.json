@@ -1,0 +1,39 @@
+{
+  "type": "json_schema",
+  "name": "careergps_action_plan_v1",
+  "strict": true,
+  "schema": {
+    "type": "object",
+    "properties": {
+      "plans": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "strategy": {"type": "string", "enum": ["balanced", "fastest", "hands_on", "credential", "campus"]},
+            "title": {"type": "string"},
+            "summary": {"type": "string"},
+            "steps": {"type": "array", "items": {"$ref": "#/$defs/item"}},
+            "alongside": {"type": "array", "items": {"$ref": "#/$defs/item"}}
+          },
+          "required": ["strategy", "title", "summary", "steps", "alongside"],
+          "additionalProperties": false
+        }
+      }
+    },
+    "required": ["plans"],
+    "additionalProperties": false,
+    "$defs": {
+      "item": {
+        "type": "object",
+        "properties": {
+          "resource_id": {"type": "string"},
+          "skill_ids": {"type": "array", "items": {"type": "string"}},
+          "reason": {"type": "string"}
+        },
+        "required": ["resource_id", "skill_ids", "reason"],
+        "additionalProperties": false
+      }
+    }
+  }
+}
