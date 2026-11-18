@@ -75,3 +75,21 @@ class CertificationSettings(BaseSettings):
 
     certification_foundry_project_endpoint: str | None = None
     certification_foundry_agent_name: str | None = None
+
+
+class ActionPlanSettings(BaseSettings):
+    """Action plan Agent; without an endpoint, plans fall back to the rule planner."""
+
+    model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
+
+    action_plan_foundry_project_endpoint: str | None = None
+    action_plan_foundry_agent_name: str = "action-plan-agent"
+    # "latest" or blank uses the newest saved version; a number (e.g. "2") pins one so a new save
+    # in the portal can't change answers unnoticed.
+    action_plan_foundry_agent_version: str | None = None
+
+    @property
+    def pinned_agent_version(self) -> str | None:
+        """The version to send to Foundry, or None for the latest."""
+        version = (self.action_plan_foundry_agent_version or "").strip()
+        return None if version.lower() in {"", "latest"} else version
