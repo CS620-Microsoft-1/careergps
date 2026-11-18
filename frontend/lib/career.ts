@@ -133,7 +133,7 @@ export function takenCoursesFor(resources: Resource[], taken: ReadonlySet<string
   return resources.filter((resource) => isTaken(resource, taken) && resource.skills.includes(skill));
 }
 
-/** How many certifications or projects show before "More …"; the backend recommends at most this many of each. */
+/** How many certifications, projects or student orgs show before "More …"; the backend recommends at most this many certifications and projects. */
 export const TOP_PICKS = 3;
 
 /**

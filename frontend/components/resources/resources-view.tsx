@@ -119,9 +119,11 @@ export function ResourcesView() {
                   // Courses by code ("COMP SCI 200" before "COMP SCI 300"), whatever order they were added in.
                   || (key === "school_course" ? a.title.localeCompare(b.title, "en", { numeric: true }) : 0));
               if (!group.length && !hiddenTaken.length) return null;
-              // Certifications and projects: the top picks up front, the rest under "More …".
+              // Certifications and projects: the top picks up front, the rest under "More …". Student orgs
+              // have no picks, so the ones that close the most gaps go on top.
               const picking = key === "certification" || key === "project" ? pending[key] : false;
-              const split = key === "certification" || key === "project" ? splitTopPicks(group, picks, gaps, picking) : null;
+              const split = key === "certification" || key === "project" || key === "student_org"
+                ? splitTopPicks(group, picks, gaps, picking) : null;
               const shown = split ? split.top : group;
               const plural = RESOURCE_TYPES[key].plural.toLowerCase();
               return (
@@ -207,7 +209,7 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
   );
 }
 
-/** Every certification or project not on top, in a collapsed list whose cards are only built once it's opened. */
+/** Every certification, project or student org not on top, in a collapsed list whose cards are only built once it's opened. */
 function MoreResources({ label, resources, gaps, picks, onTaken }: {
   label: string; resources: Resource[]; gaps: string[]; picks: ReadonlySet<string>; onTaken: (resource: Resource) => void;
 }) {
