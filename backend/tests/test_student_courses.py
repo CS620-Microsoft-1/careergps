@@ -29,10 +29,13 @@ NAMED = [
     _named(300, "Programming II"),
     _named(320, "Data Science Programming II"),
     _named(532, "Matrix Methods in Machine Learning"),
+    _named(536, "Introduction to Programming Languages and Compilers"),
     _named(537, "Introduction to Operating Systems"),
+    _named(541, "Theory & Algorithms for Data Science"),
     _named(564, "Database Management Systems: Design and Implementation"),
     _named(566, "Introduction to Computer Vision"),
     _named(577, "Introduction to Algorithms"),
+    _named(640, "Introduction to Computer Networks"),
     _named(760, "Machine Learning"),
     _named(766, "Computer Vision"),
     _named(774, "Data Exploration, Cleaning, and Integration for Data Science"),
@@ -62,6 +65,23 @@ class MatchCourseNamesTests(unittest.TestCase):
         self.assertEqual(["uw-cs-577"], self.ids("Coursework: Algorithms, Linear Algebra"))
         self.assertEqual(["uw-cs-577"], self.ids("Coursework: Intro. to Algorithms, Linear Algebra"))
         self.assertEqual([], self.ids("Designed algorithms for route planning"))
+
+    def test_a_dash_or_and_ends_a_one_word_item(self) -> None:
+        both = ["uw-cs-537", "uw-cs-577"]
+        self.assertEqual(both, self.ids("Relevant Coursework - Algorithms, Operating Systems"))
+        self.assertEqual(both, self.ids("Coursework: Algorithms and Operating Systems"))
+        self.assertEqual(both, self.ids("Coursework: Operating Systems & Algorithms"))
+        self.assertEqual(["uw-cs-577", "uw-cs-640"], self.ids("Coursework – Algorithms; Computer Networks"))
+        self.assertEqual(["uw-cs-577", "uw-cs-640"], self.ids("Coursework — Algorithms; Computer Networks"))
+        # A hyphen inside a word is not a separator.
+        self.assertEqual([], self.ids("Coursework: Graph-Algorithms"))
+
+    def test_and_stays_a_word_inside_a_longer_name(self) -> None:
+        self.assertEqual(["uw-cs-536"], self.ids("Coursework: Programming Languages and Compilers, Calculus"))
+        self.assertEqual(["uw-cs-541"], self.ids("Coursework: Theory & Algorithms for Data Science"))
+        self.assertEqual(["uw-cs-541"], self.ids("Theory and Algorithms for Data Science"))
+        self.assertEqual(["uw-cs-536", "uw-cs-577"],
+                         self.ids("Coursework: Algorithms and Programming Languages and Compilers"))
 
     def test_the_longer_name_wins(self) -> None:
         self.assertEqual(["uw-cs-532"], self.ids("Matrix Methods in Machine Learning"))

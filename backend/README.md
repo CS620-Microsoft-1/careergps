@@ -1027,9 +1027,12 @@ scores don't change.
   - Codes: "CS 400", "COMP SCI 400", "Comp. Sci. 400, 540 and 577", in the same text.
   - How names compare: case and punctuation don't matter, a leading "Introduction to" / "Intro
     to" may be left out, and the part before a colon is enough ("Database Management Systems").
-    A one-word name ("Algorithms") must be a whole list item. A name inside a longer matched
-    name doesn't count ("Matrix Methods in Machine Learning" is not also "Machine Learning"). A
-    name two courses share ("Computer Vision": 566 and 766) gives the lowest-numbered one.
+    A one-word name ("Algorithms") must be a whole list item; items end at `, ; : | / ( )`, a
+    bullet, a new line, a sentence-ending `.`, a dash with spaces around it (` - `, ` – `, ` — `)
+    and, for one-word names, "and" / "&" ("Algorithms and Operating Systems"). A name inside a
+    longer matched name doesn't count ("Matrix Methods in Machine Learning" is not also "Machine
+    Learning"). A name two courses share ("Computer Vision": 566 and 766) gives the
+    lowest-numbered one.
   - Not found: shortened names ("Databases", "Data Structures"). A sentence under an education
     entry that uses a course name ("built a machine learning model") is found by mistake; the
     student answers "Not now".

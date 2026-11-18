@@ -103,10 +103,11 @@ def course_list_strings(data) -> Iterator[str]:
 def _name_key(text: str) -> str:
     """Lower-case words with single spaces; list punctuation becomes "|", so a name can't run
     from one list item into the next: "Coursework: Algorithms, Operating Systems" →
-    "coursework | algorithms | operating systems". "Intro" is spelled out."""
+    "coursework | algorithms | operating systems". A dash with spaces around it separates items
+    too ("Coursework - Algorithms"). "Intro" is spelled out."""
     text = text.lower().replace("&", " and ").replace("'", "").replace("’", "")
     text = re.sub(r"\bintro\b\.?", "introduction", text)
-    text = re.sub(r"[,;:|/()\[\]•·\n]|\.(?=\s|$)", " | ", text)
+    text = re.sub(r"[,;:|/()\[\]•·\n]|\.(?=\s|$)|\s[-–—](?=\s)", " | ", text)
     return " ".join(re.sub(r"[^a-z0-9|]+", " ", text).split())
 
 
@@ -175,7 +176,9 @@ def match_courses(course_lists: Iterable[str], courses: Iterable[dict]) -> list[
     """Courses whose name or code appears in the course lists (course_list_strings), in course
     order. A code is any way students write it ("CS 400", "COMP SCI 400, 540 and 577"). A name:
 
-    - Whole words only, inside one list item. A one-word name ("Algorithms") must be the whole item.
+    - Whole words only, inside one list item. A one-word name ("Algorithms") must be the whole
+      item; "and" / "&" also ends such an item ("Algorithms and Operating Systems"), but stays a
+      plain word inside longer names ("Programming Languages and Compilers").
     - A name inside a longer matched name doesn't count: "Matrix Methods in Machine Learning" is
       not also "Machine Learning".
     - A name several courses share ("Computer Vision": 566 and 766) gives the lowest-numbered one.
@@ -185,15 +188,14 @@ def match_courses(course_lists: Iterable[str], courses: Iterable[dict]) -> list[
     for course in courses:
         for name in _names(course):
             by_name.setdefault(name, []).append(course)
+    patterns = {name: re.compile(rf"(?<![^ ]){re.escape(name)}(?![^ ])" if " " in name
+                                 else rf"(?:^|(?<=\| )|(?<= and )){re.escape(name)}(?= \||$| and )")
+                for name in by_name}
     found = _code_matches(course_lists, courses)
     for text in course_lists:
         key = _name_key(text)
-        spans = []
-        for name in by_name:
-            escaped = re.escape(name)
-            pattern = (rf"(?<![^ ]){escaped}(?![^ ])" if " " in name
-                       else rf"(?:^|(?<=\| )){escaped}(?= \||$)")
-            spans += [(match.start(), match.end(), name) for match in re.finditer(pattern, key)]
+        spans = [(match.start(), match.end(), name)
+                 for name, pattern in patterns.items() for match in pattern.finditer(key)]
         for start, end, name in spans:
             inside_longer = any(other_start <= start and end <= other_end and other_end - other_start > end - start
                                 for other_start, other_end, _ in spans)
