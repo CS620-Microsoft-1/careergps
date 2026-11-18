@@ -1020,9 +1020,10 @@ scores don't change.
   that role's résumé lists courses, not taken yet. A regex, no model call; nothing is saved until
   the student confirms. "Not now" is remembered in the browser only (`localStorage`, one list
   per account), so the question comes back on another device.
-  - Where: the text under an education entry, and any other text that says "coursework" or
-    "courses". Many names are everyday phrases ("Machine Learning"), so the skills and project
-    sections are not searched.
+  - Where: the text under an education entry, and any other text from a line that starts with
+    "Coursework", "Courses" or "Relevant coursework / courses" on. Many names are everyday
+    phrases ("Machine Learning"), so the skills, project and experience sections are not searched
+    ("Built a site that ranks UW courses using machine learning" finds nothing).
   - Codes: "CS 400", "COMP SCI 400", "Comp. Sci. 400, 540 and 577", in the same text.
   - How names compare: case and punctuation don't matter, a leading "Introduction to" / "Intro
     to" may be left out, and the part before a colon is enough ("Database Management Systems").

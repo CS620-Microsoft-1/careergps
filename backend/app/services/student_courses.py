@@ -22,8 +22,9 @@ from app.services.resources import same_school
 
 logger = logging.getLogger(__name__)
 
-# A string outside the education entries counts as a course list when it says one of these.
-_COURSE_LIST = re.compile(r"\b(?:coursework|courses)\b", re.IGNORECASE)
+# A string outside the education entries is a course list from a line that starts with one of
+# these. Anywhere else the word is ordinary prose: "Built a site that ranks UW courses".
+_COURSE_LIST = re.compile(r"^[^\w\n]*(?:relevant\s+)?(?:coursework|courses)\b", re.IGNORECASE | re.MULTILINE)
 # Students drop it: "Operating Systems" for "Introduction to Operating Systems".
 _INTRO = re.compile(r"^introduction to ")
 # Other ways students write a subject code (after removing spaces and dots).
@@ -83,16 +84,20 @@ def resume_strings(data) -> Iterator[str]:
 
 def course_list_strings(data) -> Iterator[str]:
     """Résumé text that lists courses: everything under an education entry, and any other string
-    that says "coursework" or "courses"."""
+    from a line that starts with "Coursework" / "Courses" / "Relevant coursework" on."""
     if not isinstance(data, dict):
         return
     education = data.get("education")
+    listed: set[str] = set()
     for entry in education if isinstance(education, list) else ():
         if isinstance(entry, dict):
-            yield from resume_strings(entry.get("content"))
+            for text in resume_strings(entry.get("content")):
+                listed.add(text)
+                yield text
     for text in resume_strings(data):
-        if _COURSE_LIST.search(text):
-            yield text
+        heading = _COURSE_LIST.search(text)
+        if heading and text not in listed:
+            yield text[heading.start():]
 
 
 def _name_key(text: str) -> str:

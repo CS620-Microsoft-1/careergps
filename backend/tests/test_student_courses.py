@@ -84,6 +84,22 @@ class MatchCourseNamesTests(unittest.TestCase):
         self.assertEqual(["uw-cs-537", "uw-cs-564"], [course["id"] for course in found])
         self.assertEqual([], list(course_list_strings(None)))
 
+    def test_coursework_must_start_the_line_outside_education(self) -> None:
+        data = {"projects": [{"content": ["Built a site that ranks UW courses using machine learning"]}],
+                "work_experience": [{"content": ["TA for CS courses: operating systems office hours"]}]}
+        self.assertEqual([], list(course_list_strings(data)))
+        self.assertEqual([], match_courses(course_list_strings(data), NAMED))
+        # A coursework line is read from its heading on, whatever section it is in.
+        data = {"other": ["Built a machine learning demo\n• Relevant courses: Operating Systems", "Courses: Algorithms"]}
+        self.assertEqual(["• Relevant courses: Operating Systems", "Courses: Algorithms"],
+                         list(course_list_strings(data)))
+        self.assertEqual(["uw-cs-537", "uw-cs-577"],
+                         [course["id"] for course in match_courses(course_list_strings(data), NAMED)])
+
+    def test_an_education_string_is_read_once(self) -> None:
+        data = {"education": [{"content": ["Relevant Coursework: Operating Systems"]}]}
+        self.assertEqual(["Relevant Coursework: Operating Systems"], list(course_list_strings(data)))
+
 
 def _coded(course_id, code=None, title=None):
     return {"id": course_id, "course_code": code, "title": title or f"{code}: A course"}
