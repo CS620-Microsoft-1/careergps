@@ -204,6 +204,19 @@ class AgentPayloadTest(unittest.TestCase):
                                                          "difficulty", "estimated_hours", "alongside", "suggested_by"})
         json.dumps(payload)  # must be serializable as INPUT_JSON
 
+    def test_docs_example_has_the_same_shape(self) -> None:
+        example_path = Path(__file__).resolve().parents[2] / "docs" / "contracts" / "action-plan-input.example.json"
+        example = json.loads(example_path.read_text(encoding="utf-8"))
+        payload = agent_payload("full", FAMILY, GAPS, build())
+        self.assertEqual(set(example), set(payload))
+        self.assertEqual(set(example["gaps"][0]), set(payload["gaps"][0]))
+        gap_ids = {gap["skill_id"] for gap in example["gaps"]}
+        for candidate in example["candidates"]:
+            with self.subTest(candidate["resource_id"]):
+                self.assertEqual(set(candidate), set(payload["candidates"][0]))
+                self.assertTrue(set(candidate["skill_ids"]) <= gap_ids)
+                self.assertEqual(candidate["alongside"], candidate["type"] == "student_org")
+
 
 if __name__ == "__main__":
     unittest.main()
