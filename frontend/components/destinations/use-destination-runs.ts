@@ -24,6 +24,9 @@ export type Destinations = {
   listed: boolean;
 };
 
+/** The last answer for the signed-in account, so a page that mounts again shows it at once while it refreshes. */
+let cache: { userId: string; resumes: Partial<Record<JobFamily, Destination>>; runs: Partial<Record<JobFamily, DestinationRun>> } | null = null;
+
 /**
  * The student's destinations (GET /me/destinations), and each one's saved analysis of the résumé
  * it uses. Only reads (GET); starting an analysis is always a click. The selected role uses
@@ -31,10 +34,16 @@ export type Destinations = {
  */
 export function useDestinationRuns(): Destinations {
   const { snapshot, family, run } = useSkillGapAnalysis();
-  const [resumes, setResumes] = useState<Partial<Record<JobFamily, Destination>>>({});
-  const [runs, setRuns] = useState<Partial<Record<JobFamily, DestinationRun>>>({});
-  const [listed, setListed] = useState(false);
+  const userId = snapshot?.user_id;
+  const cached = userId && cache?.userId === userId ? cache : null;
+  const [resumes, setResumes] = useState<Partial<Record<JobFamily, Destination>>>(cached?.resumes ?? {});
+  const [runs, setRuns] = useState<Partial<Record<JobFamily, DestinationRun>>>(cached?.runs ?? {});
+  const [listed, setListed] = useState(Boolean(cached));
   const resumeId = snapshot?.resume_id;
+
+  useEffect(() => {
+    if (userId && listed) cache = { userId, resumes, runs };
+  }, [userId, listed, resumes, runs]);
 
   useEffect(() => {
     if (!resumeId) return;
