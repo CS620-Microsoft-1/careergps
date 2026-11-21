@@ -141,6 +141,9 @@ describe("HomeView", () => {
     const swe = screen.getByRole("button", { name: /Software engineer/ });
     expect(swe).toHaveTextContent("70%");
     expect(swe).toHaveTextContent("sam-swe.pdf");
+    // A loaded score fades in; one still analyzing has nothing to fade.
+    expect(swe.firstElementChild).toHaveClass("entrance-fade");
+    expect(screen.getByRole("button", { name: /AI engineer/ }).firstElementChild).not.toHaveClass("entrance-fade");
     expect(screen.getByRole("button", { name: /AI engineer/ })).toHaveTextContent("Not analyzed yet");
     // Every role is added, so exploring opens Destinations instead of adding one.
     expect(screen.getByRole("link", { name: /Explore more destinations/ })).toHaveAttribute("href", "/destinations");

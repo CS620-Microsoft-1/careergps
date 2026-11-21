@@ -170,7 +170,9 @@ function OtherDestinations() {
           return (
             <button key={key} type="button" disabled={locked} onClick={() => void switchTo(key)}
               className="flex min-w-0 flex-[1_1_220px] items-center gap-3 rounded-lg bg-sunken px-4 py-3 text-left pressable hover:bg-secondary enabled:motion-safe:active:scale-[0.98] disabled:opacity-60">
-              <MatchRing value={value} size={56} stroke={6} label={null} />
+              {/* Keyed so the loaded score fades in over the empty ring instead of popping. */}
+              <MatchRing key={String(value !== null)} value={value} size={56} stroke={6} label={null}
+                className={value !== null ? "entrance-fade" : undefined} />
               <span className="flex min-w-0 flex-col">
                 <b>{ROLE_NAMES[key]}</b>
                 <span className="truncate text-sm text-muted-foreground">
