@@ -44,7 +44,7 @@ function mockPlan(items: PlanItem[] = [], overrides: Partial<Plan> = {}) {
 const emptyRun = { status: "missing" as const, run: null };
 function mockDestinations(overrides: Partial<Destinations> = {}) {
   vi.mocked(useDestinationRuns).mockReturnValue({
-    families: ["data_analyst"], resumes: {},
+    families: ["data_analyst"], resumes: {}, listed: true,
     runs: { data_analyst: { status: "ready", run }, software_engineer: emptyRun, ai_engineer: emptyRun },
     ...overrides,
   });
@@ -141,15 +141,32 @@ describe("HomeView", () => {
     const swe = screen.getByRole("button", { name: /Software engineer/ });
     expect(swe).toHaveTextContent("70%");
     expect(swe).toHaveTextContent("sam-swe.pdf");
-    // A loaded score fades in; one still analyzing has nothing to fade.
-    expect(swe.firstElementChild).toHaveClass("entrance-fade");
-    expect(screen.getByRole("button", { name: /AI engineer/ }).firstElementChild).not.toHaveClass("entrance-fade");
+    // Already loaded when the page appeared, so nothing fades.
+    expect(swe.parentElement).not.toHaveClass("entrance-fade");
     expect(screen.getByRole("button", { name: /AI engineer/ })).toHaveTextContent("Not analyzed yet");
     // Every role is added, so exploring opens Destinations instead of adding one.
     expect(screen.getByRole("link", { name: /Explore more destinations/ })).toHaveAttribute("href", "/destinations");
 
     await userEvent.click(swe);
     expect(switchTo).toHaveBeenCalledWith("software_engineer");
+  });
+
+  it("holds the other destinations until the list and every score are in", () => {
+    mockDestinations({ listed: false });
+    const { rerender } = render(<HomeView />);
+    expect(screen.queryByRole("link", { name: /Explore more destinations/ })).not.toBeInTheDocument();
+
+    mockDestinations({ families: ["data_analyst", "software_engineer"],
+      runs: { data_analyst: { status: "ready", run }, software_engineer: { status: "loading", run: null }, ai_engineer: emptyRun } });
+    rerender(<HomeView />);
+    expect(screen.queryByRole("button", { name: /Software engineer/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /Explore more destinations/ })).not.toBeInTheDocument();
+
+    mockDestinations({ families: ["data_analyst", "software_engineer"] });
+    rerender(<HomeView />);
+    expect(screen.getByRole("button", { name: /Software engineer/ })).toHaveTextContent("Not analyzed yet");
+    // It waited, so the rows fade in together.
+    expect(screen.getByRole("link", { name: /Explore more destinations/ }).parentElement).toHaveClass("entrance-fade");
   });
 
   it("locks the other destinations while a switch can't happen", () => {

@@ -20,6 +20,8 @@ export type Destinations = {
   /** Each added role and the résumé it uses. */
   resumes: Partial<Record<JobFamily, Destination>>;
   runs: Record<JobFamily, DestinationRun>;
+  /** The destination list has answered (or failed), so families is final. */
+  listed: boolean;
 };
 
 /**
@@ -31,6 +33,7 @@ export function useDestinationRuns(): Destinations {
   const { snapshot, family, run } = useSkillGapAnalysis();
   const [resumes, setResumes] = useState<Partial<Record<JobFamily, Destination>>>({});
   const [runs, setRuns] = useState<Partial<Record<JobFamily, DestinationRun>>>({});
+  const [listed, setListed] = useState(false);
   const resumeId = snapshot?.resume_id;
 
   useEffect(() => {
@@ -39,6 +42,7 @@ export function useDestinationRuns(): Destinations {
     listDestinations().then((destinations) => {
       if (!active) return;
       setResumes(Object.fromEntries(destinations.map((destination) => [destination.job_family, destination])));
+      setListed(true);
       for (const { job_family: key, resume_id } of destinations) {
         getLatestSkillGapRun(key)
           // A latest run for an older résumé isn't this destination's analysis, so it hasn't been analyzed.
@@ -47,7 +51,7 @@ export function useDestinationRuns(): Destinations {
           .catch((error) => active && setRuns((all) => ({ ...all,
             [key]: { status: error instanceof ApiError && error.status === 404 ? "missing" : "error", run: null } })));
       }
-    }).catch(() => {}); // The selected destination still shows from the session.
+    }).catch(() => active && setListed(true)); // The selected destination still shows from the session.
     return () => { active = false; };
   }, [resumeId]);
 
@@ -55,5 +59,5 @@ export function useDestinationRuns(): Destinations {
   for (const key of FAMILIES) {
     result[key] = key === family && run ? { status: "ready", run } : runs[key] ?? { status: "loading", run: null };
   }
-  return { families: FAMILIES.filter((key) => key === family || resumes[key]), resumes, runs: result };
+  return { families: FAMILIES.filter((key) => key === family || resumes[key]), resumes, runs: result, listed };
 }

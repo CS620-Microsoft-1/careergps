@@ -157,26 +157,27 @@ function NextTurn({ next, topGap }: { next: PlanStep | null; topGap: string | nu
 }
 
 function OtherDestinations() {
-  const { families, resumes, runs } = useDestinationRuns();
+  const { families, resumes, runs, listed } = useDestinationRuns();
   const { family, locked, switchTo } = useSwitchRoute();
   const others = families.filter((key) => key !== family);
+  // Held until the list and every score are in, so the rows fade in once instead of popping in one by one.
+  const settled = listed && others.every((key) => runs[key].status !== "loading");
+  const [waited] = useState(!settled);
   return (
     <div className="grid gap-2">
       <p className="eyebrow">Your other destinations</p>
-      <div className="flex flex-wrap gap-3">
+      {!settled ? <div aria-hidden className="h-20" /> : <div className={cn("flex flex-wrap gap-3", waited && "entrance-fade [--enter-ms:200ms]")}>
         {others.map((key) => {
-          const { status, run } = runs[key];
+          const { run } = runs[key];
           const value = run?.status === "completed" ? run.match?.score ?? null : null;
           return (
             <button key={key} type="button" disabled={locked} onClick={() => void switchTo(key)}
               className="flex min-w-0 flex-[1_1_220px] items-center gap-3 rounded-lg bg-sunken px-4 py-3 text-left pressable hover:bg-secondary enabled:motion-safe:active:scale-[0.98] disabled:opacity-60">
-              {/* Keyed so the loaded score fades in over the empty ring instead of popping. */}
-              <MatchRing key={String(value !== null)} value={value} size={56} stroke={6} label={null}
-                className={value !== null ? "entrance-fade" : undefined} />
+              <MatchRing value={value} size={56} stroke={6} label={null} />
               <span className="flex min-w-0 flex-col">
                 <b>{ROLE_NAMES[key]}</b>
                 <span className="truncate text-sm text-muted-foreground">
-                  {status === "loading" ? "Loading…" : value !== null ? resumes[key]?.original_filename ?? "Your résumé"
+                  {value !== null ? resumes[key]?.original_filename ?? "Your résumé"
                     : run && run.status !== "failed" ? "Analyzing…" : "Not analyzed yet"}
                 </span>
               </span>
@@ -192,7 +193,7 @@ function OtherDestinations() {
             <span className="text-sm text-muted-foreground">Find another role to compare</span>
           </span>
         </Link>
-      </div>
+      </div>}
     </div>
   );
 }
