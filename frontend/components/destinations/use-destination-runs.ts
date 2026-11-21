@@ -41,8 +41,9 @@ export function useDestinationRuns(): Destinations {
       setResumes(Object.fromEntries(destinations.map((destination) => [destination.job_family, destination])));
       for (const { job_family: key, resume_id } of destinations) {
         getLatestSkillGapRun(key)
-          .then((latest) => active && latest.resume_id === resume_id
-            && setRuns((all) => ({ ...all, [key]: { status: "ready", run: latest } })))
+          // A latest run for an older résumé isn't this destination's analysis, so it hasn't been analyzed.
+          .then((latest) => active && setRuns((all) => ({ ...all,
+            [key]: latest.resume_id === resume_id ? { status: "ready", run: latest } : { status: "missing", run: null } })))
           .catch((error) => active && setRuns((all) => ({ ...all,
             [key]: { status: error instanceof ApiError && error.status === 404 ? "missing" : "error", run: null } })));
       }
