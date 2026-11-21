@@ -124,11 +124,14 @@ function RouteTrack({ value, start, goal }: { value: number; start: string; goal
 
 function NextTurn({ next, topGap }: { next: PlanStep | null; topGap: string | null }) {
   const plan = usePlan();
+  // Only when the plan was still loading as the card appeared: its content fades in instead of popping.
+  const [waited] = useState(plan.status === "loading");
+  const body = cn("flex flex-1 flex-col gap-3", waited && "entrance-fade [--enter-ms:200ms]");
   return (
     <section aria-labelledby="next" className="flex flex-col gap-3 rounded-2xl border-2 border-foreground bg-card p-6 shadow-card sm:p-8 lg:col-span-5">
       <Badge variant="brand" className="self-start">Next turn</Badge>
       {plan.status === "loading" ? <p className="text-muted-foreground">Loading your plan…</p>
-        : next ? <>
+        : next ? <div className={body}>
           <h2 id="next" className="text-[2rem]/11 font-bold tracking-[-0.01em]">{next.resource.title}</h2>
           {next.skill && <p className="text-muted-foreground">Closes <b className="text-foreground">{skillLabel(next.skill)}</b></p>}
           {next.resource.description && <p className="text-lg/7.5 text-muted-foreground">{next.resource.description}</p>}
@@ -140,7 +143,7 @@ function NextTurn({ next, topGap }: { next: PlanStep | null; topGap: string | nu
             </Button>
             <Link href="/plan" className="font-bold hover:underline">See action plan</Link>
           </div>
-        </> : <>
+        </div> : <div className={body}>
           <h2 id="next" className="text-[2rem]/11 font-bold tracking-[-0.01em]">Your plan is empty</h2>
           <p className="text-lg/7.5 text-muted-foreground">
             {topGap ? <>Add a resource for <b className="text-foreground">{skillLabel(topGap)}</b> to get your first step.</>
@@ -151,7 +154,7 @@ function NextTurn({ next, topGap }: { next: PlanStep | null; topGap: string | nu
               <Link href={topGap ? `/resources?gap=${topGap}` : "/resources"}>Add resources<ArrowRight data-icon="inline-end" /></Link>
             </Button>
           </div>
-        </>}
+        </div>}
     </section>
   );
 }

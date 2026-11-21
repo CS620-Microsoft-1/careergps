@@ -169,6 +169,18 @@ describe("HomeView", () => {
     expect(screen.getByRole("link", { name: /Explore more destinations/ }).parentElement).toHaveClass("entrance-fade");
   });
 
+  it("fades the next turn in only when the plan loads after the card appears", () => {
+    mockPlan([], { status: "loading" });
+    const { rerender, unmount } = render(<HomeView />);
+    mockPlan();
+    rerender(<HomeView />);
+    expect(screen.getByRole("heading", { name: "Your plan is empty" }).parentElement).toHaveClass("entrance-fade");
+    unmount();
+
+    render(<HomeView />);
+    expect(screen.getByRole("heading", { name: "Your plan is empty" }).parentElement).not.toHaveClass("entrance-fade");
+  });
+
   it("locks the other destinations while a switch can't happen", () => {
     vi.mocked(useSwitchRoute).mockReturnValue({ family: "data_analyst", locked: true, switchTo });
     mockDestinations({ families: ["data_analyst", "software_engineer"] });
