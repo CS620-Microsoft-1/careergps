@@ -11,7 +11,7 @@ test("Home shows the match and the biggest gaps", async ({ page }) => {
   await mockApi(page);
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { level: 1, name: /42% of the way there/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Gaps · 2 left" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Skills to build" })).toBeVisible();
 });
 
 test("Gaps opens a closed gap to show ways to close it", async ({ page }) => {

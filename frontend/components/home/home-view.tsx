@@ -1,34 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import NumberFlow from "@number-flow/react";
-import { ArrowRight, Bookmark, CircleDashed, Flag, LoaderCircle, MapPin } from "lucide-react";
-import { AnimatePresence, MotionConfig, motion } from "motion/react";
+import { ArrowRight, Flag, MapPin, Plus } from "lucide-react";
 
 import {
   AnalysisGate,
   GapBar,
   GapMeta,
   MatchRing,
-  RESOURCE_TYPES,
   ROLE_NAMES,
-  numberTiming,
+  SourceNote,
   skillLabel,
 } from "@/components/career/route-parts";
 import { ADD_DESTINATION_HREF, FAMILIES, useDestinationRuns } from "@/components/destinations/use-destination-runs";
+import { useAccount } from "@/components/layout/account-provider";
 import { useSwitchRoute } from "@/components/layout/use-switch-route";
 import { usePlan } from "@/components/plan/plan-provider";
-import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { orderPlan, percent, rankGaps, rankStrengths, resourcesForSkill, withoutTaken, type PlanStep } from "@/lib/career";
-import { cn } from "@/lib/utils";
-
-/** Resource snapshot rows: a saved row leaves, the rest slide up, and the next one fades in behind them. */
-const ROW_EXIT = { duration: 0.16, ease: [0.23, 1, 0.32, 1] } as const;
-const ROW_ENTER = { duration: 0.2, ease: [0.23, 1, 0.32, 1] } as const;
-const ROW_MOVE = { duration: 0.28, ease: [0.77, 0, 0.175, 1] } as const;
+import { orderPlan, percent, rankGaps, type PlanStep } from "@/lib/career";
 
 export function HomeView() {
   const { snapshot, run } = useSkillGapAnalysis();
@@ -43,86 +34,56 @@ export function HomeView() {
 
 function HomeReady() {
   const { snapshot, family, run } = useSkillGapAnalysis();
+  const { user } = useAccount();
   const plan = usePlan();
   const report = run!.report!;
   const match = run!.match?.score ?? null;
   const gaps = rankGaps(report);
-  const strengths = rankStrengths(report);
   const ordered = orderPlan(plan.items, plan.resources, gaps.map((gap) => gap.skill_id));
-  const total = ordered.done.length + ordered.ahead.length + ordered.alongside.length;
   const sample = report.skills[0]?.demand.N ?? null;
   const role = ROLE_NAMES[family];
+  const location = user?.preferred_location;
 
   return (
-    <div className="grid gap-6">
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
-        <section aria-labelledby="where" className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-6">
-            <div className="min-w-0 flex-1 basis-72">
-              <h1 id="where" className="text-page-title">
-                {match === null ? "Your route is ready" : `You’re ${percent(match)} of the way there`}
-              </h1>
-              <p className="mt-2 text-base/7 text-muted-foreground">
-                Matched with {snapshot!.filename}{sample ? ` against ${sample.toLocaleString()} ${role.toLowerCase()} postings` : ""}.
-              </p>
-            </div>
-            <MatchRing value={match} size={120} stroke={12} />
+    <div className="grid gap-12">
+      <div className="grid gap-6 lg:grid-cols-12">
+        <section aria-labelledby="where" className="flex flex-col gap-6 rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8 lg:col-span-7">
+          <div className="grid gap-2">
+            <p className="eyebrow">Your goal · {role}{location ? ` · ${location}` : ""}</p>
+            <h1 id="where" className="text-page-title">
+              {match === null ? "Your route is ready" : `You’re ${percent(match)} of the way there`}
+            </h1>
+            <p className="text-base/7 text-muted-foreground">
+              Matched with {snapshot!.filename}{sample ? ` against ${sample.toLocaleString()} ${role.toLowerCase()} postings` : ""}.
+            </p>
           </div>
           <RouteTrack value={match ?? 0} start={`Résumé confirmed ${shortDate(snapshot!.confirmed_at)}`} goal={role} />
-          {/* Pinned to the bottom when the side column makes the row taller. */}
-          <div className="mt-auto grid gap-3 pt-6 sm:grid-cols-3">
-            <Tile value={String(gaps.length)} label={gaps.length === 1 ? "gap left" : "gaps left"} />
-            <Tile value={`${ordered.done.length} of ${total}`} label="plan steps done" />
-            <Tile value={String(strengths.length)} label={strengths.length === 1 ? "strength" : "strengths"} />
+          {/* Pinned to the bottom when Next turn makes the row taller. */}
+          <div className="mt-auto">
+            <OtherDestinations />
           </div>
         </section>
 
-        {/* Side column fills the row: Next turn takes its height, the plan card takes the rest. */}
-        <div className="flex flex-col gap-6">
-          <NextTurn next={ordered.ahead[0] ?? ordered.alongside[0] ?? null} topGap={gaps[0]?.skill_id ?? null} />
-          <section aria-labelledby="then" className="flex flex-1 flex-col rounded-2xl border border-border bg-card p-6 shadow-card">
-            <h2 id="then" className="text-title">Then on your plan</h2>
-            {plan.status === "loading" ? <p className="mt-3 text-muted-foreground">Loading your plan…</p>
-              : total === 0 ? <p className="mt-3 text-muted-foreground">Save resources and they’ll appear here in the order to do them.</p>
-              : <ul className="mt-3 grid gap-3">
-                {ordered.ahead.slice(1, 3).map((step) => <PlanLine key={step.resource.id} step={step} />)}
-                {/* With nothing ahead, Next turn is the first alongside step, so skip it here. */}
-                {ordered.alongside.slice(ordered.ahead.length ? 0 : 1).slice(0, 2).map((step) => <PlanLine key={step.resource.id} step={step} alongside />)}
-              </ul>}
-            {total > 0 && <p className="mt-auto pt-4 text-sm text-muted-foreground">{ordered.done.length} of {total} steps done</p>}
-          </section>
-        </div>
+        <NextTurn next={ordered.ahead[0] ?? ordered.alongside[0] ?? null} topGap={gaps[0]?.skill_id ?? null} />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section aria-labelledby="gapsnap" className="rounded-2xl border border-border bg-card p-6 shadow-card">
-          <div className="flex items-baseline justify-between gap-3">
-            <h2 id="gapsnap" className="text-title">Gaps · {gaps.length} left</h2>
-            <Link href="/gaps" className="text-sm font-bold hover:underline">See gaps</Link>
-          </div>
-          {gaps.length ? <ul className="mt-4 grid gap-5">
-            {gaps.slice(0, 3).map((gap) => <li key={gap.skill_id} className="grid gap-2">
-              <p className="font-bold">{skillLabel(gap.skill_id)}</p>
+      <section aria-labelledby="gaps" className="grid gap-6 rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
+        <div className="flex flex-wrap items-baseline justify-between gap-4">
+          <h2 id="gaps" className="text-title">Skills to build</h2>
+          <Link href="/gaps" className="text-sm font-bold hover:underline">See all gaps</Link>
+        </div>
+        {gaps.length ? <ul className="grid gap-8 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
+          {gaps.slice(0, 3).map((gap) => <li key={gap.skill_id}>
+            <Link href={`/resources?gap=${gap.skill_id}`} aria-label={`Ways to close the ${skillLabel(gap.skill_id)} gap`}
+              className="grid gap-2 rounded-lg">
+              <span className="font-bold">{skillLabel(gap.skill_id)}</span>
               <GapBar skill={gap} />
               <GapMeta skill={gap} />
-            </li>)}
-          </ul> : <p className="mt-3 text-muted-foreground">No gaps left for this role. Your résumé shows strong evidence for every skill postings ask for.</p>}
-        </section>
-        <ResourceSnapshot gaps={gaps.slice(0, 3).map((gap) => gap.skill_id)} />
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <Destinations />
-        <section aria-labelledby="about" className="rounded-2xl bg-sunken p-6">
-          <h2 id="about" className="text-title">How your match works</h2>
-          <p className="mt-2 text-sm/6 text-muted-foreground">
-            Each skill counts as much as postings ask for it. Strong evidence in your résumé moves you forward; listing a
-            skill counts a little, and doing it in a project or job counts more. Skills we couldn’t read clearly
-            {run!.match?.unscored_skill_count ? ` (${run!.match.unscored_skill_count} right now)` : ""} are left out until
-            you review them. It’s an early, uncalibrated score, not a hiring prediction.
-          </p>
-        </section>
-      </div>
+            </Link>
+          </li>)}
+        </ul> : <p className="text-muted-foreground">No gaps left for this role. Your résumé shows strong evidence for every skill postings ask for.</p>}
+        {sample && <SourceNote>Based on {sample.toLocaleString()} job postings{location ? ` in ${location}` : ""}.</SourceNote>}
+      </section>
     </div>
   );
 }
@@ -130,7 +91,7 @@ function HomeReady() {
 function RouteTrack({ value, start, goal }: { value: number; start: string; goal: string }) {
   const at = Math.min(96, Math.max(4, value * 100));
   return (
-    <div className="mt-8">
+    <div>
       <div aria-hidden className="relative h-11">
         <span className="absolute top-1/2 left-0 size-3.5 -translate-y-1/2 rounded-full bg-foreground" />
         <span className="absolute top-1/2 left-1 h-1.5 -translate-y-1/2 rounded-full bg-foreground" style={{ width: `${at}%` }} />
@@ -150,139 +111,77 @@ function RouteTrack({ value, start, goal }: { value: number; start: string; goal
   );
 }
 
-function Tile({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="rounded-lg bg-sunken px-4 py-3.5">
-      <p className="font-mono text-xl font-medium">{value}</p>
-      <p className="text-sm text-muted-foreground">{label}</p>
-    </div>
-  );
-}
-
 function NextTurn({ next, topGap }: { next: PlanStep | null; topGap: string | null }) {
   const plan = usePlan();
   return (
-    <section aria-labelledby="next" className="rounded-2xl border-2 border-foreground bg-card p-6 shadow-card">
-      <div className="flex items-center justify-between gap-3">
-        <Badge variant="brand">Next turn</Badge>
-        <Link href="/plan" className="text-sm font-bold hover:underline">Action plan</Link>
-      </div>
-      {plan.status === "loading" ? <p className="mt-4 text-muted-foreground">Loading your plan…</p>
+    <section aria-labelledby="next" className="flex flex-col gap-3 rounded-2xl border-2 border-foreground bg-card p-6 shadow-card sm:p-8 lg:col-span-5">
+      <Badge variant="brand" className="self-start">Next turn</Badge>
+      {plan.status === "loading" ? <p className="text-muted-foreground">Loading your plan…</p>
         : next ? <>
-          <h2 id="next" className="mt-4 text-[1.375rem]/8">{next.resource.title}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            {RESOURCE_TYPES[next.resource.type].label}{next.skill && <> · closes <b className="text-foreground">{skillLabel(next.skill)}</b></>}
-          </p>
-          <Button asChild size="lg" className="mt-5">
-            {next.resource.url
-              ? <a href={next.resource.url} target="_blank" rel="noreferrer">Start this step<ArrowRight data-icon="inline-end" /></a>
-              : <Link href="/plan">Start this step<ArrowRight data-icon="inline-end" /></Link>}
-          </Button>
+          <h2 id="next" className="text-[2rem]/11 font-bold tracking-[-0.01em]">{next.resource.title}</h2>
+          {next.skill && <p className="text-muted-foreground">Closes <b className="text-foreground">{skillLabel(next.skill)}</b></p>}
+          {next.resource.description && <p className="text-lg/7.5 text-muted-foreground">{next.resource.description}</p>}
+          <div className="mt-auto flex flex-wrap items-center gap-6 pt-2">
+            <Button asChild size="lg">
+              {next.resource.url
+                ? <a href={next.resource.url} target="_blank" rel="noreferrer">Start this step<ArrowRight data-icon="inline-end" /></a>
+                : <Link href="/plan">Start this step<ArrowRight data-icon="inline-end" /></Link>}
+            </Button>
+            <Link href="/plan" className="font-bold hover:underline">See action plan</Link>
+          </div>
         </> : <>
-          <h2 id="next" className="mt-4 text-[1.375rem]/8">
-            {topGap ? `Pick a way to close ${skillLabel(topGap)}` : "Pick your next step"}
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">Save a course, project or club and it becomes your next turn.</p>
-          <Button asChild size="lg" className="mt-5">
-            <Link href={topGap ? `/resources?gap=${topGap}` : "/resources"}>Browse resources<ArrowRight data-icon="inline-end" /></Link>
-          </Button>
+          <h2 id="next" className="text-[2rem]/11 font-bold tracking-[-0.01em]">Your plan is empty</h2>
+          <p className="text-lg/7.5 text-muted-foreground">
+            {topGap ? <>Add a resource for <b className="text-foreground">{skillLabel(topGap)}</b> to get your first step.</>
+              : "Add a resource for one of your gaps to get your first step."}
+          </p>
+          <div className="mt-auto pt-2">
+            <Button asChild size="lg">
+              <Link href={topGap ? `/resources?gap=${topGap}` : "/resources"}>Add resources<ArrowRight data-icon="inline-end" /></Link>
+            </Button>
+          </div>
         </>}
     </section>
   );
 }
 
-function PlanLine({ step, alongside = false }: { step: PlanStep; alongside?: boolean }) {
-  return (
-    <li className="flex items-start gap-3">
-      {alongside ? <CircleDashed aria-hidden className="mt-1 size-4 shrink-0 text-muted-foreground" />
-        : <span aria-hidden className="mt-1.5 size-3 shrink-0 rounded-full border-2 border-line-strong" />}
-      <span className="font-bold">{step.resource.title}{alongside && <span className="font-normal text-muted-foreground"> · alongside</span>}</span>
-    </li>
-  );
-}
-
-function ResourceSnapshot({ gaps }: { gaps: string[] }) {
-  const plan = usePlan();
-  const { taken } = useTakenCourses();
-  const listed = withoutTaken(plan.resources, taken);
-  const forGaps = new Map(gaps.flatMap((gap) => resourcesForSkill(listed, gap)).map((r) => [r.id, r]));
-  const unsaved = [...forGaps.values()].filter((resource) => !plan.saved.has(resource.id));
-  return (
-    <section aria-labelledby="ressnap" className="rounded-2xl border border-border bg-card p-6 shadow-card">
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 id="ressnap" className="text-title">Resources</h2>
-        <Link href="/resources" className="text-sm font-bold hover:underline">Browse all</Link>
-      </div>
-      {/* Counters keyed so they mount at the loaded counts instead of rolling up from 0 on every visit. */}
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-lg bg-accent px-4 py-3.5">
-          <p className="font-mono text-xl font-medium"><NumberFlow key={plan.status} value={plan.items.length} {...numberTiming(280)} /></p>
-          <p className="text-sm">saved to plan</p>
-        </div>
-        <div className="rounded-lg bg-sunken px-4 py-3.5">
-          <p className="font-mono text-xl font-medium"><NumberFlow key={plan.status} value={unsaved.length} {...numberTiming(280)} /></p>
-          <p className="text-sm text-muted-foreground">more for your top gaps</p>
-        </div>
-      </div>
-      {plan.status === "error" && <p role="alert" className="mt-3 text-sm text-destructive">{plan.error}</p>}
-      {/* Mounted only once loaded, with initial={false}, so rows animate when a save changes them and not on load. */}
-      {plan.status === "ready" && <MotionConfig reducedMotion="user"><ul className="relative mt-3 grid gap-3">
-        <AnimatePresence initial={false} mode="popLayout">{unsaved.slice(0, 2).map((resource) => (
-          <motion.li key={resource.id} layout="position" initial={{ opacity: 0, scale: 0.97 }}
-            animate={{ opacity: 1, scale: 1, transition: ROW_ENTER }} exit={{ opacity: 0, scale: 0.97, transition: ROW_EXIT }}
-            transition={ROW_MOVE} className="flex items-center gap-3 rounded-lg bg-sunken px-4 py-3">
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-bold">{resource.title}</p>
-              <p className="truncate text-sm text-muted-foreground">{[resource.provider, skillLabel(resource.skills.find((s) => gaps.includes(s)) ?? resource.skills[0])].filter(Boolean).join(" · ")}</p>
-            </div>
-            <Button size="icon-sm" variant="raised" aria-label={`Save ${resource.title} to plan`}
-              disabled={plan.pending.has(resource.id)} onClick={() => void plan.setStatus(resource.id, "saved")}>
-              {plan.pending.has(resource.id) ? <LoaderCircle className="motion-safe:animate-spin" /> : <Bookmark />}
-            </Button>
-          </motion.li>
-        ))}</AnimatePresence>
-      </ul></MotionConfig>}
-    </section>
-  );
-}
-
-function Destinations() {
-  const { families, runs } = useDestinationRuns();
+function OtherDestinations() {
+  const { families, resumes, runs } = useDestinationRuns();
   const { family, locked, switchTo } = useSwitchRoute();
+  const others = families.filter((key) => key !== family);
   return (
-    <section aria-labelledby="dest" className="rounded-2xl border border-border bg-card p-6 shadow-card">
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 id="dest" className="text-title">Your destinations</h2>
-        <Link href="/destinations" className="text-sm font-bold hover:underline">Manage</Link>
-      </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        {families.map((key) => {
+    <div className="grid gap-2">
+      <p className="eyebrow">Your other destinations</p>
+      <div className="flex flex-wrap gap-3">
+        {others.map((key) => {
           const { status, run } = runs[key];
           const value = run?.status === "completed" ? run.match?.score ?? null : null;
           return (
-            <button key={key} type="button" disabled={locked && key !== family} onClick={() => void switchTo(key)}
-              aria-pressed={key === family}
-              className={cn("grid gap-1 rounded-xl border border-border px-4 py-3.5 text-left pressable hover:bg-background enabled:motion-safe:active:scale-[0.98] disabled:opacity-60",
-                key === family && "border-2 border-foreground")}>
-              <span className="flex items-baseline justify-between gap-2">
+            <button key={key} type="button" disabled={locked} onClick={() => void switchTo(key)}
+              className="flex min-w-0 flex-[1_1_220px] items-center gap-3 rounded-lg bg-sunken px-4 py-3 text-left pressable hover:bg-secondary enabled:motion-safe:active:scale-[0.98] disabled:opacity-60">
+              <MatchRing value={value} size={56} stroke={6} label={null} />
+              <span className="flex min-w-0 flex-col">
                 <b>{ROLE_NAMES[key]}</b>
-                <span className="font-mono">{value === null ? "" : percent(value)}</span>
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {status === "loading" ? "Loading…" : value !== null ? (key === family ? "Selected" : "Select")
-                  : run && run.status !== "failed" ? "Analyzing…" : "Not analyzed yet"}
+                <span className="truncate text-sm text-muted-foreground">
+                  {status === "loading" ? "Loading…" : value !== null ? resumes[key]?.original_filename ?? "Your résumé"
+                    : run && run.status !== "failed" ? "Analyzing…" : "Not analyzed yet"}
+                </span>
               </span>
             </button>
           );
         })}
         {families.length < FAMILIES.length && (
           <Link href={ADD_DESTINATION_HREF}
-            className="grid place-content-center rounded-xl border border-dashed border-line-strong px-4 py-3.5 text-center font-bold pressable hover:bg-background motion-safe:active:scale-[0.98]">
-            + Add a destination
+            className="flex min-w-0 flex-[1_1_220px] items-center gap-3 rounded-lg border border-dashed border-line-strong px-4 py-3 pressable hover:bg-background motion-safe:active:scale-[0.98]">
+            <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-sunken"><Plus className="size-5" /></span>
+            <span className="flex min-w-0 flex-col">
+              <b>Explore more destinations</b>
+              <span className="text-sm text-muted-foreground">Find another role to compare</span>
+            </span>
           </Link>
         )}
       </div>
-    </section>
+    </div>
   );
 }
 
