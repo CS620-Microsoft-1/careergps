@@ -38,9 +38,12 @@ RAW = {"version": "test-1", "certifications": [
 ]}
 
 
-def report(priorities):
+def report(priorities, strengths=None):
+    strengths = strengths or {}
     return {"skills": [{"skill_id": skill, "skill_name": skill, "skill_gap": 1.0 if value else 0.0,
-                        "skill_gap_grade": "F", "priority": value} for skill, value in priorities.items()]}
+                        "skill_gap_grade": "F", "priority": value,
+                        "resume_evidence_strength": strengths.get(skill, None if value is None else 0.0)}
+                       for skill, value in priorities.items()]}
 
 
 def completed_run(priorities, identifier="a" * 32, family="software_engineer"):
@@ -72,6 +75,12 @@ class RankingTests(unittest.TestCase):
     def test_top_gaps_skips_unscored_and_closed_skills(self):
         gaps = top_gaps(report({"cloud": 0.9, "security": 0.2, "testing": None, "containers": 0.0}))
         self.assertEqual([gap["skill_id"] for gap in gaps], ["cloud", "security"])
+
+    def test_top_gaps_skips_skills_the_gaps_page_shows_as_strengths(self):
+        # A positive gap with strong evidence (>= 0.7) is a strength on the page, not a gap.
+        gaps = top_gaps(report({"cloud": 0.9, "security": 0.5, "containers": 0.3},
+                               strengths={"cloud": 0.7, "security": 0.69, "containers": 0.95}))
+        self.assertEqual([gap["skill_id"] for gap in gaps], ["security"])
 
     def test_greedy_cover_prefers_breadth_and_avoids_repeating_a_gap(self):
         catalog = validate_catalog(RAW, CORE)

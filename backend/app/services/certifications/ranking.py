@@ -4,12 +4,17 @@ from app.schemas.certifications import Certification, CertificationRecommendatio
 MAX_GAPS = 8
 # One row on the Resources page; the rest of the catalog sits under "More certifications".
 MAX_RECOMMENDATIONS = 3
+# Evidence at or above this is a strength on the Gaps page (frontend lib/career.ts STRONG_STRENGTH),
+# so a skill there is never shown as a gap and must not drive a certification pick.
+STRONG_STRENGTH = 0.7
 
 
 def top_gaps(report: dict, limit: int = MAX_GAPS) -> list[dict]:
-    """Scored skills with a real gap, most urgent first. Unscored skills are never guessed."""
+    """Scored skills the Gaps page shows as gaps, most urgent first. Unscored skills are never guessed."""
     gaps = [skill for skill in report["skills"]
-            if skill.get("priority") is not None and (skill.get("skill_gap") or 0) > 0]
+            if skill.get("priority") is not None and (skill.get("skill_gap") or 0) > 0
+            and skill.get("resume_evidence_strength") is not None
+            and skill["resume_evidence_strength"] < STRONG_STRENGTH]
     gaps.sort(key=lambda skill: (-skill["priority"], skill["skill_id"]))
     return [{"skill_id": skill["skill_id"], "skill_name": skill["skill_name"],
              "skill_gap": skill["skill_gap"], "skill_gap_grade": skill["skill_gap_grade"],
