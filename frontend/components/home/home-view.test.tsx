@@ -75,6 +75,7 @@ describe("HomeView", () => {
     expect(gaps.getByRole("link", { name: "Ways to close the SQL gap" })).toHaveAttribute("href", "/resources?gap=sql");
     expect(gaps.getByRole("link", { name: "Ways to close the Dashboard development gap" }))
       .toHaveAttribute("href", "/resources?gap=dashboarding");
+    expect(gaps.getByRole("link", { name: "Ways to close the SQL gap" })).toHaveTextContent("See ways to close it");
     // Strengths and skills to review aren't gaps.
     expect(gaps.queryByText("Analytical scripting")).not.toBeInTheDocument();
     expect(gaps.queryByText("Statistics")).not.toBeInTheDocument();

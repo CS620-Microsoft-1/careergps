@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Flag, MapPin, Plus } from "lucide-react";
+import { ArrowRight, ChevronRight, Flag, MapPin, Plus } from "lucide-react";
 
 import {
   AnalysisGate,
@@ -83,10 +83,13 @@ function HomeReady({ entering }: { entering: boolean }) {
         {gaps.length ? <ul className="grid gap-8 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
           {gaps.slice(0, 3).map((gap) => <li key={gap.skill_id}>
             <Link href={`/resources?gap=${gap.skill_id}`} aria-label={`Ways to close the ${skillLabel(gap.skill_id)} gap`}
-              className="grid gap-2 rounded-lg">
+              className="group -m-3 grid gap-2 rounded-lg p-3 pressable hover:bg-background motion-safe:active:scale-[0.98]">
               <span className="font-bold">{skillLabel(gap.skill_id)}</span>
               <GapBar skill={gap} />
               <GapMeta skill={gap} />
+              <span className="inline-flex items-center gap-1 justify-self-start font-bold group-hover:underline">
+                See ways to close it<ChevronRight aria-hidden className="size-4" />
+              </span>
             </Link>
           </li>)}
         </ul> : <p className="text-muted-foreground">No gaps left for this role. Your résumé shows strong evidence for every skill postings ask for.</p>}
