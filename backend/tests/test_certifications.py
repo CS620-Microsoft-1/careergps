@@ -116,6 +116,12 @@ class RecommenderTests(unittest.TestCase):
             self.recommender.recommend(run)
 
 
+class _UnreadableCatalog(CertificationRecommender):
+    @property
+    def catalog(self) -> dict:
+        raise OSError("catalog file unreadable")
+
+
 class CertificationApiTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -158,6 +164,15 @@ class CertificationApiTests(unittest.TestCase):
         body = response.json()
         self.assertEqual(body["skill_gap_run_id"], started["id"])
         self.assertEqual(set(body), {"job_family", "skill_gap_run_id", "generated_at", "recommendations"})
+
+    def test_unreadable_catalog_is_a_503(self):
+        started = self.client.post("/skill-gaps/runs", json={}, headers=self.headers).json()
+        wait_for(self.runs, self.runs.get(started["id"], user_id=USER_ID))
+        self.recommender = _UnreadableCatalog()
+        response = self.client.post("/certifications/recommendations",
+                                    json={"job_family": "software_engineer"}, headers=self.headers)
+        self.assertEqual(response.status_code, 503, response.text)
+        self.assertEqual(response.json()["detail"], "Recommendations are unavailable")
 
     def test_failed_run_asks_for_a_new_analysis(self):
         def fail(payload, save, on_request, timings):

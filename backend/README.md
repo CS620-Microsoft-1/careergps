@@ -990,7 +990,7 @@ Certifications, school courses and student organizations live in the `certificat
   gaps and picks up to three, each adding the most gap priority not covered by an earlier pick. A
   gap here is the same as on the Gaps page: a scored skill with a positive gap and evidence below
   0.7 (`STRONG_STRENGTH` in `frontend/lib/career.ts`); stronger skills are strengths and never drive
-  a pick.
+  a pick. If the catalog cannot be read (for example a local data file), the endpoint answers 503.
   The Resources page shows those three first and the rest of the catalog under "More certifications".
 - The API caches what it reads for 5 minutes (`app/services/catalog_store.py`). While the tables are
   missing or all three are empty, it reads `data/certifications.json` and `data/resources.yaml`
