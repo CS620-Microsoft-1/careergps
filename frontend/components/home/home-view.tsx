@@ -82,7 +82,7 @@ function HomeReady() {
             </Link>
           </li>)}
         </ul> : <p className="text-muted-foreground">No gaps left for this role. Your résumé shows strong evidence for every skill postings ask for.</p>}
-        {sample && <SourceNote>Based on {sample.toLocaleString()} job postings{location ? ` in ${location}` : ""}.</SourceNote>}
+        {sample && <SourceNote>Based on {sample.toLocaleString()} job postings for this role.</SourceNote>}
       </section>
     </div>
   );
@@ -170,16 +170,15 @@ function OtherDestinations() {
             </button>
           );
         })}
-        {families.length < FAMILIES.length && (
-          <Link href={ADD_DESTINATION_HREF}
-            className="flex min-w-0 flex-[1_1_220px] items-center gap-3 rounded-lg border border-dashed border-line-strong px-4 py-3 pressable hover:bg-background motion-safe:active:scale-[0.98]">
-            <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-sunken"><Plus className="size-5" /></span>
-            <span className="flex min-w-0 flex-col">
-              <b>Explore more destinations</b>
-              <span className="text-sm text-muted-foreground">Find another role to compare</span>
-            </span>
-          </Link>
-        )}
+        {/* With every role added there's nothing new to add, so it opens Destinations to compare them. */}
+        <Link href={families.length < FAMILIES.length ? ADD_DESTINATION_HREF : "/destinations"}
+          className="flex min-w-0 flex-[1_1_220px] items-center gap-3 rounded-lg border border-dashed border-line-strong px-4 py-3 pressable hover:bg-background motion-safe:active:scale-[0.98]">
+          <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-sunken"><Plus className="size-5" /></span>
+          <span className="flex min-w-0 flex-col">
+            <b>Explore more destinations</b>
+            <span className="text-sm text-muted-foreground">Find another role to compare</span>
+          </span>
+        </Link>
       </div>
     </div>
   );

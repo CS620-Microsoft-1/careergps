@@ -79,7 +79,8 @@ describe("HomeView", () => {
     expect(gaps.queryByText("Analytical scripting")).not.toBeInTheDocument();
     expect(gaps.queryByText("Statistics")).not.toBeInTheDocument();
     expect(gaps.getByRole("link", { name: "See all gaps" })).toHaveAttribute("href", "/gaps");
-    expect(gaps.getByText("Based on 200 job postings in Madison, WI.")).toBeInTheDocument();
+    // Postings aren't filtered by location, so the note doesn't name one.
+    expect(gaps.getByText("Based on 200 job postings for this role.")).toBeInTheDocument();
   });
 
   it("says so when there are no gaps left", () => {
@@ -140,8 +141,8 @@ describe("HomeView", () => {
     expect(swe).toHaveTextContent("70%");
     expect(swe).toHaveTextContent("sam-swe.pdf");
     expect(screen.getByRole("button", { name: /AI engineer/ })).toHaveTextContent("Not analyzed yet");
-    // Every role is added, so there's nothing more to explore.
-    expect(screen.queryByRole("link", { name: /Explore more destinations/ })).not.toBeInTheDocument();
+    // Every role is added, so exploring opens Destinations instead of adding one.
+    expect(screen.getByRole("link", { name: /Explore more destinations/ })).toHaveAttribute("href", "/destinations");
 
     await userEvent.click(swe);
     expect(switchTo).toHaveBeenCalledWith("software_engineer");
