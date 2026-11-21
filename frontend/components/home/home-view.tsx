@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { ArrowRight, Flag, MapPin, Plus } from "lucide-react";
 
 import {
@@ -20,19 +21,26 @@ import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { orderPlan, percent, rankGaps, type PlanStep } from "@/lib/career";
+import { cn } from "@/lib/utils";
 
 export function HomeView() {
   const { snapshot, run } = useSkillGapAnalysis();
-  if (run?.status !== "completed" || !run.report || !snapshot) {
-    return <>
+  const ready = run?.status === "completed" && !!run.report && !!snapshot;
+  /** "left" once the page has gone back to the gate (a destination switch), so its return eases in but the first load doesn't. */
+  const [seen, setSeen] = useState<"no" | "ready" | "left">("no");
+  if (ready && seen === "no") setSeen("ready");
+  if (!ready && seen === "ready") setSeen("left");
+  if (!ready) {
+    // Held back a beat so a quick load never flashes the gate.
+    return <div className="entrance-rise [--enter-ms:200ms] [animation-delay:150ms]">
       <h1 className="mb-6 text-page-title">Your route</h1>
       <AnalysisGate />
-    </>;
+    </div>;
   }
-  return <HomeReady />;
+  return <HomeReady entering={seen === "left"} />;
 }
 
-function HomeReady() {
+function HomeReady({ entering }: { entering: boolean }) {
   const { snapshot, family, run } = useSkillGapAnalysis();
   const { user } = useAccount();
   const plan = usePlan();
@@ -45,7 +53,7 @@ function HomeReady() {
   const location = user?.preferred_location;
 
   return (
-    <div className="grid gap-12">
+    <div className={cn("grid gap-12", entering && "entrance-rise [--enter-ms:200ms]")}>
       <div className="grid gap-6 lg:grid-cols-12">
         <section aria-labelledby="where" className="flex flex-col gap-6 rounded-3xl border border-border bg-card p-6 shadow-card sm:p-8 lg:col-span-7">
           <div className="grid gap-2">

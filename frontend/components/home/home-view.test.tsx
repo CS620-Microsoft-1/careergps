@@ -155,6 +155,17 @@ describe("HomeView", () => {
     expect(screen.getByRole("button", { name: /Software engineer/ })).toBeDisabled();
   });
 
+  it("eases the page in after a destination switch, but not on the first load", () => {
+    const { container, rerender } = render(<HomeView />);
+    expect(container.firstElementChild).not.toHaveClass("entrance-rise");
+    // Switching clears the run while the new role's analysis loads.
+    mockAnalysis({ run: null, restoring: true });
+    rerender(<HomeView />);
+    mockAnalysis();
+    rerender(<HomeView />);
+    expect(container.firstElementChild).toHaveClass("entrance-rise");
+  });
+
   it("shows the analysis gate until the analysis is ready", () => {
     mockAnalysis({ loaded: false, run: null, snapshot: null });
     render(<HomeView />);
