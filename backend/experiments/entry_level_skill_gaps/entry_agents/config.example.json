@@ -1,0 +1,7 @@
+{
+  "endpoint": "https://YOUR-RESOURCE.services.ai.azure.com/api/projects/YOUR-PROJECT",
+  "agent": {
+    "name": "skill-gap-experiment-YOUR-UNIQUE-NAME",
+    "version": "1"
+  }
+}

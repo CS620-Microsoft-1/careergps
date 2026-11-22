@@ -1,0 +1,639 @@
+{
+  "format_version": "entry-level-stability-history.v1",
+  "live_calls_during_packaging": 0,
+  "scope": {
+    "job_family": "ai_engineer",
+    "all_seniority_job_count": 566,
+    "seniority_filter_applied": false,
+    "production_promoted": false
+  },
+  "evidence_limitations": [
+    "Historical observations, not new runs of the packaged code.",
+    "One confirmed real resume is repeated; it is not multiple applicants.",
+    "The additional full-resume fixture was synthetic and historically reused.",
+    "Synthetic calibration labels were authored and reviewed by agents; not human gold or employer-validated standards.",
+    "All 22 calibration cases were inspected before their respective rule freezes; none is a blind population benchmark.",
+    "Timing excludes offline preparation and provisioning; three-skill diagnostics cannot be compared with full 23-skill application latency.",
+    "Valid source IDs, exact quotes and deterministic arithmetic do not establish semantic entailment."
+  ],
+  "experiments": {
+    "prompt_stability": {
+      "source_artifact_sha256": "59c3f7142abf37028292ec115e09be68b3628e927e94c59d514b50a483ccaf91",
+      "model_calls": 42,
+      "main_repeats": 5,
+      "additional_synthetic_repeats": 2,
+      "skill_count": 23,
+      "criterion_count": 69,
+      "main": {
+        "v2": {
+          "wall_seconds": {
+            "values": [
+              33.691,
+              35.731,
+              40.649,
+              41.651,
+              37.138
+            ],
+            "mean": 37.772,
+            "median": 37.138,
+            "min": 33.691,
+            "max": 41.651,
+            "range": 7.96
+          },
+          "group_mean_seconds": {
+            "foundation": 31.337589,
+            "lifecycle": 31.961578,
+            "systems": 36.423306
+          },
+          "reported_match_scores": [
+            0.6723,
+            0.7704,
+            0.7155,
+            0.6993,
+            0.7477
+          ],
+          "pending_skill_counts": [
+            3,
+            1,
+            4,
+            2,
+            2
+          ],
+          "cached_input_tokens": [
+            0,
+            23812,
+            23812,
+            23812,
+            23812
+          ],
+          "criterion_count": 69,
+          "varying_criterion_count": 27,
+          "varying_skill_counts": {
+            "score": 15,
+            "grade": 13,
+            "pending": 4
+          },
+          "mean_pairwise_mismatch_percent": 22.028986
+        },
+        "v3": {
+          "wall_seconds": {
+            "values": [
+              41.872,
+              65.861,
+              49.675,
+              52.601,
+              56.137
+            ],
+            "mean": 53.2292,
+            "median": 52.601,
+            "min": 41.872,
+            "max": 65.861,
+            "range": 23.989
+          },
+          "group_mean_seconds": {
+            "foundation": 33.450299,
+            "lifecycle": 47.376494,
+            "systems": 52.053126
+          },
+          "reported_match_scores": [
+            0.663,
+            0.6718,
+            0.6443,
+            0.7501,
+            0.6674
+          ],
+          "pending_skill_counts": [
+            4,
+            2,
+            5,
+            3,
+            3
+          ],
+          "cached_input_tokens": [
+            0,
+            24998,
+            24998,
+            24998,
+            24998
+          ],
+          "criterion_count": 69,
+          "varying_criterion_count": 24,
+          "varying_skill_counts": {
+            "score": 15,
+            "grade": 13,
+            "pending": 5
+          },
+          "mean_pairwise_mismatch_percent": 19.130435
+        }
+      },
+      "additional_synthetic": {
+        "v2": {
+          "wall_seconds": {
+            "values": [
+              35.692,
+              27.981
+            ],
+            "mean": 31.8365,
+            "median": 31.8365,
+            "min": 27.981,
+            "max": 35.692,
+            "range": 7.711
+          },
+          "group_mean_seconds": {
+            "foundation": 26.293405,
+            "lifecycle": 31.801824,
+            "systems": 25.1761
+          },
+          "reported_match_scores": [
+            0.4766,
+            0.4747
+          ],
+          "pending_skill_counts": [
+            1,
+            1
+          ],
+          "cached_input_tokens": [
+            4673,
+            24526
+          ]
+        },
+        "v3": {
+          "wall_seconds": {
+            "values": [
+              32.361,
+              33.43
+            ],
+            "mean": 32.8955,
+            "median": 32.8955,
+            "min": 32.361,
+            "max": 33.43,
+            "range": 1.069
+          },
+          "group_mean_seconds": {
+            "foundation": 28.213796,
+            "lifecycle": 22.145891,
+            "systems": 32.868105
+          },
+          "reported_match_scores": [
+            0.5596,
+            0.5625
+          ],
+          "pending_skill_counts": [
+            2,
+            1
+          ],
+          "cached_input_tokens": [
+            5859,
+            25712
+          ]
+        }
+      },
+      "fixed_common_skill_count": 16,
+      "conclusion": "Criterion variation decreased slightly but 15 of 23 skill scores or pending states still varied in both versions; mean latency increased."
+    },
+    "fixed_evidence": {
+      "source_artifact_sha256": "92a80639c2ade4fa3e653f2247a9ef75f44b3b63567c3cae08e92cf3d1b62174",
+      "model_calls": 42,
+      "main_repeats": 5,
+      "additional_synthetic_repeats": 2,
+      "skill_count": 23,
+      "criterion_count": 69,
+      "main": {
+        "v2": {
+          "wall_seconds": {
+            "values": [
+              44.218,
+              59.929,
+              64.315,
+              44.463,
+              46.312
+            ],
+            "mean": 51.8474,
+            "median": 46.312,
+            "min": 44.218,
+            "max": 64.315,
+            "range": 20.097
+          },
+          "group_mean_seconds": {
+            "foundation": 37.09463,
+            "lifecycle": 36.80055,
+            "systems": 51.817562
+          },
+          "reported_match_scores": [
+            0.601,
+            0.6929,
+            0.6496,
+            0.6246,
+            0.7215
+          ],
+          "pending_skill_counts": [
+            1,
+            4,
+            3,
+            2,
+            4
+          ],
+          "cached_input_tokens": [
+            0,
+            23812,
+            23812,
+            23812,
+            23812
+          ],
+          "criterion_count": 69,
+          "varying_criterion_count": 23,
+          "varying_skill_counts": {
+            "score": 13,
+            "grade": 12,
+            "pending": 6
+          },
+          "mean_pairwise_mismatch_percent": 20.869565
+        },
+        "fixed": {
+          "wall_seconds": {
+            "values": [
+              51.123,
+              45.407,
+              58.725,
+              44.917,
+              46.865
+            ],
+            "mean": 49.4074,
+            "median": 46.865,
+            "min": 44.917,
+            "max": 58.725,
+            "range": 13.808
+          },
+          "group_mean_seconds": {
+            "foundation": 39.476802,
+            "lifecycle": 33.512692,
+            "systems": 48.609493
+          },
+          "reported_match_scores": [
+            0.7964,
+            0.673,
+            0.7595,
+            0.706,
+            0.6269
+          ],
+          "pending_skill_counts": [
+            6,
+            4,
+            4,
+            3,
+            3
+          ],
+          "cached_input_tokens": [
+            0,
+            19302,
+            19302,
+            19302,
+            19302
+          ],
+          "criterion_count": 69,
+          "varying_criterion_count": 24,
+          "varying_skill_counts": {
+            "score": 15,
+            "grade": 14,
+            "pending": 7
+          },
+          "mean_pairwise_mismatch_percent": 18.985507
+        }
+      },
+      "additional_synthetic": {
+        "v2": {
+          "wall_seconds": {
+            "values": [
+              35.695,
+              59.716
+            ],
+            "mean": 47.7055,
+            "median": 47.7055,
+            "min": 35.695,
+            "max": 59.716,
+            "range": 24.021
+          },
+          "group_mean_seconds": {
+            "foundation": 29.619549,
+            "lifecycle": 28.823162,
+            "systems": 43.945871
+          },
+          "reported_match_scores": [
+            0.3755,
+            0.4609
+          ],
+          "pending_skill_counts": [
+            2,
+            2
+          ],
+          "cached_input_tokens": [
+            4673,
+            24526
+          ],
+          "criterion_count": 69,
+          "varying_criterion_count": 14,
+          "varying_skill_counts": {
+            "score": 8,
+            "grade": 8,
+            "pending": 2
+          },
+          "mean_pairwise_mismatch_percent": 20.289855
+        },
+        "fixed": {
+          "wall_seconds": {
+            "values": [
+              43.82,
+              44.261
+            ],
+            "mean": 44.0405,
+            "median": 44.0405,
+            "min": 43.82,
+            "max": 44.261,
+            "range": 0.441
+          },
+          "group_mean_seconds": {
+            "foundation": 37.407269,
+            "lifecycle": 34.157391,
+            "systems": 42.451934
+          },
+          "reported_match_scores": [
+            0.3427,
+            0.4961
+          ],
+          "pending_skill_counts": [
+            3,
+            3
+          ],
+          "cached_input_tokens": [
+            5111,
+            17009
+          ],
+          "criterion_count": 69,
+          "varying_criterion_count": 12,
+          "varying_skill_counts": {
+            "score": 9,
+            "grade": 8,
+            "pending": 6
+          },
+          "mean_pairwise_mismatch_percent": 17.391304
+        }
+      },
+      "fixed_common_skill_count": 14,
+      "conclusion": "No consistent overall stability improvement; mean latency decreased slightly but median latency did not improve.",
+      "packet_scope": "One whole activity and c1 anchor per skill; c2/c3 source choices and quote spans remained model-selected.",
+      "packet_preparation_time_recorded": false,
+      "compliant_skill_instances": 161,
+      "total_fixed_skill_instances": 161,
+      "literal_quote_errors": 2,
+      "literal_quote_instances": 281,
+      "quote_error_handling": "Retained as pending; no repair or selected rerun."
+    },
+    "rule_v1": {
+      "source_artifact_sha256": "de6046407984f3169ef129d6c59804567130b4cbfc8076463b3834a487e6288c",
+      "model_calls": 16,
+      "real_resume_count": 1,
+      "skill_count": 3,
+      "synthetic_case_count": 18,
+      "samples": {
+        "main": {
+          "control": {
+            "repeats": 5,
+            "case_count": 3,
+            "wall_seconds": [
+              17.504,
+              10.4,
+              15.074,
+              17.013,
+              16.577
+            ],
+            "mean_seconds": 15.313600000000001,
+            "median_seconds": 16.577,
+            "varying_criteria": 4,
+            "criterion_count": 9,
+            "varying_scores_or_pending": 2,
+            "pairwise_disagreement_rate": 0.23333333333333334,
+            "frozen_label_matches": 34,
+            "frozen_label_judgments": 45,
+            "full_case_agreement_instances": 5,
+            "case_instances": 15,
+            "schema_failures": 0
+          },
+          "rules": {
+            "repeats": 5,
+            "case_count": 3,
+            "wall_seconds": [
+              9.714,
+              7.745,
+              6.323,
+              8.701,
+              8.025
+            ],
+            "mean_seconds": 8.101600000000001,
+            "median_seconds": 8.025,
+            "varying_criteria": 0,
+            "criterion_count": 9,
+            "varying_scores_or_pending": 0,
+            "pairwise_disagreement_rate": 0.0,
+            "frozen_label_matches": 45,
+            "frozen_label_judgments": 45,
+            "full_case_agreement_instances": 15,
+            "case_instances": 15,
+            "schema_failures": 0
+          }
+        },
+        "cases": {
+          "control": {
+            "repeats": 3,
+            "case_count": 18,
+            "wall_seconds": [
+              20.907,
+              17.842,
+              21.119
+            ],
+            "mean_seconds": 19.956,
+            "median_seconds": 20.907,
+            "varying_criteria": 4,
+            "criterion_count": 54,
+            "varying_scores_or_pending": 4,
+            "pairwise_disagreement_rate": 0.04938271604938271,
+            "frozen_label_matches": 142,
+            "frozen_label_judgments": 162,
+            "full_case_agreement_instances": 40,
+            "case_instances": 54,
+            "schema_failures": 0
+          },
+          "rules": {
+            "repeats": 3,
+            "case_count": 18,
+            "wall_seconds": [
+              13.944,
+              15.454,
+              19.399
+            ],
+            "mean_seconds": 16.265666666666668,
+            "median_seconds": 15.454,
+            "varying_criteria": 1,
+            "criterion_count": 54,
+            "varying_scores_or_pending": 1,
+            "pairwise_disagreement_rate": 0.012345679012345678,
+            "frozen_label_matches": 161,
+            "frozen_label_judgments": 162,
+            "full_case_agreement_instances": 53,
+            "case_instances": 54,
+            "schema_failures": 0
+          }
+        }
+      },
+      "main_scores": {
+        "control": {
+          "python": [
+            0.8,
+            0.8,
+            0.8,
+            0.0,
+            0.8
+          ],
+          "llm": [
+            0.8,
+            0.9,
+            0.9,
+            null,
+            0.9
+          ],
+          "ai_agents": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "rules": {
+          "python": [
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.8
+          ],
+          "llm": [
+            0.8,
+            0.8,
+            0.8,
+            0.8,
+            0.8
+          ],
+          "ai_agents": [
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        }
+      },
+      "conclusion": "Five rule-v1 main repeats agreed, but one generic Python task case varied between 0.8 and 0.5 across three repeats.",
+      "control_scope": "Adapted compact-v2 judgments in the same three-skill batch and ID-only schema, not an unmodified original Agent run."
+    },
+    "rule_v1_1": {
+      "source_artifact_sha256": "d638e736e0929b9475fe6d0fc24141ddabeab90f3bbdd7869b155c523867fe4a",
+      "additional_model_calls": 9,
+      "total_rule_calibration_calls": 25,
+      "skill_count": 3,
+      "synthetic_case_count": 22,
+      "samples": {
+        "cases_extended": {
+          "v1": {
+            "repeats": 3,
+            "case_count": 22,
+            "wall_seconds": [
+              16.978,
+              16.349,
+              21.751
+            ],
+            "mean_seconds": 18.359333333333336,
+            "median_seconds": 16.978,
+            "varying_criteria": 0,
+            "criterion_count": 66,
+            "varying_score_or_pending": 0,
+            "pairwise_disagreement_rate": 0.0,
+            "frozen_label_matches": 198,
+            "frozen_label_judgments": 198,
+            "full_case_matches": 66,
+            "case_instances": 66,
+            "schema_failures": 0
+          },
+          "v1_1": {
+            "repeats": 3,
+            "case_count": 22,
+            "wall_seconds": [
+              17.23,
+              17.974,
+              19.276
+            ],
+            "mean_seconds": 18.16,
+            "median_seconds": 17.974,
+            "varying_criteria": 0,
+            "criterion_count": 66,
+            "varying_score_or_pending": 0,
+            "pairwise_disagreement_rate": 0.0,
+            "frozen_label_matches": 198,
+            "frozen_label_judgments": 198,
+            "full_case_matches": 66,
+            "case_instances": 66,
+            "schema_failures": 0
+          }
+        },
+        "main": {
+          "v1_1": {
+            "repeats": 3,
+            "case_count": 3,
+            "wall_seconds": [
+              8.111,
+              7.997,
+              8.692
+            ],
+            "mean_seconds": 8.266666666666667,
+            "median_seconds": 8.111,
+            "varying_criteria": 1,
+            "criterion_count": 9,
+            "varying_score_or_pending": 1,
+            "pairwise_disagreement_rate": 0.07407407407407407,
+            "frozen_label_matches": 26,
+            "frozen_label_judgments": 27,
+            "full_case_matches": 8,
+            "case_instances": 9,
+            "schema_failures": 0
+          }
+        }
+      },
+      "main_scores": {
+        "python": [
+          0.8,
+          0.8,
+          0.8
+        ],
+        "llm": [
+          0.8,
+          0.9,
+          0.8
+        ],
+        "ai_agents": [
+          null,
+          null,
+          null
+        ]
+      },
+      "main_stability_gate_passed": false,
+      "retained_failure": {
+        "skill_id": "llm",
+        "round": 2,
+        "observed_score": 0.9,
+        "rule_expected_score": 0.8,
+        "cause": "The model awarded partial checking credit to workflow-purpose wording without evidence of an executed check. Source IDs and arithmetic were valid; semantic entailment was not."
+      },
+      "conclusion": "Both versions passed the same 22 short cases in all three rounds. This does not prove v1.1 improved stability. The real-resume v1.1 regression still produced LLM scores 0.8, 0.9, 0.8.",
+      "causal_limit": "No evidence establishes that the Python clarification caused the unrelated LLM failure. There was no new paired control for the main v1.1 regression."
+    }
+  }
+}
