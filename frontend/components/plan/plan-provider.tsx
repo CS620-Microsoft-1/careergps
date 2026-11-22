@@ -28,12 +28,16 @@ type PlanContextValue = PlanState & {
   remove: (resourceId: string) => Promise<void>;
   toggleSaved: (resourceId: string) => Promise<void>;
   /**
-   * Save a suggested plan: steps get positions 1..N in order, alongside items none. Saved one at a time;
-   * resolves false (with actionError set) at the first failure, keeping what was saved before it.
+   * Save items from a suggested plan, each with its step number as position (none for alongside items).
+   * Saved one at a time; resolves false (with actionError set) at the first failure, keeping what was
+   * saved before it. Used by "Add all" and by a single card's "Add to plan".
    */
-  addPlan: (steps: string[], alongside: string[]) => Promise<boolean>;
+  addItems: (entries: PlanEntry[]) => Promise<boolean>;
   actionError?: string;
 };
+
+/** One item to save from a suggested plan; position is its step number (1 = do first). */
+export type PlanEntry = { resourceId: string; position?: number };
 
 const PlanContext = createContext<PlanContextValue | null>(null);
 
@@ -108,15 +112,13 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
 
   const saved = useMemo(() => new Map(state.items.map((item) => [item.resource_id, item])), [state.items]);
 
-  const addPlan = useCallback(async (steps: string[], alongside: string[]) => {
+  const addItems = useCallback(async (entries: PlanEntry[]) => {
     const family = state.family;
     if (!family) return false;
-    const entries = [...steps.map((id, index) => ({ id, position: index + 1 })),
-      ...alongside.map((id) => ({ id, position: undefined }))];
-    setPending((current) => new Set([...current, ...entries.map((entry) => entry.id)]));
+    setPending((current) => new Set([...current, ...entries.map((entry) => entry.resourceId)]));
     setActionError(undefined);
     try {
-      for (const { id, position } of entries) {
+      for (const { resourceId: id, position } of entries) {
         // Keep a done item done; everything else is saved.
         const status = saved.get(id)?.status ?? "saved";
         const item = await setPlanItem(family, id, status, position);
@@ -130,7 +132,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setPending((current) => {
         const next = new Set(current);
-        entries.forEach((entry) => next.delete(entry.id));
+        entries.forEach((entry) => next.delete(entry.resourceId));
         return next;
       });
     }
@@ -144,7 +146,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     : { family: activeFamily, status: activeFamily ? "loading" as const : "idle" as const, resources: [], items: [] };
   return (
     <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, justCompleted, justSaved, setStatus, remove,
-      toggleSaved, addPlan, actionError }}>
+      toggleSaved, addItems, actionError }}>
       {children}
     </PlanContext>
   );

@@ -13,7 +13,7 @@ type Plan = ReturnType<typeof usePlan>;
 function mockPlan(overrides: Partial<Plan> = {}) {
   const plan: Plan = {
     family: "data_analyst", status: "ready", resources: [], items: [], saved: new Map(), pending: new Set(),
-    justCompleted: null, justSaved: null, setStatus: vi.fn(), remove: vi.fn(), toggleSaved: vi.fn(), addPlan: vi.fn(),
+    justCompleted: null, justSaved: null, setStatus: vi.fn(), remove: vi.fn(), toggleSaved: vi.fn(), addItems: vi.fn(),
     ...overrides,
   };
   vi.mocked(usePlan).mockReturnValue(plan);

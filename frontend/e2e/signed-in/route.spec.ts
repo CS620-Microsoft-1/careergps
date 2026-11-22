@@ -56,6 +56,20 @@ test("a suggested plan is added to the action plan in its order", async ({ page 
     ["SQL for Data Analysis", "Analyze a public dataset with SQL", "Building Dashboards"]);
 });
 
+test("a single suggested step is added with its step number", async ({ page }) => {
+  const api = await mockApi(page);
+  await page.goto("/plan");
+  await page.getByRole("button", { name: "or let us suggest a plan" }).click();
+  const panel = page.getByRole("region", { name: "SQL first, then dashboards" });
+  const step = panel.getByRole("listitem").filter({ hasText: "Analyze a public dataset with SQL" });
+  await step.getByRole("button", { name: /Add to plan/ }).click();
+  await expect(step.getByRole("button", { name: /In your plan/ })).toHaveAttribute("aria-pressed", "true");
+  expect(api.calls).toContainEqual({ method: "PUT", path: "/plan/items/sql-project",
+    body: { job_family: "data_analyst", status: "saved", position: 2 } });
+  // The panel stays open, so more steps can be added.
+  await expect(panel.getByRole("button", { name: "Add all to my plan" })).toBeEnabled();
+});
+
 test("a gap link filters Resources to that gap", async ({ page }) => {
   await mockApi(page);
   await page.goto("/resources?gap=dashboarding");

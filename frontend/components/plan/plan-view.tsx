@@ -58,7 +58,7 @@ export function PlanView() {
         </Button>}
       </div>} />
 
-    {canSuggest && suggesting && <div className="mb-6"><SuggestedPlan key={family} family={family} onClose={() => setSuggesting(false)} /></div>}
+    {canSuggest && suggesting && <div className="mb-6"><SuggestedPlan key={family} family={family} gapOrder={gaps} onClose={() => setSuggesting(false)} /></div>}
 
     {!loaded || plan.status === "loading" ? <p role="status" className="flex items-center gap-2 text-muted-foreground"><LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Loading your plan…</p>
       // No snapshot because the profile couldn't be loaded, not because there's no résumé.

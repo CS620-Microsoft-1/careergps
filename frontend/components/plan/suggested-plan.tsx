@@ -1,14 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Check, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "lucide-react";
+import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "lucide-react";
 
 import { RESOURCE_TYPES, ResourceIcon, skillLabel } from "@/components/career/route-parts";
-import { usePlan } from "@/components/plan/plan-provider";
-import { Badge } from "@/components/ui/badge";
+import { type PlanEntry, usePlan } from "@/components/plan/plan-provider";
 import { Button } from "@/components/ui/button";
 import { getActionPlanSuggestions } from "@/lib/api/action-plans";
 import { errorMessage } from "@/lib/api/client";
+import { cn } from "@/lib/utils";
 import type { ActionPlan, ActionPlanItem, ActionPlanSuggestions, JobFamily } from "@/types/api";
 
 type State =
@@ -17,12 +17,22 @@ type State =
   | { status: "error"; message: string };
 
 const names = (skillIds: string[]) => skillIds.map(skillLabel).join(", ");
+const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
+
+/** Main-path steps keep their step number as position, so adding them one by one keeps the order. */
+const entriesFor = (plan: ActionPlan): PlanEntry[] => [
+  ...plan.steps.map((item, index) => ({ resourceId: item.resource_id, position: index + 1 })),
+  ...plan.alongside.map((item) => ({ resourceId: item.resource_id })),
+];
 
 /**
  * An optional suggested plan on the Action plan page. It asks the backend once when it opens; nothing in
- * the saved plan changes until the student clicks "Add all to my plan".
+ * the saved plan changes until the student adds a card or clicks "Add all to my plan".
+ * gapOrder: the student's gaps, biggest first (rankGaps), to order the skills strip.
  */
-export function SuggestedPlan({ family, onClose }: { family: JobFamily; onClose: () => void }) {
+export function SuggestedPlan({ family, gapOrder, onClose }: {
+  family: JobFamily; gapOrder: string[]; onClose: () => void;
+}) {
   const plan = usePlan();
   const [state, setState] = useState<State>({ status: "loading" });
   const [adding, setAdding] = useState(false);
@@ -54,11 +64,12 @@ export function SuggestedPlan({ family, onClose }: { family: JobFamily; onClose:
   };
 
   const suggested = state.status === "ready" ? state.suggestions.plans[0] ?? null : null;
+  const entries = suggested ? entriesFor(suggested) : [];
+  const allInPlan = entries.length > 0 && entries.every((entry) => plan.saved.has(entry.resourceId));
 
-  const addAll = async (suggestion: ActionPlan) => {
+  const addAll = async () => {
     setAdding(true);
-    const ok = await plan.addPlan(suggestion.steps.map((item) => item.resource_id),
-      suggestion.alongside.map((item) => item.resource_id));
+    const ok = await plan.addItems(entries);
     setAdding(false);
     if (ok) onClose();
   };
@@ -93,12 +104,13 @@ export function SuggestedPlan({ family, onClose }: { family: JobFamily; onClose:
       </p>}
 
       {suggested && state.status === "ready" && <>
+        <SkillsHighlight plan={suggested} uncovered={state.suggestions.uncovered_skill_ids} gapOrder={gapOrder} />
         {plan.actionError && <p role="alert" className="mt-4 text-sm text-destructive">{plan.actionError}</p>}
-        <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
+        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
           <div>
             <p id="suggested-steps" className="eyebrow mb-3">Main path, in order</p>
             <ol aria-labelledby="suggested-steps" className="grid gap-3">
-              {suggested.steps.map((item, index) => <SuggestedItem key={item.resource_id} item={item} label={String(index + 1)} />)}
+              {suggested.steps.map((item, index) => <SuggestedItem key={item.resource_id} item={item} step={index + 1} />)}
             </ol>
           </div>
           {suggested.alongside.length > 0 && <div>
@@ -110,20 +122,15 @@ export function SuggestedPlan({ family, onClose }: { family: JobFamily; onClose:
         </div>
 
         <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-border pt-5">
-          <p className="min-w-0 basis-80 text-sm/6 text-muted-foreground">
-            {[
-              suggested.covered_skill_ids.length ? `Covers ${names(suggested.covered_skill_ids)}.` : "",
-              suggested.project_hours !== null ? `About ${suggested.project_hours} hours of project work.` : "",
-              state.suggestions.uncovered_skill_ids.length
-                ? `No resource closes ${names(state.suggestions.uncovered_skill_ids)} yet.` : "",
-              state.suggestions.source === "rules" ? "Built from your gap ranking." : "",
-            ].filter(Boolean).join(" ")}
+          <p className="min-w-0 basis-60 text-sm/6 text-muted-foreground">
+            {state.suggestions.source === "rules" ? "Built from your gap ranking." : "Add the steps you want, or the whole plan."}
           </p>
           <div className="flex flex-wrap gap-2">
             <Button variant="ghost" size="lg" onClick={onClose} disabled={adding}>Dismiss</Button>
-            <Button size="lg" onClick={() => void addAll(suggested)} disabled={adding}>
-              {adding ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" /> : <Plus data-icon="inline-start" />}
-              Add all to my plan
+            <Button size="lg" onClick={() => void addAll()} disabled={adding || allInPlan}>
+              {adding ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />
+                : allInPlan ? <Check data-icon="inline-start" /> : <Plus data-icon="inline-start" />}
+              {allInPlan ? "All in your plan" : "Add all to my plan"}
             </Button>
           </div>
         </div>
@@ -132,28 +139,98 @@ export function SuggestedPlan({ family, onClose }: { family: JobFamily; onClose:
   );
 }
 
-/** label: the step number on the main path; none for alongside items. */
-function SuggestedItem({ item, label }: { item: ActionPlanItem; label?: string }) {
+/**
+ * The plan's headline: which gaps it closes, in the student's gap order, and how much work it is.
+ * Every number is counted from the plan's items or computed by the backend; none comes from the Agent.
+ */
+function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; uncovered: string[]; gapOrder: string[] }) {
+  const rank = (skill: string) => {
+    const index = gapOrder.indexOf(skill);
+    return index < 0 ? Number.POSITIVE_INFINITY : index;
+  };
+  const skills = [...new Set([...plan.covered_skill_ids, ...uncovered])].sort((a, b) => rank(a) - rank(b));
+  const stepsFor = (skill: string) => plan.steps.filter((item) => item.skill_ids.includes(skill)).length;
+  const covered = new Set(plan.covered_skill_ids);
+  const tiles = [
+    { value: `${covered.size} of ${skills.length}`, label: "gaps covered" },
+    { value: plural(plan.steps.length, "step"), label: plan.alongside.length ? `+ ${plan.alongside.length} alongside` : "on the main path" },
+    ...(plan.project_hours !== null ? [{ value: `≈ ${plan.project_hours} h`, label: "of project work" }] : []),
+  ];
+
+  return (
+    <div className="mt-6 grid gap-5 rounded-xl bg-sunken p-4 sm:p-5">
+      {/* Phones: one compact row per figure. From sm: tiles side by side. */}
+      <dl className="grid gap-2 sm:grid-flow-col sm:auto-cols-fr sm:gap-3">
+        {tiles.map((tile) => (
+          // Label after the value on screen, before it in the markup (dt then dd).
+          <div key={tile.label} className="flex min-w-0 flex-row-reverse items-baseline justify-end gap-2 rounded-lg bg-card px-3 py-2 sm:flex-col-reverse sm:items-start sm:gap-0 sm:px-4 sm:py-3">
+            <dt className="text-sm text-muted-foreground">{tile.label}</dt>
+            <dd className="font-mono text-base font-medium whitespace-nowrap sm:text-xl">{tile.value}</dd>
+          </div>
+        ))}
+      </dl>
+      <div>
+        <p id="suggested-skills" className="eyebrow mb-2">Skills this plan builds</p>
+        <ul aria-labelledby="suggested-skills" className="flex flex-wrap gap-2">
+          {skills.map((skill) => {
+            const isCovered = covered.has(skill);
+            const steps = stepsFor(skill);
+            const order = rank(skill);
+            const detail = !isCovered ? "not covered yet" : steps ? plural(steps, "step") : "alongside";
+            return (
+              <li key={skill} className={cn("flex min-h-9 max-w-full items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm",
+                !isCovered ? "border border-dashed border-line-strong text-muted-foreground"
+                  : order === 0 ? "bg-accent text-accent-foreground" : "bg-card")}>
+                <span aria-hidden className={cn("grid size-7 shrink-0 place-items-center rounded-full font-mono text-xs",
+                  isCovered ? "bg-foreground text-background" : "border border-dashed border-line-strong")}>
+                  {Number.isFinite(order) ? order + 1 : "·"}
+                </span>
+                <span className="min-w-0">
+                  <b className={cn(!isCovered && "font-medium")}>{skillLabel(skill)}</b>
+                  <span className="text-muted-foreground">{order === 0 ? " · top gap" : ""} · {detail}</span>
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+/** step: the step number on the main path; none for alongside items. */
+function SuggestedItem({ item, step }: { item: ActionPlanItem; step?: number }) {
   const plan = usePlan();
   const { resource } = item;
-  const inPlan = plan.saved.has(item.resource_id);
+  const saved = plan.saved.get(item.resource_id);
+  const busy = plan.pending.has(item.resource_id);
+  const toggle = () => void (saved ? plan.remove(item.resource_id)
+    : plan.addItems([{ resourceId: item.resource_id, position: step }]));
   return (
-    <li className={label ? "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2 sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-3" : undefined}>
-      {label && <span aria-hidden className="pt-4 text-right font-mono text-sm text-muted-foreground">{label}</span>}
-      <div className={label ? "rounded-xl border border-border bg-card p-4" : "rounded-xl border border-dashed border-line-strong bg-card p-4"}>
-        {/* The badge wraps under the title when the card is narrow, so the title keeps its width. */}
-        <div className="flex flex-wrap items-start gap-3">
+    <li className={step ? "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2 sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-3" : undefined}>
+      {step && <span aria-hidden className="pt-4 text-right font-mono text-sm text-muted-foreground">{step}</span>}
+      <div className={cn("rounded-xl bg-card p-4", step ? "border border-border" : "border border-dashed border-line-strong")}>
+        <div className="flex items-start gap-3">
           <ResourceIcon type={resource.type} className="size-8 bg-sunken" />
-          <div className="min-w-0 flex-1 basis-32">
-            <p className="font-bold">{label && <span className="sr-only">Step {label}: </span>}{resource.title}</p>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold">{step && <span className="sr-only">Step {step}: </span>}{resource.title}</p>
             <p className="text-sm text-muted-foreground">
               {[RESOURCE_TYPES[resource.type].label, resource.provider, resource.meta].filter(Boolean).join(" · ")}
             </p>
           </div>
-          {inPlan && <Badge variant="success" className="shrink-0"><Check aria-hidden className="size-3.5" />In your plan</Badge>}
         </div>
         <p className="mt-3 text-sm">Closes <b>{names(item.skill_ids)}</b></p>
         <p className="mt-2 rounded-lg bg-accent px-3 py-2 text-sm/6">{item.reason}</p>
+        <div className="mt-3 flex justify-end">
+          {saved?.status === "done"
+            ? <span className="inline-flex h-9 items-center gap-1.5 text-sm font-bold text-success"><CircleCheck aria-hidden className="size-4" />Done</span>
+            : <Button type="button" size="sm" variant={saved ? "accent" : "secondary"} aria-pressed={Boolean(saved)}
+              disabled={busy} onClick={toggle}>
+              {busy ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />
+                : saved ? <Check data-icon="inline-start" /> : <Plus data-icon="inline-start" />}
+              {saved ? "In your plan" : "Add to plan"}<span className="sr-only">: {resource.title}</span>
+            </Button>}
+        </div>
       </div>
     </li>
   );
