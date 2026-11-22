@@ -1,6 +1,6 @@
 import type { Page, Route } from "@playwright/test";
 
-import { destinations, market, planItem, resources, resume, run, user } from "../../test/fixtures";
+import { actionPlanSuggestions, destinations, market, planItem, resources, resume, run, user } from "../../test/fixtures";
 import type {
   CertificationRecommendations,
   JobFamily,
@@ -85,7 +85,10 @@ export async function mockApi(page: Page, options: Options = {}) {
     }
     if (method === "GET" && path === "/plan") return ok({ job_family: family, items } satisfies Plan);
     if (method === "PUT" && (match = path.match(/^\/plan\/items\/(.+)$/))) {
-      const item = planItem(decodeURIComponent(match[1]), (body as { status: PlanItem["status"] }).status);
+      const { status, position } = body as { status: PlanItem["status"]; position?: number };
+      const previous = items.find((i) => i.resource_id === decodeURIComponent(match![1]));
+      // Like the backend: a position is kept until a new one replaces it.
+      const item = { ...planItem(decodeURIComponent(match[1]), status), position: position ?? previous?.position ?? null };
       items.splice(0, items.length, ...items.filter((i) => i.resource_id !== item.resource_id), item);
       return ok(item);
     }
@@ -98,6 +101,7 @@ export async function mockApi(page: Page, options: Options = {}) {
       return ok({ job_family: family, skill_gap_run_id: run.id, source: "rules", generated_at: run.created_at,
         recommendations: [] } satisfies CertificationRecommendations);
     }
+    if (method === "POST" && path === "/action-plans/suggestions") return ok(actionPlanSuggestions);
     if (method === "POST" && path === "/resources/projects/from-skill-gap") {
       return ok({ source: "rules", recommendations: [], no_match_reason: null } satisfies ProjectRecommendations);
     }

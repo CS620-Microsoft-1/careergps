@@ -37,6 +37,25 @@ test("a resource saved on Resources shows up in the action plan", async ({ page 
   await expect(page.getByText("SQL for Data Analysis").first()).toBeVisible();
 });
 
+test("a suggested plan is added to the action plan in its order", async ({ page }) => {
+  const api = await mockApi(page);
+  await page.goto("/plan");
+  await page.getByRole("button", { name: "or let us suggest a plan" }).click();
+  const panel = page.getByRole("region", { name: "SQL first, then dashboards" });
+  await expect(panel.getByText("Learn joins and aggregates before you query real data.")).toBeVisible();
+  await panel.getByRole("button", { name: "Add all to my plan" }).click();
+  await expect(panel).toHaveCount(0);
+
+  const saves = api.calls.filter((call) => call.method === "PUT" && call.path.startsWith("/plan/items/"));
+  expect(saves.map((call) => [call.path, (call.body as { position?: number }).position])).toEqual([
+    ["/plan/items/sql-course", 1], ["/plan/items/sql-project", 2], ["/plan/items/dashboard-course", 3],
+    ["/plan/items/data-club", undefined],
+  ]);
+  const route = page.getByRole("region", { name: "Your route, step by step" });
+  await expect(route.locator("ol > li p.font-bold")).toHaveText(
+    ["SQL for Data Analysis", "Analyze a public dataset with SQL", "Building Dashboards"]);
+});
+
 test("a gap link filters Resources to that gap", async ({ page }) => {
   await mockApi(page);
   await page.goto("/resources?gap=dashboarding");

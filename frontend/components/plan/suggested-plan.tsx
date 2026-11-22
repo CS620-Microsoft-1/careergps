@@ -64,7 +64,7 @@ export function SuggestedPlan({ family, onClose }: { family: JobFamily; onClose:
   };
 
   return (
-    <section aria-labelledby="suggested-plan" className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
+    <section aria-labelledby="suggested-plan" className="rounded-2xl border border-border bg-card p-5 shadow-card sm:p-8">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="eyebrow flex items-center gap-2"><Sparkles aria-hidden className="size-4" />Suggested plan</p>
@@ -96,14 +96,14 @@ export function SuggestedPlan({ family, onClose }: { family: JobFamily; onClose:
         {plan.actionError && <p role="alert" className="mt-4 text-sm text-destructive">{plan.actionError}</p>}
         <div className="mt-6 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
           <div>
-            <p className="eyebrow mb-3">Main path, in order</p>
-            <ol className="grid gap-3">
+            <p id="suggested-steps" className="eyebrow mb-3">Main path, in order</p>
+            <ol aria-labelledby="suggested-steps" className="grid gap-3">
               {suggested.steps.map((item, index) => <SuggestedItem key={item.resource_id} item={item} label={String(index + 1)} />)}
             </ol>
           </div>
           {suggested.alongside.length > 0 && <div>
-            <p className="eyebrow mb-3">Alongside</p>
-            <ul className="grid gap-3">
+            <p id="suggested-alongside" className="eyebrow mb-3">Alongside</p>
+            <ul aria-labelledby="suggested-alongside" className="grid gap-3">
               {suggested.alongside.map((item) => <SuggestedItem key={item.resource_id} item={item} />)}
             </ul>
           </div>}
@@ -138,12 +138,13 @@ function SuggestedItem({ item, label }: { item: ActionPlanItem; label?: string }
   const { resource } = item;
   const inPlan = plan.saved.has(item.resource_id);
   return (
-    <li className={label ? "grid grid-cols-[2rem_minmax(0,1fr)] gap-3" : undefined}>
+    <li className={label ? "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2 sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-3" : undefined}>
       {label && <span aria-hidden className="pt-4 text-right font-mono text-sm text-muted-foreground">{label}</span>}
       <div className={label ? "rounded-xl border border-border bg-card p-4" : "rounded-xl border border-dashed border-line-strong bg-card p-4"}>
-        <div className="flex items-start gap-3">
+        {/* The badge wraps under the title when the card is narrow, so the title keeps its width. */}
+        <div className="flex flex-wrap items-start gap-3">
           <ResourceIcon type={resource.type} className="size-8 bg-sunken" />
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0 flex-1 basis-32">
             <p className="font-bold">{label && <span className="sr-only">Step {label}: </span>}{resource.title}</p>
             <p className="text-sm text-muted-foreground">
               {[RESOURCE_TYPES[resource.type].label, resource.provider, resource.meta].filter(Boolean).join(" · ")}
