@@ -96,12 +96,17 @@ describe("SuggestedPlan", () => {
     it("shows a gap no resource closes as not covered yet", async () => {
       await renderReady(suggestions({ uncovered_skill_ids: ["statistics"] }));
       expect(skillChips()).toContain("3Statistics · not covered yet");
-      expect(screen.getByText("2 of 3")).toBeInTheDocument();
     });
 
-    it("counts gaps, steps, alongside items and project hours", async () => {
+    it("counts covered gaps out of all the student's gaps, like the Gaps page", async () => {
+      // GAP_ORDER has 3 gaps; the plan covers the top 2.
       await renderReady();
-      expect(screen.getByText("2 of 2")).toBeInTheDocument();
+      expect(screen.getByText("2 of 3")).toBeInTheDocument();
+      expect(screen.getByText("gaps covered")).toBeInTheDocument();
+    });
+
+    it("counts steps, alongside items and project hours", async () => {
+      await renderReady();
       expect(screen.getByText("3 steps")).toBeInTheDocument();
       expect(screen.getByText("+ 1 alongside")).toBeInTheDocument();
       expect(screen.getByText("≈ 12 h")).toBeInTheDocument();

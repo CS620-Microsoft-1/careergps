@@ -157,7 +157,8 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
   const stepsFor = (skill: string) => plan.steps.filter((item) => item.skill_ids.includes(skill)).length;
   const covered = new Set(plan.covered_skill_ids);
   const tiles = [
-    { value: `${covered.size} of ${skills.length}`, label: "gaps covered" },
+    // Out of all the student's gaps (as the Gaps page counts them), not only the top ones the plan targets.
+    { value: `${covered.size} of ${Math.max(gapOrder.length, skills.length)}`, label: "gaps covered" },
     { value: plural(plan.steps.length, "step"), label: plan.alongside.length ? `+ ${plan.alongside.length} alongside` : "on the main path" },
     ...(plan.project_hours !== null ? [{ value: `≈ ${plan.project_hours} h`, label: "of project work" }] : []),
   ];
