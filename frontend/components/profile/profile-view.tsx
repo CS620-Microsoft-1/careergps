@@ -8,6 +8,7 @@ import { ROLE_NAMES, skillLabel } from "@/components/career/route-parts";
 import { useAccount } from "@/components/layout/account-provider";
 import { BackendStatus } from "@/components/layout/backend-status";
 import { usePlan } from "@/components/plan/plan-provider";
+import { DeleteAccount } from "@/components/profile/delete-account";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -65,6 +66,7 @@ export function ProfileView() {
           <p className="mt-2 text-sm/6 text-muted-foreground">Only you can see your résumés. We keep each version you confirm so you can go back to it.</p>
           <BackendStatus className="mt-4" />
         </section>
+        <DeleteAccount />
       </aside>
     </div>
   </>;
