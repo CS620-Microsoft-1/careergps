@@ -20,7 +20,7 @@ from pathlib import Path
 BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
-from app.services.resources import FAMILY_TO_CATALOG, load_projects  # noqa: E402
+from app.services.resources import FAMILY_TO_CATALOG, load_curated_projects  # noqa: E402
 from app.services.resources_agent import _candidates, _shortlist, rank_projects, recommend_projects  # noqa: E402
 from app.services.skill_gaps.assets import ASSET_ROOT  # noqa: E402
 
@@ -53,10 +53,9 @@ def main() -> int:
             for s in args.skill_ids]
     names = [gap["skill_name"] for gap in gaps]
     career_path = FAMILY_TO_CATALOG[args.family]
-    pool = [p for p in load_projects() if p["career_path"] == career_path]
+    pool = [p for p in load_curated_projects() if p["career_path"] == career_path]
     candidates = _candidates(career_path, args.hours, gaps)
-    print(f"{career_path}: {len(pool)} projects in catalog "
-          f"({sum(p.get('source') == 'github' for p in pool)} from GitHub), {len(candidates)} match these gaps")
+    print(f"{career_path}: {len(pool)} curated projects, {len(candidates)} match these gaps")
     if args.agent:
         print(f"Asking the agent with the top {len(_shortlist(candidates, gaps, names))} candidates...")
         result = {**recommend_projects(career_path, [], names, args.hours, gaps), "source": "agent"}

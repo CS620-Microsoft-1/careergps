@@ -28,7 +28,8 @@ router = APIRouter(tags=["resources"])
 logger = logging.getLogger(__name__)
 
 # Agent picks per completed run, so a page visit doesn't pay for another model call.
-PROJECT_PICKS_DIR = BACKEND_ROOT / "local_results" / "project_recommendations"
+# Use a new cache for picks based on the curated catalog.
+PROJECT_PICKS_DIR = BACKEND_ROOT / "local_results" / "project_recommendations" / "curated"
 _RUN_ID = re.compile(r"[0-9a-f]{32}\Z")
 _picks_locks: defaultdict[str, Lock] = defaultdict(Lock)
 _picks_locks_guard = Lock()

@@ -413,8 +413,10 @@ different company with the same name.
 
 ## Sync real projects from GitHub
 
-The resources agent recommends from `data/projects.json` (hand-written) plus
-`data/github_projects.json` (real projects pulled from GitHub). The sources are listed in
+The resources agent and the rule-based fallback recommend from `data/projects.json`.
+They match the project's team-defined `supported_skill_ids` to the scored gaps in the
+role's skill catalog. The resource library also lists examples from
+`data/github_projects.json`. The GitHub sources are listed in
 `data/project_sources.yaml`: an `idea_list` repo whose README has project tables, or a GitHub
 `topic` whose top repos become "contribute to <repo>" projects (supported, but no topic source
 is configured).
@@ -426,9 +428,7 @@ python -m scripts.sync_github_projects --source cool_coders --dry-run
 ```
 
 Skills are assigned by keyword rules in `app/services/github_projects.py`, and a project is
-only offered for a role when its own name or description names a skill specific to that role.
-The agent sees at most 25 candidates per request, the ones that cover the most
-high-priority gaps.
+only listed for a role when its own name or description names a skill specific to that role.
 
 **Re-syncing.** The app only reads the committed snapshot; GitHub is contacted only when
 someone runs the script. Re-sync on a branch and open a PR, so the change to

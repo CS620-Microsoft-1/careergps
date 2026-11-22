@@ -51,10 +51,15 @@ def load_catalog() -> tuple[dict, ...]:
     return tuple(entries)
 
 
+def load_curated_projects() -> tuple[dict, ...]:
+    """The team-authored projects and their explicitly mapped skill IDs."""
+    return tuple(json.loads(PROJECTS_PATH.read_text(encoding="utf-8")))
+
+
 @lru_cache
 def load_projects() -> tuple[dict, ...]:
     """Hand-written projects first, then the GitHub-sourced ones; an id appears once."""
-    projects = json.loads(PROJECTS_PATH.read_text(encoding="utf-8"))
+    projects = list(load_curated_projects())
     if GITHUB_PROJECTS_PATH.exists():
         projects += json.loads(GITHUB_PROJECTS_PATH.read_text(encoding="utf-8"))
     unique: dict[str, dict] = {}
