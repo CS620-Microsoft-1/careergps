@@ -53,6 +53,15 @@ class LocalPlanStore:
             if data["families"].get(family, {}).pop(resource_id, None) is not None:
                 save_json(self._path(user_id), data)
 
+    def delete_user(self, user_id: UUID) -> bool:
+        """Remove the user's whole plan file (account deletion). True if a file was removed."""
+        with self._lock:
+            path = self._path(user_id)
+            if not path.exists():
+                return False
+            path.unlink()
+            return True
+
 
 @lru_cache
 def get_plan_store() -> LocalPlanStore:

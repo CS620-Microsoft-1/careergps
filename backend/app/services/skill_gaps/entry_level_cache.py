@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Callable
 from uuid import UUID
 
-from .branch_cache import CacheHit, _RUN_ID, _digest
+from .branch_cache import CacheHit, _RUN_ID, _digest, _remove_tree
 from .skill_groups import GROUPS
 from .storage import load, save_json
 
@@ -57,6 +57,14 @@ class EntryLevelBranchCache:
         # A short directory hash leaves room for atomic temp names on Windows.
         namespace = _digest({"owner": identity["owner"]})[:24]
         return self.directory / namespace / (key + ".json")
+
+    def owner_folder(self, owner: str) -> Path:
+        """The folder holding every cached response for one owner (a user id)."""
+        return self.directory / _digest({"owner": str(UUID(str(owner)))})[:24]
+
+    def delete_owner(self, owner: str) -> bool:
+        """Remove all of one owner's cached responses (account deletion). True if any were removed."""
+        return _remove_tree(self.owner_folder(owner))
 
     def store(self, *, owner: str, resume_id: str, branch: str, payload: dict,
               binding: dict, dependencies: dict, output: dict, validation: dict,

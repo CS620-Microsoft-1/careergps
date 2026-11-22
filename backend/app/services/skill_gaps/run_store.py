@@ -11,10 +11,11 @@ Both stores take the same calls: `create` (a new queued run), `save_state` (prog
 
 Branch inputs, raw responses and the branch cache stay in the local run folders for every store.
 """
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from datetime import datetime, timezone
 from pathlib import Path
 import re
+import shutil
 from typing import Any
 from uuid import UUID
 
@@ -37,6 +38,20 @@ def run_folder(directory: Path, identifier: str) -> Path:
     if not RUN_ID.fullmatch(identifier):
         raise KeyError(identifier)
     return directory / identifier
+
+
+def delete_run_folders(directory: Path, run_ids: Iterable[str]) -> int:
+    """Remove each run's artifact folder (account deletion). Returns how many were removed.
+
+    Every id is checked before any path is built, so a bad value removes nothing.
+    """
+    folders = [run_folder(directory, identifier) for identifier in run_ids]
+    removed = 0
+    for folder in folders:
+        if folder.is_dir():
+            shutil.rmtree(folder)
+            removed += 1
+    return removed
 
 
 class ActiveRunExists(RuntimeError):
