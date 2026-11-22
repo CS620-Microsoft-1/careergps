@@ -49,7 +49,7 @@ test("Destinations shows the selected role and its job market", async ({ page })
   await mockApi(page);
   await page.goto("/destinations");
   // The selected destination card is the pressed one.
-  await expect(page.getByRole("button", { name: /Data Analyst/, pressed: true })).toContainText("42%");
-  await expect(page.getByRole("heading", { name: "Data Analyst market" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Data analyst/, pressed: true })).toContainText("42%");
+  await expect(page.getByRole("heading", { name: "Data analyst market" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Most-asked skills" })).toBeVisible();
 });

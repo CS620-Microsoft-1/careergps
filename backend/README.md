@@ -275,7 +275,7 @@ app/
     ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
     ├── catalog_writes.py    # writes them: seed script and catalog refresh
     ├── course_listing.py    # hides school courses not taught in the last four semesters
-    ├── student_courses.py   # taken courses + finding course codes in a résumé
+    ├── student_courses.py   # taken courses + finding course names and codes in a résumé
     ├── uw_courses.py        # UW–Madison course guide data (data/uw_courses) as catalog entries
     ├── resume_children.py   # builds the résumé child table rows from confirmed_data
     └── postings/            # job board adapters (Greenhouse, Ashby, Lever) and daily ingest
@@ -410,6 +410,43 @@ To add companies, add them to `data/company_candidates.yaml` and run
 `python -m scripts.probe_boards`. It prints the boards it finds; `--write` replaces
 `data/companies.yaml`. Check each match before committing, since a slug can belong to a
 different company with the same name.
+
+## Sync real projects from GitHub
+
+The resources agent recommends from `data/projects.json` (hand-written) plus
+`data/github_projects.json` (real projects pulled from GitHub). The sources are listed in
+`data/project_sources.yaml`: an `idea_list` repo whose README has project tables, or a GitHub
+`topic` whose top repos become "contribute to <repo>" projects (supported, but no topic source
+is configured).
+
+```bash
+export GITHUB_TOKEN=<fine-grained token, no scopes needed>   # optional; raises the rate limit
+python -m scripts.sync_github_projects             # every source
+python -m scripts.sync_github_projects --source cool_coders --dry-run
+```
+
+Skills are assigned by keyword rules in `app/services/github_projects.py`, and a project is
+only offered for a role when its own name or description names a skill specific to that role.
+The agent sees at most 25 candidates per request, the ones that cover the most
+high-priority gaps.
+
+**Re-syncing.** The app only reads the committed snapshot; GitHub is contacted only when
+someone runs the script. Re-sync on a branch and open a PR, so the change to
+`data/github_projects.json` is reviewed like code. In the diff, check:
+
+- **Links.** They come from other people's READMEs. Only `https` links to github.com and
+  youtube.com are kept (others print `skip`), but a link can still point at the wrong project.
+  The script prints `shared link` when two projects link to the same place; fix those with
+  `link_overrides` in `project_sources.yaml`.
+- **Tags.** Spot-check `supported_skill_ids` on new entries: the card tells students the
+  project "closes" those skills.
+- **Removed projects.** A project's id is built from its source and title
+  (`gh_<role>_<source>_<title>`). If an upstream README renames or drops a project, its id
+  changes or disappears, and students who saved it to their plan lose it.
+
+Removing a source from `project_sources.yaml` removes its projects on the next sync. Copied
+names and descriptions stay under each source's licence; see `data/THIRD_PARTY_NOTICES.md`,
+and add a section there for any new source.
 
 ## Job posting analysis
 
@@ -1016,10 +1053,26 @@ scores don't change.
 - `GET /me/courses`, `PUT /me/courses/{course_id}` (`{"source": "manual" | "resume"}`, optional),
   `DELETE /me/courses/{course_id}`. `PUT` answers 404 for a course that isn't in `school_courses`
   or that belongs to another school than the student's university.
-- `GET /me/courses/resume-matches?job_family=…`: listed courses whose code appears in that role's
-  résumé ("CS 400", "COMP SCI 400", "Comp. Sci. 400, 540"), not taken yet. A regex, no model call;
-  nothing is saved until the student confirms. "Not now" is remembered in the browser only
-  (`localStorage`, one list per account), so the question comes back on another device.
+- `GET /me/courses/resume-matches?job_family=…`: listed courses whose name or code appears where
+  that role's résumé lists courses, not taken yet. A regex, no model call; nothing is saved until
+  the student confirms. "Not now" is remembered in the browser only (`localStorage`, one list
+  per account), so the question comes back on another device.
+  - Where: the text under an education entry, and any other text from a line that starts with
+    "Coursework", "Courses" or "Relevant coursework / courses" on. Many names are everyday
+    phrases ("Machine Learning"), so the skills, project and experience sections are not searched
+    ("Built a site that ranks UW courses using machine learning" finds nothing).
+  - Codes: "CS 400", "COMP SCI 400", "Comp. Sci. 400, 540 and 577", in the same text.
+  - How names compare: case and punctuation don't matter, a leading "Introduction to" / "Intro
+    to" may be left out, and the part before a colon is enough ("Database Management Systems").
+    A one-word name ("Algorithms") must be a whole list item; items end at `, ; : | / ( )`, a
+    bullet, a new line, a sentence-ending `.`, a dash with spaces around it (` - `, ` – `, ` — `)
+    and, for one-word names, "and" / "&" ("Algorithms and Operating Systems"). A name inside a
+    longer matched name doesn't count ("Matrix Methods in Machine Learning" is not also "Machine
+    Learning"). A name two courses share ("Computer Vision": 566 and 766) gives the
+    lowest-numbered one.
+  - Not found: shortened names ("Databases", "Data Structures"). A sentence under an education
+    entry that uses a course name ("built a machine learning model") is found by mistake; the
+    student answers "Not now".
 
 ## Changing the schema
 
