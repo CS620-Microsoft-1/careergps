@@ -44,6 +44,7 @@ class AccountDeletionTests(unittest.TestCase):
         self.db = FakeSession(self.run_ids)
         self.requests: list[httpx2.Request] = []
         self.local_calls: list[tuple] = []
+        self.events: list[str] = []
 
     def _client(self, status: int = 200, error: Exception | None = None) -> httpx2.Client:
         def handler(request: httpx2.Request) -> httpx2.Response:
@@ -54,11 +55,17 @@ class AccountDeletionTests(unittest.TestCase):
         return httpx2.Client(transport=httpx2.MockTransport(handler))
 
     def _delete_local(self, user_id, run_ids) -> None:
+        self.events.append("files")
         self.local_calls.append((user_id, list(run_ids)))
+
+    def _forget_runs(self, user_id) -> None:
+        self.events.append("runs")
+        self.assertEqual(self.user_id, user_id)
 
     def _run(self, client: httpx2.Client, settings: Settings | None = None, **kwargs) -> None:
         delete_account(self.db, self.user_id, settings or _settings(), client=client,
-                       delete_local=kwargs.get("delete_local", self._delete_local))
+                       delete_local=kwargs.get("delete_local", self._delete_local),
+                       forget_runs=kwargs.get("forget_runs", self._forget_runs))
 
     def test_deletes_the_auth_user_then_local_files(self) -> None:
         self._run(self._client(200))
@@ -71,6 +78,7 @@ class AccountDeletionTests(unittest.TestCase):
         self.assertEqual(f"Bearer {SECRET}", request.headers["authorization"])
         self.assertTrue(self.db.rolled_back)
         self.assertEqual([(self.user_id, self.run_ids)], self.local_calls)
+        self.assertEqual(["runs", "files"], self.events)
 
     def test_trailing_slash_in_supabase_url(self) -> None:
         self._run(self._client(200), _settings(supabase_url=SUPABASE_URL + "/"))
@@ -88,6 +96,7 @@ class AccountDeletionTests(unittest.TestCase):
                     self._run(self._client(status))
                 self.assertIn(str(status), str(caught.exception))
                 self.assertEqual([], self.local_calls)
+                self.assertEqual([], self.events)
 
     def test_network_error_changes_nothing_and_hides_the_key(self) -> None:
         with self.assertRaises(AccountDeletionFailed) as caught:
@@ -105,6 +114,14 @@ class AccountDeletionTests(unittest.TestCase):
         self.assertEqual([], self.requests)
         self.assertEqual(0, self.db.queries)
         self.assertEqual([], self.local_calls)
+
+    def test_run_cancellation_failure_still_removes_files(self) -> None:
+        def broken(_user_id):
+            raise RuntimeError("manager unavailable")
+
+        with self.assertLogs("app.services.account_deletion", level="WARNING"):
+            self._run(self._client(200), forget_runs=broken)
+        self.assertEqual(1, len(self.local_calls))
 
     def test_local_cleanup_failure_still_succeeds_and_warns(self) -> None:
         def broken(_user_id, _run_ids):

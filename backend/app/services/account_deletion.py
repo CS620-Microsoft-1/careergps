@@ -5,9 +5,10 @@ ON DELETE CASCADE, and résumés, destinations, courses, plan items and skill-ga
 cascade from users or résumés. Local result files are outside the database, so they are removed
 afterwards with the run ids read beforehand.
 
-Order matters: if the Supabase call fails nothing has changed and the student can retry; if local
-cleanup fails the account is already gone, so that only logs a warning (the files are recomputable
-caches and can be swept later).
+Order matters: if the Supabase call fails nothing has changed and the student can retry. After it
+succeeds, the user's queued/running skill-gap runs are cancelled (so their worker writes nothing
+more), then local files are removed. Failures in those last two steps only log a warning: the
+account is already gone and the files are recomputable caches that can be swept later.
 """
 from collections.abc import Callable, Iterable
 import logging
@@ -20,6 +21,7 @@ from sqlalchemy.orm import Session
 from app.core.config import Settings
 from app.models.skill_gap import SkillGapRunRecord
 from app.services.local_user_data import delete_local_user_data
+from app.services.skill_gaps.runs import forget_user_runs
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +43,7 @@ def delete_account(
     *,
     client: httpx2.Client | None = None,
     delete_local: Callable[[UUID, Iterable[UUID]], object] = delete_local_user_data,
+    forget_runs: Callable[[UUID], object] = forget_user_runs,
 ) -> None:
     base_url = (settings.supabase_url or "").rstrip("/")
     key = settings.supabase_service_role_key.get_secret_value() if settings.supabase_service_role_key else ""
@@ -55,6 +58,12 @@ def delete_account(
 
     _delete_auth_user(base_url, key, user_id, client)
 
+    # Before the files: a cancelled worker stops writing, and removes what it wrote when it ends.
+    try:
+        forget_runs(user_id)
+    except Exception:
+        logger.warning("Account %s deleted, but its skill-gap runs could not be cancelled", user_id,
+                       exc_info=True)
     try:
         delete_local(user_id, run_ids)
     except Exception:
