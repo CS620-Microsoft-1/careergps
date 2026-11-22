@@ -27,6 +27,11 @@ type PlanContextValue = PlanState & {
   setStatus: (resourceId: string, status: PlanStatus) => Promise<void>;
   remove: (resourceId: string) => Promise<void>;
   toggleSaved: (resourceId: string) => Promise<void>;
+  /**
+   * Save a suggested plan: steps get positions 1..N in order, alongside items none. Saved one at a time;
+   * resolves false (with actionError set) at the first failure, keeping what was saved before it.
+   */
+  addPlan: (steps: string[], alongside: string[]) => Promise<boolean>;
   actionError?: string;
 };
 
@@ -102,6 +107,34 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   }), [state.family, track]);
 
   const saved = useMemo(() => new Map(state.items.map((item) => [item.resource_id, item])), [state.items]);
+
+  const addPlan = useCallback(async (steps: string[], alongside: string[]) => {
+    const family = state.family;
+    if (!family) return false;
+    const entries = [...steps.map((id, index) => ({ id, position: index + 1 })),
+      ...alongside.map((id) => ({ id, position: undefined }))];
+    setPending((current) => new Set([...current, ...entries.map((entry) => entry.id)]));
+    setActionError(undefined);
+    try {
+      for (const { id, position } of entries) {
+        // Keep a done item done; everything else is saved.
+        const status = saved.get(id)?.status ?? "saved";
+        const item = await setPlanItem(family, id, status, position);
+        setState((current) => current.family !== family ? current
+          : { ...current, items: [...current.items.filter((i) => i.resource_id !== id), item] });
+      }
+      return true;
+    } catch (error) {
+      setActionError(errorMessage(error, "The suggested plan could not be fully added. Try again."));
+      return false;
+    } finally {
+      setPending((current) => {
+        const next = new Set(current);
+        entries.forEach((entry) => next.delete(entry.id));
+        return next;
+      });
+    }
+  }, [saved, state.family]);
   const toggleSaved = useCallback(
     (resourceId: string) => saved.has(resourceId) ? remove(resourceId) : setStatus(resourceId, "saved"),
     [remove, saved, setStatus],
@@ -111,7 +144,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     : { family: activeFamily, status: activeFamily ? "loading" as const : "idle" as const, resources: [], items: [] };
   return (
     <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, justCompleted, justSaved, setStatus, remove,
-      toggleSaved, actionError }}>
+      toggleSaved, addPlan, actionError }}>
       {children}
     </PlanContext>
   );

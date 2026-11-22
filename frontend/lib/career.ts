@@ -79,8 +79,9 @@ const TYPE_ORDER: Record<ResourceType, number> = {
 };
 
 /**
- * Order saved resources: done steps first (when they were finished), then the rest by the biggest
- * gap each one closes. gapOrder is rankGaps' skill_ids; skills outside it come last.
+ * Order saved resources: done steps first (when they were finished), then steps added from a suggested
+ * plan in its order (position), then the rest by the biggest gap each one closes. gapOrder is rankGaps'
+ * skill_ids; skills outside it come last.
  */
 export function orderPlan(items: PlanItem[], resources: Resource[], gapOrder: string[]): OrderedPlan {
   const byId = new Map(resources.map((resource) => [resource.id, resource]));
@@ -96,11 +97,12 @@ export function orderPlan(items: PlanItem[], resources: Resource[], gapOrder: st
     steps.push({ resource, item, skill, rank: skill === null ? Number.POSITIVE_INFINITY : rank(skill) });
   }
   const strip = ({ resource, item, skill }: PlanStep) => ({ resource, item, skill });
+  const position = (step: PlanStep) => step.item.position ?? Number.POSITIVE_INFINITY;
   const done = steps.filter((step) => step.item.status === "done")
     .sort((a, b) => (a.item.done_at ?? "").localeCompare(b.item.done_at ?? ""));
   const open = steps.filter((step) => step.item.status !== "done")
-    .sort((a, b) => a.rank - b.rank || TYPE_ORDER[a.resource.type] - TYPE_ORDER[b.resource.type]
-      || a.item.saved_at.localeCompare(b.item.saved_at));
+    .sort((a, b) => position(a) - position(b) || a.rank - b.rank
+      || TYPE_ORDER[a.resource.type] - TYPE_ORDER[b.resource.type] || a.item.saved_at.localeCompare(b.item.saved_at));
   return {
     done: done.map(strip),
     ahead: open.filter((step) => !step.resource.alongside).map(strip),

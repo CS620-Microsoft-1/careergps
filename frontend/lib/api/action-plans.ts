@@ -8,8 +8,9 @@ import type { ActionPlanMode, ActionPlanSuggestions, JobFamily } from "@/types/a
 export const ACTION_PLAN_TIMEOUT_MS = 100_000;
 
 /** A suggested action plan for the role's latest completed skill gap analysis. */
-export function getActionPlanSuggestions(family: JobFamily, mode: ActionPlanMode = "full") {
+export function getActionPlanSuggestions(family: JobFamily,
+  { mode = "full", signal }: { mode?: ActionPlanMode; signal?: AbortSignal } = {}) {
   return apiPost<ActionPlanSuggestions>("/action-plans/suggestions", {
-    json: { job_family: family, mode }, timeoutMs: ACTION_PLAN_TIMEOUT_MS,
+    json: { job_family: family, mode }, timeoutMs: ACTION_PLAN_TIMEOUT_MS, signal,
   });
 }

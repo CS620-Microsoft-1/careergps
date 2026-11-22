@@ -33,7 +33,7 @@ describe("GapsView", () => {
   beforeEach(() => {
     vi.mocked(usePlan).mockReturnValue({
       family: "data_analyst", status: "ready", resources, items: [], saved: new Map(), pending: new Set(),
-      justCompleted: null, justSaved: null, setStatus: vi.fn(), remove: vi.fn(), toggleSaved: vi.fn(),
+      justCompleted: null, justSaved: null, setStatus: vi.fn(), remove: vi.fn(), toggleSaved: vi.fn(), addPlan: vi.fn(),
     });
     mockAnalysis();
   });
