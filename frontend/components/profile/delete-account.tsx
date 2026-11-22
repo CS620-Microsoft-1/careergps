@@ -81,7 +81,8 @@ export function DeleteAccount() {
         </AlertDialogTrigger>
         <AlertDialogContent
           onEscapeKeyDown={(event) => { if (pending) event.preventDefault(); }}
-          className="gap-5 rounded-2xl p-6 data-[size=default]:max-w-[calc(100%-2rem)] data-[size=default]:sm:max-w-md">
+          // Scrolls inside the screen when it is taller (small phones, larger text), so the title and buttons stay reachable.
+          className="max-h-[calc(100dvh-2rem)] gap-5 overflow-y-auto rounded-2xl p-6 data-[size=default]:max-w-[calc(100%-2rem)] data-[size=default]:sm:max-w-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-title font-bold">Delete your account?</AlertDialogTitle>
             <AlertDialogDescription className="text-left">
