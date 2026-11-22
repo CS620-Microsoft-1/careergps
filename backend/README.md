@@ -32,6 +32,9 @@ pooler (port 6543): the session pooler (port 5432) allows only 15 connections fo
 running backend holds some of them even when idle. `CORS_ORIGINS` can stay
 as `http://localhost:3000`. Set `SUPABASE_URL` to `https://<project-ref>.supabase.co` (the project ref
 is the part after `postgres.` in `DATABASE_URL`); without it, endpoints that need login return 503.
+`SUPABASE_SERVICE_ROLE_KEY` (Supabase → Project Settings → API Keys: the secret key) is only needed
+to delete accounts; without it `DELETE /me` returns 503. It bypasses every security rule, so it stays
+in `backend/.env`: never in a `NEXT_PUBLIC_*` variable, a log or a commit. Ask Abanish for it privately.
 Then check:
 
 ```bash
@@ -252,7 +255,7 @@ app/
 │   ├── deps.py              # get_db, get_current_user (token), get_current_db_user (token + users row)
 │   └── routes/
 │       ├── health.py        # GET /health, GET /health/db
-│       ├── me.py            # POST /me, GET /me, PATCH /me, GET /me/resume, POST /me/resumes
+│       ├── me.py            # POST /me, GET /me, PATCH /me, DELETE /me, GET /me/resume, POST /me/resumes
 │       ├── resumes.py       # POST /resumes/analyze, /analyze/stream (no persistence)
 │       └── student_courses.py  # /me/courses: courses the student has taken, résumé suggestions
 ├── db/
@@ -310,6 +313,7 @@ uvicorn app.main:app --reload --port 8010   # if port 8000 is already in use
 | `POST /me` | Finish onboarding: creates the `users` row, the first confirmed résumé and the destination for `target_role`. **403** until the email is confirmed, **409** if it exists |
 | `GET /me` | `{user}` for the logged-in account; `null` until onboarding is finished. Syncs `primary_email` with the token |
 | `PATCH /me` | Change the name (`first_name`, `last_name`), `university` or goal (`target_role`, `experience_level`, `graduation_year`, `preferred_location`). **403** until onboarding is finished |
+| `DELETE /me` | Permanently delete the account (hard delete, no grace period); **204**. Works before onboarding is finished too. See [Deleting an account](#deleting-an-account). **503** without `SUPABASE_SERVICE_ROLE_KEY`, **502** if Supabase refuses or can't be reached (nothing was deleted; retry) |
 | `GET /me/resume` | The résumé a destination uses (`original_filename`, `file_type`, `classification`): `?job_family=`, or the target role's by default. **404** if none |
 | `POST /me/resumes` | Save a confirmed résumé; the destination for `job_family` uses it from now on (added if new). Fills empty contact fields on `users`. Earlier versions are kept |
 | `GET /me/resumes` | Every version, newest first; `destinations` lists the roles that use each one |
@@ -346,6 +350,27 @@ Supabase Auth settings (dashboard, not migrations; record any change here):
 - `Depends(get_current_db_user)`: also requires the `users` row; **403** until onboarding is finished.
   Use this for everything else.
 - Never log tokens.
+
+### Deleting an account
+
+`DELETE /me` (`services/account_deletion.py`) runs in this order, so a failure leaves something the
+student can retry:
+
+1. Read the account's skill-gap run ids (the next step removes those rows).
+2. Delete the Supabase Auth user through the Admin API with `SUPABASE_SERVICE_ROLE_KEY`. If this fails,
+   nothing has changed (**502**). A 404 counts as done: the user is already gone.
+3. The database cascades from `auth.users`: `users`, résumés and their child rows, destinations,
+   taken courses, plan items and skill-gap runs and results.
+4. Cancel the account's queued or running skill-gap runs in this process. Each one stops at its next
+   checkpoint and writes nothing more.
+5. Remove its files in `local_results/` (`services/local_user_data.py`): the plan file, run folders,
+   cached Agent responses, and project picks, certifications and action plans per run.
+
+Steps 4 and 5 only log a warning if they fail: the account is already gone, and the files are caches.
+
+Known limit: an Agent call already in flight when the account is deleted (for example project picks
+on Resources, which take tens of seconds) still finishes and can save one cache file in
+`local_results/` afterwards. It holds no account id and nothing reads it again.
 
 New endpoints go in their own router under `app/api/routes/` and are registered in `app/main.py`.
 Use `db: Session = Depends(get_db)` for database access; keep business logic out of the route

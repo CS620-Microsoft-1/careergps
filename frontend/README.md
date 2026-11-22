@@ -136,6 +136,10 @@ Accounts live in Supabase Auth (SPEC-001). Set `NEXT_PUBLIC_SUPABASE_URL` and
   logged in → `/dashboard` from `/login` and `/signup`. The API checks the token again on every call.
 - `lib/supabase/client.ts` registers the access token with `lib/api/client.ts`, so every API call
   sends `Authorization: Bearer <token>`.
+- **Profile → Delete account** permanently deletes the account after the student types their email
+  (`components/profile/delete-account.tsx`, `DELETE /me`). It then signs out locally and loads
+  `/login?deleted=1`, which shows "Your account has been deleted." If the backend has no
+  `SUPABASE_SERVICE_ROLE_KEY`, the dialog says deletion isn't available right now.
 - Supabase's built-in mailer sends 2 emails an hour, only to members of the Supabase organization.
   For testing, create confirmed users in Supabase → Authentication → Users instead.
 
