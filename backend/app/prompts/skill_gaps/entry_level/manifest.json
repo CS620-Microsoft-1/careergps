@@ -1,0 +1,220 @@
+{
+  "bundle_version": "careergps-entry-level-agents.v1",
+  "model": "gpt-6-luna",
+  "reasoning_effort": "medium",
+  "agents": {
+    "ai_engineer": {
+      "foundation": {
+        "name": "careergps-entry-level-ai-foundation",
+        "version": "1",
+        "instructions": "ai_engineer/foundation/Instructions.md",
+        "response_format": "ai_engineer/foundation/response-format.json",
+        "instructions_sha256": "83050749738bc9d1eed2c138ed67b4a2d7769160c15af8357a64c924e5c2fc0e",
+        "response_format_sha256": "dbee8c18e36fd312ea07f2fa1dfe29b82b67cea4114465e040acf92ec13f5a71",
+        "definition_sha256": "fd05fdc5bfa7ae1e1a0d725cf9c779fea402dc62bb271129d7b0a5787f538c3a",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-foundation-0bad2100",
+          "version": "3",
+          "definition_sha256": "fd05fdc5bfa7ae1e1a0d725cf9c779fea402dc62bb271129d7b0a5787f538c3a"
+        }
+      },
+      "lifecycle": {
+        "name": "careergps-entry-level-ai-lifecycle",
+        "version": "1",
+        "instructions": "ai_engineer/lifecycle/Instructions.md",
+        "response_format": "ai_engineer/lifecycle/response-format.json",
+        "instructions_sha256": "2bc766d88647fc480961e3ba996f9e029d660102600eca9b9eaa92e7ffe32be8",
+        "response_format_sha256": "ad96028a40f44e8b3adcfa830a8ecbfdce35fd04a5b00086c0c6cbf93cd1401b",
+        "definition_sha256": "de4266c24d0936ca6fe5912d9eb7cca6307ea854ef3fda16bdb9ad9da904d7fa",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-lifecycle-0bad2100",
+          "version": "4",
+          "definition_sha256": "de4266c24d0936ca6fe5912d9eb7cca6307ea854ef3fda16bdb9ad9da904d7fa"
+        }
+      },
+      "systems": {
+        "name": "careergps-entry-level-ai-systems",
+        "version": "1",
+        "instructions": "ai_engineer/systems/Instructions.md",
+        "response_format": "ai_engineer/systems/response-format.json",
+        "instructions_sha256": "ccf687e647756c32aca6ec32d858fef78cf85498b8539140f96f0f2313603c6c",
+        "response_format_sha256": "3d6bc8c2883e05d3ed9de3ce192508c8b550a51fbfb217da4d0b887a5868a1a2",
+        "definition_sha256": "5c9573e8c450c6c74f95facca85a522c8586037d32f63fff5a5eb3c4504fad25",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-systems-partial-core-0bad2100",
+          "version": "1",
+          "definition_sha256": "5c9573e8c450c6c74f95facca85a522c8586037d32f63fff5a5eb3c4504fad25"
+        }
+      }
+    },
+    "software_engineer": {
+      "foundation": {
+        "name": "careergps-entry-level-se-foundation",
+        "version": "1",
+        "instructions": "software_engineer/foundation/Instructions.md",
+        "response_format": "software_engineer/foundation/response-format.json",
+        "instructions_sha256": "6bb95fdcbb9d40506a1d090dc4c73cacf9a81d6388aa65ea43d73647fbbc024e",
+        "response_format_sha256": "f8e8d0e78d17c043e668fb89329c3d84a08db8269d0943d336c7fdd9e9124826",
+        "definition_sha256": "f0842436ebb543db89329931d74b9663bf7537e0595298375634294205f09012",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-se-foundation-0bad2100",
+          "version": "1",
+          "definition_sha256": "f0842436ebb543db89329931d74b9663bf7537e0595298375634294205f09012"
+        }
+      },
+      "lifecycle": {
+        "name": "careergps-entry-level-se-lifecycle",
+        "version": "1",
+        "instructions": "software_engineer/lifecycle/Instructions.md",
+        "response_format": "software_engineer/lifecycle/response-format.json",
+        "instructions_sha256": "7d757be4b8d1757bc5ff6003d45ababaabe9510e6ab789fdfe86bab108a6200c",
+        "response_format_sha256": "8a5a4ea7ce8849dc88ed2e10d298d00cd95c064fa70482de00b449925070b9c4",
+        "definition_sha256": "948142373abd2ea05c7b984c5ead546b02e920cdf04eb42e7c780b953a853d01",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-se-lifecycle-0bad2100",
+          "version": "1",
+          "definition_sha256": "948142373abd2ea05c7b984c5ead546b02e920cdf04eb42e7c780b953a853d01"
+        }
+      },
+      "systems": {
+        "name": "careergps-entry-level-se-systems",
+        "version": "1",
+        "instructions": "software_engineer/systems/Instructions.md",
+        "response_format": "software_engineer/systems/response-format.json",
+        "instructions_sha256": "318f39542c75a7c0cea08ef3f1bfb4ef9ee149e0a20deeb9a72b7a45049ce586",
+        "response_format_sha256": "b1a8c45d40d77906434e5f5dd888cadb71de8d544a7fd52d5056161d3fc8eee3",
+        "definition_sha256": "e2e5e112323b076d853e0dc346d37a1a6276dea9a3a4589ea56fea9d037fd0d5",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-se-systems-0bad2100",
+          "version": "1",
+          "definition_sha256": "e2e5e112323b076d853e0dc346d37a1a6276dea9a3a4589ea56fea9d037fd0d5"
+        }
+      }
+    },
+    "data_analyst": {
+      "foundation": {
+        "name": "careergps-entry-level-da-foundation",
+        "version": "1",
+        "instructions": "data_analyst/foundation/Instructions.md",
+        "response_format": "data_analyst/foundation/response-format.json",
+        "instructions_sha256": "f8f48d066e418b8962bb95811d4c4f84582bfcf0b7148705e8bf0fd5e1ebafe7",
+        "response_format_sha256": "94fe53706ffe00228db16cd584835c4215993e031f7798a4842b1d596b826588",
+        "definition_sha256": "9f1bb94e6f3820c6c9c3ae737eda5ed7c22d575a30eb085d56e9790cabaf26d4",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-da-foundation-0bad2100",
+          "version": "1",
+          "definition_sha256": "9f1bb94e6f3820c6c9c3ae737eda5ed7c22d575a30eb085d56e9790cabaf26d4"
+        }
+      },
+      "lifecycle": {
+        "name": "careergps-entry-level-da-lifecycle",
+        "version": "1",
+        "instructions": "data_analyst/lifecycle/Instructions.md",
+        "response_format": "data_analyst/lifecycle/response-format.json",
+        "instructions_sha256": "2b173c56e6cde66b662cec25f80f70db54267ce72f27798ef294e32a6138283c",
+        "response_format_sha256": "f36ce6918732774226d7b81138797e6481078a279a281230766861bd022967c2",
+        "definition_sha256": "5a3bf1623c414652f892c280438ed9b0db34c6631ddd4bde9ccff3e23a94512f",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-da-lifecycle-0bad2100",
+          "version": "1",
+          "definition_sha256": "5a3bf1623c414652f892c280438ed9b0db34c6631ddd4bde9ccff3e23a94512f"
+        }
+      },
+      "systems": {
+        "name": "careergps-entry-level-da-systems",
+        "version": "1",
+        "instructions": "data_analyst/systems/Instructions.md",
+        "response_format": "data_analyst/systems/response-format.json",
+        "instructions_sha256": "e7162570fbdcce982fe3daf66a6c1deca1bb02991da603fc2085dae326766bf5",
+        "response_format_sha256": "330fe5b5fcde5310a3c051be0ca985861123b24d09e45fa4c5940b3ecfc4157c",
+        "definition_sha256": "3837950c2ab13f270fe480d229ee075da92dc0990be1f28f62513c27e956f209",
+        "definition_options": {
+          "kind": "prompt",
+          "model": "gpt-6-luna",
+          "reasoning": {
+            "effort": "medium"
+          },
+          "tools": [],
+          "text": {}
+        },
+        "source": {
+          "name": "skill-gap-experiment-entry-level-da-systems-0bad2100",
+          "version": "1",
+          "definition_sha256": "3837950c2ab13f270fe480d229ee075da92dc0990be1f28f62513c27e956f209"
+        }
+      }
+    }
+  }
+}
