@@ -1,0 +1,237 @@
+{
+  "type": "json_schema",
+  "name": "entry_fixed_software_engineer_foundation_v1",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "task": {
+        "type": "string",
+        "enum": [
+          "assess_entry_level_readiness"
+        ]
+      },
+      "proofs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/Proof"
+        },
+        "maxItems": 42
+      },
+      "result": {
+        "type": "object",
+        "properties": {
+          "job_family": {
+            "type": "string",
+            "enum": [
+              "software_engineer"
+            ]
+          },
+          "programming": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "algorithms": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "object_oriented_design": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "ai_assisted_development": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "relational_sql": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "nosql_search": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "version_control": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "job_family",
+          "programming",
+          "algorithms",
+          "object_oriented_design",
+          "ai_assisted_development",
+          "relational_sql",
+          "nosql_search",
+          "version_control"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "required": [
+      "task",
+      "proofs",
+      "result"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "Proof": {
+        "type": "object",
+        "properties": {
+          "proof_id": {
+            "type": "string"
+          },
+          "unit_id": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "proof_id",
+          "unit_id",
+          "quote"
+        ],
+        "additionalProperties": false
+      },
+      "Criterion": {
+        "type": "object",
+        "properties": {
+          "criterion_id": {
+            "type": "string",
+            "enum": [
+              "c1",
+              "c2",
+              "c3"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "partial",
+              "not_evidenced",
+              "uncertain"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "knowledge",
+              "unclear",
+              "none"
+            ]
+          },
+          "proof_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "criterion_id",
+          "status",
+          "basis",
+          "proof_ids"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "strict": true
+}

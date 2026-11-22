@@ -51,7 +51,7 @@ export function TakenUndo({ resource, onClose }: { resource: Resource; onClose: 
 }
 
 /**
- * Course codes found in the role's résumé. Nothing is saved until the student presses
+ * Courses whose name is in the role's résumé. Nothing is saved until the student presses
  * "Mark them taken"; "Not now" hides these courses for this account, in this browser only.
  */
 export function ResumeCourseMatches({ family, courses }: { family: JobFamily; courses: Resource[] }) {

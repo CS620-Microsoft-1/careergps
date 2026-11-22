@@ -74,6 +74,11 @@ def evidence_items(skill_row: dict, source_index: dict) -> list[dict]:
             items.append(_item(_SPAN_ROLES[suffix], _unit(source_index, span["unit_id"]), span["start"], span["end"]))
         return items
     if kind in ("knowledge", "uncertain") and assessment.get("evidence_id"):
+        if kind == "knowledge":
+            spans = skill_row["local_reference_check"].get("proof_spans", [])
+            if spans:
+                return [_item(kind, _unit(source_index, span["unit_id"]), span["start"], span["end"])
+                        for span in spans]
         unit = _unit(source_index, assessment["evidence_id"])
         return [_item(kind, unit, 0, len(unit["text"]))]
     return []
@@ -141,7 +146,8 @@ def queued_run_row(state: dict, reviewed_resume: dict, *, demand_snapshot_finger
         "reviewed_resume_snapshot": deepcopy(reviewed_resume),
         "calculation_fingerprint": state["calculation_fingerprint"],
         "demand_snapshot_fingerprint": demand_snapshot_fingerprint,
-        "policy_version": POLICY_VERSION, "response_schema_name": SCHEMA_NAME,
+        "policy_version": state.get("policy_version", POLICY_VERSION),
+        "response_schema_name": state.get("response_schema_name", SCHEMA_NAME),
         "catalog_version": catalog_version, "prompt_revision": state.get("prompt_revision"),
         "instructions_sha256": state.get("instructions_sha256"),
         "response_processing_version": state.get("response_processing_version"),

@@ -57,8 +57,9 @@ def unmark_course_taken(course_id: str, user: User = Depends(get_current_db_user
 def resume_course_matches(job_family: JobFamily, user: User = Depends(get_current_db_user),
                           accounts: AccountService = Depends(get_account_service),
                           db: Session = Depends(get_db)) -> ResumeCourseMatches:
-    """Listed courses whose code appears in the role's résumé and that aren't marked taken yet.
-    Only a suggestion: nothing is written until the student confirms (PUT for each course)."""
+    """Listed courses whose name or code appears where the role's résumé lists courses and that
+    aren't marked taken yet. Only a suggestion: nothing is written until the student confirms (PUT
+    for each course)."""
     resume = accounts.get_resume(user, job_family)
     if resume is None:
         return ResumeCourseMatches(course_ids=[])
@@ -66,7 +67,8 @@ def resume_course_matches(job_family: JobFamily, user: User = Depends(get_curren
         taken = {row.course_id for row in student_courses.list_taken(db, user.id)}
     except SQLAlchemyError:
         raise _UNAVAILABLE from None
-    courses = [entry for entry in resources_for(job_family, user.university)
-               if entry["type"] == "school_course" and entry["id"] not in taken]
-    found = student_courses.match_courses(student_courses.resume_strings(resume.confirmed_data), courses)
-    return ResumeCourseMatches(course_ids=[course["id"] for course in found])
+    courses = [entry for entry in resources_for(job_family, user.university) if entry["type"] == "school_course"]
+    # Taken courses are matched too and dropped after: a name two courses share must not move on
+    # to the next course once the first is taken.
+    found = student_courses.match_courses(student_courses.course_list_strings(resume.confirmed_data), courses)
+    return ResumeCourseMatches(course_ids=[course["id"] for course in found if course["id"] not in taken])
