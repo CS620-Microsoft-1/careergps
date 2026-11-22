@@ -21,7 +21,7 @@ function mockAnalysis(overrides: Partial<Analysis> = {}) {
     loaded: true, family: "data_analyst", run, submitting: false, restoring: false, elapsed: 0, awaiting: null,
     snapshot: { user_id: user.id, resume_id: resume.id, filename: resume.original_filename,
       confirmed_at: resume.created_at, job_family: "data_analyst" },
-    analyze: vi.fn(), changeFamily: vi.fn(), reload: vi.fn(),
+    analyze: vi.fn(), changeFamily: vi.fn(), reload: vi.fn(), checkAgain: vi.fn(),
     ...overrides,
   });
 }

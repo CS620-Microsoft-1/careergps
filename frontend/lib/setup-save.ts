@@ -54,6 +54,16 @@ export function retrySetupSave() {
   if (state.status === "failed") void run(current);
 }
 
+/** Set by the route page's Back: setup opens again where the student left it instead of starting over. */
+let returning = false;
+export function returnToSetup() { returning = true; }
+/** Whether setup is being opened by that Back; clears it, so any later visit starts over. */
+export function takeSetupReturn() {
+  const value = returning;
+  returning = false;
+  return value;
+}
+
 export const setupSave = {
   subscribe: (listener: () => void) => {
     listeners.add(listener);

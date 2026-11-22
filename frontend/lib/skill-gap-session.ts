@@ -183,6 +183,12 @@ export class SkillGapSession {
       if (generation === this.generation) this.update({ submitting: false });
     }
   };
+  /** Try again after a poll failed: check the active run now instead of waiting for the next poll. */
+  checkAgain = () => {
+    if (this.pollInFlight || !isActiveSkillGapRun(this.state.run)) return;
+    this.stopTimers();
+    void this.poll();
+  };
   changeFamily = (value: string) => {
     const { snapshot, run, submitting, restoring, family } = this.state;
     if (!snapshot || submitting || restoring || isActiveSkillGapRun(run) || value === family) return;

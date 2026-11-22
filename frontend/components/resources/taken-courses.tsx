@@ -13,11 +13,11 @@ import type { JobFamily, Resource } from "@/types/api";
 
 /** Mark taken / Taken, on a school course card. Marking hides the course from the lists. */
 export function TakenButton({ resource, onMarked }: { resource: Resource; onMarked?: (resource: Resource) => void }) {
-  const { taken, pending, mark, unmark } = useTakenCourses();
+  const { taken, ready, pending, mark, unmark } = useTakenCourses();
   const isTaken = taken.has(resource.id);
   const busy = pending.has(resource.id);
   return (
-    <Button type="button" size="sm" variant={isTaken ? "accent" : "ghost"} aria-pressed={isTaken} disabled={busy}
+    <Button type="button" size="sm" variant={isTaken ? "accent" : "ghost"} aria-pressed={isTaken} disabled={busy || !ready}
       className="-my-1 shrink-0"
       onClick={() => {
         if (isTaken) {
@@ -51,14 +51,14 @@ export function TakenUndo({ resource, onClose }: { resource: Resource; onClose: 
 }
 
 /**
- * Course codes found in the role's résumé. Nothing is saved until the student presses
+ * Courses whose name is in the role's résumé. Nothing is saved until the student presses
  * "Mark them taken"; "Not now" hides these courses for this account, in this browser only.
  */
 export function ResumeCourseMatches({ family, courses }: { family: JobFamily; courses: Resource[] }) {
   const { status, user } = useAccount();
   // "anonymous" covers UI-only development, as in TakenCoursesProvider.
   const userId = user?.id ?? "anonymous";
-  const { taken, mark } = useTakenCourses();
+  const { taken, ready, mark } = useTakenCourses();
   const [found, setFound] = useState<{ family: JobFamily; ids: string[] } | null>(null);
   const [dismissed, setDismissed] = useState<string[]>([]);
 
@@ -85,7 +85,7 @@ export function ResumeCourseMatches({ family, courses }: { family: JobFamily; co
         Found in your résumé: <b>{names.join(", ")}</b>. Mark {shown.length === 1 ? "it" : "them"} as taken?
       </p>
       <div className="flex gap-2">
-        <Button type="button" size="sm" onClick={() => { for (const course of shown) void mark(course.id, "resume"); }}>
+        <Button type="button" size="sm" disabled={!ready} onClick={() => { for (const course of shown) void mark(course.id, "resume"); }}>
           Mark {shown.length === 1 ? "it" : "them"} taken
         </Button>
         <Button type="button" size="sm" variant="raised" onClick={() => {

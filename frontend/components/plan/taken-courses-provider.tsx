@@ -9,6 +9,8 @@ import { getTakenCourses, markCourseTaken, unmarkCourseTaken } from "@/lib/api/s
 type TakenCoursesValue = {
   /** School course ids the student has taken. They stay out of the lists; the plan keeps them. */
   taken: ReadonlySet<string>;
+  /** The list has loaded. Changes made before then would be dropped, so wait for it. */
+  ready: boolean;
   /** Course ids with a change in flight. */
   pending: ReadonlySet<string>;
   error?: string;
@@ -75,7 +77,7 @@ export function TakenCoursesProvider({ children }: { children: React.ReactNode }
   const noteTaken = useCallback((courseId: string) => update(courseId, true), [update]);
 
   return (
-    <TakenCoursesContext value={{ taken, pending, error, mark, unmark, noteTaken }}>
+    <TakenCoursesContext value={{ taken, ready: loaded?.userId === userId, pending, error, mark, unmark, noteTaken }}>
       {children}
     </TakenCoursesContext>
   );
