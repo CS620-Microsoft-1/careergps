@@ -1,8 +1,9 @@
 import logging
 import sqlite3
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from functools import lru_cache
 from secrets import compare_digest
+from uuid import UUID
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
@@ -17,6 +18,7 @@ from app.core.security import (
 )
 from app.db.session import SessionLocal
 from app.models import User
+from app.services.account_deletion import delete_account
 from app.services.accounts import AccountService
 from app.services.foundry_agent import FoundryResumeAgentService
 from app.services.resume_pipeline import ResumePipeline
@@ -83,6 +85,12 @@ def get_current_user(
 
 def get_account_service(db: Session = Depends(get_db)) -> AccountService:
     return AccountService(db)
+
+
+def get_account_deleter(db: Session = Depends(get_db)) -> Callable[[UUID], None]:
+    """Deletes one account with this request's session (DELETE /me). Tests replace it."""
+    settings = get_settings()
+    return lambda user_id: delete_account(db, user_id, settings)
 
 
 def get_current_db_user(

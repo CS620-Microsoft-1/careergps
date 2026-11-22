@@ -466,5 +466,63 @@ class MeApiTests(unittest.TestCase):
         self.assertEqual(503, response.status_code)
 
 
+class DeleteMeApiTests(unittest.TestCase):
+    """DELETE /me. The deleter is replaced, so nothing reaches Supabase or the database."""
+
+    def setUp(self) -> None:
+        self.key = new_signing_key()
+        verifier = SupabaseTokenVerifier(SUPABASE_URL, jwks_client=FakeJwks(self.key))
+        self.accounts = FakeAccountService()
+        self.deleted: list[uuid.UUID] = []
+        self.failure: Exception | None = None
+
+        def deleter(user_id: uuid.UUID) -> None:
+            if self.failure is not None:
+                raise self.failure
+            self.deleted.append(user_id)
+
+        app.dependency_overrides[deps.get_account_service] = lambda: self.accounts
+        app.dependency_overrides[deps.get_token_verifier] = lambda: verifier
+        app.dependency_overrides[deps.get_account_deleter] = lambda: deleter
+        self.addCleanup(app.dependency_overrides.clear)
+        self.client = TestClient(app)
+        self.user_id = uuid.uuid4()
+        self.headers = {"Authorization": f"Bearer {make_token(self.key, sub=str(self.user_id), email='ada@example.com')}"}
+
+    def test_requires_a_token(self) -> None:
+        response = self.client.delete("/me")
+
+        self.assertEqual(401, response.status_code)
+        self.assertEqual([], self.deleted)
+
+    def test_deletes_an_onboarded_account(self) -> None:
+        self.assertEqual(201, self.client.post("/me", json=onboarding_body(), headers=self.headers).status_code)
+
+        response = self.client.delete("/me", headers=self.headers)
+
+        self.assertEqual(204, response.status_code)
+        self.assertEqual(b"", response.content)
+        self.assertEqual([self.user_id], self.deleted)
+
+    def test_deletes_before_onboarding_is_finished(self) -> None:
+        response = self.client.delete("/me", headers=self.headers)
+
+        self.assertEqual(204, response.status_code)
+        self.assertEqual([self.user_id], self.deleted)
+
+    def test_maps_service_errors_without_internal_details(self) -> None:
+        from app.services.account_deletion import AccountDeletionFailed, AccountDeletionNotConfigured
+
+        cases = [(AccountDeletionNotConfigured("SUPABASE_SERVICE_ROLE_KEY missing"), 503),
+                 (AccountDeletionFailed("Supabase refused to delete the user (HTTP 500)."), 502)]
+        for error, expected in cases:
+            with self.subTest(status=expected):
+                self.failure = error
+                response = self.client.delete("/me", headers=self.headers)
+                self.assertEqual(expected, response.status_code)
+                self.assertNotIn(str(error), response.text)
+                self.assertNotIn("Supabase", response.text)
+
+
 if __name__ == "__main__":
     unittest.main()

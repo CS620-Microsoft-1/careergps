@@ -1,8 +1,9 @@
 import uuid
+from collections.abc import Callable
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from app.api.deps import get_account_service, get_current_db_user, get_current_user
+from app.api.deps import get_account_deleter, get_account_service, get_current_db_user, get_current_user
 from app.core.options import JobFamily
 from app.core.security import AuthenticatedUser
 from app.models import Resume, User
@@ -17,6 +18,7 @@ from app.schemas.me import (
     ResumeSummary,
     UserRead,
 )
+from app.services.account_deletion import AccountDeletionFailed, AccountDeletionNotConfigured
 from app.services.accounts import (
     AccountAlreadyExistsError,
     AccountService,
@@ -55,6 +57,26 @@ def create_me(
             status_code=status.HTTP_403_FORBIDDEN, detail="Confirm your email, then log in again."
         )
     return MeRead(user=UserRead.model_validate(user))
+
+
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT, response_class=Response)
+def delete_me(
+    auth_user: AuthenticatedUser = Depends(get_current_user),
+    delete: Callable[[uuid.UUID], None] = Depends(get_account_deleter),
+) -> Response:
+    """Permanently delete the account and all its data. Works before onboarding is finished too.
+
+    A plain def: FastAPI runs it in a worker thread, so the Supabase call blocks no other request.
+    """
+    try:
+        delete(auth_user.id)
+    except AccountDeletionNotConfigured:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                            detail="Account deletion isn't available right now.") from None
+    except AccountDeletionFailed:
+        raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY,
+                            detail="We couldn't delete your account. Try again.") from None
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("", response_model=MeRead)
