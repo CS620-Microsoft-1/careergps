@@ -150,13 +150,32 @@ export function apiPostForm<T>(
  * POST multipart form data to an NDJSON endpoint and call onLine with each parsed line as it
  * arrives. An exception thrown by onLine stops reading and rejects with that exception.
  */
-export async function apiPostFormLines<T>(
+export function apiPostFormLines<T>(
   path: string,
   form: FormData,
   onLine: (value: T) => void,
-  { timeoutMs = DEFAULT_TIMEOUT_MS, signal }: Pick<RequestOptions, "timeoutMs" | "signal"> = {},
+  options: Pick<RequestOptions, "timeoutMs" | "signal"> = {},
 ): Promise<void> {
-  const response = await sendRequest("POST", path, { form, timeoutMs, signal });
+  return postLines(path, { form }, onLine, options);
+}
+
+/** Like apiPostFormLines, with a JSON request body. */
+export function apiPostJsonLines<T>(
+  path: string,
+  json: unknown,
+  onLine: (value: T) => void,
+  options: Pick<RequestOptions, "timeoutMs" | "signal"> = {},
+): Promise<void> {
+  return postLines(path, { json }, onLine, options);
+}
+
+async function postLines<T>(
+  path: string,
+  body: Pick<RequestOptions, "form" | "json">,
+  onLine: (value: T) => void,
+  { timeoutMs = DEFAULT_TIMEOUT_MS, signal }: Pick<RequestOptions, "timeoutMs" | "signal">,
+): Promise<void> {
+  const response = await sendRequest("POST", path, { ...body, timeoutMs, signal });
   if (!response.body) throw new ApiError(0, `POST ${path} returned no body`);
 
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();

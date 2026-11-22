@@ -6,17 +6,20 @@ import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "
 import { RESOURCE_TYPES, ResourceIcon, skillLabel } from "@/components/career/route-parts";
 import { type PlanEntry, usePlan } from "@/components/plan/plan-provider";
 import { Button } from "@/components/ui/button";
-import { getActionPlanSuggestions } from "@/lib/api/action-plans";
+import { PlanBuilding } from "@/components/plan/plan-building";
+import { streamActionPlanSuggestions } from "@/lib/api/action-plans";
 import { errorMessage } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
-import type { ActionPlan, ActionPlanItem, ActionPlanSuggestions, JobFamily } from "@/types/api";
+import type { ActionPlan, ActionPlanBuildStage, ActionPlanItem, ActionPlanSuggestions, JobFamily } from "@/types/api";
 
 type State =
-  | { status: "loading" }
+  | { status: "loading"; stages: ActionPlanBuildStage[] }
   | { status: "ready"; suggestions: ActionPlanSuggestions }
   | { status: "error"; message: string };
 
 const names = (skillIds: string[]) => skillIds.map(skillLabel).join(", ");
+/** A stagger delay, applied only when motion is allowed (see the motion-safe:[animation-delay] classes). */
+const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as React.CSSProperties;
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 
 /** Main-path steps keep their step number as position, so adding them one by one keeps the order. */
@@ -34,7 +37,7 @@ export function SuggestedPlan({ family, gapOrder, onClose }: {
   family: JobFamily; gapOrder: string[]; onClose: () => void;
 }) {
   const plan = usePlan();
-  const [state, setState] = useState<State>({ status: "loading" });
+  const [state, setState] = useState<State>({ status: "loading", stages: [] });
   const [adding, setAdding] = useState(false);
   const controller = useRef<AbortController | null>(null);
 
@@ -42,8 +45,13 @@ export function SuggestedPlan({ family, gapOrder, onClose }: {
     controller.current?.abort();
     const current = new AbortController();
     controller.current = current;
-    setState({ status: "loading" });
-    getActionPlanSuggestions(family, { signal: current.signal })
+    setState({ status: "loading", stages: [] });
+    const onStage = (stage: ActionPlanBuildStage) => {
+      if (!current.signal.aborted) {
+        setState((previous) => previous.status === "loading" ? { ...previous, stages: [...previous.stages, stage] } : previous);
+      }
+    };
+    streamActionPlanSuggestions(family, onStage, { signal: current.signal })
       .then((suggestions) => { if (!current.signal.aborted) setState({ status: "ready", suggestions }); })
       .catch((error: unknown) => {
         if (!current.signal.aborted) {
@@ -85,12 +93,7 @@ export function SuggestedPlan({ family, gapOrder, onClose }: {
         <Button size="icon-sm" variant="ghost" aria-label="Close suggested plan" onClick={cancel}><X /></Button>
       </div>
 
-      {state.status === "loading" && <div className="mt-6 flex flex-wrap items-center gap-3">
-        <p role="status" className="flex items-center gap-2 text-muted-foreground">
-          <LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Building your plan… this can take up to a minute.
-        </p>
-        <Button variant="ghost" size="sm" onClick={cancel}>Cancel</Button>
-      </div>}
+      {state.status === "loading" && <PlanBuilding stages={state.stages} onCancel={cancel} />}
 
       {state.status === "error" && <div className="mt-6 grid justify-items-start gap-3">
         <p role="alert" className="rounded-xl bg-danger-soft px-4 py-3">{state.message}</p>
@@ -110,13 +113,15 @@ export function SuggestedPlan({ family, gapOrder, onClose }: {
           <div>
             <p id="suggested-steps" className="eyebrow mb-3">Main path, in order</p>
             <ol aria-labelledby="suggested-steps" className="grid gap-3">
-              {suggested.steps.map((item, index) => <SuggestedItem key={item.resource_id} item={item} step={index + 1} />)}
+              {suggested.steps.map((item, index) => <SuggestedItem key={item.resource_id} item={item} step={index + 1} order={index} />)}
             </ol>
           </div>
           {suggested.alongside.length > 0 && <div>
             <p id="suggested-alongside" className="eyebrow mb-3">Alongside</p>
             <ul aria-labelledby="suggested-alongside" className="grid gap-3">
-              {suggested.alongside.map((item) => <SuggestedItem key={item.resource_id} item={item} />)}
+              {suggested.alongside.map((item, index) => (
+                <SuggestedItem key={item.resource_id} item={item} order={suggested.steps.length + index} />
+              ))}
             </ul>
           </div>}
         </div>
@@ -158,7 +163,7 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
   ];
 
   return (
-    <div className="mt-6 grid gap-5 rounded-xl bg-sunken p-4 sm:p-5">
+    <div className="entrance-settle mt-6 grid gap-5 rounded-xl bg-sunken p-4 sm:p-5">
       {/* Phones: one compact row per figure. From sm: tiles side by side. */}
       <dl className="grid gap-2 sm:grid-flow-col sm:auto-cols-fr sm:gap-3">
         {tiles.map((tile) => (
@@ -172,13 +177,14 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
       <div>
         <p id="suggested-skills" className="eyebrow mb-2">Skills this plan builds</p>
         <ul aria-labelledby="suggested-skills" className="flex flex-wrap gap-2">
-          {skills.map((skill) => {
+          {skills.map((skill, index) => {
             const isCovered = covered.has(skill);
             const steps = stepsFor(skill);
             const order = rank(skill);
             const detail = !isCovered ? "not covered yet" : steps ? plural(steps, "step") : "alongside";
             return (
-              <li key={skill} className={cn("flex min-h-9 max-w-full items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm",
+              <li key={skill} style={delay(150 + index * 60)}
+                className={cn("entrance-pop motion-safe:[animation-delay:var(--delay)] flex min-h-9 max-w-full items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm",
                 !isCovered ? "border border-dashed border-line-strong text-muted-foreground"
                   : order === 0 ? "bg-accent text-accent-foreground" : "bg-card")}>
                 <span aria-hidden className={cn("grid size-7 shrink-0 place-items-center rounded-full font-mono text-xs",
@@ -198,8 +204,11 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
   );
 }
 
-/** step: the step number on the main path; none for alongside items. */
-function SuggestedItem({ item, step }: { item: ActionPlanItem; step?: number }) {
+/** Delay between cards sliding in when the plan arrives, so it reads as the plan being laid out. */
+const REVEAL_STAGGER_MS = 70;
+
+/** step: the step number on the main path; none for alongside items. order: its place in the reveal. */
+function SuggestedItem({ item, step, order }: { item: ActionPlanItem; step?: number; order: number }) {
   const plan = usePlan();
   const { resource } = item;
   const saved = plan.saved.get(item.resource_id);
@@ -207,7 +216,8 @@ function SuggestedItem({ item, step }: { item: ActionPlanItem; step?: number }) 
   const toggle = () => void (saved ? plan.remove(item.resource_id)
     : plan.addItems([{ resourceId: item.resource_id, position: step }]));
   return (
-    <li className={step ? "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2 sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-3" : undefined}>
+    <li className={cn("entrance-rise motion-safe:[animation-delay:var(--delay)]", step && "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2 sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-3")}
+      style={delay(order * REVEAL_STAGGER_MS)}>
       {step && <span aria-hidden className="pt-4 text-right font-mono text-sm text-muted-foreground">{step}</span>}
       <div className={cn("rounded-xl bg-card p-4", step ? "border border-border" : "border border-dashed border-line-strong")}>
         <div className="flex items-start gap-3">

@@ -1102,6 +1102,11 @@ gaps → candidates.py (shortlists) → agent.py (action-plan-agent) → validat
   One lock per run: two requests at once make one Agent call.
 - Errors: 404 no run for the direction, 409 run running or failed, 503 storage unavailable. An Agent
   failure is not an error: the answer is the rule plan with `"source": "rules"`.
+- `POST /action-plans/suggestions/stream` returns the same plan as NDJSON for the live view: one
+  `{"type": "stage"}` line per build stage (`gaps` with the gap names, `candidates` with counts per type
+  and up to 12 catalog titles, then `cached`, or `agent` → `checking`, or `rules`), then a `result` line
+  (`{"suggestions": …}`) or an `error` line (`{"status", "detail"}`). Run and storage problems are still
+  plain 404/409/503 before streaming starts. The stages come from `planner.suggest(..., on_event=...)`.
 
 **Configuration** (`backend/.env`, see `.env.example`): `ACTION_PLAN_FOUNDRY_PROJECT_ENDPOINT`,
 `ACTION_PLAN_FOUNDRY_AGENT_NAME` (default `action-plan-agent`) and `ACTION_PLAN_FOUNDRY_AGENT_VERSION`

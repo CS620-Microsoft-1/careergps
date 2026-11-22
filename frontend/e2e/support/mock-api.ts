@@ -18,7 +18,8 @@ import type {
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/+$/, "");
 
 type Call = { method: string; path: string; body: unknown };
-type Reply = { status: number; json?: unknown };
+/** json: a JSON body; lines: an NDJSON body, one JSON value per line (a streaming endpoint). */
+type Reply = { status: number; json?: unknown; lines?: unknown[] };
 
 type Options = {
   planItems?: PlanItem[];
@@ -102,6 +103,17 @@ export async function mockApi(page: Page, options: Options = {}) {
         recommendations: [] } satisfies CertificationRecommendations);
     }
     if (method === "POST" && path === "/action-plans/suggestions") return ok(actionPlanSuggestions);
+    if (method === "POST" && path === "/action-plans/suggestions/stream") {
+      return { status: 200, lines: [
+        { type: "stage", stage: "gaps", gaps: [{ skill_id: "sql", skill_name: "SQL" },
+          { skill_id: "dashboarding", skill_name: "Dashboard development" }] },
+        { type: "stage", stage: "candidates", counts: { project: 1, online_course: 2, student_org: 1 },
+          samples: listed.map((resource) => ({ title: resource.title, type: resource.type })) },
+        { type: "stage", stage: "agent" },
+        { type: "stage", stage: "checking" },
+        { type: "result", suggestions: actionPlanSuggestions },
+      ] };
+    }
     if (method === "POST" && path === "/resources/projects/from-skill-gap") {
       return ok({ source: "rules", recommendations: [], no_match_reason: null } satisfies ProjectRecommendations);
     }
@@ -124,7 +136,11 @@ export async function mockApi(page: Page, options: Options = {}) {
     calls.push({ method: request.method(), path, body });
     // Recorded above, answered only once a test that is holding course saves lets go.
     if (request.method() === "PUT" && path.startsWith("/me/courses/")) await held;
-    const { status, json } = reply(request.method(), path, url.searchParams, body);
+    const { status, json, lines } = reply(request.method(), path, url.searchParams, body);
+    if (lines) {
+      return route.fulfill({ status, headers: { ...headers, "content-type": "application/x-ndjson" },
+        body: lines.map((line) => JSON.stringify(line)).join("\n") + "\n" });
+    }
     return json === undefined ? route.fulfill({ status, headers }) : route.fulfill({ status, headers, json });
   });
 

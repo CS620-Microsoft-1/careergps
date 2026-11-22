@@ -4,13 +4,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { usePlan } from "@/components/plan/plan-provider";
 import { SuggestedPlan } from "@/components/plan/suggested-plan";
-import { getActionPlanSuggestions } from "@/lib/api/action-plans";
+import { streamActionPlanSuggestions } from "@/lib/api/action-plans";
 import { ApiError } from "@/lib/api/client";
 import { actionPlanSuggestions, planItem, resources } from "@/test/fixtures";
 import type { ActionPlanSuggestions, PlanItem } from "@/types/api";
 
 vi.mock("@/components/plan/plan-provider", () => ({ usePlan: vi.fn() }));
-vi.mock("@/lib/api/action-plans", () => ({ getActionPlanSuggestions: vi.fn() }));
+vi.mock("@/lib/api/action-plans", () => ({ streamActionPlanSuggestions: vi.fn() }));
 
 const addItems = vi.fn();
 const remove = vi.fn();
@@ -36,7 +36,7 @@ function renderPanel(onClose = vi.fn()) {
 }
 
 async function renderReady(response = suggestions()) {
-  vi.mocked(getActionPlanSuggestions).mockResolvedValue(response);
+  vi.mocked(streamActionPlanSuggestions).mockResolvedValue(response);
   const onClose = renderPanel();
   await screen.findByRole("heading", { name: "SQL first, then dashboards" });
   return onClose;
@@ -54,10 +54,27 @@ describe("SuggestedPlan", () => {
   });
 
   it("asks for the role's plan and shows that it is working", async () => {
-    vi.mocked(getActionPlanSuggestions).mockReturnValue(new Promise(() => {}));
+    vi.mocked(streamActionPlanSuggestions).mockReturnValue(new Promise(() => {}));
     renderPanel();
-    expect(await screen.findByRole("status")).toHaveTextContent("Building your plan");
-    expect(getActionPlanSuggestions).toHaveBeenCalledWith("data_analyst", { signal: expect.any(AbortSignal) });
+    expect(await screen.findByRole("list", { name: "Plan building steps" })).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("Reading your gaps");
+    expect(streamActionPlanSuggestions).toHaveBeenCalledWith("data_analyst", expect.any(Function),
+      { signal: expect.any(AbortSignal) });
+  });
+
+  it("shows each stage as the stream reports it, then the plan", async () => {
+    let finish: (value: ActionPlanSuggestions) => void = () => {};
+    vi.mocked(streamActionPlanSuggestions).mockImplementation((_family, onStage) => new Promise((resolve) => {
+      onStage({ type: "stage", stage: "gaps", gaps: [{ skill_id: "sql", skill_name: "SQL" }] });
+      onStage({ type: "stage", stage: "candidates", counts: { project: 2 }, samples: [{ title: "SQL project", type: "project" }] });
+      onStage({ type: "stage", stage: "agent" });
+      finish = resolve;
+    }));
+    renderPanel();
+    expect(await screen.findByRole("status")).toHaveTextContent("Your mentor is choosing and ordering the steps");
+    finish(suggestions());
+    expect(await screen.findByRole("heading", { name: "SQL first, then dashboards" })).toBeInTheDocument();
+    expect(screen.queryByRole("list", { name: "Plan building steps" })).not.toBeInTheDocument();
   });
 
   it("shows the plan in order, with each mentor reason and the alongside items", async () => {
@@ -147,18 +164,18 @@ describe("SuggestedPlan", () => {
   });
 
   it("shows the backend's message and asks again on Try again", async () => {
-    vi.mocked(getActionPlanSuggestions)
+    vi.mocked(streamActionPlanSuggestions)
       .mockRejectedValueOnce(new ApiError(409, "failed", "The skill gap analysis has not finished yet"))
       .mockResolvedValueOnce(suggestions());
     renderPanel();
     expect(await screen.findByRole("alert")).toHaveTextContent("The skill gap analysis has not finished yet");
     await userEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(await screen.findByRole("heading", { name: "SQL first, then dashboards" })).toBeInTheDocument();
-    expect(getActionPlanSuggestions).toHaveBeenCalledTimes(2);
+    expect(streamActionPlanSuggestions).toHaveBeenCalledTimes(2);
   });
 
   it("closes from Cancel while loading and from Dismiss when ready", async () => {
-    vi.mocked(getActionPlanSuggestions).mockReturnValue(new Promise(() => {}));
+    vi.mocked(streamActionPlanSuggestions).mockReturnValue(new Promise(() => {}));
     const onCancel = vi.fn();
     const { unmount } = render(<SuggestedPlan family="data_analyst" gapOrder={GAP_ORDER} onClose={onCancel} />);
     await userEvent.click(await screen.findByRole("button", { name: "Cancel" }));

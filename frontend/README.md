@@ -208,8 +208,12 @@ steps of a suggested plan on Action plan). Don't add separate "why", source or a
 ## Suggested action plan
 
 On `/plan`, **Suggest a plan** (or "or let us suggest a plan" on an empty plan) opens
-`components/plan/suggested-plan.tsx`, which calls `getActionPlanSuggestions` (`lib/api/action-plans.ts`,
-backend `POST /action-plans/suggestions`). A first plan can take up to a minute; a repeat is cached.
+`components/plan/suggested-plan.tsx`, which calls `streamActionPlanSuggestions` (`lib/api/action-plans.ts`,
+backend `POST /action-plans/suggestions/stream`). A first plan can take up to a minute, so
+`components/plan/plan-building.tsx` shows the real build stages as they stream in: the gaps read, the
+shortlist counts, the mentor choosing (cycling through real shortlisted titles), then the check. There's
+no progress percentage, only elapsed time. A repeat is cached and comes back at once. Each card has its
+own **Add to plan**.
 **Add all to my plan** saves each step with `position` 1..N (clubs without one) through
 `PUT /plan/items/{id}`. `orderPlan` (`lib/career.ts`) puts steps with a position first, in that order,
 then the rest by gap; resources saved one by one still slot in by gap.

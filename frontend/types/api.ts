@@ -344,6 +344,20 @@ export type ActionPlanSuggestions = {
   uncovered_skill_ids: string[];
 };
 
+/**
+ * POST /action-plans/suggestions/stream: one line per build stage, then "result" or "error".
+ * Stages: gaps → candidates → cached | agent → checking | rules. samples are catalog titles only.
+ */
+export type ActionPlanBuildStage =
+  | { type: "stage"; stage: "gaps"; gaps: { skill_id: string; skill_name: string }[] }
+  | { type: "stage"; stage: "candidates"; counts: Partial<Record<ResourceType, number>>;
+      samples: { title: string; type: ResourceType }[] }
+  | { type: "stage"; stage: "cached" | "agent" | "checking" | "rules" };
+export type ActionPlanStreamEvent =
+  | ActionPlanBuildStage
+  | { type: "result"; suggestions: ActionPlanSuggestions }
+  | { type: "error"; status: number; detail: string };
+
 /** The stages POST /resumes/analyze/stream reports. "ocr" appears only when a PDF page is an image. */
 export type ResumeAnalysisStep = "upload" | "extract" | "ocr" | "classify";
 
