@@ -278,13 +278,12 @@ export type TakenCourseList = { courses: TakenCourse[] };
 /** GET /me/courses/resume-matches: course ids found in the role's résumé, not marked taken yet. */
 export type ResumeCourseMatches = { course_ids: string[] };
 
-/** POST /certifications/recommendations. reason is null when source is "rules". */
+/** POST /certifications/recommendations: up to three certifications matched to the gaps by skill. */
 export type CertificationRecommendations = {
   job_family: JobFamily;
   skill_gap_run_id: string;
-  source: "agent" | "rules";
   generated_at: string;
-  recommendations: { certification_id: string; skill_ids: string[]; reason: string | null }[];
+  recommendations: { certification_id: string; skill_ids: string[] }[];
 };
 
 /** POST /resources/projects/from-skill-gap: up to three projects from data/projects.json. */

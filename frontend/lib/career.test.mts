@@ -2,7 +2,8 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import {
-  courseCode, evidenceLevel, orderPlan, rankGaps, rankStrengths, resourcesForSkill, takenCoursesFor, withoutTaken,
+  courseCode, evidenceLevel, orderPlan, rankGaps, rankStrengths, resourcesForSkill, splitTopPicks, takenCoursesFor,
+  withoutTaken,
 } from "./career.ts";
 
 const skill = (skill_id: string, strength: number | null, priority: number | null, required = 10) => ({
@@ -91,5 +92,35 @@ describe("taken courses", () => {
   it("names a course by its code", () => {
     assert.equal(courseCode(resources[0]), "COMP SCI 564");
     assert.equal(courseCode(resources[1]), "STAT 240");
+  });
+});
+
+describe("splitTopPicks", () => {
+  const certs = [
+    resource("a", "certification", ["sql"]),
+    resource("b", "certification", ["sql", "statistics"]),
+    resource("c", "certification", ["excel"]),
+    resource("d", "certification", ["statistics"]),
+    resource("e", "certification", ["sql", "statistics", "excel"]),
+  ];
+  const gaps = ["sql", "statistics"];
+  const ids = (list: { id: string }[]) => list.map((entry) => entry.id);
+
+  it("puts the picks on top and the rest under More, widest gap coverage first", () => {
+    const { top, more } = splitTopPicks(certs, new Set(["d", "a"]), gaps, false);
+    assert.deepEqual(ids(top), ["a", "d"]);
+    assert.deepEqual(ids(more), ["b", "e", "c"]);
+  });
+
+  it("falls back to the three that close the most gaps when nothing was picked", () => {
+    const { top, more } = splitTopPicks(certs, new Set(), gaps, false);
+    assert.deepEqual(ids(top), ["b", "e", "a"]);
+    assert.deepEqual(ids(more), ["d", "c"]);
+  });
+
+  it("keeps the top empty while the picks are loading", () => {
+    const { top, more } = splitTopPicks(certs, new Set(), gaps, true);
+    assert.deepEqual(ids(top), []);
+    assert.equal(more.length, 5);
   });
 });

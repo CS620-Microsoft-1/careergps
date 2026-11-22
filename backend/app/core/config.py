@@ -70,12 +70,3 @@ class SkillGapSettings(BaseSettings):
     skill_gap_lifecycle_agent_version: str | None = None
     skill_gap_systems_agent_name: str | None = None
     skill_gap_systems_agent_version: str | None = None
-
-
-class CertificationSettings(BaseSettings):
-    """Certification recommendation Agent; without it, recommendations fall back to gap ranking."""
-
-    model_config = SettingsConfigDict(env_file=BACKEND_ROOT / ".env", extra="ignore")
-
-    certification_foundry_project_endpoint: str | None = None
-    certification_foundry_agent_name: str | None = None

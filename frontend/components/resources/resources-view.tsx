@@ -23,7 +23,7 @@ import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider"
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getCertificationPicks, getProjectPicks } from "@/lib/api/resources";
-import { rankGaps, withoutTaken } from "@/lib/career";
+import { TOP_PICKS, rankGaps, splitTopPicks, withoutTaken } from "@/lib/career";
 import { cn } from "@/lib/utils";
 import type { JobFamily, Resource, ResourceType } from "@/types/api";
 
@@ -42,8 +42,8 @@ export function ResourcesView() {
   const listed = withoutTaken(plan.resources, taken);
 
   const report = run?.status === "completed" ? run.report : null;
-  const { byId: picks, projectsPending } = usePicks(family, report ? run!.id : null);
-  const pickOrder = [...picks.keys()];
+  const { picks, pending } = usePicks(family, report ? run!.id : null);
+  const pickOrder = [...picks];
   const gaps = report ? rankGaps(report).map((gap) => gap.skill_id) : [];
   const requestedGap = params.get("gap");
   const gap = requestedGap && listed.some((r) => r.skills.includes(requestedGap)) ? requestedGap : null;
@@ -119,9 +119,13 @@ export function ResourcesView() {
                   // Courses by code ("COMP SCI 200" before "COMP SCI 300"), whatever order they were added in.
                   || (key === "school_course" ? a.title.localeCompare(b.title, "en", { numeric: true }) : 0));
               if (!group.length && !hiddenTaken.length) return null;
-              // Projects: the agent's top picks up front, every other project under "More projects".
-              const split = key === "project" ? splitProjects(group, picks, gaps, projectsPending) : null;
+              // Certifications and projects: the top picks up front, the rest under "More …". Student orgs
+              // have no picks, so the ones that close the most gaps go on top.
+              const picking = key === "certification" || key === "project" ? pending[key] : false;
+              const split = key === "certification" || key === "project" || key === "student_org"
+                ? splitTopPicks(group, picks, gaps, picking) : null;
               const shown = split ? split.top : group;
+              const plural = RESOURCE_TYPES[key].plural.toLowerCase();
               return (
                 <section key={key} aria-labelledby={`type-${key}`}>
                   <div className="mb-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -133,16 +137,17 @@ export function ResourcesView() {
                   </div>
                   {courses && <ResumeCourseMatches family={family} courses={plan.resources} />}
                   {courses && justTaken && taken.has(justTaken.id) && <TakenUndo resource={justTaken} onClose={() => setJustTaken(null)} />}
-                  {split && projectsPending && !split.top.length && (
+                  {split && picking && !split.top.length && (
                     <p role="status" className="flex items-center gap-2 rounded-2xl border border-border bg-card p-5 text-muted-foreground">
-                      <LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Picking your top {TOP_PROJECTS} projects…
+                      <LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Picking your top {TOP_PICKS} {plural}…
                     </p>
                   )}
                   {shown.length > 0 && <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                     {shown.map((resource) => <ResourceCard key={resource.id}
-                      resource={resource} gaps={gaps} pick={picks.get(resource.id)} onTaken={setJustTaken} />)}
+                      resource={resource} gaps={gaps} recommended={picks.has(resource.id)} onTaken={setJustTaken} />)}
                   </div>}
-                  {split && split.more.length > 0 && <MoreProjects resources={split.more} gaps={gaps} picks={picks} onTaken={setJustTaken} />}
+                  {split && split.more.length > 0 && <MoreResources label={`More ${plural}`}
+                    resources={split.more} gaps={gaps} picks={picks} onTaken={setJustTaken} />}
                 </section>
               );
             })}
@@ -153,9 +158,8 @@ export function ResourcesView() {
   </>;
 }
 
-/** pick: undefined when not recommended, otherwise the reason (null when the rule ranking chose it). */
-function ResourceCard({ resource, gaps, pick, onTaken }: {
-  resource: Resource; gaps: string[]; pick?: string | null; onTaken: (resource: Resource) => void;
+function ResourceCard({ resource, gaps, recommended, onTaken }: {
+  resource: Resource; gaps: string[]; recommended: boolean; onTaken: (resource: Resource) => void;
 }) {
   // Only skills that are gaps, in gap order; strengths it also practices aren't "closed".
   const closes = resource.skills.filter((skill) => gaps.includes(skill))
@@ -166,7 +170,7 @@ function ResourceCard({ resource, gaps, pick, onTaken }: {
         <ResourceIcon type={resource.type} className="bg-sunken" />
         {/* The section heading already names the school; the Taken button needs the room. */}
         <p className="min-w-0 flex-1 truncate text-sm text-muted-foreground">{resource.type === "school_course" ? null : resource.provider}</p>
-        {pick !== undefined && <Badge variant="brand">Recommended</Badge>}
+        {recommended && <Badge variant="brand">Recommended</Badge>}
         {resource.type === "school_course" && <TakenButton resource={resource} onMarked={onTaken} />}
       </div>
       <h3 className="mt-4 text-title">{resource.title}</h3>
@@ -174,7 +178,6 @@ function ResourceCard({ resource, gaps, pick, onTaken }: {
       {resource.description && <p className={cn("mt-3 text-sm/6 text-muted-foreground",
         // Course guide descriptions run long; the full text is one click away.
         resource.type === "school_course" && "line-clamp-4")}>{resource.description}</p>}
-      {pick && <p className="mt-3 rounded-lg bg-accent px-3 py-2 text-sm/6">{pick}</p>}
       {closes.length > 0 && <p className="mt-auto pt-4 text-sm">Closes: <b>{closes.map(skillLabel).join(", ")}</b></p>}
       <div className={cn("flex items-center gap-2", closes.length ? "mt-4" : "mt-auto pt-4")}>
         <SaveButton resourceId={resource.id} />
@@ -206,56 +209,35 @@ function FilterGroup<K extends string | null>({ title, options, value, onChange 
   );
 }
 
-/** Every project not on top, in a collapsed list whose cards are only built once it's opened. */
-function MoreProjects({ resources, gaps, picks, onTaken }: {
-  resources: Resource[]; gaps: string[]; picks: Map<string, string | null>; onTaken: (resource: Resource) => void;
+/** Every certification, project or student org not on top, in a collapsed list whose cards are only built once it's opened. */
+function MoreResources({ label, resources, gaps, picks, onTaken }: {
+  label: string; resources: Resource[]; gaps: string[]; picks: ReadonlySet<string>; onTaken: (resource: Resource) => void;
 }) {
   const [open, setOpen] = useState(false);
   return (
     <details className="group mt-4 rounded-2xl border border-border bg-card shadow-card"
       onToggle={(event) => setOpen(event.currentTarget.open)}>
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-2xl px-5 py-4 font-bold hover:bg-background [&::-webkit-details-marker]:hidden">
-        <span>More projects <span className="ml-1 font-mono text-sm font-normal text-muted-foreground">{resources.length}</span></span>
+        <span>{label} <span className="ml-1 font-mono text-sm font-normal text-muted-foreground">{resources.length}</span></span>
         <ChevronDown aria-hidden className="size-4.5 transition-transform group-open:rotate-180" />
       </summary>
       {open && (
         <div className="grid gap-4 border-t border-border p-4 sm:grid-cols-2 xl:grid-cols-3">
           {resources.map((resource) => <ResourceCard key={resource.id}
-            resource={resource} gaps={gaps} pick={picks.get(resource.id)} onTaken={onTaken} />)}
+            resource={resource} gaps={gaps} recommended={picks.has(resource.id)} onTaken={onTaken} />)}
         </div>
       )}
     </details>
   );
 }
 
-const NO_PICKS = new Map<string, string | null>();
-/** How many projects show before "More projects"; the agent recommends at most this many. */
-const TOP_PROJECTS = 3;
-
+const NO_PICKS: ReadonlySet<string> = new Set();
 /**
- * The agent's project picks (in pick order) as the top projects, the rest under "More projects",
- * ordered by how many of the student's gaps they close. Without picks (no analysis yet, the agent
- * failed, or a gap filter hides them) the projects that close the most gaps go on top instead;
- * while picks are still loading, nothing does, so the top doesn't jump when they arrive.
- */
-function splitProjects(projects: Resource[], picks: Map<string, string | null>, gaps: string[], pending: boolean) {
-  const closed = (resource: Resource) => resource.skills.filter((skill) => gaps.includes(skill)).length;
-  const byCoverage = (list: Resource[]) => list
-    .map((resource, index) => ({ resource, index }))
-    .sort((a, b) => closed(b.resource) - closed(a.resource) || a.index - b.index)
-    .map(({ resource }) => resource);
-  const picked = projects.filter((resource) => picks.has(resource.id));
-  const top = picked.length ? picked.slice(0, TOP_PROJECTS) : pending ? [] : byCoverage(projects).slice(0, TOP_PROJECTS);
-  const onTop = new Set(top.map((resource) => resource.id));
-  return { top, more: byCoverage(projects.filter((resource) => !onTop.has(resource.id))) };
-}
-
-/**
- * Certification and project picks for the role's analysis: resource id → reason, in pick order.
- * projectsPending is true until the project picks for this analysis have come back (or failed).
+ * Ids of the certifications and projects picked for the role's analysis, in pick order.
+ * pending is true per type until its picks for this analysis have come back (or failed).
  */
 function usePicks(family: JobFamily, runId: string | null) {
-  type Loaded = { key: string; byId: Map<string, string | null> };
+  type Loaded = { key: string; ids: string[] };
   const [certifications, setCertifications] = useState<Loaded | null>(null);
   const [projects, setProjects] = useState<Loaded | null>(null);
   const key = `${family}:${runId}`;
@@ -264,26 +246,29 @@ function usePicks(family: JobFamily, runId: string | null) {
     let active = true;
     // Each list loads on its own, so slow certification picks don't hold up the project picks.
     // Either can fail on its own (it then counts as loaded with no picks); the catalog still shows everything.
-    const load = (request: Promise<Map<string, string | null>>, set: (loaded: Loaded) => void) => {
+    const load = (request: Promise<string[]>, set: (loaded: Loaded) => void) => {
       void request.then(
-        (byId) => { if (active) set({ key, byId }); },
-        () => { if (active) set({ key, byId: new Map() }); },
+        (ids) => { if (active) set({ key, ids }); },
+        () => { if (active) set({ key, ids: [] }); },
       );
     };
     load(getCertificationPicks(family).then((response) =>
-      new Map(response.recommendations.map((pick) => [pick.certification_id, pick.reason]))), setCertifications);
-    // A project pick's reason only restates the skills the card already lists under Closes.
+      response.recommendations.map((pick) => pick.certification_id)), setCertifications);
+    // A project pick's reason only restates the skills the card already lists under Closes, so it isn't kept.
     load(getProjectPicks(runId).then((response) =>
-      new Map(response.recommendations.map((pick) => [pick.project_id, null]))), setProjects);
+      response.recommendations.map((pick) => pick.project_id)), setProjects);
     return () => { active = false; };
   }, [family, runId, key]);
-  const certificationPicks = certifications?.key === key ? certifications.byId : null;
-  const projectPicks = projects?.key === key ? projects.byId : null;
-  const byId = useMemo(
-    () => (certificationPicks || projectPicks ? new Map([...(certificationPicks ?? []), ...(projectPicks ?? [])]) : NO_PICKS),
+  const certificationPicks = certifications?.key === key ? certifications.ids : null;
+  const projectPicks = projects?.key === key ? projects.ids : null;
+  const picks = useMemo(
+    () => (certificationPicks || projectPicks ? new Set([...(certificationPicks ?? []), ...(projectPicks ?? [])]) : NO_PICKS),
     [certificationPicks, projectPicks],
   );
-  return { byId, projectsPending: runId !== null && projectPicks === null };
+  return { picks, pending: {
+    certification: runId !== null && certificationPicks === null,
+    project: runId !== null && projectPicks === null,
+  } };
 }
 
 const rank = (order: string[], key: string) => {

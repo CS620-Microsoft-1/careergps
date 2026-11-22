@@ -5,8 +5,7 @@ import type {
 
 // backend: app/api/routes/resources.py
 
-/** A little longer than the backend's agent timeouts (90 s certifications, 120 s projects), so an uncached pick can finish. */
-const CERTIFICATION_PICKS_TIMEOUT_MS = 100_000;
+/** A little longer than the backend's project agent timeout (120 s), so an uncached pick can finish. */
 const PROJECT_PICKS_TIMEOUT_MS = 130_000;
 
 /** Resources that close the role's skills; school-specific ones follow the account's university. */
@@ -29,9 +28,7 @@ export function removePlanItem(family: JobFamily, resourceId: string) {
 
 /** Certifications picked for a role's latest analysis (backend: app/api/routes/certifications.py). */
 export function getCertificationPicks(family: JobFamily) {
-  return apiPost<CertificationRecommendations>("/certifications/recommendations", {
-    json: { job_family: family }, timeoutMs: CERTIFICATION_PICKS_TIMEOUT_MS,
-  });
+  return apiPost<CertificationRecommendations>("/certifications/recommendations", { json: { job_family: family } });
 }
 
 /** Projects picked for one completed analysis. */
