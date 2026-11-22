@@ -19,6 +19,8 @@ sys.path.insert(0, str(BACKEND_ROOT))
 
 import pymupdf
 from docx import Document
+from docx.oxml import OxmlElement
+from docx.shared import Inches
 from fastapi.testclient import TestClient
 
 from app.api.deps import get_current_user, get_resume_pipeline, get_token_verifier
@@ -101,6 +103,76 @@ class ExtractionTests(unittest.TestCase):
         self.assertEqual("PyMuPDF", pdf["parser"])
         self.assertIn("Grace Hopper", docx["text"])
         self.assertEqual("python-docx", docx["parser"])
+
+    def test_extracts_contact_once_from_shared_header_with_table(self) -> None:
+        document = Document()
+        header = document.sections[0].header
+        header.paragraphs[0].text = "A. Student"
+        table = header.add_table(rows=1, cols=2, width=Inches(6))
+        table.cell(0, 0).merge(table.cell(0, 1)).text = "candidate@example.com"
+        document.add_paragraph("Education: Example University")
+        document.add_section()
+        document.add_paragraph("Experience: Data analyst")
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "resume.docx"
+            document.save(path)
+            text = extract_resume(path, ".docx")["text"]
+
+        self.assertEqual(text.splitlines(), [
+            "A. Student", "candidate@example.com",
+            "Education: Example University", "Experience: Data analyst",
+        ])
+
+    def test_reads_contact_inside_an_inline_word_template_field(self) -> None:
+        document = Document()
+        paragraph = document.sections[0].header.paragraphs[0]
+        paragraph.add_run("Email: ")
+        email = paragraph.add_run("candidate@example.com")
+        # Word stores a fillable template field inside an inline content control.
+        field = OxmlElement("w:sdt")
+        content = OxmlElement("w:sdtContent")
+        content.append(email._r)
+        field.append(content)
+        paragraph._p.append(field)
+        document.add_paragraph("Education")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "resume.docx"
+            document.save(path)
+            text = extract_resume(path, ".docx")["text"]
+
+        self.assertEqual(text.splitlines(), ["Email: candidate@example.com", "Education"])
+
+    def test_first_and_even_page_headers_follow_document_settings(self) -> None:
+        for first, even in ((True, False), (False, True), (False, False), (True, True)):
+            with self.subTest(first=first, even=even), tempfile.TemporaryDirectory() as directory:
+                document = Document()
+                section = document.sections[0]
+                section.first_page_header.paragraphs[0].text = "First page contact"
+                section.even_page_header.paragraphs[0].text = "Even page contact"
+                section.different_first_page_header_footer = first
+                document.settings.odd_and_even_pages_header_footer = even
+                document.add_paragraph("Education")
+                path = Path(directory) / "resume.docx"
+                document.save(path)
+
+                lines = extract_resume(path, ".docx")["text"].splitlines()
+                self.assertEqual("First page contact" in lines, first)
+                self.assertEqual("Even page contact" in lines, even)
+                self.assertEqual(lines[-1], "Education")
+
+    def test_later_section_can_enable_an_inherited_first_page_header(self) -> None:
+        document = Document()
+        document.sections[0].first_page_header.paragraphs[0].text = "candidate@example.com"
+        document.add_paragraph("Education")
+        document.add_section().different_first_page_header_footer = True
+        document.add_paragraph("Experience")
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "resume.docx"
+            document.save(path)
+            text = extract_resume(path, ".docx")["text"]
+
+        self.assertEqual(text.splitlines(), ["candidate@example.com", "Education", "Experience"])
 
 
 class ClassificationTests(unittest.TestCase):
