@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "lucide-react";
 
 import { RESOURCE_TYPES, ResourceIcon, skillLabel } from "@/components/career/route-parts";
@@ -156,9 +157,11 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
   const skills = [...new Set([...plan.covered_skill_ids, ...uncovered])].sort((a, b) => rank(a) - rank(b));
   const stepsFor = (skill: string) => plan.steps.filter((item) => item.skill_ids.includes(skill)).length;
   const covered = new Set(plan.covered_skill_ids);
+  // All the student's gaps, as the Gaps page counts them; the plan targets only the biggest ones.
+  const allGaps = Math.max(gapOrder.length, skills.length);
+  const others = allGaps - skills.length;
   const tiles = [
-    // Out of all the student's gaps (as the Gaps page counts them), not only the top ones the plan targets.
-    { value: `${covered.size} of ${Math.max(gapOrder.length, skills.length)}`, label: "gaps covered" },
+    { value: `${covered.size} of ${allGaps}`, label: "gaps covered" },
     { value: plural(plan.steps.length, "step"), label: plan.alongside.length ? `+ ${plan.alongside.length} alongside` : "on the main path" },
     ...(plan.project_hours !== null ? [{ value: `≈ ${plan.project_hours} h`, label: "of project work" }] : []),
   ];
@@ -200,6 +203,10 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
             );
           })}
         </ul>
+        {others > 0 && <p className="mt-3 text-sm text-muted-foreground">
+          This plan focuses on your {plural(skills.length, "biggest gap")}. The other {others} {others === 1 ? "is" : "are"} on
+          the <Link href="/gaps" className="font-bold text-foreground underline underline-offset-4">Gaps page</Link>.
+        </p>}
       </div>
     </div>
   );

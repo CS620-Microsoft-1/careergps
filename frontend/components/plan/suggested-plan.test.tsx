@@ -105,6 +105,17 @@ describe("SuggestedPlan", () => {
       expect(screen.getByText("gaps covered")).toBeInTheDocument();
     });
 
+    it("says the plan focuses on the biggest gaps and points to the rest", async () => {
+      await renderReady();
+      expect(screen.getByText(/This plan focuses on your 2 biggest gaps\. The other 1 is on/)).toBeInTheDocument();
+      expect(screen.getByRole("link", { name: "Gaps page" })).toHaveAttribute("href", "/gaps");
+    });
+
+    it("has no such note when the plan targets every gap", async () => {
+      await renderReady(suggestions({ uncovered_skill_ids: ["statistics"] }));
+      expect(screen.queryByText(/This plan focuses on/)).not.toBeInTheDocument();
+    });
+
     it("counts steps, alongside items and project hours", async () => {
       await renderReady();
       expect(screen.getByText("3 steps")).toBeInTheDocument();
