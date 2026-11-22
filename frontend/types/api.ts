@@ -296,8 +296,53 @@ export type ProjectRecommendations = {
 
 /** GET /plan: saved resources for one role; the browser orders them from the gap ranking. */
 export type PlanStatus = "saved" | "done";
-export type PlanItem = { resource_id: string; status: PlanStatus; saved_at: string; done_at: string | null };
+/** position: the order a suggested plan was added in (1 = do first); null for items saved one by one. */
+export type PlanItem = {
+  resource_id: string;
+  status: PlanStatus;
+  saved_at: string;
+  done_at: string | null;
+  position?: number | null;
+};
 export type Plan = { job_family: JobFamily; items: PlanItem[] };
+
+/**
+ * POST /action-plans/suggestions (backend: app/schemas/action_plans.py). A plan from action-plan-agent, or
+ * from the rule planner when source is "rules". covered_skill_ids, project_hours and uncovered_skill_ids
+ * are computed by the backend, never by the Agent.
+ */
+export type ActionPlanMode = "full";
+export type ActionPlanStrategy = "balanced" | "fastest" | "hands_on" | "credential" | "campus";
+export type ActionPlanItem = {
+  resource_id: string;
+  /** Gap skills this resource closes, highest priority first. */
+  skill_ids: string[];
+  /** The mentor's sentence, or a plain template ("Closes …") from the rule planner. */
+  reason: string;
+  resource: Resource;
+};
+export type ActionPlan = {
+  strategy: ActionPlanStrategy;
+  title: string;
+  summary: string;
+  /** Main path in order: steps[0] is what the student starts now. */
+  steps: ActionPlanItem[];
+  /** Ongoing commitments (clubs) next to the main path. */
+  alongside: ActionPlanItem[];
+  covered_skill_ids: string[];
+  /** Sum of the projects' estimated hours; null when no project has an estimate. */
+  project_hours: number | null;
+};
+export type ActionPlanSuggestions = {
+  job_family: JobFamily;
+  skill_gap_run_id: string;
+  mode: ActionPlanMode;
+  source: "agent" | "rules";
+  generated_at: string;
+  plans: ActionPlan[];
+  /** Top gaps no item in any plan closes. */
+  uncovered_skill_ids: string[];
+};
 
 /** The stages POST /resumes/analyze/stream reports. "ocr" appears only when a PDF page is an image. */
 export type ResumeAnalysisStep = "upload" | "extract" | "ocr" | "classify";
