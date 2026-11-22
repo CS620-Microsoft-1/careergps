@@ -62,6 +62,9 @@ to the existing placeholder dashboard. Refreshing during Review also discards th
 | `npm run test:components` | Component tests (Vitest and Testing Library); `npm run test:components:watch` reruns on save |
 | `npm run test:e2e` | End-to-end tests (Playwright); `npm run test:e2e:ui` opens the Playwright UI |
 
+`npm test` needs Node 22.18 or newer (it runs `.mts` files with Node's built-in type stripping);
+on an older Node 22, run `NODE_OPTIONS=--experimental-strip-types npm test`.
+
 Pull requests to `dev` that touch `frontend/` run all of these, plus lint, typecheck and build
 (`.github/workflows/frontend-tests.yml`).
 
@@ -101,7 +104,7 @@ app/                 routes, layouts, global styles
 components/ui/       shadcn/ui primitives (owned source, restyle freely)
 components/layout/   app shell: sidebar, topbar, mobile nav, user menu, page header, backend status
 components/auth/     login, signup, onboarding pieces
-components/panels/   Copilot panel and the hook to open it from anywhere
+components/plan/     action plan page, saved-plan state, suggested plan
 components/common/   shared building blocks (logo, form fields, empty states)
 lib/                 nav items, form options, validation schemas, utilities
 lib/api/             every call to the backend API (see "Connect to the backend")
@@ -197,9 +200,16 @@ plus with the browser's default font size raised to 20px. No page may scroll hor
 
 ## Copilot
 
-The **Ask CareerGPS** panel (`components/panels/`) is the single place for questions,
-explanations and sources: there are no separate "why", source or analysis-detail panels.
-Each answer will carry its citations and the agent steps behind it. Any component can open
-it with `useCopilot().openCopilot("Why is Docker a high-priority gap?")`.
-The answer format is designed together with the backend Copilot API; until then the
-panel is a shell with the input disabled.
+**Planned, not built yet.** The **Ask CareerGPS** panel will be the single place for questions,
+explanations and sources, with each answer carrying its citations and the agent steps behind it.
+Until it exists, an agent's one-line reason is shown inline on its card (resource picks on Resources,
+steps of a suggested plan on Action plan). Don't add separate "why", source or analysis-detail panels.
+
+## Suggested action plan
+
+On `/plan`, **Suggest a plan** (or "or let us suggest a plan" on an empty plan) opens
+`components/plan/suggested-plan.tsx`, which calls `getActionPlanSuggestions` (`lib/api/action-plans.ts`,
+backend `POST /action-plans/suggestions`). A first plan can take up to a minute; a repeat is cached.
+**Add all to my plan** saves each step with `position` 1..N (clubs without one) through
+`PUT /plan/items/{id}`. `orderPlan` (`lib/career.ts`) puts steps with a position first, in that order,
+then the rest by gap; resources saved one by one still slot in by gap.
