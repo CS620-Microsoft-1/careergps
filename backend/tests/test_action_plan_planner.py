@@ -205,5 +205,45 @@ class EnrichTest(PlannerTestCase):
         self.assertEqual(result.uncovered_skill_ids, ["security"])
 
 
+
+class StageEventTest(PlannerTestCase):
+    def stages(self, planner: ActionPlanner, **options) -> list[dict]:
+        events: list[dict] = []
+        planner.suggest(run(), on_event=events.append, **options)
+        return events
+
+    def test_agent_run_reports_each_stage_in_order(self) -> None:
+        events = self.stages(self.planner())
+        self.assertEqual([event["stage"] for event in events], ["gaps", "candidates", "agent", "checking"])
+        self.assertTrue(all(event["type"] == "stage" for event in events))
+        self.assertEqual([gap["skill_id"] for gap in events[0]["gaps"]],
+                         ["system_design", "testing", "cloud", "security"])
+        self.assertEqual(events[1]["counts"], {"project": 3, "certification": 1, "school_course": 1,
+                                               "online_course": 1, "student_org": 1})
+
+    def test_cached_run_skips_the_agent_stages(self) -> None:
+        planner = self.planner()
+        planner.suggest(run())
+        self.assertEqual([event["stage"] for event in self.stages(planner)], ["gaps", "candidates", "cached"])
+
+    def test_fallbacks_report_rules(self) -> None:
+        with self.assertLogs("app.services.action_plans.planner", "WARNING"):
+            failed = self.stages(self.planner(FakeAgent(error=TimeoutError())))
+        self.assertEqual([event["stage"] for event in failed], ["gaps", "candidates", "agent", "rules"])
+        unconfigured = self.stages(self.planner(configured=False))
+        self.assertEqual([event["stage"] for event in unconfigured], ["gaps", "candidates", "rules"])
+
+    def test_samples_take_each_type_in_turn_and_carry_only_catalog_fields(self) -> None:
+        samples = self.stages(self.planner())[1]["samples"]
+        self.assertEqual([sample["type"] for sample in samples[:5]],
+                         ["project", "certification", "school_course", "online_course", "student_org"])
+        self.assertTrue(all(set(sample) == {"title", "type"} for sample in samples))
+
+    def test_no_events_when_there_are_no_gaps(self) -> None:
+        events: list[dict] = []
+        self.planner().suggest(run(priorities={"testing": None}), on_event=events.append)
+        self.assertEqual(events, [])
+
+
 if __name__ == "__main__":
     unittest.main()

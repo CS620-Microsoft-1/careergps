@@ -6,10 +6,11 @@ everything the answer depends on (INPUT_JSON, the saved Instructions and respons
 version), so a taken course, new specialist picks or a prompt edit gets a fresh plan. Rule plans are free
 and never cached, so a working Agent is never hidden behind an old fallback.
 """
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from functools import lru_cache
 import hashlib
+from itertools import zip_longest
 import json
 import logging
 from pathlib import Path
@@ -38,6 +39,9 @@ PROMPT_DIR = BACKEND_ROOT / "app" / "prompts" / "action_plan"
 _RUN_ID = re.compile(r"[0-9a-f]{32}\Z")
 
 SourceLoader = Callable[[str, str | None, list[dict], str], Sources]
+# Build stages for the live view: gaps, candidates, then cached | agent → checking | rules.
+EventSink = Callable[[dict], None]
+SAMPLE_LIMIT = 12
 
 
 class _Cached(BaseModel):
@@ -66,7 +70,12 @@ class ActionPlanner:
 
     def suggest(self, run: SkillGapRun, *, mode: ActionPlanMode = "full", university: str | None = None,
                 taken_course_ids: set[str] = frozenset(), done_resource_ids: set[str] = frozenset(),
-                ) -> ActionPlanSuggestions:
+                on_event: EventSink | None = None) -> ActionPlanSuggestions:
+        """on_event gets {"type": "stage", "stage": ..., ...} as each stage finishes (see EventSink)."""
+        def emit(stage: str, **data) -> None:
+            if on_event is not None:
+                on_event({"type": "stage", "stage": stage, **data})
+
         if run.status != "completed" or run.report is None:
             raise ValueError("The skill gap analysis has not completed")
         if not _RUN_ID.fullmatch(run.id):
@@ -75,9 +84,13 @@ class ActionPlanner:
         if not gaps:
             return self._response(run, mode, "rules", _now(), [], Candidates(items=[], resources={}), gaps)
 
+        emit("gaps", gaps=[{"skill_id": gap["skill_id"], "skill_name": gap["skill_name"]} for gap in gaps])
+
         sources = self._sources(run.job_family, university, gaps, run.id)
         candidates = build_candidates(gaps, sources, taken_course_ids=set(taken_course_ids),
                                       done_resource_ids=set(done_resource_ids))
+        emit("candidates", counts=dict(Counter(item["type"] for item in candidates.items)),
+             samples=_samples(candidates.items))
         payload = agent_payload(mode, run.job_family, gaps, candidates)
         path = self.directory / run.id / f"{self._cache_key(payload)}.json"
 
@@ -87,22 +100,27 @@ class ActionPlanner:
         with lock:
             cached = self._read(path)
             if cached is not None:
+                emit("cached")
                 return self._response(run, mode, "agent", cached.generated_at, cached.plans, candidates, gaps)
-            plans = self._agent_plans(payload, candidates, gaps, mode) if candidates.items else None
+            plans = self._agent_plans(payload, candidates, gaps, mode, emit) if candidates.items else None
             if plans is not None:
                 record = _Cached(generated_at=_now(), plans=plans)
                 save_json(path, record.model_dump(mode="json"))
                 return self._response(run, mode, "agent", record.generated_at, plans, candidates, gaps)
 
+        emit("rules")
         plan = rules.full_plan(candidates, gaps)
         return self._response(run, mode, "rules", _now(), [plan] if plan else [], candidates, gaps)
 
-    def _agent_plans(self, payload: dict, candidates: Candidates, gaps: list[dict],
-                     mode: str) -> list[AgentPlan] | None:
+    def _agent_plans(self, payload: dict, candidates: Candidates, gaps: list[dict], mode: str,
+                     emit: Callable[..., None]) -> list[AgentPlan] | None:
         if not self._configured():
             return None
+        emit("agent")
         try:
-            return validate(self._invoke(payload), candidates, gaps, mode)
+            raw = self._invoke(payload)
+            emit("checking")
+            return validate(raw, candidates, gaps, mode)
         except Exception as error:
             # Error type only: SDK messages can echo the payload. The student still gets the rule plan.
             logger.warning("Action plan Agent failed (%s); using the rule plan", type(error).__name__)
@@ -136,6 +154,18 @@ class ActionPlanner:
             job_family=run.job_family, skill_gap_run_id=run.id, mode=mode, source=source,
             generated_at=generated_at, plans=enriched,
             uncovered_skill_ids=[gap["skill_id"] for gap in gaps if gap["skill_id"] not in covered])
+
+
+def _samples(items: list[dict]) -> list[dict]:
+    """Up to SAMPLE_LIMIT candidate titles for the live view, taking each type in turn so all show up.
+    Catalog titles only; nothing about the student."""
+    by_type: dict[str, list[dict]] = {}
+    for item in items:
+        by_type.setdefault(item["type"], []).append(item)
+    samples: list[dict] = []
+    for round_ in zip_longest(*by_type.values()):
+        samples += [{"title": item["title"], "type": item["type"]} for item in round_ if item is not None]
+    return samples[:SAMPLE_LIMIT]
 
 
 def enrich(plan: AgentPlan, candidates: Candidates, gaps: list[dict]) -> ActionPlan:

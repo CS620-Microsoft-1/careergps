@@ -1,3 +1,4 @@
+import json
 import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -44,6 +45,9 @@ class FakePlanner:
     def suggest(self, run, **kwargs):
         self.events.append("suggest")
         self.calls.append((run, kwargs))
+        if on_event := kwargs.get("on_event"):
+            on_event({"type": "stage", "stage": "gaps", "gaps": [{"skill_id": "sql", "skill_name": "SQL"}]})
+            on_event({"type": "stage", "stage": "agent"})
         if self.error:
             raise self.error
         return ActionPlanSuggestions(job_family=run.job_family, skill_gap_run_id=run.id, mode=kwargs["mode"],
@@ -61,7 +65,7 @@ class RecordingAccounts(FakeAccounts):
         self.events.append("end_reads")
 
 
-class ActionPlanRouteTest(unittest.TestCase):
+class RouteTestCase(unittest.TestCase):
     def setUp(self) -> None:
         self.events: list[str] = []
         self.accounts = RecordingAccounts(self.events)
@@ -86,6 +90,9 @@ class ActionPlanRouteTest(unittest.TestCase):
     def post(self, body=BODY):
         return self.client.post(URL, json=body, headers=self.headers)
 
+
+
+class ActionPlanRouteTest(RouteTestCase):
     def test_requires_login(self) -> None:
         self.assertEqual(self.client.post(URL, json=BODY).status_code, 401)
 
@@ -128,6 +135,51 @@ class ActionPlanRouteTest(unittest.TestCase):
         for body in ({**BODY, "mode": "skill"}, {**BODY, "extra": 1}, {"job_family": "astronaut"}):
             with self.subTest(body):
                 self.assertEqual(self.post(body).status_code, 422)
+
+
+
+class ActionPlanStreamRouteTest(RouteTestCase):
+    STREAM = URL + "/stream"
+
+    def stream(self, body=BODY):
+        return self.client.post(self.STREAM, json=body, headers=self.headers)
+
+    @staticmethod
+    def lines(response) -> list[dict]:
+        return [json.loads(line) for line in response.text.splitlines() if line.strip()]
+
+    def test_streams_each_stage_then_the_result(self) -> None:
+        response = self.stream()
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.headers["content-type"], "application/x-ndjson")
+        events = self.lines(response)
+        self.assertEqual([event.get("stage", event["type"]) for event in events], ["gaps", "agent", "result"])
+        self.assertEqual(events[-1]["suggestions"]["skill_gap_run_id"], run().id)
+        options = self.planner.calls[0][1]
+        self.assertEqual((options["taken_course_ids"], options["done_resource_ids"]), ({"cs_400"}, {"p_done"}))
+
+    def test_run_problems_are_plain_http_errors_before_streaming(self) -> None:
+        self.runs.result = run("running")
+        self.assertEqual(self.stream().status_code, 409)
+        self.runs.error = KeyError("none")
+        self.assertEqual(self.stream().status_code, 404)
+        self.assertEqual(self.planner.calls, [])
+
+    def test_a_failure_after_streaming_starts_is_an_error_line(self) -> None:
+        self.planner.error = OSError("disk")
+        events = self.lines(self.stream())
+        self.assertEqual(events[-1], {"type": "error", "status": 503, "detail": "Action plans are unavailable"})
+
+    def test_an_unexpected_failure_logs_only_its_type(self) -> None:
+        self.planner.error = RuntimeError("secret plan text")
+        with self.assertLogs("app.api.routes.action_plans", "ERROR") as logs:
+            events = self.lines(self.stream())
+        self.assertEqual(events[-1]["status"], 500)
+        self.assertNotIn("secret plan text", "".join(logs.output))
+
+    def test_ends_the_read_transaction_before_the_agent(self) -> None:
+        self.stream()
+        self.assertEqual(self.events[-2:], ["end_reads", "suggest"])
 
 
 if __name__ == "__main__":
