@@ -133,4 +133,25 @@ export function takenCoursesFor(resources: Resource[], taken: ReadonlySet<string
   return resources.filter((resource) => isTaken(resource, taken) && resource.skills.includes(skill));
 }
 
+/** How many certifications, projects or student orgs show before "More …"; the backend recommends at most this many certifications and projects. */
+export const TOP_PICKS = 3;
+
+/**
+ * One type's picks (in pick order) on top, the rest under "More …", ordered by how many of the
+ * student's gaps they close. Without picks (no analysis yet, the request failed, or a gap filter
+ * hides them) the ones that close the most gaps go on top instead; while picks are still loading,
+ * nothing does, so the top doesn't jump when they arrive.
+ */
+export function splitTopPicks(resources: Resource[], picks: ReadonlySet<string>, gaps: string[], pending: boolean) {
+  const closed = (resource: Resource) => resource.skills.filter((skill) => gaps.includes(skill)).length;
+  const byCoverage = (list: Resource[]) => list
+    .map((resource, index) => ({ resource, index }))
+    .sort((a, b) => closed(b.resource) - closed(a.resource) || a.index - b.index)
+    .map(({ resource }) => resource);
+  const picked = resources.filter((resource) => picks.has(resource.id));
+  const top = picked.length ? picked.slice(0, TOP_PICKS) : pending ? [] : byCoverage(resources).slice(0, TOP_PICKS);
+  const onTop = new Set(top.map((resource) => resource.id));
+  return { top, more: byCoverage(resources.filter((resource) => !onTop.has(resource.id))) };
+}
+
 export const percent = (ratio: number) => `${Math.round(ratio * 100)}%`;

@@ -1,4 +1,4 @@
-"""Taken courses: the résumé course-code match, the /me/courses API and the plan "done" hook.
+"""Taken courses: the résumé course name and code match, the /me/courses API and the plan "done" hook.
 No database: the student_courses storage functions are replaced with an in-memory dict
 (tests/test_student_courses_postgres.py covers the real table)."""
 from datetime import UTC, datetime
@@ -16,29 +16,130 @@ from app.main import app
 from app.models import StudentCourse
 from app.services import student_courses
 from app.services.plans import LocalPlanStore, get_plan_store
-from app.services.student_courses import match_courses, resume_strings
+from app.services.student_courses import course_list_strings, match_courses
 from tests.support import SUPABASE_URL, FakeJwks, make_token, new_signing_key
 from tests.test_me import FakeAccountService, onboarding_body
 
 
-def _course(course_id, code=None, title=None):
-    return {"id": course_id, "course_code": code, "title": title or f"{code}: A course"}
+def _named(number, name):
+    return {"id": f"uw-cs-{number}", "course_code": f"COMP SCI {number}", "title": f"COMP SCI {number}: {name}"}
 
 
-COURSES = [
-    _course("uw-cs-400", "COMP SCI 400"),
-    _course("uw-cs-540", "COMP SCI 540"),
-    _course("uw-cs-552", "COMP SCI/E C E 552"),
-    _course("uw-cs-577", "COMP SCI 577"),
-    _course("uw-stat-240", title="STAT 240: Data Science Modeling I"),
+NAMED = [
+    _named(300, "Programming II"),
+    _named(320, "Data Science Programming II"),
+    _named(532, "Matrix Methods in Machine Learning"),
+    _named(536, "Introduction to Programming Languages and Compilers"),
+    _named(537, "Introduction to Operating Systems"),
+    _named(541, "Theory & Algorithms for Data Science"),
+    _named(564, "Database Management Systems: Design and Implementation"),
+    _named(566, "Introduction to Computer Vision"),
+    _named(577, "Introduction to Algorithms"),
+    _named(640, "Introduction to Computer Networks"),
+    _named(760, "Machine Learning"),
+    _named(766, "Computer Vision"),
+    _named(774, "Data Exploration, Cleaning, and Integration for Data Science"),
+    {"id": "uw-stat-240", "course_code": None, "title": "STAT 240: Data Science Modeling I"},
 ]
 
 
-class MatchCoursesTests(unittest.TestCase):
-    def ids(self, *texts):
-        return [course["id"] for course in match_courses(texts, COURSES)]
+class MatchCourseNamesTests(unittest.TestCase):
+    def ids(self, *course_lists, courses=NAMED):
+        return [course["id"] for course in match_courses(course_lists, courses)]
+
+    def test_matches_names_however_they_are_punctuated(self) -> None:
+        self.assertEqual(["uw-cs-537"], self.ids("Coursework: Introduction to Operating Systems"))
+        self.assertEqual(["uw-cs-537"], self.ids("Relevant courses: operating systems; Calculus"))
+        self.assertEqual(["uw-cs-537"], self.ids("Intro to Operating Systems"))
+        self.assertEqual(["uw-cs-564"], self.ids("Database Management Systems"))
+        self.assertEqual(["uw-cs-564"], self.ids("Database Management Systems: Design and Implementation"))
+        self.assertEqual(["uw-cs-774"], self.ids("Data Exploration, Cleaning, and Integration for Data Science"))
+        self.assertEqual(["uw-stat-240"], self.ids("Data Science Modeling I"))
+
+    def test_names_are_whole_words_inside_one_list_item(self) -> None:
+        self.assertEqual([], self.ids("Operating Systemsx", "Cooperating systems"))
+        # "Machine" and "Learning Theory" are two list items, so "Machine Learning" isn't there.
+        self.assertEqual([], self.ids("Statistical Machine, Learning Theory"))
+
+    def test_a_one_word_name_must_be_the_whole_item(self) -> None:
+        self.assertEqual(["uw-cs-577"], self.ids("Coursework: Algorithms, Linear Algebra"))
+        self.assertEqual(["uw-cs-577"], self.ids("Coursework: Intro. to Algorithms, Linear Algebra"))
+        self.assertEqual([], self.ids("Designed algorithms for route planning"))
+
+    def test_a_dash_or_and_ends_a_one_word_item(self) -> None:
+        both = ["uw-cs-537", "uw-cs-577"]
+        self.assertEqual(both, self.ids("Relevant Coursework - Algorithms, Operating Systems"))
+        self.assertEqual(both, self.ids("Coursework: Algorithms and Operating Systems"))
+        self.assertEqual(both, self.ids("Coursework: Operating Systems & Algorithms"))
+        self.assertEqual(["uw-cs-577", "uw-cs-640"], self.ids("Coursework – Algorithms; Computer Networks"))
+        self.assertEqual(["uw-cs-577", "uw-cs-640"], self.ids("Coursework — Algorithms; Computer Networks"))
+        # A hyphen inside a word is not a separator.
+        self.assertEqual([], self.ids("Coursework: Graph-Algorithms"))
+
+    def test_and_stays_a_word_inside_a_longer_name(self) -> None:
+        self.assertEqual(["uw-cs-536"], self.ids("Coursework: Programming Languages and Compilers, Calculus"))
+        self.assertEqual(["uw-cs-541"], self.ids("Coursework: Theory & Algorithms for Data Science"))
+        self.assertEqual(["uw-cs-541"], self.ids("Theory and Algorithms for Data Science"))
+        self.assertEqual(["uw-cs-536", "uw-cs-577"],
+                         self.ids("Coursework: Algorithms and Programming Languages and Compilers"))
+
+    def test_the_longer_name_wins(self) -> None:
+        self.assertEqual(["uw-cs-532"], self.ids("Matrix Methods in Machine Learning"))
+        self.assertEqual(["uw-cs-320"], self.ids("Data Science Programming II"))
+        self.assertEqual(["uw-cs-300", "uw-cs-760"], self.ids("Programming II, Machine Learning"))
+
+    def test_a_shared_name_gives_the_lowest_numbered_course(self) -> None:
+        self.assertEqual(["uw-cs-566"], self.ids("Computer Vision"))
+        self.assertEqual(["uw-cs-566"], self.ids("Introduction to Computer Vision"))
+
+    def test_names_count_only_in_course_lists(self) -> None:
+        data = {"education": [{"institution": "UW", "major": "Machine Learning", "content": ["Operating Systems"]}],
+                "technical_skills": ["Machine Learning", "Computer Vision"],
+                "projects": [{"name": "Algorithms", "content": ["Used computer vision in CS 577"]}],
+                "other": [{"content": "Relevant Coursework: Database Management Systems"}]}
+        self.assertEqual(["Operating Systems", "Relevant Coursework: Database Management Systems"],
+                         list(course_list_strings(data)))
+        found = match_courses(course_list_strings(data), NAMED)
+        # Not the names in the major or the skills, and neither the name nor the code in the project.
+        self.assertEqual(["uw-cs-537", "uw-cs-564"], [course["id"] for course in found])
+        self.assertEqual([], list(course_list_strings(None)))
+
+    def test_coursework_must_start_the_line_outside_education(self) -> None:
+        data = {"projects": [{"content": ["Built a site that ranks UW courses using machine learning"]}],
+                "work_experience": [{"content": ["TA for CS courses: operating systems office hours"]}]}
+        self.assertEqual([], list(course_list_strings(data)))
+        self.assertEqual([], match_courses(course_list_strings(data), NAMED))
+        # A coursework line is read from its heading on, whatever section it is in.
+        data = {"other": ["Built a machine learning demo\n• Relevant courses: Operating Systems", "Courses: Algorithms"]}
+        self.assertEqual(["• Relevant courses: Operating Systems", "Courses: Algorithms"],
+                         list(course_list_strings(data)))
+        self.assertEqual(["uw-cs-537", "uw-cs-577"],
+                         [course["id"] for course in match_courses(course_list_strings(data), NAMED)])
+
+    def test_an_education_string_is_read_once(self) -> None:
+        data = {"education": [{"content": ["Relevant Coursework: Operating Systems"]}]}
+        self.assertEqual(["Relevant Coursework: Operating Systems"], list(course_list_strings(data)))
+
+
+def _coded(course_id, code=None, title=None):
+    return {"id": course_id, "course_code": code, "title": title or f"{code}: A course"}
+
+
+CODED = [
+    _coded("uw-cs-400", "COMP SCI 400"),
+    _coded("uw-cs-540", "COMP SCI 540"),
+    _coded("uw-cs-552", "COMP SCI/E C E 552"),
+    _coded("uw-cs-577", "COMP SCI 577", "COMP SCI 577: Introduction to Algorithms"),
+    _coded("uw-stat-240", title="STAT 240: Data Science Modeling I"),
+]
+
+
+class MatchCourseCodesTests(unittest.TestCase):
+    def ids(self, *course_lists):
+        return [course["id"] for course in match_courses(course_lists, CODED)]
 
     def test_matches_the_ways_students_write_codes(self) -> None:
+        self.assertEqual(["uw-cs-400", "uw-cs-540", "uw-cs-577"], self.ids("Coursework: CS 400, CS 540, CS 577"))
         self.assertEqual(["uw-cs-400"], self.ids("Relevant coursework: COMP SCI 400"))
         self.assertEqual(["uw-cs-400"], self.ids("CS400 (Programming III)"))
         self.assertEqual(["uw-cs-400"], self.ids("Comp. Sci. 400"))
@@ -54,10 +155,17 @@ class MatchCoursesTests(unittest.TestCase):
         self.assertEqual([], self.ids("GPA 3.400", "Class of 2027", "Physics 400", "CS 4000", "ABCS 400"))
         self.assertEqual([], self.ids("CS 999"))
 
-    def test_reads_every_string_in_the_resume(self) -> None:
-        data = {"education": [{"school": "UW", "content": ["Coursework: CS 577"]}], "skills": ["Python"],
-                "projects": [{"content": ["Built a compiler for COMP SCI 536"]}], "gpa": 3.9}
-        self.assertEqual(["uw-cs-577"], [c["id"] for c in match_courses(resume_strings(data), COURSES)])
+    def test_codes_and_names_combine(self) -> None:
+        self.assertEqual(["uw-cs-400", "uw-cs-577", "uw-stat-240"],
+                         self.ids("Coursework: CS 400, Algorithms", "COMP SCI 577: Introduction to Algorithms",
+                                  "Data Science Modeling I"))
+
+    def test_codes_count_only_in_course_lists(self) -> None:
+        data = {"education": [{"institution": "UW", "content": ["Coursework: CS 577"]}], "technical_skills": ["Python"],
+                "projects": [{"content": ["Built a compiler for COMP SCI 540"]}],
+                "other": ["Coursework: CS 400"]}
+        self.assertEqual(["uw-cs-400", "uw-cs-577"],
+                         [course["id"] for course in match_courses(course_list_strings(data), CODED)])
 
 
 class _TakenStore:
@@ -102,7 +210,7 @@ class TakenCoursesApiTests(unittest.TestCase):
         self.user_id = uuid.uuid4()
         self.headers = {"Authorization": f"Bearer {make_token(key, sub=str(self.user_id), email='ada@example.com')}"}
         body = onboarding_body()
-        body["resume"]["classification"]["education"][0]["content"] = ["Relevant coursework: CS 564, COMP SCI 400"]
+        body["resume"]["classification"]["education"][0]["content"] = ["Relevant coursework: Database Management Systems, CS 400"]
         self.assertEqual(201, self.client.post("/me", json=body, headers=self.headers).status_code)
 
     def tearDown(self) -> None:
@@ -148,7 +256,7 @@ class TakenCoursesApiTests(unittest.TestCase):
             self.assertEqual(200, response.status_code, response.text)
             return response.json()["course_ids"]
 
-        # COMP SCI 400 closes no data analyst skill, so only CS 564 is listed for this role.
+        # COMP SCI 400 closes no data analyst skill, so only COMP SCI 564 is listed for this role.
         self.assertEqual(["uw-cs-564"], matches())
         self.client.put("/me/courses/uw-cs-564", json={"source": "resume"}, headers=self.headers)
         self.assertEqual([], matches())

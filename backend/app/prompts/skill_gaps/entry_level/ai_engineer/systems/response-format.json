@@ -1,0 +1,560 @@
+{
+  "type": "json_schema",
+  "name": "entry_systems_affirmative_partial_core_v1",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "task": {
+        "type": "string",
+        "enum": [
+          "assess_entry_level_readiness"
+        ]
+      },
+      "result": {
+        "type": "object",
+        "properties": {
+          "job_family": {
+            "type": "string",
+            "enum": [
+              "ai_engineer"
+            ]
+          },
+          "ai_infrastructure": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "generative_ai": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "llm": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              },
+              "check_facts": {
+                "type": "object",
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "enum": [
+                      "performed",
+                      "purpose",
+                      "planned",
+                      "prepared",
+                      "absent",
+                      "ambiguous"
+                    ]
+                  },
+                  "workload_link": {
+                    "type": "string",
+                    "enum": [
+                      "same",
+                      "other",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "checked_output": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "string"
+                  },
+                  "proof_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 2
+                  }
+                },
+                "required": [
+                  "event",
+                  "workload_link",
+                  "action",
+                  "checked_output",
+                  "detail",
+                  "proof_ids"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "criteria",
+              "check_facts"
+            ],
+            "additionalProperties": false
+          },
+          "rag": {
+            "type": "object",
+            "properties": {
+              "core_facts": {
+                "type": "object",
+                "properties": {
+                  "personal_retrieval": {
+                    "type": "string",
+                    "enum": [
+                      "performed",
+                      "others_only",
+                      "absent",
+                      "ambiguous"
+                    ]
+                  },
+                  "model_generation": {
+                    "type": "string",
+                    "enum": [
+                      "explicit",
+                      "explicitly_absent",
+                      "not_stated",
+                      "ambiguous"
+                    ]
+                  },
+                  "retrieval_use": {
+                    "type": "string",
+                    "enum": [
+                      "generation_context",
+                      "unspecified_output",
+                      "search_only",
+                      "absent",
+                      "ambiguous"
+                    ]
+                  },
+                  "workload_link": {
+                    "type": "string",
+                    "enum": [
+                      "same",
+                      "other",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "proof_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 2
+                  }
+                },
+                "required": [
+                  "personal_retrieval",
+                  "model_generation",
+                  "retrieval_use",
+                  "workload_link",
+                  "proof_ids"
+                ],
+                "additionalProperties": false
+              },
+              "children": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "c2": {
+                        "$ref": "#/$defs/RagChild"
+                      },
+                      "c3": {
+                        "$ref": "#/$defs/RagChild"
+                      }
+                    },
+                    "required": [
+                      "c2",
+                      "c3"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "core_facts",
+              "children"
+            ],
+            "additionalProperties": false
+          },
+          "ai_agents": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "prompt_engineering": {
+            "type": "object",
+            "properties": {
+              "criteria": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Criterion"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            },
+            "required": [
+              "criteria"
+            ],
+            "additionalProperties": false
+          },
+          "vector_retrieval": {
+            "type": "object",
+            "properties": {
+              "core_facts": {
+                "type": "object",
+                "properties": {
+                  "claim_kind": {
+                    "type": "string",
+                    "enum": [
+                      "operation",
+                      "design",
+                      "evaluation",
+                      "tool_list",
+                      "absent",
+                      "unclear"
+                    ]
+                  },
+                  "execution": {
+                    "type": "string",
+                    "enum": [
+                      "performed",
+                      "explicitly_not_performed",
+                      "not_stated",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "method": {
+                    "type": "string",
+                    "enum": [
+                      "embeddings",
+                      "similarity_search",
+                      "vector_indexing",
+                      "vector_storage",
+                      "multiple_eligible",
+                      "unrelated",
+                      "not_stated",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "ownership": {
+                    "type": "string",
+                    "enum": [
+                      "personal",
+                      "others_only",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "workload_link": {
+                    "type": "string",
+                    "enum": [
+                      "same",
+                      "other",
+                      "unclear",
+                      "not_applicable"
+                    ]
+                  },
+                  "proof_ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 2
+                  }
+                },
+                "required": [
+                  "claim_kind",
+                  "execution",
+                  "method",
+                  "ownership",
+                  "workload_link",
+                  "proof_ids"
+                ],
+                "additionalProperties": false
+              },
+              "children": {
+                "anyOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "c2": {
+                        "$ref": "#/$defs/RagChild"
+                      },
+                      "c3": {
+                        "$ref": "#/$defs/RagChild"
+                      }
+                    },
+                    "required": [
+                      "c2",
+                      "c3"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "core_facts",
+              "children"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "job_family",
+          "ai_infrastructure",
+          "generative_ai",
+          "llm",
+          "rag",
+          "ai_agents",
+          "prompt_engineering",
+          "vector_retrieval"
+        ],
+        "additionalProperties": false
+      },
+      "partial_core": {
+        "type": "object",
+        "properties": {
+          "vector_retrieval": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 2
+              }
+            ]
+          },
+          "rag": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 2
+              }
+            ]
+          },
+          "ai_agents": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 2
+              }
+            ]
+          },
+          "ai_infrastructure": {
+            "anyOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 2
+              }
+            ]
+          }
+        },
+        "required": [
+          "vector_retrieval",
+          "rag",
+          "ai_agents",
+          "ai_infrastructure"
+        ],
+        "additionalProperties": false
+      },
+      "proofs": {
+        "type": "array",
+        "items": {
+          "$ref": "#/$defs/Proof"
+        },
+        "maxItems": 42
+      }
+    },
+    "required": [
+      "task",
+      "result",
+      "partial_core",
+      "proofs"
+    ],
+    "additionalProperties": false,
+    "$defs": {
+      "Proof": {
+        "type": "object",
+        "properties": {
+          "proof_id": {
+            "type": "string"
+          },
+          "unit_id": {
+            "type": "string"
+          },
+          "quote": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "proof_id",
+          "unit_id",
+          "quote"
+        ],
+        "additionalProperties": false
+      },
+      "Criterion": {
+        "type": "object",
+        "properties": {
+          "criterion_id": {
+            "type": "string",
+            "enum": [
+              "c1",
+              "c2",
+              "c3"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "partial",
+              "not_evidenced",
+              "uncertain"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "knowledge",
+              "unclear",
+              "none"
+            ]
+          },
+          "proof_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "criterion_id",
+          "status",
+          "basis",
+          "proof_ids"
+        ],
+        "additionalProperties": false
+      },
+      "RagChild": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "supported",
+              "partial",
+              "not_evidenced",
+              "uncertain"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "practice",
+              "knowledge",
+              "unclear",
+              "none"
+            ]
+          },
+          "proof_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 2
+          }
+        },
+        "required": [
+          "status",
+          "basis",
+          "proof_ids"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "strict": true
+}

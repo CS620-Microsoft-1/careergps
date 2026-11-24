@@ -1,0 +1,4 @@
+# Instructions are hashed as exact UTF-8 bytes; retain LF on Windows checkouts.
+**/Instructions.md text eol=lf
+**/response-format.json text eol=lf
+manifest.json text eol=lf

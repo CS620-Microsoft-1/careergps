@@ -1,0 +1,1643 @@
+{
+  "rule_version": "entry-level-skill-rules.v2-draft",
+  "skills": {
+    "sql": {
+      "skill_id": "sql",
+      "skill_name": "SQL",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal SQL or explicit relational querying to answer a named analytical question OR access identified relevant data.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Do not infer SQL or relational querying from JSON, a CSV file, generic data handling or an ordinary key lookup alone."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal SQL or explicit relational querying to answer a named analytical question OR access identified relevant data."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied evidence shows only JSON, a CSV file, generic data handling or ordinary key lookup, with no personal SQL or explicit relational-querying task."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe at least one selection, filter, join, aggregation OR relational relationship used for this task by stating what is selected, filtered, joined, aggregated OR related; the generic label alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed query-output check states an expected count, known record, join behavior OR connection to the analytical question.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "analytical_scripting": {
+      "skill_id": "analytical_scripting",
+      "skill_name": "Analytical scripting",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal code or script writing for an identified data transformation OR analysis task, using an identified programming language OR analytical library.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "General application coding without a stated transformation or analytical task does not establish analytical scripting.",
+        "Using a teammate's script without personal code contribution does not establish c1."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal code or script writing for an identified data transformation OR analysis task, using an identified programming language OR analytical library."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied coding work has no stated data-transformation or analytical task, or the only stated script was written by someone else."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe a transformation, calculation, data structure OR analytical procedure implemented in the script by stating the operation performed OR what the structure stores or represents; a broad category name alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed check of the script, transformed data OR analysis states an expected property OR independent calculation.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "spreadsheets": {
+      "skill_id": "spreadsheets",
+      "skill_name": "Spreadsheet analysis",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal spreadsheet analysis for a stated task using formulas, pivots OR another analytical spreadsheet operation.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "A spreadsheet file, static table, typed text or ordinary document does not establish spreadsheet analysis."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "Do not infer a particular spreadsheet product when none is stated.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal spreadsheet analysis for a stated task using formulas, pivots OR another analytical spreadsheet operation."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied evidence shows only a spreadsheet file, static table, typed text or document, with no personal analytical spreadsheet operation."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe the formula, aggregation, lookup, pivot configuration OR spreadsheet workflow used by stating the calculation, lookup relationship, grouping/configuration OR analytical steps; a generic formula/pivot label alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed spreadsheet check identifies checked results, input ranges, formula behavior OR reconciliation with source data.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "data_analysis": {
+      "skill_id": "data_analysis",
+      "skill_name": "Data analysis",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal inspection, comparison OR interpretation of identified data to answer a stated question.",
+      "c3_kind": "finding_interpretation",
+      "exclusions": [
+        "Collecting, storing or displaying data alone does not establish analytical inspection or interpretation.",
+        "A numerical output without its question or analytical action is insufficient for c1."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "c3 is interpretation of the relevant finding or design, not a mandatory second software test. Preserve every baseline OR route.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal inspection, comparison OR interpretation of identified data to answer a stated question."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied work only collects, stores or displays data, or supplies an unexplained number without a stated analytical question and personal inspection, comparison or interpretation."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe an analytical comparison, grouping, calculation OR inspection method by stating what was compared, grouped, calculated OR inspected for the question; a generic analysis label alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Interpret a specific finding from the analysis OR describe a performed check against data quality, an alternative explanation OR the original question.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a hoped-for outcome or plan to interpret findings is supplied, without an actual explanation, interpretation or assessment."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "business_analytics": {
+      "skill_id": "business_analytics",
+      "skill_name": "Business analytics",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal definition OR analysis of a business/product metric OR a concrete decision-relevant business question.",
+      "c3_kind": "finding_interpretation",
+      "exclusions": [
+        "A business job title, project coordination or an unexplained numerical outcome does not establish business analytics."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "c3 is interpretation of the relevant finding or design, not a mandatory second software test. Preserve every baseline OR route.",
+        "The first c3 route requires business meaning plus a limitation; the alternative route requires a concrete decision. Meaning alone receives the explicit partial status.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal definition OR analysis of a business/product metric OR a concrete decision-relevant business question."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied evidence shows only a business title, project coordination or an unexplained numerical outcome, with no personal business/product metric work or concrete decision-relevant analysis."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe the metric definition, comparison, segment OR analytical procedure connecting the data to the question by stating its definition, compared quantities, selected group OR analytical operation; a generic business-analysis label alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Interpret OR check both the business meaning and one limitation of a result; OR connect that result to a concrete decision.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant states the business meaning of a specific result from the same analysis, but supplies neither a limitation of that interpretation nor a concrete decision connected to the result.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a hoped-for outcome or plan to interpret findings is supplied, without an actual explanation, interpretation or assessment."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "statistics": {
+      "skill_id": "statistics",
+      "skill_name": "Statistics",
+      "linkage_policy": "same_concept_independent_sources",
+      "core_boundary": "Explicit study OR explanation of statistical concepts or methods, OR personal application of a statistical method.",
+      "c3_kind": "worked_concept",
+      "exclusions": [
+        "A degree, software name, unexplained percentage or broad interest in statistics alone is insufficient."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "Knowledge criteria are assessed individually. Do not suppress c2 or c3 solely because c1 is absent; the shared critical-score cap still applies.",
+        "Explicit study or explanation may qualify without a personal project. A source type that permits knowledge evidence does not make a broad skill listing sufficient for every criterion.",
+        "c3 accepts the stated worked-concept explanation or assessment route and does not require execution of software tests."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explicit study OR explanation of statistical concepts or methods, OR personal application of a statistical method."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "The supplied evidence contains only a degree, software name, unexplained percentage or broad interest, without explicit study, explanation or application of a statistical concept or method."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Identify a relevant statistical method, quantity, assumption OR interpretation with enough specificity to distinguish it from a software name or broad field label.",
+            "The evidence concerns the same statistics concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Interpret a statistical result OR assess an assumption, uncertainty OR limitation in an identified worked example or actual analysis.",
+            "The evidence concerns the same statistics concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "Only a hoped-for outcome or plan to interpret findings is supplied, without an actual explanation, interpretation or assessment."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        }
+      ]
+    },
+    "requirements_analysis": {
+      "skill_id": "requirements_analysis",
+      "skill_name": "Requirements analysis",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal elicitation, clarification, analysis OR translation of a stakeholder/problem requirement.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Receiving a specification, attending meetings or implementing assigned work alone does not establish requirements analysis."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal elicitation, clarification, analysis OR translation of a stakeholder/problem requirement."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied evidence only describes receiving a specification, attending meetings or following instructions, without personal elicitation, clarification, analysis or translation of requirements."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Identify a concrete ambiguity, acceptance condition, data need, metric definition OR requirement translation addressed.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed check of the interpreted requirement uses stakeholder feedback, a documented acceptance condition OR a worked scenario.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "experimentation": {
+      "skill_id": "experimentation",
+      "skill_name": "Experimentation",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal design OR execution of an experiment with explicit comparison groups, treatments OR conditions.",
+      "c3_kind": "finding_interpretation",
+      "exclusions": [
+        "Ordinary implementation iterations or before-and-after figures without an experimental setup are insufficient."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "c3 is interpretation of the relevant finding or design, not a mandatory second software test. Preserve every baseline OR route.",
+        "Design OR execution qualifies for c1. A stated design limitation can support c3 before an experiment has run; do not invent observed outcomes.",
+        "A successful treatment effect and an executed study are not mandatory when a designed comparison and its limitations are explicitly explained.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal design OR execution of an experiment with explicit comparison groups, treatments OR conditions."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied work only iterates implementations or reports before-and-after figures without an explicit experimental comparison setup."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe the comparison setup, assignment/control, outcome measure OR confounding consideration by stating the compared conditions, assignment/control rule, measured quantity OR identified confounding factor; a generic experiment label alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Evaluate OR interpret the comparison with a stated observed result, uncertainty OR design limitation.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a hoped-for outcome or plan to interpret findings is supplied, without an actual explanation, interpretation or assessment."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "causal_inference": {
+      "skill_id": "causal_inference",
+      "skill_name": "Causal inference",
+      "linkage_policy": "same_concept_independent_sources",
+      "core_boundary": "Explicit study, explanation OR application of an identified causal-inference method aimed at estimating a causal effect.",
+      "c3_kind": "worked_concept",
+      "exclusions": [
+        "Prediction, correlation or an unsupported claim that a change caused improvement does not establish causal inference."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "Knowledge criteria are assessed individually. Do not suppress c2 or c3 solely because c1 is absent; the shared critical-score cap still applies.",
+        "Explicit study or explanation may qualify without a personal project. A source type that permits knowledge evidence does not make a broad skill listing sufficient for every criterion.",
+        "c3 accepts the stated worked-concept explanation or assessment route and does not require execution of software tests."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explicit study, explanation OR application of an identified causal-inference method aimed at estimating a causal effect."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "The supplied evidence only describes prediction, correlation or an unsupported causal claim, without study, explanation or application of a causal-inference method."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Identify a causal identification strategy, comparison, intervention, confounder adjustment OR explicit identifying assumption.",
+            "The evidence concerns the same causal inference concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explain OR check an identification assumption, bias risk, validity limit OR interpretation of a causal estimate in an identified worked example or actual analysis.",
+            "The evidence concerns the same causal inference concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "Only a hoped-for outcome or plan to interpret findings is supplied, without an actual explanation, interpretation or assessment."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        }
+      ]
+    },
+    "data_pipelines": {
+      "skill_id": "data_pipelines",
+      "skill_name": "Data pipelines",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal building OR operation of a repeatable ingestion, transformation OR ETL flow with stated source and destination stages.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "A one-off download, isolated data edit or manually copied file is insufficient."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "Repeatability does not require a cloud platform or production schedule.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal building OR operation of a repeatable ingestion, transformation OR ETL flow with stated source and destination stages."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied work only downloads, copies or edits data once, without a personally built or operated repeatable flow with source and destination stages."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe an extraction, transformation, dependency, scheduling OR loading mechanism used in that flow by stating a relevant operation, ordering rule, trigger/timing OR loading behavior; a pipeline or mechanism category name alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed check of the repeatable flow identifies a run condition, data transfer, schema, row count OR failure condition.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "data_modeling": {
+      "skill_id": "data_modeling",
+      "skill_name": "Data modeling",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal design of an explicit data schema, entities/relationships, dimensions OR analytical data structure.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Producing JSON, formatting a response or training a predictive model does not by itself establish data schema design."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal design of an explicit data schema, entities/relationships, dimensions OR analytical data structure."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied work only outputs JSON, formats a response or trains a predictive model, without personal data-schema or analytical-structure design."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe a key, relationship, grain, dimension, constraint OR representation choice in the model by stating the identified field, connected entities, represented unit, analytical dimension, rule OR chosen representation; the word schema or model alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed model check identifies a query/use case, consistency condition, relationship OR analytical requirement.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "data_quality": {
+      "skill_id": "data_quality",
+      "skill_name": "Data quality",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal cleaning, validation, reconciliation, preparation OR governance of a stated dataset.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "Data storage, a bare quality assertion or ordinary UI input checks unrelated to a dataset are insufficient."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "c2 requires the quality issue and rule/transformation. A verification condition in c3 is not automatically the cleaning transformation in c2.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal cleaning, validation, reconciliation, preparation OR governance of a stated dataset."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied evidence shows only data storage, a bare quality assertion or UI input checks unrelated to a stated dataset, with no personal dataset preparation or quality activity."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "State the actual quality issue AND describe a relevant rule or transformation that addresses it in the dataset; generic claims that data were cleaned do not provide both parts.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The quality issue is explicitly identified in the applicant's eligible dataset work, but the rule or transformation used to address that issue is absent; a transformation with an unresolved issue or unclear ownership is not this partial case.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed check of the resulting data OR quality rule states expected values, counts, consistency OR documented exceptions.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "dashboarding": {
+      "skill_id": "dashboarding",
+      "skill_name": "Dashboard development",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal building OR maintenance of an analytical/business dashboard with stated metrics OR analytical views.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "An isolated chart, static document, handover note or unspecified reporting is insufficient."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "Dashboard evidence does not require a named BI product.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal building OR maintenance of an analytical/business dashboard with stated metrics OR analytical views."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied artifact is only an isolated chart, static document, handover note or unspecified report, with no personally built or maintained dashboard."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe a dashboard metric, data connection, filter, interaction, layout decision OR refresh behavior by stating the represented quantity, connected data, selected condition, interaction, layout choice OR refresh rule; a broad dashboard-feature label alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed dashboard check compares a displayed metric, filter, refresh OR interaction with its data source OR intended use.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "data_visualization": {
+      "skill_id": "data_visualization",
+      "skill_name": "Data visualization",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal creation OR explicit design of a data visualization to communicate a stated analytical quantity OR relationship.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "A text-only report or a teammate's visualization does not establish personal visualization work."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "An isolated chart can qualify here without establishing dashboard development."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal creation OR explicit design of a data visualization to communicate a stated analytical quantity OR relationship."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied evidence is only a text report or another person's visualization, with no personal visualization creation or design."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Identify a chart type, visual encoding, grouping, axis OR design choice appropriate to that data or question.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed visualization check uses value validation, scale/label inspection OR audience feedback to assess displayed data OR interpretability.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "bi_tools": {
+      "skill_id": "bi_tools",
+      "skill_name": "Business intelligence tools",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal use of an explicitly identified BI platform for a stated analytical activity.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "A generic chart, spreadsheet or database does not identify a BI platform."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "Do not infer proficiency in one BI platform from use of another.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal use of an explicitly identified BI platform for a stated analytical activity."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied evidence shows only a generic chart, spreadsheet or database, with no identified BI platform personally used for analysis."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe a data connection, model, measure, visual, filter OR report operation in the named BI platform by stating the connected data, model element, calculation, represented quantity, selection condition OR reporting action; a generic BI-feature label alone is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed check of the BI output OR behavior uses source data, an expected calculation OR a stated analytical requirement.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    },
+    "warehousing": {
+      "skill_id": "warehousing",
+      "skill_name": "Data warehousing",
+      "linkage_policy": "same_concept_independent_sources",
+      "core_boundary": "Explicit study OR explanation of data-warehouse concepts, OR personal use of an identified warehouse in an analytical context.",
+      "c3_kind": "worked_concept",
+      "exclusions": [
+        "An ordinary transactional database or file store does not automatically establish warehouse knowledge."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "Knowledge criteria are assessed individually. Do not suppress c2 or c3 solely because c1 is absent; the shared critical-score cap still applies.",
+        "Explicit study or explanation may qualify without a personal project. A source type that permits knowledge evidence does not make a broad skill listing sufficient for every criterion.",
+        "c3 accepts the stated worked-concept explanation or assessment route and does not require execution of software tests."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explicit study OR explanation of data-warehouse concepts, OR personal use of an identified warehouse in an analytical context."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "The supplied evidence describes only an ordinary transactional database or file store, without explicit warehouse study, explanation or analytical use."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Identify a warehouse-specific analytical structure OR operation, including fact/dimension modeling, analytical loading, partitioning OR warehouse querying.",
+            "The evidence concerns the same data warehousing concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explain OR check a warehouse query, load, grain, reconciliation OR analytical use case in an actual task or a worked learning example.",
+            "The evidence concerns the same data warehousing concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "Only a hoped-for outcome or plan to interpret findings is supplied, without an actual explanation, interpretation or assessment."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        }
+      ]
+    },
+    "large_scale_processing": {
+      "skill_id": "large_scale_processing",
+      "skill_name": "Large-scale processing",
+      "linkage_policy": "same_concept_independent_sources",
+      "core_boundary": "Explicit knowledge of large/distributed data processing, OR personal work with an explicitly described scale OR distribution constraint.",
+      "c3_kind": "worked_concept",
+      "exclusions": [
+        "A framework name alone or an unexplained claim that data were big is insufficient."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "Knowledge criteria are assessed individually. Do not suppress c2 or c3 solely because c1 is absent; the shared critical-score cap still applies.",
+        "Explicit study or explanation may qualify without a personal project. A source type that permits knowledge evidence does not make a broad skill listing sufficient for every criterion.",
+        "c3 accepts the stated worked-concept explanation or assessment route and does not require execution of software tests.",
+        "A bounded worked distributed example can qualify; no arbitrary row-count threshold is required.",
+        "For c2, describe the stated mechanism or choice to the level specified in this card. Do not require code, exact API names or a second alternative when one described route qualifies.",
+        "A bounded conceptual or course example can describe the c2 mechanism; actual large-scale execution and a personal project are not prerequisites."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explicit knowledge of large/distributed data processing, OR personal work with an explicitly described scale OR distribution constraint."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "The supplied evidence only names a framework or says data were big, without explicit distributed/scale knowledge or a described scale/distribution constraint."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Describe one behavior of a partitioning, distributed transformation, memory/resource, shuffle OR scale-handling mechanism for the relevant concept or workload, such as grouping records by a key OR processing chunks to bound memory; a bare mechanism term such as shuffle is insufficient.",
+            "The evidence concerns the same large-scale processing concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "knowledge",
+          "supported_when": [
+            "Explain OR check correctness OR resource behavior for the stated workload or mechanism, including a bounded distributed learning example.",
+            "The evidence concerns the same large-scale processing concept as the claim being assessed; separate learning sources may establish individual criteria."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Only a bare interest, broad field label or irrelevant tool/degree is supplied, without the specific knowledge required by this criterion.",
+            "Only a hoped-for outcome or plan to interpret findings is supplied, without an actual explanation, interpretation or assessment."
+          ],
+          "uncertain_when": [
+            "A stated concept or explanation has conflicting technical meanings that materially change whether this criterion is met.",
+            "The source contains a relevant worked example, but conflicting wording makes the applicant's explanation or the concept being discussed unclear."
+          ]
+        }
+      ]
+    },
+    "workflow_automation": {
+      "skill_id": "workflow_automation",
+      "skill_name": "Workflow automation",
+      "linkage_policy": "same_personal_example",
+      "core_boundary": "Personal automation OR orchestration of a repeatable analytical/data workflow.",
+      "c3_kind": "executed_check",
+      "exclusions": [
+        "A single manual analysis or software build CI unrelated to an analytical/data workflow is insufficient."
+      ],
+      "policy_decisions": [
+        "All-seniority job demand is retained; demand prevalence does not change these evidence statuses.",
+        "The card is a draft operational interpretation of the preserved baseline; examples are synthetic and are not blind or independently adjudicated validation data.",
+        "Do not require production deployment, senior ownership, monetary gains or numerical improvements beyond the evidence stated in a criterion.",
+        "c1 not_evidenced suppresses dependent c2 and c3 credit. If personal core eligibility is uncertain, keep the skill pending and do not infer dependent credit.",
+        "Coursework, personal projects, research, internships and employment can all establish personal practice.",
+        "For c2, describe the stated operation or choice to the level specified in this card. Do not require code, exact API names, a full algorithm or a second alternative when one described route qualifies."
+      ],
+      "criteria": [
+        {
+          "id": "c1",
+          "weight": 0.5,
+          "critical": true,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Personal automation OR orchestration of a repeatable analytical/data workflow."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "Core eligibility is a binary content and ownership boundary; incomplete or ambiguous skill identity is not half credit.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "The supplied work is only a one-off manual analysis or software CI unrelated to an analytical/data workflow, with no repeatable analytical automation."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity."
+          ]
+        },
+        {
+          "id": "c2",
+          "weight": 0.3,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "Describe the repeated steps, trigger, dependency, scheduling OR orchestration logic by stating the steps, triggering event, ordering rule, schedule OR workflow-control behavior; the generic word automation is insufficient.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": false,
+          "partial_when": null,
+          "partial_disabled_reason": "This criterion accepts any one complete listed alternative; a generic label or unresolved meaning does not form a separate eligible halfway condition.",
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "Only a broad mechanism or activity label is supplied, without the description required above and without meeting this criterion's permitted partial case."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        },
+        {
+          "id": "c3",
+          "weight": 0.2,
+          "critical": false,
+          "minimum_evidence": "practice",
+          "supported_when": [
+            "The evidence attributes the eligible action to the applicant; a team claim alone is insufficient.",
+            "An explicitly performed automated-workflow check evaluates a run, produced artifact, dependency OR failure-handling behavior against the intended workflow.",
+            "The detail belongs to the same personal example and relevant workload as established c1; a neighboring task does not supply it."
+          ],
+          "partial_allowed": true,
+          "partial_when": "The applicant explicitly performed a check of this same eligible workload, but states none of the case, comparison basis, checked condition, expected behavior or observed result required to establish the full check.",
+          "partial_disabled_reason": null,
+          "not_evidenced_when": [
+            "No eligible evidence is supplied for this criterion, including any permitted partial case.",
+            "Evidence is only a skill listing, interest, generic familiarity or another person's contribution.",
+            "c1 is not_evidenced, so the practice-dependent criterion receives no credit.",
+            "The text states only an intended benefit, future test, test-harness preparation, ordinary output or plan; no check was actually performed."
+          ],
+          "uncertain_when": [
+            "The text describes relevant team work but leaves personal responsibility unresolved, without explicitly attributing it to someone else.",
+            "The wording supports competing eligible and ineligible meanings for this skill; a missing detail alone is not this ambiguity.",
+            "A relevant detail or check is present, but its association with the selected personal workload is genuinely ambiguous."
+          ]
+        }
+      ]
+    }
+  }
+}

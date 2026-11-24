@@ -38,13 +38,10 @@ class CertificationRecommendation(BaseModel):
     certification_id: str
     # The user's gap skills this certification covers.
     skill_ids: list[str]
-    reason: str | None
 
 
 class CertificationRecommendations(BaseModel):
     job_family: JobFamily
     skill_gap_run_id: str
-    # "rules" when the Agent is not configured or failed; reasons are then empty.
-    source: Literal["agent", "rules"]
     generated_at: str
     recommendations: list[CertificationRecommendation]
