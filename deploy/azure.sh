@@ -15,7 +15,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 RG=${RG:-rg-careergps}
-LOCATION=${LOCATION:-eastus}               # pick the region closest to the Supabase project
+LOCATION=${LOCATION:-northcentralus}       # nearest allowed region to Supabase (us-east-2); Azure for Students
+                                           # only allows some: az policy assignment list --query "[].parameters"
 PLAN=${PLAN:-plan-careergps}
 # Defaults to the repo's GitHub owner; set GHCR_OWNER=<your-username> if the org blocks packages.
 GHCR_OWNER=${GHCR_OWNER:-$(git remote get-url origin | sed -E 's#.*github\.com[:/]([^/]+)/.*#\1#')}
@@ -60,9 +61,9 @@ for image in "$API_IMAGE" "$WEB_IMAGE"; do
 done
 
 echo "==> Resource group and plan"
-az group create -n "$RG" -l "$LOCATION" -o none
+az group show -n "$RG" -o none 2>/dev/null || az group create -n "$RG" -l "$LOCATION" -o none
 az appservice plan show -n "$PLAN" -g "$RG" -o none 2>/dev/null ||
-  az appservice plan create -n "$PLAN" -g "$RG" --is-linux --sku B1 -o none
+  az appservice plan create -n "$PLAN" -g "$RG" -l "$LOCATION" --is-linux --sku B1 -o none
 
 # Creates the app on first run, otherwise swaps the image. The system identity is for Foundry.
 deploy_app() {
