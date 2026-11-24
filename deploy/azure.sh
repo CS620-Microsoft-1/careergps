@@ -1,29 +1,27 @@
 #!/usr/bin/env bash
-# Build both images, push them to GitHub Container Registry, and deploy them to App Service.
+# Build both images, push them to GitHub Container Registry, and deploy them to Azure Container Apps.
 # Safe to re-run: the first run creates everything, later runs only redeploy new images.
 #
 #   az login                                         # once
 #   docker login ghcr.io -u <github-username>        # once; password = classic token with write:packages
 #   ./deploy/azure.sh                                # from the repo root, with Docker running
 #
-# The packages must be public so App Service can pull them without credentials: after the first
+# The packages must be public so Container Apps can pull them without credentials: after the first
 # push, set each package to Public in GitHub (package -> Package settings -> Change visibility).
 #
-# Reads backend/.env (becomes the API's app settings) and frontend/.env (Supabase public values).
-# Override any name below by setting it in the environment, e.g. LOCATION=westus2 ./deploy/azure.sh
+# Reads backend/.env (stored as Container Apps secrets for the API) and frontend/.env (Supabase
+# public values). Override any name below in the environment, e.g. LOCATION=canadacentral ./deploy/azure.sh
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 RG=${RG:-rg-careergps}
 LOCATION=${LOCATION:-northcentralus}       # nearest allowed region to Supabase (us-east-2); Azure for Students
                                            # only allows some: az policy assignment list --query "[].parameters"
-PLAN=${PLAN:-plan-careergps}
+ENV_NAME=${ENV_NAME:-cae-careergps}
 # Defaults to the repo's GitHub owner; set GHCR_OWNER=<your-username> if the org blocks packages.
 GHCR_OWNER=${GHCR_OWNER:-$(git remote get-url origin | sed -E 's#.*github\.com[:/]([^/]+)/.*#\1#')}
-API_APP=${API_APP:-careergps-api}          # globally unique, becomes <name>.azurewebsites.net
-WEB_APP=${WEB_APP:-careergps-web}          # globally unique
-API_URL=${API_URL:-https://$API_APP.azurewebsites.net}
-WEB_URL=${WEB_URL:-https://$WEB_APP.azurewebsites.net}
+API_APP=${API_APP:-careergps-api}
+WEB_APP=${WEB_APP:-careergps-web}
 TAG=$(git rev-parse --short HEAD)$(git diff --quiet HEAD || echo -dirty)
 
 REGISTRY=ghcr.io/$(echo "$GHCR_OWNER" | tr '[:upper:]' '[:lower:]')   # ghcr names must be lowercase
@@ -31,6 +29,17 @@ API_IMAGE=$REGISTRY/careergps-api:$TAG
 WEB_IMAGE=$REGISTRY/careergps-web:$TAG
 
 for f in backend/.env frontend/.env; do [[ -f $f ]] || { echo "Missing $f" >&2; exit 1; }; done
+
+echo "==> Resource group and Container Apps environment"
+az provider register -n Microsoft.App --wait -o none
+az group show -n "$RG" -o none 2>/dev/null || az group create -n "$RG" -l "$LOCATION" -o none
+# No Log Analytics workspace (it bills per GB); live logs still work with `az containerapp logs show`.
+az containerapp env show -n "$ENV_NAME" -g "$RG" -o none 2>/dev/null ||
+  az containerapp env create -n "$ENV_NAME" -g "$RG" -l "$LOCATION" --logs-destination none -o none
+# App URLs are https://<app>.<environment domain>, known only once the environment exists.
+DOMAIN=$(az containerapp env show -n "$ENV_NAME" -g "$RG" --query properties.defaultDomain -o tsv)
+API_URL=${API_URL:-https://$API_APP.$DOMAIN}
+WEB_URL=${WEB_URL:-https://$WEB_APP.$DOMAIN}
 
 echo "==> Build and push images ($TAG)"
 docker build --platform linux/amd64 -t "$API_IMAGE" backend
@@ -43,7 +52,7 @@ docker build --platform linux/amd64 -t "$API_IMAGE" backend
 docker push "$API_IMAGE"
 docker push "$WEB_IMAGE"
 
-# App Service pulls anonymously, so stop here (before creating anything) if a package is still private.
+# Container Apps pulls anonymously, so stop here (before creating apps) if a package is still private.
 public() {
   local repo=${1#ghcr.io/}; repo=${repo%:*}
   local token
@@ -60,35 +69,15 @@ for image in "$API_IMAGE" "$WEB_IMAGE"; do
   }
 done
 
-echo "==> Resource group and plan"
-az group show -n "$RG" -o none 2>/dev/null || az group create -n "$RG" -l "$LOCATION" -o none
-az appservice plan show -n "$PLAN" -g "$RG" -o none 2>/dev/null ||
-  az appservice plan create -n "$PLAN" -g "$RG" -l "$LOCATION" --is-linux --sku B1 -o none
-
-# Creates the app on first run, otherwise swaps the image. The system identity is for Foundry.
-deploy_app() {
-  local app=$1 image=$2
-  if az webapp show -n "$app" -g "$RG" -o none 2>/dev/null; then
-    az webapp config container set -n "$app" -g "$RG" --container-image-name "$image" -o none
-  else
-    az webapp create -n "$app" -g "$RG" -p "$PLAN" --container-image-name "$image" \
-      --assign-identity '[system]' -o none
-  fi
-  az webapp update -n "$app" -g "$RG" --https-only true -o none
-  # Always On keeps background threads (resume analysis) from being stopped when idle.
-  az webapp config set -n "$app" -g "$RG" --always-on true -o none
-  az webapp log config -n "$app" -g "$RG" --docker-container-logging filesystem -o none
-}
-
-echo "==> API app"
-deploy_app "$API_APP" "$API_IMAGE"
-# backend/.env -> app settings, via a temp file so secrets stay off the command line.
+# backend/.env -> one secret per key (lowercase, dashes) and an env var that references it.
 # MIGRATION_DATABASE_URL is left out: migrations are run by the database owner, not the app.
-SETTINGS=$(mktemp)
-trap 'rm -f "$SETTINGS"' EXIT
-python3 - "$SETTINGS" "$WEB_URL" <<'PY'
-import json, sys
-out, web_url = sys.argv[1], sys.argv[2]
+# shortcut: secret values pass as CLI arguments on this machine; use `--yaml` if that ever matters.
+SECRETS=() ENV_VARS=()
+while IFS= read -r -d '' pair; do
+  key=${pair%%=*} name=$(echo "${pair%%=*}" | tr '[:upper:]_' '[:lower:]-')
+  SECRETS+=("$name=${pair#*=}") ENV_VARS+=("$key=secretref:$name")
+done < <(python3 - "$WEB_URL" <<'PY'
+import sys
 settings = {}
 for line in open("backend/.env"):
     line = line.strip()
@@ -97,15 +86,31 @@ for line in open("backend/.env"):
     key, value = line.split("=", 1)
     settings[key.strip()] = value.strip().strip("'\"")
 settings.pop("MIGRATION_DATABASE_URL", None)
-settings.update(CORS_ORIGINS=web_url, WEBSITES_PORT="8000")
-json.dump(settings, open(out, "w"))
+settings["CORS_ORIGINS"] = sys.argv[1]
+sys.stdout.write("".join(f"{k}={v}\0" for k, v in settings.items()))
 PY
-az webapp config appsettings set -n "$API_APP" -g "$RG" --settings "@$SETTINGS" -o none
-rm -f "$SETTINGS"
+)
+
+echo "==> API app"
+if az containerapp show -n "$API_APP" -g "$RG" -o none 2>/dev/null; then
+  az containerapp secret set -n "$API_APP" -g "$RG" --secrets "${SECRETS[@]}" -o none
+  az containerapp update -n "$API_APP" -g "$RG" --image "$API_IMAGE" --set-env-vars "${ENV_VARS[@]}" -o none
+else
+  # Exactly one replica: résumé analysis runs on a background thread, and plan/run stores use
+  # in-process locks and local files, so scaling to zero or out would lose work.
+  az containerapp create -n "$API_APP" -g "$RG" --environment "$ENV_NAME" --image "$API_IMAGE" \
+    --ingress external --target-port 8000 --cpu 0.5 --memory 1.0Gi --min-replicas 1 --max-replicas 1 \
+    --system-assigned --secrets "${SECRETS[@]}" --env-vars "${ENV_VARS[@]}" -o none
+fi
 
 echo "==> Web app"
-deploy_app "$WEB_APP" "$WEB_IMAGE"
-az webapp config appsettings set -n "$WEB_APP" -g "$RG" --settings WEBSITES_PORT=3000 -o none
+if az containerapp show -n "$WEB_APP" -g "$RG" -o none 2>/dev/null; then
+  az containerapp update -n "$WEB_APP" -g "$RG" --image "$WEB_IMAGE" -o none
+else
+  # Scales to zero when idle: the first visit after a quiet spell waits a few seconds.
+  az containerapp create -n "$WEB_APP" -g "$RG" --environment "$ENV_NAME" --image "$WEB_IMAGE" \
+    --ingress external --target-port 3000 --cpu 0.25 --memory 0.5Gi --min-replicas 0 --max-replicas 1 -o none
+fi
 
 echo "==> Waiting for the API"
 for _ in $(seq 30); do
@@ -114,7 +119,7 @@ for _ in $(seq 30); do
 done
 echo
 
-PRINCIPAL_ID=$(az webapp identity show -n "$API_APP" -g "$RG" --query principalId -o tsv)
+PRINCIPAL_ID=$(az containerapp identity show -n "$API_APP" -g "$RG" --query principalId -o tsv)
 cat <<EOF
 
 Deployed $TAG
@@ -125,5 +130,5 @@ First deploy only:
   1. Send the Foundry project owner the API's identity and ask them to run:
        az role assignment create --assignee $PRINCIPAL_ID --role "Azure AI User" --scope <Foundry resource ID>
   2. Supabase -> Authentication -> URL Configuration: Site URL $WEB_URL, add redirect URL $WEB_URL/**
-Logs: az webapp log tail -n $API_APP -g $RG
+Logs: az containerapp logs show -n $API_APP -g $RG --follow
 EOF
