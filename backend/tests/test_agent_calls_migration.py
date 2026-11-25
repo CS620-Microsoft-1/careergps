@@ -33,14 +33,16 @@ class AgentCallsMigrationTests(unittest.TestCase):
         self.assertEqual("9aa1698efdd2", self.script.get_revision(REVISION).down_revision)
         self.assertEqual([REVISION], self.script.get_heads())
 
-    def test_creates_agent_calls_with_checks_indexes_and_rls(self) -> None:
+    def test_creates_agent_calls_with_checks_indexes_cascade_and_rls(self) -> None:
         sql = self.render("upgrade")
         self.assertIn("CREATE TABLE agent_calls (", sql)
         self.assertIn("cost_usd NUMERIC(14, 8)", sql)
         self.assertIn("CONSTRAINT ck_agent_calls_status CHECK", sql)
         self.assertIn("CREATE INDEX ix_agent_calls_agent_created_at ON agent_calls (agent, created_at)", sql)
         self.assertIn("ALTER TABLE agent_calls ENABLE ROW LEVEL SECURITY", sql)
-        self.assertNotIn("FOREIGN KEY", sql)
+        self.assertIn("ALTER TABLE agent_calls ADD CONSTRAINT fk_agent_calls_user FOREIGN KEY (user_id) "
+                      "REFERENCES auth.users (id) ON DELETE CASCADE", sql)
+        self.assertEqual(1, sql.count("FOREIGN KEY"))
         self.assertNotIn("INSERT", sql)
         self.assertIn("DROP TABLE agent_calls", self.render("downgrade"))
 

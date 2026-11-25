@@ -1103,6 +1103,8 @@ answers are never stored; an error keeps only its class name.
 - **Who:** `RequestContextMiddleware` starts a holder per request and `get_current_user` fills in the
   user. Work moved to another thread must use `agent_calls.in_context(fn)` as its target, or its
   calls have no user. Job posting analysis runs without a signed-in user, so `user_id` is empty.
+- **Account deletion:** `user_id` references `auth.users` with `ON DELETE CASCADE`, so `DELETE /me`
+  (which removes the Supabase Auth user) also removes that student's rows.
 - **Never in the way:** the row is written in its own short session after the call. If that write
   fails, the call's result or error is returned unchanged and a warning is logged.
 

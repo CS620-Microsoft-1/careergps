@@ -4,8 +4,10 @@ Revision ID: 9ea89c504d80
 Revises: 9aa1698efdd2
 
 One row per responses.create, written by app.services.agent_calls. No prompts or answers are stored.
-user_id has no foreign key: onboarding analyses a résumé before the users row exists. run_id is the
-Skill Gap run id, also without a foreign key, since local runs may not be saved to skill_gap_runs.
+user_id references auth.users, not users: onboarding analyses a résumé before the users row exists.
+ON DELETE CASCADE, so deleting an account (DELETE /me removes the Supabase Auth user) removes its
+rows. run_id is the Skill Gap run id, without a foreign key, since local runs may not be saved to
+skill_gap_runs.
 Schema only: no data copy. RLS follows the backend-only access model (Supabase Data API disabled);
 no anonymous/authenticated policies. The database owner applies this after merge.
 """
@@ -47,6 +49,13 @@ def upgrade() -> None:
     op.create_index('ix_agent_calls_created_at', 'agent_calls', ['created_at'], unique=False)
     op.create_index('ix_agent_calls_agent_created_at', 'agent_calls', ['agent', 'created_at'], unique=False)
     op.create_index('ix_agent_calls_user_id', 'agent_calls', ['user_id'], unique=False)
+
+    # Added by hand: auth is Supabase's schema, so this foreign key isn't in the models;
+    # migrations/env.py keeps autogenerate from dropping it (see the users migration).
+    op.execute(
+        'ALTER TABLE agent_calls ADD CONSTRAINT fk_agent_calls_user '
+        'FOREIGN KEY (user_id) REFERENCES auth.users (id) ON DELETE CASCADE'
+    )
 
     # Added by hand (autogenerate doesn't know about RLS); see the users migration.
     op.execute("ALTER TABLE agent_calls ENABLE ROW LEVEL SECURITY")

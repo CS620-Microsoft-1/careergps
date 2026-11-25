@@ -35,7 +35,8 @@ class AgentCall(Base):
     agent_version: Mapped[str | None] = mapped_column(Text)
     # The model the response reports; None when the call failed before a response.
     model: Mapped[str | None] = mapped_column(Text)
-    # The signed-in student. No foreign key: onboarding analyses a résumé before the users row exists.
+    # The signed-in student (a Supabase Auth id; onboarding calls come before the users row exists).
+    # The foreign key to auth.users (ON DELETE CASCADE) lives only in the migration, as for users.id.
     user_id: Mapped[uuid.UUID | None] = mapped_column()
     # The Skill Gap run the call belongs to, if any.
     run_id: Mapped[uuid.UUID | None] = mapped_column()
