@@ -23,7 +23,7 @@
      "estimated_hours": 40, "alongside": false, "suggested_by": "catalog"},
     {"resource_id": "example-cert-cloud-associate", "type": "certification", "title": "Cloud Developer Associate",
      "provider": "Example Cloud", "skill_ids": ["cloud", "security"], "difficulty": "intermediate",
-     "estimated_hours": null, "alongside": false, "suggested_by": "certification_agent"},
+     "estimated_hours": null, "alongside": false, "suggested_by": "rules"},
     {"resource_id": "example-cert-security-basics", "type": "certification", "title": "Security Fundamentals",
      "provider": "Example Security Institute", "skill_ids": ["security"], "difficulty": "beginner",
      "estimated_hours": null, "alongside": false, "suggested_by": "catalog"},

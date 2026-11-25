@@ -1095,12 +1095,12 @@ of a direction. The `/plan` page shows it on request; nothing is saved until the
 | Type | Shortlist | Cap |
 | --- | --- | --- |
 | project | the project Agent's shortlist (`resources_agent._candidates`), its picks first | 20 |
-| certification | the certification Agent's shortlist (`certifications.catalog.for_family`), its picks first | 12 |
+| certification | the role's certification catalog (`certifications.catalog.for_family`), the skill-match picks (`certifications.ranking.rank`) first | 12 |
 | school course, online course, student org | the Resources list (`resources.resources_for`) | 8 each |
 
-Specialist picks come from their per-run caches (`local_results/project_recommendations/`,
-`local_results/certifications/`); without one, their free rule rankings stand in. No specialist Agent
-is called. Taken school courses and plan items marked done are removed; saved-but-not-done items stay.
+Project Agent picks come from its per-run cache (`local_results/project_recommendations/`); without
+one, the free rule ranking stands in. No specialist Agent is called. The top gaps follow the Gaps page
+(`certifications.ranking.top_gaps`: a positive gap and evidence below 0.7). Taken school courses and plan items marked done are removed; saved-but-not-done items stay.
 When the project Agent's shortlist gets shorter, revisit `PROJECT_CAP` in `services/action_plans/candidates.py`.
 
 **What comes out.** One `balanced` plan: an ordered main path (`steps`, the first is "now") and

@@ -18,7 +18,8 @@ PRIORITIES = {"system_design": 0.9, "testing": 0.7, "cloud": 0.5, "security": 0.
 
 def run(status="completed", priorities=PRIORITIES) -> SkillGapRun:
     report = {"skills": [{"skill_id": skill, "skill_name": skill.replace("_", " ").title(), "skill_gap": 1.0,
-                          "skill_gap_grade": "F", "priority": value} for skill, value in priorities.items()]}
+                          "skill_gap_grade": "F", "priority": value, "resume_evidence_strength": 0.0}
+                         for skill, value in priorities.items()]}
     return SkillGapRun(id=RUN_ID, user_id=USER_ID, resume_id=USER_ID, status=status, phase=status,
                        job_family="software_engineer", filename="r.pdf", resume_hash="h",
                        created_at="2026-11-19T00:00:00+00:00", completed_at="2026-11-19T00:00:01+00:00",

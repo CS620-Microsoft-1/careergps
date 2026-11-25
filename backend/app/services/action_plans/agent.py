@@ -29,7 +29,7 @@ def invoke(payload: dict, *, timeout_seconds: float = 90.0, settings: ActionPlan
 
     name, version = settings.action_plan_foundry_agent_name, settings.pinned_agent_version
     # A pinned version goes in agent_reference (like the Skill Gap and JD Agents); otherwise the
-    # client is bound to the Agent's latest version (like the certification Agent).
+    # client is bound to the Agent's latest version.
     client_options = {} if version else {"agent_name": name}
     request_options = ({"extra_body": {"agent_reference": {"type": "agent_reference", "name": name, "version": version}}}
                        if version else {})

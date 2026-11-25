@@ -2,11 +2,12 @@
 
 The candidates are the specialist recommenders' own shortlists, not the whole catalog:
 - projects: the project Agent's shortlist (resources_agent._candidates), its picks ranked first;
-- certifications: the certification Agent's shortlist (certifications.catalog.for_family), its picks first;
+- certifications: the role's certification catalog (certifications.catalog.for_family), the Resources page's
+  skill-match picks (certifications.ranking.rank) first;
 - school courses, online courses and clubs: the Resources page list (resources.resources_for); no Agent
   picks these.
-Specialist picks come from their per-run caches; when a cache is missing, their free rule rankings stand
-in. No specialist Agent is called here. When the project Agent's shortlist changes, this follows it.
+Project Agent picks come from its per-run cache; when it is missing, the free rule ranking stands in. No
+specialist Agent is called here. When the project Agent's shortlist changes, this follows it.
 
 load_sources() reads the catalogs and caches; build_candidates() and agent_payload() are pure.
 """
@@ -36,7 +37,7 @@ _RUN_ID = re.compile(r"[0-9a-f]{32}\Z")
 @dataclass(frozen=True)
 class Picks:
     ids: tuple[str, ...]
-    # "project_agent" / "certification_agent" from that Agent's cache, else "rules".
+    # "project_agent" from that Agent's cache, else "rules".
     source: str
 
 
@@ -44,7 +45,7 @@ class Picks:
 class Sources:
     resources: list[dict]               # resources_for(): card data for every type
     projects: list[dict]                # the project Agent's shortlist
-    certifications: list[Certification]  # the certification Agent's shortlist
+    certifications: list[Certification]  # the role's certification catalog
     project_picks: Picks
     certification_picks: Picks
 
@@ -60,36 +61,31 @@ def gaps_from_report(report: dict) -> list[dict]:
     return top_gaps(report)
 
 
-def cached_picks(run_id: str, kind: str, directory: Path = LOCAL_RESULTS) -> tuple[str, ...]:
-    """IDs a specialist Agent picked for this run, or () when there is no usable cache.
-
-    kind: "project" (local_results/project_recommendations) or "certification" (local_results/certifications).
-    """
+def cached_project_picks(run_id: str, directory: Path = LOCAL_RESULTS) -> tuple[str, ...]:
+    """IDs the project Agent picked for this run (local_results/project_recommendations), or ()."""
     if not _RUN_ID.fullmatch(run_id):
         return ()
-    folder, key = {"project": ("project_recommendations", "project_id"),
-                   "certification": ("certifications", "certification_id")}[kind]
-    path = directory / folder / f"{run_id}.json"
+    path = directory / "project_recommendations" / f"{run_id}.json"
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         if data.get("source") != "agent":
             return ()
-        return tuple(dict.fromkeys(str(item[key]) for item in data["recommendations"]))
+        return tuple(dict.fromkeys(str(item["project_id"]) for item in data["recommendations"]))
     except FileNotFoundError:
         return ()
     except (OSError, ValueError, KeyError, TypeError, AttributeError):
-        logger.warning("Ignoring an unreadable %s pick cache", kind)
+        logger.warning("Ignoring an unreadable project pick cache")
         return ()
 
 
 def load_sources(family: str, university: str | None, gaps: list[dict], run_id: str,
                  directory: Path = LOCAL_RESULTS) -> Sources:
-    """Read the catalogs, the specialists' shortlists and their picks for this run."""
+    """Read the catalogs, the shortlists and their picks for this run."""
     verified = [{"skill_id": gap["skill_id"], "skill_name": gap["skill_name"]} for gap in gaps]
     projects = project_shortlist(FAMILY_TO_CATALOG[family], None, verified)
     certifications = for_family(get_catalog(), family)
 
-    project_ids = cached_picks(run_id, "project", directory)
+    project_ids = cached_project_picks(run_id, directory)
     if project_ids:
         project_picks = Picks(project_ids, "project_agent")
     else:
@@ -97,12 +93,9 @@ def load_sources(family: str, university: str | None, gaps: list[dict], run_id: 
                                verified_skill_gaps=verified)
         project_picks = Picks(tuple(item["project_id"] for item in ranked["recommendations"]), "rules")
 
-    certification_ids = cached_picks(run_id, "certification", directory)
-    if certification_ids:
-        certification_picks = Picks(certification_ids, "certification_agent")
-    else:
-        ranked = rank_certifications(certifications, family, gaps)
-        certification_picks = Picks(tuple(item.certification_id for item in ranked), "rules")
+    # The same skill-match picks the Resources page shows (there is no certification Agent).
+    ranked = rank_certifications(certifications, family, gaps)
+    certification_picks = Picks(tuple(item.certification_id for item in ranked), "rules")
 
     return Sources(resources=resources_for(family, university), projects=projects,
                    certifications=certifications, project_picks=project_picks,

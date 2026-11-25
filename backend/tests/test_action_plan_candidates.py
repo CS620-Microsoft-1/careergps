@@ -7,7 +7,7 @@ from unittest.mock import patch
 from app.schemas.certifications import Certification
 from app.services.action_plans import candidates as module
 from app.services.action_plans.candidates import (
-    Picks, Sources, agent_payload, build_candidates, cached_picks, gaps_from_report, load_sources,
+    Picks, Sources, agent_payload, build_candidates, cached_project_picks, gaps_from_report, load_sources,
 )
 
 RUN_ID = "0123456789abcdef0123456789abcdef"
@@ -67,10 +67,12 @@ def by_id(result) -> dict:
 
 class GapsFromReportTest(unittest.TestCase):
     def test_keeps_scored_gaps_in_priority_order(self) -> None:
-        skill = lambda sid, gap, priority: {"skill_id": sid, "skill_name": sid, "skill_gap": gap,
-                                             "skill_gap_grade": "C", "priority": priority}
+        skill = lambda sid, gap, priority, strength=0.3: {"skill_id": sid, "skill_name": sid, "skill_gap": gap,
+                                                          "skill_gap_grade": "C", "priority": priority,
+                                                          "resume_evidence_strength": strength}
+        # Same rule as the Gaps page: evidence at or above 0.7 is a strength, not a gap.
         report = {"skills": [skill("low", 0.2, 0.1), skill("none", 0, 0.9), skill("unscored", 0.5, None),
-                             skill("high", 0.7, 0.8)]}
+                             skill("high", 0.7, 0.8), skill("strong", 0.1, 0.95, strength=0.7)]}
         self.assertEqual([gap["skill_id"] for gap in gaps_from_report(report)], ["high", "low"])
 
 
@@ -151,17 +153,15 @@ class CachedPicksTest(unittest.TestCase):
     def test_reads_agent_picks_in_order(self) -> None:
         self.write("project_recommendations", {"source": "agent", "recommendations": [
             {"project_id": "b"}, {"project_id": "a"}, {"project_id": "b"}]})
-        self.write("certifications", {"source": "agent", "recommendations": [{"certification_id": "c1"}]})
-        self.assertEqual(cached_picks(RUN_ID, "project", self.root), ("b", "a"))
-        self.assertEqual(cached_picks(RUN_ID, "certification", self.root), ("c1",))
+        self.assertEqual(cached_project_picks(RUN_ID, self.root), ("b", "a"))
 
     def test_missing_corrupt_rule_or_bad_id_gives_nothing(self) -> None:
-        self.assertEqual(cached_picks(RUN_ID, "project", self.root), ())
+        self.assertEqual(cached_project_picks(RUN_ID, self.root), ())
         self.write("project_recommendations", "{not json")
-        self.assertEqual(cached_picks(RUN_ID, "project", self.root), ())
+        self.assertEqual(cached_project_picks(RUN_ID, self.root), ())
         self.write("project_recommendations", {"source": "rules", "recommendations": [{"project_id": "a"}]})
-        self.assertEqual(cached_picks(RUN_ID, "project", self.root), ())
-        self.assertEqual(cached_picks("../../etc", "project", self.root), ())
+        self.assertEqual(cached_project_picks(RUN_ID, self.root), ())
+        self.assertEqual(cached_project_picks("../../etc", self.root), ())
 
 
 class LoadSourcesTest(unittest.TestCase):
