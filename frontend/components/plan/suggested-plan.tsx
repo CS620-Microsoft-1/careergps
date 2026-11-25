@@ -195,7 +195,7 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
               <li key={skill} style={delay(150 + index * 60)}
                 className={cn("entrance-pop motion-safe:[animation-delay:var(--delay)] flex min-h-9 max-w-full items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm",
                 !isCovered ? "border border-dashed border-line-strong text-muted-foreground"
-                  : order === 0 ? "bg-accent text-accent-foreground" : "bg-card")}>
+                  : "bg-card")}>
                 <span aria-hidden className={cn("grid size-7 shrink-0 place-items-center rounded-full font-mono text-xs",
                   isCovered ? "bg-foreground text-background" : "border border-dashed border-line-strong")}>
                   {Number.isFinite(order) ? order + 1 : "·"}
@@ -263,6 +263,7 @@ function SuggestedItem({ item, step, order, full = false }: {
   );
   const why = <>
     <p className="text-sm">Closes <b>{names(item.skill_ids)}</b></p>
+    {/* Lime marks only the one next step (step 1); everything else stays neutral. */}
     {item.reason && <p className={cn("mt-2 rounded-lg px-3 py-2 text-sm/6", full ? "bg-accent" : "bg-sunken")}>{item.reason}</p>}
   </>;
   return (
@@ -307,7 +308,7 @@ function AddButton({ item }: { item: ActionPlanItem }) {
     return <span className="inline-flex h-9 items-center gap-1.5 text-sm font-bold text-success"><CircleCheck aria-hidden className="size-4" />Done</span>;
   }
   return (
-    <Button type="button" size="sm" variant={saved ? "accent" : "secondary"} aria-pressed={Boolean(saved)}
+    <Button type="button" size="sm" variant={saved ? "secondary" : "outline"} aria-pressed={Boolean(saved)}
       disabled={busy} onClick={() => void plan.toggleSaved(item.resource_id)}>
       {busy ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />
         : saved ? <Check data-icon="inline-start" /> : <Plus data-icon="inline-start" />}

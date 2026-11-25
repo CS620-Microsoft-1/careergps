@@ -137,6 +137,17 @@ describe("SuggestedPlan", () => {
     expect(main.compareDocumentPosition(alongside) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
+  it("keeps lime for step 1 only", async () => {
+    // Review on PR #58: the design system saves lime for the one next step.
+    mockPlan([planItem("sql-project")]);
+    await renderReady();
+    const limed = [...document.querySelectorAll(".bg-accent")];
+    expect(limed).toHaveLength(1);
+    expect(card("SQL for Data Analysis")).toContainElement(limed[0] as HTMLElement);
+    expect(within(card("Analyze a public dataset with SQL")).getByRole("button", { name: /In your plan/ }))
+      .not.toHaveClass("bg-accent");
+  });
+
   describe("skills highlight", () => {
     it("lists the covered skills in gap order and marks the top gap, without step counts", async () => {
       await renderReady();
