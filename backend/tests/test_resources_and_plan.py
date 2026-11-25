@@ -10,7 +10,11 @@ from app.api import deps
 from app.core.security import SupabaseTokenVerifier
 from app.main import app
 from app.services.plans import LocalPlanStore, get_plan_store
-from app.services.resources import family_skills, load_catalog, resources_for
+from types import SimpleNamespace
+
+from app.services.resources import (
+    certification_cost, family_skills, load_catalog, resources_for, school_details,
+)
 from app.services.skill_gaps.match import summarize_match
 from tests.support import SUPABASE_URL, FakeJwks, make_token, new_signing_key
 from tests.test_me import FakeAccountService, onboarding_body
@@ -51,6 +55,49 @@ class ResourceCatalogTests(unittest.TestCase):
         known = family_skills("software_engineer") | family_skills("data_analyst") | family_skills("ai_engineer")
         for entry in load_catalog():
             self.assertTrue(set(entry["skills"]) <= known, entry["id"])
+
+
+class CardDetailsTests(unittest.TestCase):
+    """time · cost · level for the suggested-plan cards (review on PR #58)."""
+
+    def test_every_online_course_has_a_cost(self) -> None:
+        for entry in load_catalog():
+            if entry["type"] == "online_course":
+                self.assertTrue(entry.get("cost"), entry["id"])
+
+    def test_each_type_gets_its_details(self) -> None:
+        by_type = {}
+        for entry in resources_for("data_analyst", "University of Wisconsin–Madison"):
+            by_type.setdefault(entry["type"], entry)
+        project, certification = by_type["project"], by_type["certification"]
+        self.assertRegex(project["time"], r"^\d+ h$")
+        self.assertIn(project["level"], {"Beginner", "Intermediate", "Advanced"})
+        self.assertNotIn("time", certification)
+        self.assertTrue(certification["cost"] and certification["level"])
+        self.assertTrue(by_type["online_course"]["cost"])
+
+    def test_certification_costs_are_short(self) -> None:
+        def cost(usd, note):
+            return certification_cost(SimpleNamespace(cost_usd=usd, cost_note=note))
+        self.assertEqual("Free", cost(0, "Free"))
+        self.assertEqual("$150 exam", cost(150, "Exam fee"))
+        self.assertEqual("$59/mo with Coursera Plus", cost(59, "Coursera Plus subscription, per month"))
+        self.assertEqual("$404 voucher", cost(404, "Exam voucher"))
+        self.assertEqual("Included with a subscription", cost(None, "Included with a subscription"))
+
+    def test_database_rows_get_time_and_cost_from_what_they_store(self) -> None:
+        def org(meta):
+            return school_details({"type": "student_org", "meta": meta})
+        self.assertEqual({"time": "Weekly coding meetups", "cost": "Free"}, org("Weekly coding meetups · free"))
+        self.assertEqual({"time": "Each semester", "cost": "$20 dues"}, org("Each semester · $20 dues"))
+        # Any other shape is kept whole as its time, so nothing is lost.
+        self.assertEqual({"time": "Weekly"}, org("Weekly"))
+        self.assertEqual({"time": "Fridays · in person"}, org("Fridays · in person"))
+        self.assertEqual({}, org(""))
+        course = {"type": "school_course", "meta": "Check the course guide for terms"}
+        self.assertEqual({"time": "3 credits"}, school_details({**course, "credits": "3"}))
+        self.assertEqual({"time": "1 credit"}, school_details({**course, "credits": "1"}))
+        self.assertEqual({}, school_details(course))
 
 
 def _skill(strength, required, preferred=0, n=100):

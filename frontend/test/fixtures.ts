@@ -78,14 +78,16 @@ export const run: SkillGapRun = {
 
 export const resources: Resource[] = [
   { id: "sql-course", type: "online_course", title: "SQL for Data Analysis", provider: "Example Courses",
-    meta: "6 weeks", description: "Queries, joins and aggregates.", skills: ["sql"],
+    meta: "6 weeks · free", time: "6 weeks", cost: "Free", description: "Queries, joins and aggregates.", skills: ["sql"],
     url: "https://example.com/sql", school: null, alongside: false },
   { id: "sql-project", type: "project", title: "Analyze a public dataset with SQL", provider: "CareerGPS",
-    meta: "2 weekends", description: "", skills: ["sql"], url: null, school: null, alongside: false },
+    meta: "2 weekends", time: "12 h", level: "Beginner", description: "", skills: ["sql"], url: null, school: null,
+    alongside: false },
   { id: "dashboard-course", type: "online_course", title: "Building Dashboards", provider: "Example Courses",
     meta: "4 weeks", description: "", skills: ["dashboarding"], url: null, school: null, alongside: false },
   { id: "data-club", type: "student_org", title: "Data Science Club", provider: "Example University",
-    meta: "Weekly", description: "", skills: ["dashboarding"], url: null, school: null, alongside: true },
+    meta: "Weekly · free", time: "Weekly", cost: "Free", description: "", skills: ["dashboarding"], url: null,
+    school: null, alongside: true },
 ];
 
 export const market: MarketDemandSnapshot = {

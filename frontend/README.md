@@ -214,6 +214,8 @@ backend `POST /action-plans/suggestions/stream`). A first plan can take up to a 
 shortlist counts, the mentor choosing (cycling through real shortlisted titles), then the check. There's
 no progress percentage, only elapsed time. A repeat is cached and comes back at once. Each card has its
 own **Add to plan**, which saves it like any resource, so it slots in by gap.
+Each card shows its type as a tag and its details as provider, then `time` · `cost` · `level` (backend
+`Resource` fields; a type without one skips it), with time and cost in `font-mono`.
 **Add all to my plan** sends the whole plan in one request (`PUT /plan/suggested`): steps get `position`
 1..N, clubs none, and every other saved item loses its position, so an older suggested plan no longer sorts
 ahead. `orderPlan` (`lib/career.ts`) puts steps with a position first, in that order, then the rest by gap.

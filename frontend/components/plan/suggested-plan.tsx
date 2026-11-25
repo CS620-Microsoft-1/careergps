@@ -6,12 +6,13 @@ import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "
 
 import { RESOURCE_TYPES, ResourceIcon, skillLabel } from "@/components/career/route-parts";
 import { type SuggestedEntries, usePlan } from "@/components/plan/plan-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PlanBuilding } from "@/components/plan/plan-building";
 import { streamActionPlanSuggestions } from "@/lib/api/action-plans";
 import { errorMessage } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
-import type { ActionPlan, ActionPlanBuildStage, ActionPlanItem, ActionPlanSuggestions, JobFamily } from "@/types/api";
+import type { ActionPlan, ActionPlanBuildStage, ActionPlanItem, ActionPlanSuggestions, JobFamily, Resource } from "@/types/api";
 
 type State =
   | { status: "loading"; stages: ActionPlanBuildStage[] }
@@ -213,6 +214,30 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
   );
 }
 
+/** Numbers ("20 h", "$59/mo …") are monospaced; words ("Self-paced", "Free") stay in the body font. */
+const hasNumber = (text: string) => /\d/.test(text);
+
+/**
+ * Provider, then time · cost · level, always in that order so cards compare at a glance. A detail a type
+ * doesn't have is skipped.
+ */
+function ResourceDetails({ resource }: { resource: Resource }) {
+  const parts = [
+    resource.provider && { key: "provider", text: resource.provider, mono: false },
+    resource.time && { key: "time", text: resource.time, mono: hasNumber(resource.time) },
+    resource.cost && { key: "cost", text: resource.cost, mono: hasNumber(resource.cost) },
+    resource.level && { key: "level", text: resource.level, mono: false },
+  ].filter((part): part is { key: string; text: string; mono: boolean } => Boolean(part));
+  if (!parts.length) return null;
+  return (
+    <p className="text-sm text-muted-foreground">
+      {parts.map((part, index) => (
+        <span key={part.key}>{index > 0 && " · "}<span className={cn(part.mono && "font-mono")}>{part.text}</span></span>
+      ))}
+    </p>
+  );
+}
+
 /** Delay between cards sliding in when the plan arrives, so it reads as the plan being laid out. */
 const REVEAL_STAGGER_MS = 70;
 
@@ -231,10 +256,11 @@ function SuggestedItem({ item, step, order }: { item: ActionPlanItem; step?: num
         <div className="flex items-start gap-3">
           <ResourceIcon type={resource.type} className="size-8 bg-sunken" />
           <div className="min-w-0 flex-1">
-            <p className="font-bold">{step && <span className="sr-only">Step {step}: </span>}{resource.title}</p>
-            <p className="text-sm text-muted-foreground">
-              {[RESOURCE_TYPES[resource.type].label, resource.provider, resource.meta].filter(Boolean).join(" · ")}
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="font-bold">{step && <span className="sr-only">Step {step}: </span>}{resource.title}</span>
+              <Badge>{RESOURCE_TYPES[resource.type].label}</Badge>
             </p>
+            <ResourceDetails resource={resource} />
           </div>
         </div>
         <p className="mt-3 text-sm">Closes <b>{names(item.skill_ids)}</b></p>

@@ -14,6 +14,11 @@ class Resource(BaseModel):
     title: str
     provider: str
     meta: str
+    # Short card details, shown as time · cost · level; None when a type doesn't have one.
+    # "20 h", "9 weeks", "3 credits", "Weekly" · "Free", "$150 exam", "$59/mo with Coursera Plus" · "Intermediate".
+    time: str | None = None
+    cost: str | None = None
+    level: str | None = None
     description: str
     # Only the skills in the requested role's catalog.
     skills: list[str]

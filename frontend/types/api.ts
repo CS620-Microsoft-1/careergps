@@ -259,6 +259,10 @@ export type Resource = {
   title: string;
   provider: string;
   meta: string;
+  /** Short card details, shown as time · cost · level; missing when a type doesn't have one. */
+  time?: string | null;
+  cost?: string | null;
+  level?: string | null;
   description: string;
   skills: string[];
   url: string | null;

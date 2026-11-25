@@ -79,7 +79,7 @@ describe("SuggestedPlan", () => {
   it("shows the plan in order, with each mentor reason and the alongside items", async () => {
     await renderReady();
     const steps = within(screen.getByRole("list", { name: "Main path, in order" })).getAllByRole("listitem");
-    expect(steps.map((step) => within(step).getByText(/^Step \d:/, { exact: false }).closest("p")?.textContent)).toEqual([
+    expect(steps.map((step) => within(step).getByText(/^Step \d:/, { exact: false }).parentElement?.textContent)).toEqual([
       "Step 1: SQL for Data Analysis", "Step 2: Analyze a public dataset with SQL", "Step 3: Building Dashboards",
     ]);
     expect(within(steps[0]).getByText("Learn joins and aggregates before you query real data.")).toBeInTheDocument();
@@ -95,6 +95,21 @@ describe("SuggestedPlan", () => {
     expect(within(step).queryByText("Learn joins and aggregates before you query real data.")).not.toBeInTheDocument();
     expect(within(card("Analyze a public dataset with SQL"))
       .getByText("Publish an analysis with your queries to prove SQL.")).toBeInTheDocument();
+  });
+
+  it("shows each card's type as a tag and its details as time · cost · level, skipping missing ones", async () => {
+    // Review on PR #58: every type in the same order, so cards compare at a glance.
+    await renderReady();
+    const details = (title: string) => [...card(title).querySelectorAll("p")].map((line) => line.textContent)
+      .find((text) => text?.includes(" · "));
+    expect(details("SQL for Data Analysis")).toBe("Example Courses · 6 weeks · Free");
+    expect(details("Analyze a public dataset with SQL")).toBe("CareerGPS · 12 h · Beginner");
+    expect(details("Data Science Club")).toBe("Example University · Weekly · Free");
+    expect(within(card("SQL for Data Analysis")).getByText("6 weeks")).toHaveClass("font-mono");
+    // Numbers are monospaced; words such as "Free" or "Weekly" are not.
+    expect(within(card("SQL for Data Analysis")).getByText("Free")).not.toHaveClass("font-mono");
+    expect(within(card("Data Science Club")).getByText("Weekly")).not.toHaveClass("font-mono");
+    expect(within(card("Analyze a public dataset with SQL")).getByText("Project")).toBeInTheDocument();
   });
 
   describe("skills highlight", () => {
