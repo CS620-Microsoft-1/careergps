@@ -91,7 +91,23 @@ sys.stdout.write("".join(f"{k}={v}\0" for k, v in settings.items()))
 PY
 )
 
+echo "==> API identity"
+# Express environments (Azure picks that mode itself) reject system-assigned identities, so the API
+# uses a user-assigned one. It outlives the app, so the Foundry role is granted only once.
+IDENTITY=${IDENTITY:-id-careergps-api}
+az identity show -n "$IDENTITY" -g "$RG" -o none 2>/dev/null || az identity create -n "$IDENTITY" -g "$RG" -l "$LOCATION" -o none
+IDENTITY_ID=$(az identity show -n "$IDENTITY" -g "$RG" --query id -o tsv)
+PRINCIPAL_ID=$(az identity show -n "$IDENTITY" -g "$RG" --query principalId -o tsv)
+# DefaultAzureCredential picks the user-assigned identity by this client ID.
+ENV_VARS+=("AZURE_CLIENT_ID=$(az identity show -n "$IDENTITY" -g "$RG" --query clientId -o tsv)")
+
 echo "==> API app"
+# An API app from before the switch still carries a system identity, which blocks every update.
+# Recreating it keeps its URL; it holds no data beyond local files that a restart loses anyway.
+if [[ $(az containerapp show -n "$API_APP" -g "$RG" --query identity.type -o tsv 2>/dev/null) == *SystemAssigned* ]]; then
+  echo "Recreating $API_APP with the user-assigned identity"
+  az containerapp delete -n "$API_APP" -g "$RG" --yes -o none
+fi
 if az containerapp show -n "$API_APP" -g "$RG" -o none 2>/dev/null; then
   az containerapp secret set -n "$API_APP" -g "$RG" --secrets "${SECRETS[@]}" -o none
   az containerapp update -n "$API_APP" -g "$RG" --image "$API_IMAGE" --set-env-vars "${ENV_VARS[@]}" -o none
@@ -100,7 +116,7 @@ else
   # in-process locks and local files, so scaling to zero or out would lose work.
   az containerapp create -n "$API_APP" -g "$RG" --environment "$ENV_NAME" --image "$API_IMAGE" \
     --ingress external --target-port 8000 --cpu 0.5 --memory 1.0Gi --min-replicas 1 --max-replicas 1 \
-    --system-assigned --secrets "${SECRETS[@]}" --env-vars "${ENV_VARS[@]}" -o none
+    --user-assigned "$IDENTITY_ID" --secrets "${SECRETS[@]}" --env-vars "${ENV_VARS[@]}" -o none
 fi
 
 echo "==> Web app"
@@ -119,7 +135,6 @@ for _ in $(seq 30); do
 done
 echo
 
-PRINCIPAL_ID=$(az containerapp identity show -n "$API_APP" -g "$RG" --query principalId -o tsv)
 cat <<EOF
 
 Deployed $TAG
@@ -127,7 +142,7 @@ Deployed $TAG
   API:      $API_URL
 
 First deploy only:
-  1. Send the Foundry project owner the API's identity and ask them to run:
+  1. Send the Foundry project owner the API's identity ($IDENTITY) and ask them to run:
        az role assignment create --assignee $PRINCIPAL_ID --role "Foundry User" --scope <Foundry resource ID>
   2. Supabase -> Authentication -> URL Configuration: Site URL $WEB_URL, add redirect URL $WEB_URL/**
 Logs: az containerapp logs show -n $API_APP -g $RG --follow
