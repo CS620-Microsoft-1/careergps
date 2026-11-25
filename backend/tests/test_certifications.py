@@ -1,4 +1,4 @@
-"""Certification catalog checks, gap ranking, Agent filtering/caching and the API; no network."""
+"""Certification catalog checks, gap ranking, the recommender and the API; no network."""
 import json
 import os
 from pathlib import Path
@@ -38,9 +38,12 @@ RAW = {"version": "test-1", "certifications": [
 ]}
 
 
-def report(priorities):
+def report(priorities, strengths=None):
+    strengths = strengths or {}
     return {"skills": [{"skill_id": skill, "skill_name": skill, "skill_gap": 1.0 if value else 0.0,
-                        "skill_gap_grade": "F", "priority": value} for skill, value in priorities.items()]}
+                        "skill_gap_grade": "F", "priority": value,
+                        "resume_evidence_strength": strengths.get(skill, None if value is None else 0.0)}
+                       for skill, value in priorities.items()]}
 
 
 def completed_run(priorities, identifier="a" * 32, family="software_engineer"):
@@ -73,65 +76,50 @@ class RankingTests(unittest.TestCase):
         gaps = top_gaps(report({"cloud": 0.9, "security": 0.2, "testing": None, "containers": 0.0}))
         self.assertEqual([gap["skill_id"] for gap in gaps], ["cloud", "security"])
 
+    def test_top_gaps_skips_skills_the_gaps_page_shows_as_strengths(self):
+        # A positive gap with strong evidence (>= 0.7) is a strength on the page, not a gap.
+        gaps = top_gaps(report({"cloud": 0.9, "security": 0.5, "containers": 0.3},
+                               strengths={"cloud": 0.7, "security": 0.69, "containers": 0.95}))
+        self.assertEqual([gap["skill_id"] for gap in gaps], ["security"])
+
     def test_greedy_cover_prefers_breadth_and_avoids_repeating_a_gap(self):
         catalog = validate_catalog(RAW, CORE)
         gaps = top_gaps(report({"cloud": 0.9, "containers": 0.5, "security": 0.3}))
         picks = rank(catalog["certifications"][:3], "software_engineer", gaps)
         self.assertEqual([pick.certification_id for pick in picks], ["cloud-and-containers", "security-basics"])
 
+    def test_at_most_three_picks(self):
+        skills = ["cloud", "containers", "security", "relational_sql"]
+        catalog = validate_catalog({"version": "v", "certifications": [
+            cert(f"cert-{skill}", {"software_engineer": [skill]}) for skill in skills]}, CORE)
+        gaps = top_gaps(report(dict(zip(skills, (0.9, 0.8, 0.7, 0.6)))))
+        picks = rank(catalog["certifications"], "software_engineer", gaps)
+        self.assertEqual([pick.certification_id for pick in picks], ["cert-cloud", "cert-containers", "cert-security"])
+
 
 class RecommenderTests(unittest.TestCase):
     def setUp(self):
-        self.temp = tempfile.TemporaryDirectory()
-        self.catalog = validate_catalog(RAW, CORE)
-        self.calls = []
-        self.output = {"recommendations": []}
-        self.configured = True
+        self.recommender = CertificationRecommender(catalog=validate_catalog(RAW, CORE))
 
-    def tearDown(self):
-        self.temp.cleanup()
+    def test_picks_come_from_the_gap_ranking_with_the_gap_skills_each_covers(self):
+        result = self.recommender.recommend(completed_run({"cloud": 0.9, "containers": 0.5, "security": 0.4}))
+        self.assertEqual([(pick.certification_id, pick.skill_ids) for pick in result.recommendations],
+                         [("cloud-and-containers", ["cloud", "containers"]), ("security-basics", ["security"])])
+        self.assertEqual((result.job_family, result.skill_gap_run_id), ("software_engineer", "a" * 32))
 
-    def recommender(self):
-        def invoke(payload):
-            self.calls.append(payload)
-            if isinstance(self.output, Exception):
-                raise self.output
-            return self.output
-        return CertificationRecommender(Path(self.temp.name), catalog=self.catalog, invoker=invoke,
-                                        configured=lambda: self.configured)
-
-    def test_agent_picks_are_limited_to_catalog_and_gap_skills_then_cached(self):
-        self.output = {"recommendations": [
-            {"certification_id": "made-up", "skill_ids": ["cloud"], "reason": "x"},
-            {"certification_id": "sql-basics", "skill_ids": ["relational_sql"], "reason": "not a gap"},
-            {"certification_id": "cloud-basics", "skill_ids": ["cloud", "security"], "reason": " Covers cloud. "},
-        ]}
-        recommender = self.recommender()
-        run = completed_run({"cloud": 0.9, "security": 0.4})
-        result = recommender.recommend(run)
-        self.assertEqual(result.source, "agent")
-        self.assertEqual([(r.certification_id, r.skill_ids, r.reason) for r in result.recommendations],
-                         [("cloud-basics", ["cloud"], "Covers cloud.")])
-        self.assertEqual({item["certification_id"] for item in self.calls[0]["catalog"]},
-                         {"cloud-basics", "cloud-and-containers", "security-basics", "sql-basics"})
-        self.assertEqual(recommender.recommend(run), result)
-        self.assertEqual(len(self.calls), 1)
-
-    def test_unconfigured_or_failing_agent_falls_back_to_rules_without_caching(self):
-        run = completed_run({"security": 0.4})
-        self.configured = False
-        result = self.recommender().recommend(run)
-        self.assertEqual((result.source, result.recommendations[0].certification_id), ("rules", "security-basics"))
-        self.assertIsNone(result.recommendations[0].reason)
-        self.assertEqual(self.calls, [])
-        self.configured, self.output = True, RuntimeError("boom")
-        self.assertEqual(self.recommender().recommend(run).source, "rules")
-        self.assertEqual(list(Path(self.temp.name).iterdir()), [])
+    def test_no_gap_in_the_catalog_means_no_picks(self):
+        self.assertEqual(self.recommender.recommend(completed_run({"testing": 0.9})).recommendations, [])
 
     def test_unfinished_run_is_rejected(self):
         run = completed_run({"cloud": 0.9}).model_copy(update={"status": "running", "report": None})
         with self.assertRaises(ValueError):
-            self.recommender().recommend(run)
+            self.recommender.recommend(run)
+
+
+class _UnreadableCatalog(CertificationRecommender):
+    @property
+    def catalog(self) -> dict:
+        raise OSError("catalog file unreadable")
 
 
 class CertificationApiTests(unittest.TestCase):
@@ -140,9 +128,7 @@ class CertificationApiTests(unittest.TestCase):
         self.root = root = Path(self.temp.name)
         self.runs = group_manager(root / "runs", invoker=lambda payload, save, on_request, timings:
                                   (on_request(), absent_response(payload))[1])
-        self.recommender = CertificationRecommender(root / "certs", catalog=validate_catalog(RAW, CORE),
-                                                    invoker=lambda payload: {"recommendations": []},
-                                                    configured=lambda: False)
+        self.recommender = CertificationRecommender(catalog=validate_catalog(RAW, CORE))
         self.accounts = FakeAccounts()
         verifier = FakeVerifier({"owner-token": USER_ID})
         app.dependency_overrides[deps.get_token_verifier] = lambda: verifier
@@ -176,7 +162,17 @@ class CertificationApiTests(unittest.TestCase):
                                     json={"job_family": "software_engineer"}, headers=self.headers)
         self.assertEqual(response.status_code, 200, response.text)
         body = response.json()
-        self.assertEqual((body["skill_gap_run_id"], body["source"]), (started["id"], "rules"))
+        self.assertEqual(body["skill_gap_run_id"], started["id"])
+        self.assertEqual(set(body), {"job_family", "skill_gap_run_id", "generated_at", "recommendations"})
+
+    def test_unreadable_catalog_is_a_503(self):
+        started = self.client.post("/skill-gaps/runs", json={}, headers=self.headers).json()
+        wait_for(self.runs, self.runs.get(started["id"], user_id=USER_ID))
+        self.recommender = _UnreadableCatalog()
+        response = self.client.post("/certifications/recommendations",
+                                    json={"job_family": "software_engineer"}, headers=self.headers)
+        self.assertEqual(response.status_code, 503, response.text)
+        self.assertEqual(response.json()["detail"], "Recommendations are unavailable")
 
     def test_failed_run_asks_for_a_new_analysis(self):
         def fail(payload, save, on_request, timings):

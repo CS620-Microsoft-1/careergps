@@ -11,7 +11,18 @@ test("Home shows the match and the biggest gaps", async ({ page }) => {
   await mockApi(page);
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { level: 1, name: /42% of the way there/ })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Gaps · 2 left" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Skills to build" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Ways to close the SQL gap" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Ways to close the Dashboard development gap" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your plan is empty" })).toBeVisible();
+});
+
+test("Home's empty plan opens resources for the biggest gap", async ({ page }) => {
+  await mockApi(page);
+  await page.goto("/dashboard");
+  await page.getByRole("link", { name: "Add resources" }).click();
+  await page.waitForURL("**/resources?gap=sql");
+  await expect(page.getByText("Showing resources that close")).toContainText("SQL");
 });
 
 test("Gaps opens a closed gap to show ways to close it", async ({ page }) => {

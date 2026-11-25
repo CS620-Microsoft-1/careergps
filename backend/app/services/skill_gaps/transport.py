@@ -85,8 +85,13 @@ def decode_response(response, save):
     return json.loads(response.output_text)
 
 
-def create_response(client, payload, on_request=lambda: None, timings=None, *, agent_reference=None):
+def create_response(client, payload, on_request=lambda: None, timings=None, *, agent_reference=None,
+                    request_hint: str | None = None):
     timings = {} if timings is None else timings
+    instruction = "Execute extract_resume_evidence using your saved Instructions and response format."
+    if request_hint:
+        instruction = f"Execute {payload['task']} using your saved Instructions and response format.\n{request_hint}"
+    content = instruction + " INPUT_JSON:\n" + json.dumps(payload, ensure_ascii=False)
     started = time.perf_counter()
     conversation = client.conversations.create()
     timings["conversation_create_seconds"] = round(time.perf_counter() - started, 3)
@@ -96,9 +101,7 @@ def create_response(client, payload, on_request=lambda: None, timings=None, *, a
         try:
             return client.responses.create(
                 conversation=conversation.id,
-                input=[{"role": "user", "content":
-                        "Execute extract_resume_evidence using your saved Instructions and response format. INPUT_JSON:\n"
-                        + json.dumps(payload, ensure_ascii=False)}],
+                input=[{"role": "user", "content": content}],
                 max_output_tokens=40000,
                 **({"extra_body": {"agent_reference": agent_reference}} if agent_reference else {}),
             )
@@ -124,7 +127,7 @@ def invoke(payload, save, on_request=lambda: None, timings=None):
     if not settings.skill_gap_foundry_project_endpoint or not settings.skill_gap_foundry_agent_name:
         raise SkillGapConfigurationError("agent_not_configured",
             "The local Skill Gap Agent connection is not configured. Set its project endpoint and Agent name, then retry.")
-    with DefaultAzureCredential(exclude_managed_identity_credential=True) as credential:
+    with DefaultAzureCredential() as credential:
         with AIProjectClient(endpoint=settings.skill_gap_foundry_project_endpoint,
                              credential=credential, allow_preview=True) as project:
             version = next(iter(project.agents.list_versions(

@@ -41,7 +41,7 @@ Each choice is explained in the [architecture decision records](docs/decisions/)
 Next.js frontend ──HTTP/JSON──▶ FastAPI backend ──▶ Supabase PostgreSQL
   (localhost:3000)               (localhost:8000)  ├─▶ Supabase Auth (verifies login tokens)
         │                                          ├─▶ Microsoft Foundry Agents (résumé, job description,
-        │                                          │   skill gap, certification)
+        │                                          │   skill gap)
         │                                          └─▶ Greenhouse / Ashby / Lever public job-board APIs
         └──▶ Supabase Auth (sign-up / login)
 ```
@@ -122,7 +122,6 @@ Windows setup, Foundry access, and troubleshooting are covered in the [backend R
 | | `FOUNDRY_PROJECT_ENDPOINT`, `FOUNDRY_AGENT_NAME` | Résumé classification Agent |
 | | `SKILL_GAP_FOUNDRY_PROJECT_ENDPOINT`, `SKILL_GAP_FOUNDRY_AGENT_NAME` | Skill gap evidence Agent |
 | | `JOB_ANALYSIS_*` | Job-description extraction Agent and its local queue |
-| | `CERTIFICATION_FOUNDRY_PROJECT_ENDPOINT`, `CERTIFICATION_FOUNDRY_AGENT_NAME` | Certification Agent (optional; falls back to the catalog) |
 | `frontend/.env.local` | `NEXT_PUBLIC_API_URL` | Backend URL (public: never put secrets here) |
 | | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Supabase Auth (publishable key only) |
 

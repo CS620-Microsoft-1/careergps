@@ -48,4 +48,5 @@ def recommendations(request: CertificationRecommendationRequest,
     try:
         return recommender.recommend(run)
     except OSError:
+        # The catalog can still come from local files; a read failure is "unavailable", not a 500.
         raise HTTPException(status_code=503, detail="Recommendations are unavailable") from None

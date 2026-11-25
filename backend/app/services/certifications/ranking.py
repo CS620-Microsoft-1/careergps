@@ -1,14 +1,20 @@
-"""Pick the gap skills worth covering and rank certifications without a model call."""
+"""Pick the gap skills worth covering and rank certifications by the gap skills they cover."""
 from app.schemas.certifications import Certification, CertificationRecommendation
 
 MAX_GAPS = 8
-MAX_RECOMMENDATIONS = 5
+# One row on the Resources page; the rest of the catalog sits under "More certifications".
+MAX_RECOMMENDATIONS = 3
+# Evidence at or above this is a strength on the Gaps page (frontend lib/career.ts STRONG_STRENGTH),
+# so a skill there is never shown as a gap and must not drive a certification pick.
+STRONG_STRENGTH = 0.7
 
 
 def top_gaps(report: dict, limit: int = MAX_GAPS) -> list[dict]:
-    """Scored skills with a real gap, most urgent first. Unscored skills are never guessed."""
+    """Scored skills the Gaps page shows as gaps, most urgent first. Unscored skills are never guessed."""
     gaps = [skill for skill in report["skills"]
-            if skill.get("priority") is not None and (skill.get("skill_gap") or 0) > 0]
+            if skill.get("priority") is not None and (skill.get("skill_gap") or 0) > 0
+            and skill.get("resume_evidence_strength") is not None
+            and skill["resume_evidence_strength"] < STRONG_STRENGTH]
     gaps.sort(key=lambda skill: (-skill["priority"], skill["skill_id"]))
     return [{"skill_id": skill["skill_id"], "skill_name": skill["skill_name"],
              "skill_gap": skill["skill_gap"], "skill_gap_grade": skill["skill_gap_grade"],
@@ -29,7 +35,7 @@ def rank(certifications: list[Certification], family: str, gaps: list[dict],
         if gain(best) <= 0:
             break
         skill_ids = [skill for skill in best.skills[family] if skill in priority]
-        picks.append(CertificationRecommendation(certification_id=best.id, skill_ids=skill_ids, reason=None))
+        picks.append(CertificationRecommendation(certification_id=best.id, skill_ids=skill_ids))
         covered.update(skill_ids)
         remaining.remove(best)
     return picks

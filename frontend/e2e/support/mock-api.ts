@@ -25,6 +25,8 @@ type Options = {
   planItems?: PlanItem[];
   /** What GET /resources lists; the shared fixtures when left out. */
   resources?: Resource[];
+  /** Certification ids POST /certifications/recommendations picks; none when left out. */
+  certificationPicks?: string[];
   /** School course ids the student has already marked taken. */
   takenCourses?: string[];
   /** School course ids GET /me/courses/resume-matches finds in the résumé. */
@@ -99,8 +101,9 @@ export async function mockApi(page: Page, options: Options = {}) {
       return { status: 204 };
     }
     if (method === "POST" && path === "/certifications/recommendations") {
-      return ok({ job_family: family, skill_gap_run_id: run.id, source: "rules", generated_at: run.created_at,
-        recommendations: [] } satisfies CertificationRecommendations);
+      return ok({ job_family: family, skill_gap_run_id: run.id, generated_at: run.created_at,
+        recommendations: (options.certificationPicks ?? []).map((certification_id) => ({ certification_id, skill_ids: [] })),
+      } satisfies CertificationRecommendations);
     }
     if (method === "POST" && path === "/action-plans/suggestions") return ok(actionPlanSuggestions);
     if (method === "POST" && path === "/action-plans/suggestions/stream") {

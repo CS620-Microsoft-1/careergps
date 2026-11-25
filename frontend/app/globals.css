@@ -203,6 +203,10 @@
   .entrance-settle {
     animation: settle-in 500ms var(--ease-out) backwards;
   }
+  /* Opacity only: for values that load in place, where movement would read as a change. */
+  .entrance-fade {
+    animation: fade-in var(--enter-ms, 150ms) var(--ease-out) backwards;
+  }
   .entrance-pop {
     animation: pop-in 200ms var(--ease-out) backwards;
   }
@@ -294,6 +298,7 @@
     }
     /* Keep the fades that explain a change; drop the movement. In this layer so these can beat the rule above. */
     .entrance-rise,
+    .entrance-fade,
     .entrance-settle,
     .entrance-pop,
     .entrance-step,

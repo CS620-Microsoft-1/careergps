@@ -62,7 +62,7 @@ class ThreeAgentFullFlowTests(unittest.TestCase):
         self.other = uuid4()
         self.accounts.users[self.other] = SimpleNamespace(
             id=self.other, target_role="Software Engineer", university=None)
-        self.calls, self.project_calls, self.cert_calls = [], [], []
+        self.calls, self.project_calls = [], []
         self.preflights = 0
         self.preflight_error = None
         self.versions = {group: "1" for group in GROUPS}
@@ -75,8 +75,7 @@ class ThreeAgentFullFlowTests(unittest.TestCase):
         self.barrier = None
         self.manager = self.new_manager()
         self.plan_store = LocalPlanStore(self.root / "plans")
-        self.recommender = CertificationRecommender(self.root / "certs",
-            configured=lambda: True, invoker=self.cert_agent)
+        self.recommender = CertificationRecommender()
         verifier = FakeVerifier({"owner-token": USER_ID, "other-token": self.other})
         app.dependency_overrides[deps.get_token_verifier] = lambda: verifier
         app.dependency_overrides[deps.get_account_service] = lambda: self.accounts
@@ -167,19 +166,6 @@ class ThreeAgentFullFlowTests(unittest.TestCase):
         self.project_calls.append(deepcopy(inputs))
         return rank_projects(**inputs)
 
-    def cert_agent(self, payload):
-        self.assertFalse(self.accounts.reads_open)
-        self.cert_calls.append(deepcopy(payload))
-        gaps = {row["skill_id"] for row in payload["gaps"]}
-        result = []
-        for certification in payload["catalog"]:
-            covered = [skill for skill in certification["skill_ids"] if skill in gaps]
-            if covered:
-                result.append({"certification_id": certification["certification_id"],
-                    "skill_ids": covered, "reason": "Covers an actual scored gap in this run."})
-                break
-        return {"recommendations": result}
-
     def start(self, family="software_engineer", **changes):
         response = self.client.post("/skill-gaps/runs", json={"job_family": family, **changes}, headers=self.headers)
         self.assertEqual(response.status_code, 202, response.text)
@@ -233,12 +219,9 @@ class ThreeAgentFullFlowTests(unittest.TestCase):
                 certifications = self.client.post("/certifications/recommendations", json={"job_family": family}, headers=self.headers)
                 self.assertEqual(certifications.status_code, 200, certifications.text)
                 self.assertEqual(certifications.json()["skill_gap_run_id"], run["id"])
-                self.assertEqual(certifications.json()["source"], "agent")
-                self.assertFalse(unscored & {s["skill_id"] for s in self.cert_calls[-1]["gaps"]})
-                cert_count = len(self.cert_calls)
-                self.assertEqual(self.client.post("/certifications/recommendations", json={"job_family": family},
-                    headers=self.headers).status_code, 200)
-                self.assertEqual(len(self.cert_calls), cert_count)
+                picks = certifications.json()["recommendations"]
+                self.assertTrue(picks)
+                self.assertFalse(unscored & {skill for pick in picks for skill in pick["skill_ids"]})
                 listed = self.client.get("/resources", params={"job_family": family}, headers=self.headers)
                 self.assertEqual(listed.status_code, 200, listed.text)
                 resource = next(r for r in listed.json()["resources"] if r["type"] == "project")

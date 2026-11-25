@@ -20,7 +20,12 @@ export type Destinations = {
   /** Each added role and the résumé it uses. */
   resumes: Partial<Record<JobFamily, Destination>>;
   runs: Record<JobFamily, DestinationRun>;
+  /** The destination list has answered (or failed), so families is final. */
+  listed: boolean;
 };
+
+/** The last answer for the signed-in account, so a page that mounts again shows it at once while it refreshes. */
+let cache: { userId: string; resumes: Partial<Record<JobFamily, Destination>>; runs: Partial<Record<JobFamily, DestinationRun>> } | null = null;
 
 /**
  * The student's destinations (GET /me/destinations), and each one's saved analysis of the résumé
@@ -29,9 +34,16 @@ export type Destinations = {
  */
 export function useDestinationRuns(): Destinations {
   const { snapshot, family, run } = useSkillGapAnalysis();
-  const [resumes, setResumes] = useState<Partial<Record<JobFamily, Destination>>>({});
-  const [runs, setRuns] = useState<Partial<Record<JobFamily, DestinationRun>>>({});
+  const userId = snapshot?.user_id;
+  const cached = userId && cache?.userId === userId ? cache : null;
+  const [resumes, setResumes] = useState<Partial<Record<JobFamily, Destination>>>(cached?.resumes ?? {});
+  const [runs, setRuns] = useState<Partial<Record<JobFamily, DestinationRun>>>(cached?.runs ?? {});
+  const [listed, setListed] = useState(Boolean(cached));
   const resumeId = snapshot?.resume_id;
+
+  useEffect(() => {
+    if (userId && listed) cache = { userId, resumes, runs };
+  }, [userId, listed, resumes, runs]);
 
   useEffect(() => {
     if (!resumeId) return;
@@ -39,14 +51,16 @@ export function useDestinationRuns(): Destinations {
     listDestinations().then((destinations) => {
       if (!active) return;
       setResumes(Object.fromEntries(destinations.map((destination) => [destination.job_family, destination])));
+      setListed(true);
       for (const { job_family: key, resume_id } of destinations) {
         getLatestSkillGapRun(key)
-          .then((latest) => active && latest.resume_id === resume_id
-            && setRuns((all) => ({ ...all, [key]: { status: "ready", run: latest } })))
+          // A latest run for an older résumé isn't this destination's analysis, so it hasn't been analyzed.
+          .then((latest) => active && setRuns((all) => ({ ...all,
+            [key]: latest.resume_id === resume_id ? { status: "ready", run: latest } : { status: "missing", run: null } })))
           .catch((error) => active && setRuns((all) => ({ ...all,
             [key]: { status: error instanceof ApiError && error.status === 404 ? "missing" : "error", run: null } })));
       }
-    }).catch(() => {}); // The selected destination still shows from the session.
+    }).catch(() => active && setListed(true)); // The selected destination still shows from the session.
     return () => { active = false; };
   }, [resumeId]);
 
@@ -54,5 +68,5 @@ export function useDestinationRuns(): Destinations {
   for (const key of FAMILIES) {
     result[key] = key === family && run ? { status: "ready", run } : runs[key] ?? { status: "loading", run: null };
   }
-  return { families: FAMILIES.filter((key) => key === family || resumes[key]), resumes, runs: result };
+  return { families: FAMILIES.filter((key) => key === family || resumes[key]), resumes, runs: result, listed };
 }
