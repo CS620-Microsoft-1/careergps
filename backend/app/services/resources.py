@@ -74,7 +74,12 @@ def _project(project: dict) -> dict:
 
 def _certification(item, family: str) -> dict:
     """A certifications.json entry as a resource; its skills are listed per role."""
-    cost = "Free" if item.cost_usd == 0 else f"${item.cost_usd:g} · {item.cost_note}"
+    if item.cost_usd is None:
+        cost = item.cost_note  # Subscription or unpublished price: the note is all there is.
+    elif item.cost_usd == 0:
+        cost = "Free"
+    else:
+        cost = f"${item.cost_usd:g} · {item.cost_note}"
     return {"id": item.id, "type": "certification", "title": item.name, "provider": item.provider,
             "meta": f"{item.level.capitalize()} · {cost}", "description": "", "skills": item.skills[family],
             "url": item.url}
