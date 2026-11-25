@@ -211,7 +211,7 @@ class FetchTest(unittest.TestCase):
 
 
 class CatalogMergeTest(unittest.TestCase):
-    def test_load_projects_merges_github_entries_and_ranking_uses_them(self):
+    def test_github_entries_are_browsable_but_excluded_from_recommendations(self):
         with tempfile.TemporaryDirectory() as tmp:
             extra = Path(tmp) / "github_projects.json"
             with create_client(transport=httpx2.MockTransport(_transport)) as client:
@@ -227,7 +227,7 @@ class CatalogMergeTest(unittest.TestCase):
                     # No hand-written project practices agents & tool use; the GitHub repo does.
                     gaps = [{"skill_id": "ai_agents", "skill_name": "Agents & tool use", "definition": ""}]
                     picks = rank_projects("AI/ML Engineering", [], ["Agents & tool use"], None, gaps)
-                    self.assertIn("gh_aiml_oss_acme_rag_chat", [r["project_id"] for r in picks["recommendations"]])
+                    self.assertEqual([], picks["recommendations"])
                     listed = {r["id"]: r for r in resources.resources_for("ai_engineer", None)}
                     self.assertTrue(all(r["provider"] == "" for r in listed.values() if r["type"] == "project"))
                     self.assertEqual(listed["gh_aiml_oss_acme_rag_chat"]["url"], "https://github.com/acme/rag-chat")

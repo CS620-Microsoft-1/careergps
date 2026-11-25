@@ -5,11 +5,11 @@ from azure.ai.projects import AIProjectClient
 
 from app.core.config import get_settings
 from app.schemas.resources import ResourceRecommendations
-from app.services.resources import load_projects
+from app.services.resources import load_curated_projects
 
 
 MAX_PROJECTS = 3
-# GitHub sync can add hundreds of projects; the agent sees only the best-covering ones.
+# Limit the payload as the curated catalog grows.
 MAX_AGENT_CANDIDATES = 25
 
 
@@ -18,7 +18,7 @@ def _candidates(career_path: str, available_hours: int | None,
     """Approved projects for the career path, within the time budget and touching a verified gap."""
     candidates = [
         project
-        for project in load_projects()
+        for project in load_curated_projects()
         if project["career_path"] == career_path
         and (available_hours is None or project["estimated_hours"] <= available_hours)
     ]

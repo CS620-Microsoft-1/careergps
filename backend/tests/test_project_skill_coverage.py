@@ -47,6 +47,9 @@ class CoverageTest(unittest.TestCase):
             self.assertEqual(empty["recommendations"], [])
             self.assertIsNotNone(empty["no_match_reason"])
             self.assertEqual(client.responses.create.call_count, 1)
+            payload = json.loads(client.responses.create.call_args.kwargs["input"][0]["content"])
+            self.assertEqual(["aiml_01", "aiml_02", "aiml_03"], [p["id"] for p in payload["candidate_projects"]])
+            self.assertEqual(gaps, payload["verified_skill_gaps"])
 
     def test_agent_picks_that_all_miss_the_verified_gaps_are_a_failure(self):
         gaps = [{"skill_id": "general_programming", "skill_name": "General programming", "definition": "Non-Python languages"},
