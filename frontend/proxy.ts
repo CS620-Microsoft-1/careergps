@@ -14,7 +14,7 @@ const PROTECTED_PREFIXES = [
   "/profile",
   "/resources",
 ];
-const AUTH_PAGES = ["/login", "/signup"];
+const AUTH_PAGES = ["/login", "/signup", "/forgot-password"];
 
 const startsWithAny = (path: string, prefixes: string[]) =>
   prefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
@@ -22,7 +22,7 @@ const startsWithAny = (path: string, prefixes: string[]) =>
 /**
  * Refreshes the Supabase session cookies on every page request and sends people to the
  * right place: logged out → /login (remembering the page in ?next=), logged in → away from
- * /login and /signup.
+ * /login, /signup and /forgot-password.
  * This only checks the session; the API checks the token again on every call.
  */
 export async function proxy(request: NextRequest) {
