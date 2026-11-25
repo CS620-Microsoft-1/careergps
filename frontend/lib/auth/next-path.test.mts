@@ -19,6 +19,8 @@ describe("safeNextPath", () => {
     assert.equal(safeNextPath("/login"), null);
     assert.equal(safeNextPath("/signup?x=1"), null);
     assert.equal(safeNextPath("/auth/confirm"), null);
+    assert.equal(safeNextPath("/auth/reset?token_hash=abc"), null);
+    assert.equal(safeNextPath("/forgot-password"), null);
     assert.equal(safeNextPath(undefined), null);
     assert.equal(safeNextPath(["/profile"]), null);
   });

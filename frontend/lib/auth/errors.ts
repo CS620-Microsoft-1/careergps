@@ -16,6 +16,16 @@ const MESSAGES: Partial<Record<string, string>> = {
   // University mail scanners often open the link first and confirm the email, so signing in usually works.
   flow_state_expired: "This link was already used. Your email may already be confirmed. Try signing in.",
   otp_expired: "This link was already used or has expired. Your email may already be confirmed. Try signing in.",
+  same_password: "Choose a password different from your current one.",
+};
+
+// A reset link that can't be used: the student needs a new one, not a hint about confirming.
+const EXPIRED_RESET_LINK = "This reset link has expired or was already used. Request a new one.";
+const RECOVERY_MESSAGES: Partial<Record<string, string>> = {
+  otp_expired: EXPIRED_RESET_LINK,
+  flow_state_expired: EXPIRED_RESET_LINK,
+  // Not a recovery link at all (no token, or a different type).
+  missing_token: "This reset link is incomplete. Request a new one.",
 };
 
 /** A message for a Supabase error code, e.g. the error_code a confirmation link comes back with. */
@@ -23,10 +33,22 @@ export function authCodeMessage(code: string | null | undefined) {
   return (code && MESSAGES[code]) || GENERIC;
 }
 
+/** Like authCodeMessage, for the password reset link. null means the link carried no token. */
+export function recoveryCodeMessage(code: string | null | undefined) {
+  return RECOVERY_MESSAGES[code ?? "missing_token"] ?? authCodeMessage(code);
+}
+
+const UNREACHABLE = "Can't reach the sign-in service. Check your connection and try again.";
+const isNetworkError = (error: AuthError) =>
+  error.status === 0 || error.name === "AuthRetryableFetchError";
+
 /** A message for the user. Never shows Supabase's raw text, which can leak details. */
 export function authErrorMessage(error: AuthError) {
-  if (error.status === 0 || error.name === "AuthRetryableFetchError") {
-    return "Can't reach the sign-in service. Check your connection and try again.";
-  }
-  return authCodeMessage(error.code);
+  return isNetworkError(error) ? UNREACHABLE : authCodeMessage(error.code);
+}
+
+/** authErrorMessage for the password reset steps (verifying the link, saving the password). */
+export function recoveryErrorMessage(error: AuthError) {
+  // An error without a code is not a missing token, so it gets the generic message.
+  return isNetworkError(error) ? UNREACHABLE : error.code ? recoveryCodeMessage(error.code) : GENERIC;
 }

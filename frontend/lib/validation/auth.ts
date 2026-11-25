@@ -26,3 +26,18 @@ export const signupSchema = z.object({
     .refine(Boolean, "Please accept the Terms of Service and Privacy Policy."),
 });
 export type SignupValues = z.infer<typeof signupSchema>;
+
+export const forgotPasswordSchema = z.object({ email });
+export type ForgotPasswordValues = z.infer<typeof forgotPasswordSchema>;
+
+// A new password follows the sign-up rules and is typed twice.
+export const resetPasswordSchema = z
+  .object({
+    password,
+    confirmPassword: z.string().min(1, "Enter the password again."),
+  })
+  .refine((values) => values.password === values.confirmPassword, {
+    message: "The passwords don't match.",
+    path: ["confirmPassword"],
+  });
+export type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
