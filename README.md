@@ -10,7 +10,7 @@ and turns them into an action plan.
 
 | Area | Status |
 | --- | --- |
-| Sign-up / login with Supabase Auth (email confirmation), onboarding, profile | Working |
+| Sign-up / login / password reset with Supabase Auth (email confirmation), onboarding, profile | Working |
 | Résumé parsing: PDF/DOCX extraction, OCR fallback for scanned pages, classification by a Microsoft Foundry Agent, editable review, saved to the user's account | Working |
 | Job-market data: daily ingest of public Greenhouse, Ashby and Lever job postings; job-description field extraction by a Foundry Agent | Working |
 | Skill-gap analysis: résumé evidence scored against market demand, with a demand-weighted match score | Working (runs are local JSON on the backend host) |
@@ -70,7 +70,7 @@ careergps/
 │   ├── decisions/         ADR-001 frontend, ADR-002 backend, ADR-003 market data sources, JPA storage schema
 │   ├── infrastructure/    domain setup
 │   ├── specs/             SPEC-001 sign-up and login
-│   ├── supabase/          email templates
+│   ├── supabase/          email templates (confirm sign-up, reset password)
 │   ├── testing/           Supabase database test plan, skill-gap test guides
 │   └── resume-classifier-agent-prompt.md   Foundry Agent instructions and JSON contract
 └── .github/workflows/     CI
