@@ -128,7 +128,7 @@ Deployed $TAG
 
 First deploy only:
   1. Send the Foundry project owner the API's identity and ask them to run:
-       az role assignment create --assignee $PRINCIPAL_ID --role "Azure AI User" --scope <Foundry resource ID>
+       az role assignment create --assignee $PRINCIPAL_ID --role "Foundry User" --scope <Foundry resource ID>
   2. Supabase -> Authentication -> URL Configuration: Site URL $WEB_URL, add redirect URL $WEB_URL/**
 Logs: az containerapp logs show -n $API_APP -g $RG --follow
 EOF
