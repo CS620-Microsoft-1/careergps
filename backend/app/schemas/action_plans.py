@@ -57,7 +57,7 @@ class ActionPlanItem(BaseModel):
     resource_id: str
     # Gap skills this resource really closes (checked against the catalog and the run's gaps).
     skill_ids: list[str] = Field(min_length=1)
-    # The mentor's sentence from the Agent, or a plain template from the rule planner.
+    # The mentor's sentence from the Agent; "" when there is none (rule plan, filled-in step, blank answer).
     reason: str
     resource: Resource
 

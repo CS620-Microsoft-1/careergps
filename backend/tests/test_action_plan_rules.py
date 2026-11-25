@@ -88,7 +88,7 @@ class FullPlanTest(unittest.TestCase):
         self.assertEqual(plan_for(), plan_for())
         plan = plan_for()
         self.assertEqual(plan.strategy, "balanced")
-        self.assertEqual(plan.steps[0].reason, "Closes System design.")
+        self.assertEqual(plan.steps[0].reason, "")
 
     def test_none_without_main_path_candidates(self) -> None:
         self.assertIsNone(plan_for([item for item in ITEMS if item["alongside"]]))

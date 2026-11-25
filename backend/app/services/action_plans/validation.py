@@ -23,16 +23,6 @@ class InvalidAgentAnswer(ValueError):
     """The answer can't be used; the planner falls back to the rule plan."""
 
 
-def skill_names(skill_ids: list[str], gaps: list[dict]) -> str:
-    names = {gap["skill_id"]: gap["skill_name"] for gap in gaps}
-    return ", ".join(names.get(skill, skill) for skill in skill_ids)
-
-
-def plain_reason(skill_ids: list[str], gaps: list[dict], *, added: bool = False) -> str:
-    """Text for an item without a mentor sentence (blank reasons, filled minimums, the rule plan)."""
-    return f"Closes {skill_names(skill_ids, gaps)}" + ("; added to complete your plan." if added else ".")
-
-
 def validate(raw: object, candidates: Candidates, gaps: list[dict], mode: str = "full") -> list[AgentPlan]:
     """The Agent's plans, cleaned; raises InvalidAgentAnswer when nothing usable is left."""
     try:
@@ -63,9 +53,9 @@ def clean_plan(plan: AgentPlan, candidates: Candidates, gaps: list[dict]) -> Age
         skill_ids = [skill for skill in candidate["skill_ids"] if skill in claimed]
         if not skill_ids or counts[candidate["type"]] >= MAX_PER_TYPE[candidate["type"]]:
             continue
-        reason = item.reason.strip() or plain_reason(skill_ids, gaps)
+        # A blank reason stays blank: the card already says which skills the item closes.
         (alongside if candidate["alongside"] else steps).append(
-            AgentPlanItem(resource_id=item.resource_id, skill_ids=skill_ids, reason=reason))
+            AgentPlanItem(resource_id=item.resource_id, skill_ids=skill_ids, reason=item.reason.strip()))
         used.add(item.resource_id)
         counts[candidate["type"]] += 1
 
@@ -87,8 +77,7 @@ def clean_plan(plan: AgentPlan, candidates: Candidates, gaps: list[dict]) -> Age
                 break
             if candidate["type"] != kind or candidate["resource_id"] in used:
                 continue
-            filler = AgentPlanItem(resource_id=candidate["resource_id"], skill_ids=candidate["skill_ids"],
-                                   reason=plain_reason(candidate["skill_ids"], gaps, added=True))
+            filler = AgentPlanItem(resource_id=candidate["resource_id"], skill_ids=candidate["skill_ids"], reason="")
             target = alongside if candidate["alongside"] else steps
             at = next((index for index, step in enumerate(target) if place(step) > place(filler)), len(target))
             target.insert(at, filler)

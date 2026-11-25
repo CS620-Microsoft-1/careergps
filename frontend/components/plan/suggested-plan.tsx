@@ -238,7 +238,7 @@ function SuggestedItem({ item, step, order }: { item: ActionPlanItem; step?: num
           </div>
         </div>
         <p className="mt-3 text-sm">Closes <b>{names(item.skill_ids)}</b></p>
-        <p className="mt-2 rounded-lg bg-accent px-3 py-2 text-sm/6">{item.reason}</p>
+        {item.reason && <p className="mt-2 rounded-lg bg-accent px-3 py-2 text-sm/6">{item.reason}</p>}
         <div className="mt-3 flex justify-end">
           {saved?.status === "done"
             ? <span className="inline-flex h-9 items-center gap-1.5 text-sm font-bold text-success"><CircleCheck aria-hidden className="size-4" />Done</span>

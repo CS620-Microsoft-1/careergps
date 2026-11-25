@@ -86,6 +86,17 @@ describe("SuggestedPlan", () => {
     expect(within(screen.getByRole("list", { name: "Alongside" })).getByText("Data Science Club")).toBeInTheDocument();
   });
 
+  it("shows no reason box for a step without a mentor reason, so its skills appear once", async () => {
+    // Review on PR #58: a rule plan or filled-in step used to repeat "Closes …" in the reason box.
+    const [first, ...rest] = actionPlanSuggestions.plans[0].steps;
+    await renderReady(suggestions({ source: "rules" }, { steps: [{ ...first, reason: "" }, ...rest] }));
+    const step = card("SQL for Data Analysis");
+    expect(within(step).getAllByText(/Closes/)).toHaveLength(1);
+    expect(within(step).queryByText("Learn joins and aggregates before you query real data.")).not.toBeInTheDocument();
+    expect(within(card("Analyze a public dataset with SQL"))
+      .getByText("Publish an analysis with your queries to prove SQL.")).toBeInTheDocument();
+  });
+
   describe("skills highlight", () => {
     it("lists the covered skills in gap order with their step counts and marks the top gap", async () => {
       await renderReady();

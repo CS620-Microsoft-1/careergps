@@ -118,7 +118,8 @@ class CleaningTest(unittest.TestCase):
         raw = answer([item("p1", ["system_design"], reason="  ")], title=" ", summary="")
         [plan] = validate(raw, CANDIDATES, GAPS)
         self.assertEqual((plan.title, plan.summary), (DEFAULT_TITLE, DEFAULT_SUMMARY))
-        self.assertEqual(step(plan, "p1").reason, "Closes System design.")
+        # No "Closes …" stand-in: the card already lists the skills (review on PR #58).
+        self.assertEqual(step(plan, "p1").reason, "")
 
 
 class FillMinimumsTest(unittest.TestCase):
@@ -128,7 +129,7 @@ class FillMinimumsTest(unittest.TestCase):
         self.assertEqual(ids(plan.steps), ["cs400", "p1", "sql", "p3", "cert1"])
         self.assertEqual(ids(plan.alongside), ["club"])
         self.assertEqual(plan.steps[3].reason, "Do this because it proves the skill.")
-        self.assertEqual(plan.steps[1].reason, "Closes System design, Testing; added to complete your plan.")
+        self.assertEqual(plan.steps[1].reason, "")
 
     def test_a_missed_online_course_goes_before_the_certification(self) -> None:
         # Review on PR #58: a filler must not land after the certification ("certify, then learn").

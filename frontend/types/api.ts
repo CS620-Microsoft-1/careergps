@@ -316,7 +316,7 @@ export type ActionPlanItem = {
   resource_id: string;
   /** Gap skills this resource closes, highest priority first. */
   skill_ids: string[];
-  /** The mentor's sentence, or a plain template ("Closes …") from the rule planner. */
+  /** The mentor's sentence; "" when there is none (rule plan, filled-in step). */
   reason: string;
   resource: Resource;
 };

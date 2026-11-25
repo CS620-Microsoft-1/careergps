@@ -26,7 +26,6 @@ from app.services.action_plans.validation import (  # noqa: E402
 )
 
 EXAMPLE = BACKEND_ROOT.parent / "docs" / "contracts" / "action-plan-input.example.json"
-FILLED = "; added to complete your plan."
 LIMITS = {"title": 6, "summary": 30, "reason": 25}
 
 
@@ -84,7 +83,7 @@ def main() -> int:
     raw_ids = [item["resource_id"] for item in raw_plan.get("steps", []) + raw_plan.get("alongside", [])]
     final = plan.steps + plan.alongside
     final_ids = [item.resource_id for item in final]
-    filled = [item.resource_id for item in final if item.reason.endswith(FILLED)]
+    filled = [resource_id for resource_id in final_ids if resource_id not in raw_ids]
     dropped = [resource_id for resource_id in raw_ids if resource_id not in final_ids]
 
     print(f"\nTitle:   {plan.title}\nSummary: {plan.summary}\n")
@@ -93,7 +92,7 @@ def main() -> int:
         for index, item in enumerate(entries, 1):
             kind = by_id[item.resource_id]["type"]
             mark = " [filled]" if item.resource_id in filled else ""
-            print(f"  {index}. {item.resource_id} ({kind}) {item.skill_ids}{mark}\n     {item.reason}")
+            print(f"  {index}. {item.resource_id} ({kind}) {item.skill_ids}{mark}\n     {item.reason or '(no reason)'}")
 
     counts = Counter(by_id[resource_id]["type"] for resource_id in final_ids)
     available = Counter(item["type"] for item in candidates.items)

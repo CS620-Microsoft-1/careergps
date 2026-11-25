@@ -1106,7 +1106,8 @@ When the project Agent's shortlist gets shorter, revisit `PROJECT_CAP` in `servi
 **What comes out.** One `balanced` plan: an ordered main path (`steps`, the first is "now") and
 `alongside` (clubs). Composition: 2–3 projects, 1–2 classes, 1–2 online courses, 1–2 certifications and
 1–2 clubs, each only when a candidate exists and never padded. Order: learn, then prove, then certify.
-Each item has a mentor-voice `reason`. `covered_skill_ids`, `project_hours` and `uncovered_skill_ids`
+Each item has a mentor-voice `reason`, or `""` when there is none (rule plan, filled-in step); the card
+then shows only the skills it closes. `covered_skill_ids`, `project_hours` and `uncovered_skill_ids`
 are computed in Python, never by the Agent.
 
 **Saving it.** "Add all" calls `PUT /plan/suggested` (`job_family`, `steps`, `alongside`) once: under the
@@ -1123,7 +1124,7 @@ gaps → candidates.py (shortlists) → agent.py (action-plan-agent) → validat
 
 - `validation.py` keeps only candidate ids and skills each candidate really closes, puts clubs in
   `alongside`, drops items over a type's maximum and fills a missed minimum with the best-ranked unused
-  candidate (its reason ends "added to complete your plan"). A filler goes before the first step that
+  candidate (with an empty `reason`). A filler goes before the first step that
   should come after it (biggest gap, then learn → prove → certify); the Agent's own steps keep their order.
 - Only Agent plans are cached, at `local_results/action_plans/{run_id}/{key}.json`. The key hashes the
   Agent input, `Instructions.md`, `response-format.json` and the Agent version, so a taken course, new

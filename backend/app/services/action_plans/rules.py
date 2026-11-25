@@ -6,7 +6,7 @@ as a validated Agent plan, so the planner treats both alike. Deterministic: no m
 from app.schemas.action_plans import AgentPlan, AgentPlanItem
 from app.services.action_plans.candidates import Candidates
 from app.services.action_plans.validation import (
-    DEFAULT_SUMMARY, DEFAULT_TITLE, MAX_PER_TYPE, MIN_PER_TYPE, STEP_ORDER, plain_reason,
+    DEFAULT_SUMMARY, DEFAULT_TITLE, MAX_PER_TYPE, MIN_PER_TYPE, STEP_ORDER,
 )
 
 
@@ -52,7 +52,7 @@ def full_plan(candidates: Candidates, gaps: list[dict]) -> AgentPlan | None:
 
     def plan_item(item: dict) -> AgentPlanItem:
         return AgentPlanItem(resource_id=item["resource_id"], skill_ids=item["skill_ids"],
-                             reason=plain_reason(item["skill_ids"], gaps))
+                             reason="")  # no mentor sentence; the card shows the skills it closes
 
     steps = [plan_item(item) for item in sorted(chosen, key=order) if not item["alongside"]]
     if not steps:
