@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   cacheComponents: true,
   // Pages renamed in the redesign; keep old bookmarks working.
   async redirects() {

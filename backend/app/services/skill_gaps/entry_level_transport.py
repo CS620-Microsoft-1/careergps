@@ -122,7 +122,7 @@ def preflight(
         from azure.identity import DefaultAzureCredential
 
         prepared = {}
-        with DefaultAzureCredential(exclude_managed_identity_credential=True) as credential:
+        with DefaultAzureCredential() as credential:
             with AIProjectClient(endpoint=endpoint, credential=credential, allow_preview=True) as project:
                 for group in requested:
                     pin = bindings[group]
@@ -210,7 +210,7 @@ def invoke_prepared(
         from azure.ai.projects import AIProjectClient
         from azure.identity import DefaultAzureCredential
 
-        with DefaultAzureCredential(exclude_managed_identity_credential=True) as credential:
+        with DefaultAzureCredential() as credential:
             with AIProjectClient(endpoint=prepared.project_endpoint, credential=credential, allow_preview=True) as project:
                 with project.get_openai_client(timeout=480, max_retries=0) as client:
                     timings["sdk_auth_configuration_seconds"] = round(perf_counter() - started, 3)
