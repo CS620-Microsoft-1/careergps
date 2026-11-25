@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
-import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, X } from "lucide-react";
+import { Check, ChevronDown, CircleCheck, LoaderCircle, Plus, RotateCcw, X } from "lucide-react";
 
 import { RESOURCE_TYPES, ResourceIcon, skillLabel } from "@/components/career/route-parts";
 import { type SuggestedEntries, usePlan } from "@/components/plan/plan-provider";
@@ -112,16 +112,19 @@ export function SuggestedPlan({ family, gapOrder, onClose }: {
       {suggested && state.status === "ready" && <>
         <SkillsHighlight plan={suggested} uncovered={state.suggestions.uncovered_skill_ids} gapOrder={gapOrder} />
         {plan.actionError && <p role="alert" className="mt-4 text-sm text-destructive">{plan.actionError}</p>}
-        <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.6fr)]">
+        {/* One column: the main path, then what runs alongside it. */}
+        <div className="mt-8 grid gap-8">
           <div>
             <p id="suggested-steps" className="eyebrow mb-3">Main path, in order</p>
-            <ol aria-labelledby="suggested-steps" className="grid gap-3">
-              {suggested.steps.map((item, index) => <SuggestedItem key={item.resource_id} item={item} step={index + 1} order={index} />)}
+            <ol aria-labelledby="suggested-steps" className="grid gap-2">
+              {suggested.steps.map((item, index) => (
+                <SuggestedItem key={item.resource_id} item={item} step={index + 1} order={index} full={index === 0} />
+              ))}
             </ol>
           </div>
           {suggested.alongside.length > 0 && <div>
             <p id="suggested-alongside" className="eyebrow mb-3">Alongside</p>
-            <ul aria-labelledby="suggested-alongside" className="grid gap-3">
+            <ul aria-labelledby="suggested-alongside" className="grid gap-2">
               {suggested.alongside.map((item, index) => (
                 <SuggestedItem key={item.resource_id} item={item} order={suggested.steps.length + index} />
               ))}
@@ -157,37 +160,37 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
     return index < 0 ? Number.POSITIVE_INFINITY : index;
   };
   const skills = [...new Set([...plan.covered_skill_ids, ...uncovered])].sort((a, b) => rank(a) - rank(b));
-  const stepsFor = (skill: string) => plan.steps.filter((item) => item.skill_ids.includes(skill)).length;
+  const onMainPath = (skill: string) => plan.steps.some((item) => item.skill_ids.includes(skill));
   const covered = new Set(plan.covered_skill_ids);
   // All the student's gaps, as the Gaps page counts them; the plan targets only the biggest ones.
   const allGaps = Math.max(gapOrder.length, skills.length);
   const others = allGaps - skills.length;
-  const tiles = [
+  const stats = [
     { value: `${covered.size} of ${allGaps}`, label: "gaps covered" },
-    { value: plural(plan.steps.length, "step"), label: plan.alongside.length ? `+ ${plan.alongside.length} alongside` : "on the main path" },
+    { value: plural(plan.steps.length, "step"), label: plan.alongside.length ? `+ ${plan.alongside.length} alongside` : "" },
     ...(plan.project_hours !== null ? [{ value: `≈ ${plan.project_hours} h`, label: "of project work" }] : []),
   ];
 
   return (
-    <div className="entrance-settle mt-6 grid gap-5 rounded-xl bg-sunken p-4 sm:p-5">
-      {/* Phones: one compact row per figure. From sm: tiles side by side. */}
-      <dl className="grid gap-2 sm:grid-flow-col sm:auto-cols-fr sm:gap-3">
-        {tiles.map((tile) => (
-          // Label after the value on screen, before it in the markup (dt then dd).
-          <div key={tile.label} className="flex min-w-0 flex-row-reverse items-baseline justify-end gap-2 rounded-lg bg-card px-3 py-2 sm:flex-col-reverse sm:items-start sm:gap-0 sm:px-4 sm:py-3">
-            <dt className="text-sm text-muted-foreground">{tile.label}</dt>
-            <dd className="font-mono text-base font-medium whitespace-nowrap sm:text-xl">{tile.value}</dd>
-          </div>
+    <div className="entrance-settle mt-6 grid gap-4">
+      {/* One line of figures; it wraps between figures, never inside one. */}
+      <p className="text-sm/6 text-muted-foreground">
+        {stats.map((stat, index) => (
+          <span key={stat.value}>
+            {index > 0 && " · "}
+            <span className="whitespace-nowrap">
+              <span className="font-mono font-medium text-foreground">{stat.value}</span>{stat.label && ` ${stat.label}`}
+            </span>
+          </span>
         ))}
-      </dl>
+      </p>
       <div>
         <p id="suggested-skills" className="eyebrow mb-2">Skills this plan builds</p>
         <ul aria-labelledby="suggested-skills" className="flex flex-wrap gap-2">
           {skills.map((skill, index) => {
             const isCovered = covered.has(skill);
-            const steps = stepsFor(skill);
             const order = rank(skill);
-            const detail = !isCovered ? "not covered yet" : steps ? plural(steps, "step") : "alongside";
+            const detail = !isCovered ? "not covered yet" : onMainPath(skill) ? "" : "alongside";
             return (
               <li key={skill} style={delay(150 + index * 60)}
                 className={cn("entrance-pop motion-safe:[animation-delay:var(--delay)] flex min-h-9 max-w-full items-center gap-2 rounded-full py-1 pr-3.5 pl-1 text-sm",
@@ -199,7 +202,7 @@ function SkillsHighlight({ plan, uncovered, gapOrder }: { plan: ActionPlan; unco
                 </span>
                 <span className="min-w-0">
                   <b className={cn(!isCovered && "font-medium")}>{skillLabel(skill)}</b>
-                  <span className="text-muted-foreground">{order === 0 ? " · top gap" : ""} · {detail}</span>
+                  <span className="text-muted-foreground">{[order === 0 && " · top gap", detail && ` · ${detail}`]}</span>
                 </span>
               </li>
             );
@@ -241,41 +244,74 @@ function ResourceDetails({ resource }: { resource: Resource }) {
 /** Delay between cards sliding in when the plan arrives, so it reads as the plan being laid out. */
 const REVEAL_STAGGER_MS = 70;
 
-/** step: the step number on the main path; none for alongside items. order: its place in the reveal. */
-function SuggestedItem({ item, step, order }: { item: ActionPlanItem; step?: number; order: number }) {
-  const plan = usePlan();
+/**
+ * One suggested resource. full: the first step, shown as a card with its skills and reason. The rest are
+ * one line each; "Why" opens the same skills and reason, so no explanation is lost.
+ * step: the step number on the main path; none for alongside items. order: its place in the reveal.
+ */
+function SuggestedItem({ item, step, order, full = false }: {
+  item: ActionPlanItem; step?: number; order: number; full?: boolean;
+}) {
   const { resource } = item;
-  const saved = plan.saved.get(item.resource_id);
-  const busy = plan.pending.has(item.resource_id);
-  const toggle = () => void plan.toggleSaved(item.resource_id);
+  const [open, setOpen] = useState(false);
+  const whyId = useId();
+  const title = (
+    <p className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+      <span className="font-bold">{step && <span className="sr-only">Step {step}: </span>}{resource.title}</span>
+      <Badge>{RESOURCE_TYPES[resource.type].label}</Badge>
+    </p>
+  );
+  const why = <>
+    <p className="text-sm">Closes <b>{names(item.skill_ids)}</b></p>
+    {item.reason && <p className={cn("mt-2 rounded-lg px-3 py-2 text-sm/6", full ? "bg-accent" : "bg-sunken")}>{item.reason}</p>}
+  </>;
   return (
     <li className={cn("entrance-rise motion-safe:[animation-delay:var(--delay)]", step && "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2 sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-3")}
       style={delay(order * REVEAL_STAGGER_MS)}>
-      {step && <span aria-hidden className="pt-4 text-right font-mono text-sm text-muted-foreground">{step}</span>}
-      <div className={cn("rounded-xl bg-card p-4", step ? "border border-border" : "border border-dashed border-line-strong")}>
-        <div className="flex items-start gap-3">
-          <ResourceIcon type={resource.type} className="size-8 bg-sunken" />
-          <div className="min-w-0 flex-1">
-            <p className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="font-bold">{step && <span className="sr-only">Step {step}: </span>}{resource.title}</span>
-              <Badge>{RESOURCE_TYPES[resource.type].label}</Badge>
-            </p>
-            <ResourceDetails resource={resource} />
+      {step && <span aria-hidden className={cn("text-right font-mono text-sm text-muted-foreground", full ? "pt-4" : "pt-3.5")}>{step}</span>}
+      <div className={cn("rounded-xl bg-card", full ? "p-4" : "px-4 py-2.5",
+        step ? "border border-border" : "border border-dashed border-line-strong")}>
+        {full ? <>
+          <div className="flex items-start gap-3">
+            <ResourceIcon type={resource.type} className="size-8 bg-sunken" />
+            <div className="min-w-0 flex-1">{title}<ResourceDetails resource={resource} /></div>
           </div>
-        </div>
-        <p className="mt-3 text-sm">Closes <b>{names(item.skill_ids)}</b></p>
-        {item.reason && <p className="mt-2 rounded-lg bg-accent px-3 py-2 text-sm/6">{item.reason}</p>}
-        <div className="mt-3 flex justify-end">
-          {saved?.status === "done"
-            ? <span className="inline-flex h-9 items-center gap-1.5 text-sm font-bold text-success"><CircleCheck aria-hidden className="size-4" />Done</span>
-            : <Button type="button" size="sm" variant={saved ? "accent" : "secondary"} aria-pressed={Boolean(saved)}
-              disabled={busy} onClick={toggle}>
-              {busy ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />
-                : saved ? <Check data-icon="inline-start" /> : <Plus data-icon="inline-start" />}
-              {saved ? "In your plan" : "Add to plan"}<span className="sr-only">: {resource.title}</span>
-            </Button>}
-        </div>
+          <div className="mt-3">{why}</div>
+          <div className="mt-3 flex justify-end"><AddButton item={item} /></div>
+        </> : <>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <div className="min-w-0 flex-1 basis-56">{title}<ResourceDetails resource={resource} /></div>
+            {/* Wraps under the title on narrow cards and stays right-aligned, never past the card edge. */}
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-1">
+              <Button type="button" size="sm" variant="ghost" aria-expanded={open} aria-controls={whyId}
+                onClick={() => setOpen((value) => !value)}>
+                Why<span className="sr-only">: {resource.title}</span>
+                <ChevronDown data-icon="inline-end" className={cn("motion-safe:transition-transform", open && "rotate-180")} />
+              </Button>
+              <AddButton item={item} />
+            </div>
+          </div>
+          <div id={whyId} hidden={!open} className="mt-2 border-t border-border pt-3 pb-1">{why}</div>
+        </>}
       </div>
     </li>
+  );
+}
+
+/** Add to plan, as a toggle: a card added on its own slots in by gap, like any saved resource. */
+function AddButton({ item }: { item: ActionPlanItem }) {
+  const plan = usePlan();
+  const saved = plan.saved.get(item.resource_id);
+  const busy = plan.pending.has(item.resource_id);
+  if (saved?.status === "done") {
+    return <span className="inline-flex h-9 items-center gap-1.5 text-sm font-bold text-success"><CircleCheck aria-hidden className="size-4" />Done</span>;
+  }
+  return (
+    <Button type="button" size="sm" variant={saved ? "accent" : "secondary"} aria-pressed={Boolean(saved)}
+      disabled={busy} onClick={() => void plan.toggleSaved(item.resource_id)}>
+      {busy ? <LoaderCircle data-icon="inline-start" className="motion-safe:animate-spin" />
+        : saved ? <Check data-icon="inline-start" /> : <Plus data-icon="inline-start" />}
+      {saved ? "In your plan" : "Add to plan"}<span className="sr-only">: {item.resource.title}</span>
+    </Button>
   );
 }

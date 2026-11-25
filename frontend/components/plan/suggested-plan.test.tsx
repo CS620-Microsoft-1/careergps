@@ -112,10 +112,40 @@ describe("SuggestedPlan", () => {
     expect(within(card("Analyze a public dataset with SQL")).getByText("Project")).toBeInTheDocument();
   });
 
+  it("shows step 1 as a full card and the rest as one line each, with their reasons behind Why", async () => {
+    // Review on PR #58: less before step 1, and nothing lost (explainability is a project requirement).
+    await renderReady();
+    expect(within(card("SQL for Data Analysis")).getByText("Learn joins and aggregates before you query real data."))
+      .toBeVisible();
+    expect(within(card("SQL for Data Analysis")).queryByRole("button", { name: /^Why/ })).not.toBeInTheDocument();
+
+    const second = card("Analyze a public dataset with SQL");
+    const why = within(second).getByRole("button", { name: "Why: Analyze a public dataset with SQL" });
+    const reason = within(second).getByText("Publish an analysis with your queries to prove SQL.");
+    expect(why).toHaveAttribute("aria-expanded", "false");
+    expect(reason).not.toBeVisible();
+    await userEvent.click(why);
+    expect(why).toHaveAttribute("aria-expanded", "true");
+    expect(reason).toBeVisible();
+    expect(within(card("Data Science Club")).getByRole("button", { name: /^Why/ })).toBeInTheDocument();
+  });
+
+  it("lists the alongside items after the main path", async () => {
+    await renderReady();
+    const main = screen.getByRole("list", { name: "Main path, in order" });
+    const alongside = screen.getByRole("list", { name: "Alongside" });
+    expect(main.compareDocumentPosition(alongside) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   describe("skills highlight", () => {
-    it("lists the covered skills in gap order with their step counts and marks the top gap", async () => {
+    it("lists the covered skills in gap order and marks the top gap, without step counts", async () => {
       await renderReady();
-      expect(skillChips()).toEqual(["1SQL · top gap · 2 steps", "2Dashboard development · 1 step"]);
+      expect(skillChips()).toEqual(["1SQL · top gap", "2Dashboard development"]);
+    });
+
+    it("marks a skill only the alongside items cover", async () => {
+      await renderReady(suggestions({}, { steps: actionPlanSuggestions.plans[0].steps.slice(0, 2) }));
+      expect(skillChips()).toEqual(["1SQL · top gap", "2Dashboard development · alongside"]);
     });
 
     it("shows a gap no resource closes as not covered yet", async () => {
@@ -141,11 +171,10 @@ describe("SuggestedPlan", () => {
       expect(screen.queryByText(/This plan focuses on/)).not.toBeInTheDocument();
     });
 
-    it("counts steps, alongside items and project hours", async () => {
+    it("puts gaps covered, steps and project hours on one line", async () => {
       await renderReady();
-      expect(screen.getByText("3 steps")).toBeInTheDocument();
-      expect(screen.getByText("+ 1 alongside")).toBeInTheDocument();
-      expect(screen.getByText("≈ 12 h")).toBeInTheDocument();
+      expect(screen.getByText("≈ 12 h").closest("p")).toHaveTextContent("2 of 3 gaps covered · 3 steps + 1 alongside · ≈ 12 h of project work");
+      expect(screen.getByText("3 steps")).toHaveClass("font-mono");
     });
 
     it("leaves out the hours when no project has an estimate", async () => {
