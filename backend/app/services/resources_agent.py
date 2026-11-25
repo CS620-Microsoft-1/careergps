@@ -5,6 +5,7 @@ from azure.ai.projects import AIProjectClient
 
 from app.core.config import get_settings
 from app.schemas.resources import ResourceRecommendations
+from app.services import agent_calls
 from app.services.resources import load_projects
 
 
@@ -127,7 +128,8 @@ def recommend_projects(
         conversation = client.conversations.create()
 
         try:
-            response = client.responses.create(
+            response = agent_calls.call(
+                settings.resources_agent_name, None, client.responses.create,
                 conversation=conversation.id,
                 input=[
                     {

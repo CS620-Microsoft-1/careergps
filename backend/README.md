@@ -1087,17 +1087,22 @@ scores don't change.
 
 ## Agent call metrics
 
-A Foundry Agent request wrapped in `agent_calls.call` writes one row to `agent_calls` (migration
+Every Foundry Agent request (`responses.create`) writes one row to `agent_calls` (migration
 `9ea89c504d80`): the Agent name and version, the model, the student (`user_id`), the Skill Gap run
 (`run_id`), `status`, `error_type`, `latency_ms`, the four token counts and `cost_usd`. Prompts and
 answers are never stored; an error keeps only its class name.
 
-- **How:** a call site wraps its request: `agent_calls.call(name, version, client.responses.create,
-  **kwargs)`. The student and Skill Gap run come from context (`set_user`, `bind_run`, `in_context`).
+- **Which calls:** résumé classification, job posting analysis, the resources (projects) Agent and
+  the three Skill Gap groups (through `skill_gaps/transport.create_response`). A new call site must
+  wrap its request: `agent_calls.call(name, version, client.responses.create, **kwargs)`.
+  `tests/test_agent_calls.py` fails if any `responses.create(` in `app/` is called directly.
 - **Latency** is `responses.create` alone, not creating or deleting the conversation.
 - **Cost** is an estimate from `app/services/model_prices.py` (USD per 1M tokens, Azure Global
   Standard list prices, checked 2026-11-25). A model with no listed price gets tokens but no cost,
   and a warning in the log. Cache writes and the long-context tier are not counted.
+- **Who:** `RequestContextMiddleware` starts a holder per request and `get_current_user` fills in the
+  user. Work moved to another thread must use `agent_calls.in_context(fn)` as its target, or its
+  calls have no user. Job posting analysis runs without a signed-in user, so `user_id` is empty.
 - **Never in the way:** the row is written in its own short session after the call. If that write
   fails, the call's result or error is returned unchanged and a warning is logged.
 

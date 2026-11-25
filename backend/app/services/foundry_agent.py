@@ -9,6 +9,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from app.schemas.resume import ResumeClassification
+from app.services import agent_calls
 
 class FoundryAgentError(RuntimeError):
     """A sanitized Agent failure that never includes résumé content."""
@@ -306,7 +307,8 @@ class FoundryResumeAgentService:
                 )
                 conversation = client.conversations.create()
                 try:
-                    response = client.responses.create(
+                    response = agent_calls.call(
+                        self.agent_name, None, client.responses.create,
                         conversation=conversation.id,
                         input=[{"role": "user", "content": extracted_resume_text}],
                     )

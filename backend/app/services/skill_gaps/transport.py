@@ -8,6 +8,7 @@ import json
 import time
 
 from app.core.config import BACKEND_ROOT
+from app.services import agent_calls
 from .assets import ASSET_ROOT
 from .schema import SCHEMA_NAME
 
@@ -99,7 +100,9 @@ def create_response(client, payload, on_request=lambda: None, timings=None, *, a
         on_request()
         started = time.perf_counter()
         try:
-            return client.responses.create(
+            return agent_calls.call(
+                (agent_reference or {}).get("name") or "skill-gap-agent", (agent_reference or {}).get("version"),
+                client.responses.create,
                 conversation=conversation.id,
                 input=[{"role": "user", "content": content}],
                 max_output_tokens=40000,

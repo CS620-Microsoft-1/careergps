@@ -1,4 +1,5 @@
 """Agent call records: latency, tokens, cost, who made the call, and that every call site is covered."""
+import re
 import threading
 import unittest
 import uuid
@@ -8,6 +9,7 @@ from types import SimpleNamespace
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
+from app.core.config import BACKEND_ROOT
 from app.core.request_context import RequestContextMiddleware
 from app.services import agent_calls
 from app.services.model_prices import estimate_cost, price_for
@@ -179,6 +181,17 @@ class PriceTests(unittest.TestCase):
 
     def test_cached_tokens_never_exceed_input(self) -> None:
         self.assertEqual(Decimal("0.00001"), estimate_cost("gpt-6-luna", 1_000, 5_000, 0))
+
+
+class CoverageTests(unittest.TestCase):
+    def test_every_responses_create_goes_through_agent_calls(self) -> None:
+        """A new Agent call site must use agent_calls.call(..., client.responses.create, ...)."""
+        direct = []
+        for path in sorted((BACKEND_ROOT / "app").rglob("*.py")):
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if re.search(r"responses\.create\s*\(", line):
+                    direct.append(f"{path.relative_to(BACKEND_ROOT)}:{number}")
+        self.assertEqual([], direct)
 
 
 if __name__ == "__main__":

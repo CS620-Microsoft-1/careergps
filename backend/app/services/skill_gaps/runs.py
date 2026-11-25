@@ -20,6 +20,7 @@ from uuid import UUID, uuid4
 
 from app.core.config import BACKEND_ROOT, SkillGapSettings
 from app.schemas.skill_gap_web import JobFamily, SkillGapRun
+from app.services import agent_calls
 from . import entry_level, entry_level_transport
 from .entry_level_cache import ENTRY_LEVEL_BRANCH_CACHE_VERSION, EntryLevelBranchCache
 from .entry_level_report import (
@@ -346,7 +347,7 @@ class SkillGapRunManager:
                         save_json(folder / "branches" / branch / name, value)
                 self._unsaved[identifier] = reviewed
                 self._persist(state)
-                self._executor.submit(self._work, identifier, reviewed)
+                self._executor.submit(agent_calls.in_context(self._work_in_run), identifier, reviewed)
             except BaseException:
                 # Preserve the upstream queue-submission rollback protection.
                 self._unsaved.pop(identifier, None)
@@ -647,7 +648,7 @@ class SkillGapRunManager:
             # The parent queue has one worker; use a separate bounded pool here.
             # Waiting on children in the parent pool would deadlock it.
             with ThreadPoolExecutor(max_workers=len(pending), thread_name_prefix="skill-gap-evidence") as executor:
-                futures = {executor.submit(extract, branch): branch for branch in pending}
+                futures = {executor.submit(agent_calls.in_context(extract), branch): branch for branch in pending}
                 for future in as_completed(futures):
                     branch = futures[future]
                     try:
@@ -691,6 +692,11 @@ class SkillGapRunManager:
         audit["score_demand_coverage"] = score_demand_coverage(report)
         output = {"job_family": family, "groups": {branch: outputs[branch] for branch in self._branches}}
         return output, audit, report
+
+    def _work_in_run(self, identifier: str, reviewed: dict) -> None:
+        # Agent calls made for this run are recorded with its id (agent_calls.run_id).
+        with agent_calls.bind_run(identifier):
+            self._work(identifier, reviewed)
 
     def _work(self, identifier: str, reviewed: dict) -> None:
         started = time.perf_counter()

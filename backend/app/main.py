@@ -8,12 +8,16 @@ from fastapi.responses import JSONResponse
 from app.api.routes import certifications, health, job_postings, me, resources, resumes, skill_gaps, student_courses
 from app.core.body_limit import BodyLimitMiddleware
 from app.core.config import get_settings
+from app.core.request_context import RequestContextMiddleware
 
 logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
 app = FastAPI(title="CareerGPS API", version="0.1.0")
+
+# Innermost, so the Agent-call context is set in the same task the endpoint runs from.
+app.add_middleware(RequestContextMiddleware)
 
 # The largest request body accepted: a 10 MB résumé plus room for the multipart wrapping.
 MAX_REQUEST_BYTES = resumes.MAX_UPLOAD_BYTES + 1024 * 1024

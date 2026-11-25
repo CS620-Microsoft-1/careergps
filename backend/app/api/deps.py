@@ -17,6 +17,7 @@ from app.core.security import (
 )
 from app.db.session import SessionLocal
 from app.models import User
+from app.services import agent_calls
 from app.services.accounts import AccountService
 from app.services.foundry_agent import FoundryResumeAgentService
 from app.services.resume_pipeline import ResumePipeline
@@ -69,7 +70,7 @@ def get_current_user(
     if credentials is None:
         raise unauthorized
     try:
-        return verifier.verify(credentials.credentials)
+        user = verifier.verify(credentials.credentials)
     except AuthUnavailableError:
         logger.exception("Could not fetch Supabase signing keys")
         raise HTTPException(
@@ -79,6 +80,8 @@ def get_current_user(
         # The reason is logged, never the token itself. Warning, so it shows in uvicorn's console.
         logger.warning("Rejected token: %s", error)
         raise unauthorized
+    agent_calls.set_user(user.id)
+    return user
 
 
 def get_account_service(db: Session = Depends(get_db)) -> AccountService:
