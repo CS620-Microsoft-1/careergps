@@ -6,11 +6,8 @@ as a validated Agent plan, so the planner treats both alike. Deterministic: no m
 from app.schemas.action_plans import AgentPlan, AgentPlanItem
 from app.services.action_plans.candidates import Candidates
 from app.services.action_plans.validation import (
-    DEFAULT_SUMMARY, DEFAULT_TITLE, MAX_PER_TYPE, MIN_PER_TYPE, plain_reason,
+    DEFAULT_SUMMARY, DEFAULT_TITLE, MAX_PER_TYPE, MIN_PER_TYPE, STEP_ORDER, plain_reason,
 )
-
-# Within one gap: learn, then prove, then certify.
-_STEP_ORDER = {"online_course": 0, "school_course": 1, "project": 2, "certification": 3, "student_org": 4}
 
 
 def full_plan(candidates: Candidates, gaps: list[dict]) -> AgentPlan | None:
@@ -50,7 +47,7 @@ def full_plan(candidates: Candidates, gaps: list[dict]) -> AgentPlan | None:
             take(min(pool, key=lambda item: candidate_rank[item["resource_id"]]))
 
     def order(item: dict) -> tuple:
-        return (min(gap_rank[skill] for skill in item["skill_ids"]), _STEP_ORDER[item["type"]],
+        return (min(gap_rank[skill] for skill in item["skill_ids"]), STEP_ORDER[item["type"]],
                 candidate_rank[item["resource_id"]])
 
     def plan_item(item: dict) -> AgentPlanItem:

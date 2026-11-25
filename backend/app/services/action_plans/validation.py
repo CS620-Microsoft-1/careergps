@@ -2,7 +2,7 @@
 
 Every item must be a candidate and claim only gap skills that candidate closes. Placement follows the
 candidate (clubs alongside), per-type maximums drop extras, and a missed minimum is filled with the
-best-ranked unused candidate of that type. An answer that is malformed or has no usable main path raises
+best-ranked unused candidate of that type, placed by gap and learn → prove → certify. An answer that is malformed or has no usable main path raises
 InvalidAgentAnswer, and the planner uses the rule plan instead.
 """
 from pydantic import ValidationError
@@ -13,6 +13,8 @@ from app.services.action_plans.candidates import Candidates
 # The plan's parts (app/prompts/action_plan/Instructions.md, PICK).
 MAX_PER_TYPE = {"project": 3, "school_course": 2, "online_course": 2, "certification": 2, "student_org": 2}
 MIN_PER_TYPE = {"project": 2, "school_course": 1, "online_course": 1, "certification": 1, "student_org": 1}
+# Within one gap: learn, then prove, then certify.
+STEP_ORDER = {"online_course": 0, "school_course": 1, "project": 2, "certification": 3, "student_org": 4}
 DEFAULT_TITLE = "Your action plan"
 DEFAULT_SUMMARY = "You close your highest-priority gaps first, in this order."
 
@@ -70,16 +72,26 @@ def clean_plan(plan: AgentPlan, candidates: Candidates, gaps: list[dict]) -> Age
     if not steps:
         raise InvalidAgentAnswer("No usable main-path step")
 
+    gap_rank = {gap["skill_id"]: index for index, gap in enumerate(gaps)}
+
+    def place(item: AgentPlanItem) -> tuple[int, int]:
+        """Biggest gap the item closes, then learn → prove → certify."""
+        return (min((gap_rank.get(skill, len(gaps)) for skill in item.skill_ids), default=len(gaps)),
+                STEP_ORDER[by_id[item.resource_id]["type"]])
+
     # Fill a missed minimum with the best-ranked unused candidate of that type (candidates are ranked).
+    # The Agent's own steps keep their order; a filler goes before the first step that should come after it.
     for kind, minimum in MIN_PER_TYPE.items():
         for candidate in candidates.items:
             if counts[kind] >= minimum:
                 break
             if candidate["type"] != kind or candidate["resource_id"] in used:
                 continue
-            (alongside if candidate["alongside"] else steps).append(AgentPlanItem(
-                resource_id=candidate["resource_id"], skill_ids=candidate["skill_ids"],
-                reason=plain_reason(candidate["skill_ids"], gaps, added=True)))
+            filler = AgentPlanItem(resource_id=candidate["resource_id"], skill_ids=candidate["skill_ids"],
+                                   reason=plain_reason(candidate["skill_ids"], gaps, added=True))
+            target = alongside if candidate["alongside"] else steps
+            at = next((index for index, step in enumerate(target) if place(step) > place(filler)), len(target))
+            target.insert(at, filler)
             used.add(candidate["resource_id"])
             counts[kind] += 1
 

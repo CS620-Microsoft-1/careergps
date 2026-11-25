@@ -49,6 +49,10 @@ def ids(plan_items) -> list[str]:
     return [entry.resource_id for entry in plan_items]
 
 
+def step(plan, resource_id: str):
+    return next(entry for entry in plan.steps if entry.resource_id == resource_id)
+
+
 class ValidAnswerTest(unittest.TestCase):
     def test_complete_answer_passes_unchanged(self) -> None:
         [plan] = validate(COMPLETE, CANDIDATES, GAPS)
@@ -94,14 +98,14 @@ class CleaningTest(unittest.TestCase):
     def test_keeps_only_skills_the_candidate_closes_in_gap_order(self) -> None:
         raw = answer([item("p1", ["testing", "cloud", "system_design"]), item("p2", ["cloud"]), item("p4", ["testing"])])
         [plan] = validate(raw, CANDIDATES, GAPS)
-        self.assertEqual(plan.steps[0].skill_ids, ["system_design", "testing"])
+        self.assertEqual(step(plan, "p1").skill_ids, ["system_design", "testing"])
         self.assertNotIn("p2", ids(plan.steps))  # p2 claimed only a skill it doesn't close
 
     def test_placement_follows_the_candidate(self) -> None:
         raw = answer([item("p1", ["testing"]), item("club", ["cloud"])], [item("p2", ["testing"])])
         [plan] = validate(raw, CANDIDATES, GAPS)
         self.assertEqual(ids(plan.alongside), ["club"])
-        self.assertEqual(ids(plan.steps)[:2], ["p1", "p2"])
+        self.assertEqual([i for i in ids(plan.steps) if i in {"p1", "p2"}], ["p1", "p2"])
 
     def test_drops_items_over_the_maximum(self) -> None:
         raw = answer([item(p, ["testing"] if p != "p3" else ["cloud"]) for p in ("p1", "p2", "p3", "p4")]
@@ -114,17 +118,31 @@ class CleaningTest(unittest.TestCase):
         raw = answer([item("p1", ["system_design"], reason="  ")], title=" ", summary="")
         [plan] = validate(raw, CANDIDATES, GAPS)
         self.assertEqual((plan.title, plan.summary), (DEFAULT_TITLE, DEFAULT_SUMMARY))
-        self.assertEqual(plan.steps[0].reason, "Closes System design.")
+        self.assertEqual(step(plan, "p1").reason, "Closes System design.")
 
 
 class FillMinimumsTest(unittest.TestCase):
     def test_fills_each_missing_type_with_its_best_ranked_candidate(self) -> None:
         [plan] = validate(answer([item("p3", ["cloud"])]), CANDIDATES, GAPS)
-        # Filled in type order: project, class, online course, certification.
-        self.assertEqual(ids(plan.steps), ["p3", "p1", "cs400", "sql", "cert1"])
+        # Each filler goes in by its biggest gap, then learn → prove → certify.
+        self.assertEqual(ids(plan.steps), ["cs400", "p1", "sql", "p3", "cert1"])
         self.assertEqual(ids(plan.alongside), ["club"])
-        self.assertEqual(plan.steps[0].reason, "Do this because it proves the skill.")
+        self.assertEqual(plan.steps[3].reason, "Do this because it proves the skill.")
         self.assertEqual(plan.steps[1].reason, "Closes System design, Testing; added to complete your plan.")
+
+    def test_a_missed_online_course_goes_before_the_certification(self) -> None:
+        # Review on PR #58: a filler must not land after the certification ("certify, then learn").
+        raw = answer([item("cs400", ["system_design"]), item("p1", ["system_design", "testing"]),
+                      item("p2", ["testing"]), item("cert1", ["cloud"])], [item("club", ["cloud"])])
+        [plan] = validate(raw, CANDIDATES, GAPS)
+        self.assertEqual(ids(plan.steps), ["cs400", "p1", "sql", "p2", "cert1"])
+
+    def test_fillers_keep_the_agents_own_order(self) -> None:
+        # The Agent put the certification first; a filler doesn't reorder the Agent's steps.
+        raw = answer([item("cert2", ["system_design"]), item("p1", ["testing"]), item("p2", ["testing"]),
+                      item("cs400", ["system_design"]), item("sql", ["testing"])], [item("club", ["cloud"])])
+        [plan] = validate(raw, CANDIDATES, GAPS)
+        self.assertEqual(ids(plan.steps), ["cert2", "p1", "p2", "cs400", "sql"])
 
     def test_skips_types_without_candidates(self) -> None:
         only_projects = Candidates(items=[c for c in CANDIDATES.items if c["type"] == "project"], resources={})
