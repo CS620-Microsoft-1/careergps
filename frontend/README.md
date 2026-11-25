@@ -213,7 +213,7 @@ backend `POST /action-plans/suggestions/stream`). A first plan can take up to a 
 `components/plan/plan-building.tsx` shows the real build stages as they stream in: the gaps read, the
 shortlist counts, the mentor choosing (cycling through real shortlisted titles), then the check. There's
 no progress percentage, only elapsed time. A repeat is cached and comes back at once. Each card has its
-own **Add to plan**.
-**Add all to my plan** saves each step with `position` 1..N (clubs without one) through
-`PUT /plan/items/{id}`. `orderPlan` (`lib/career.ts`) puts steps with a position first, in that order,
-then the rest by gap; resources saved one by one still slot in by gap.
+own **Add to plan**, which saves it like any resource, so it slots in by gap.
+**Add all to my plan** sends the whole plan in one request (`PUT /plan/suggested`): steps get `position`
+1..N, clubs none, and every other saved item loses its position, so an older suggested plan no longer sorts
+ahead. `orderPlan` (`lib/career.ts`) puts steps with a position first, in that order, then the rest by gap.

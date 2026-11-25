@@ -36,7 +36,7 @@ function mockPlan(items: PlanItem[] = [], overrides: Partial<Plan> = {}) {
   vi.mocked(usePlan).mockReturnValue({
     family: "data_analyst", status: "ready", resources, items,
     saved: new Map(items.map((item) => [item.resource_id, item])), pending: new Set(),
-    justCompleted: null, justSaved: null, setStatus: vi.fn(), remove: vi.fn(), toggleSaved: vi.fn(), addItems: vi.fn(),
+    justCompleted: null, justSaved: null, setStatus: vi.fn(), remove: vi.fn(), toggleSaved: vi.fn(), addSuggested: vi.fn(),
     ...overrides,
   });
 }

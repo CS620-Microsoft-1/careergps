@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "lucide-react";
 
 import { RESOURCE_TYPES, ResourceIcon, skillLabel } from "@/components/career/route-parts";
-import { type PlanEntry, usePlan } from "@/components/plan/plan-provider";
+import { type SuggestedEntries, usePlan } from "@/components/plan/plan-provider";
 import { Button } from "@/components/ui/button";
 import { PlanBuilding } from "@/components/plan/plan-building";
 import { streamActionPlanSuggestions } from "@/lib/api/action-plans";
@@ -23,11 +23,11 @@ const names = (skillIds: string[]) => skillIds.map(skillLabel).join(", ");
 const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as React.CSSProperties;
 const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? "" : "s"}`;
 
-/** Main-path steps keep their step number as position, so adding them one by one keeps the order. */
-const entriesFor = (plan: ActionPlan): PlanEntry[] => [
-  ...plan.steps.map((item, index) => ({ resourceId: item.resource_id, position: index + 1 })),
-  ...plan.alongside.map((item) => ({ resourceId: item.resource_id })),
-];
+/** "Add all" keeps the plan's order; a card added on its own slots in by gap like any saved resource. */
+const entriesFor = (plan: ActionPlan): SuggestedEntries => ({
+  steps: plan.steps.map((item) => item.resource_id),
+  alongside: plan.alongside.map((item) => item.resource_id),
+});
 
 /**
  * An optional suggested plan on the Action plan page. It asks the backend once when it opens; nothing in
@@ -73,12 +73,13 @@ export function SuggestedPlan({ family, gapOrder, onClose }: {
   };
 
   const suggested = state.status === "ready" ? state.suggestions.plans[0] ?? null : null;
-  const entries = suggested ? entriesFor(suggested) : [];
-  const allInPlan = entries.length > 0 && entries.every((entry) => plan.saved.has(entry.resourceId));
+  const entries = suggested ? entriesFor(suggested) : null;
+  const allInPlan = Boolean(entries) && [...entries!.steps, ...entries!.alongside].every((id) => plan.saved.has(id));
 
   const addAll = async () => {
+    if (!entries) return;
     setAdding(true);
-    const ok = await plan.addItems(entries);
+    const ok = await plan.addSuggested(entries);
     setAdding(false);
     if (ok) onClose();
   };
@@ -221,8 +222,7 @@ function SuggestedItem({ item, step, order }: { item: ActionPlanItem; step?: num
   const { resource } = item;
   const saved = plan.saved.get(item.resource_id);
   const busy = plan.pending.has(item.resource_id);
-  const toggle = () => void (saved ? plan.remove(item.resource_id)
-    : plan.addItems([{ resourceId: item.resource_id, position: step }]));
+  const toggle = () => void plan.toggleSaved(item.resource_id);
   return (
     <li className={cn("entrance-rise motion-safe:[animation-delay:var(--delay)]", step && "grid grid-cols-[1.25rem_minmax(0,1fr)] gap-2 sm:grid-cols-[2rem_minmax(0,1fr)] sm:gap-3")}
       style={delay(order * REVEAL_STAGGER_MS)}>

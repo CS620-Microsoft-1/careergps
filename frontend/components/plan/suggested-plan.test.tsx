@@ -12,17 +12,16 @@ import type { ActionPlanSuggestions, PlanItem } from "@/types/api";
 vi.mock("@/components/plan/plan-provider", () => ({ usePlan: vi.fn() }));
 vi.mock("@/lib/api/action-plans", () => ({ streamActionPlanSuggestions: vi.fn() }));
 
-const addItems = vi.fn();
-const remove = vi.fn();
+const addSuggested = vi.fn();
+const toggleSaved = vi.fn();
 const GAP_ORDER = ["sql", "dashboarding", "statistics"];
-const ALL_ENTRIES = [{ resourceId: "sql-course", position: 1 }, { resourceId: "sql-project", position: 2 },
-  { resourceId: "dashboard-course", position: 3 }, { resourceId: "data-club" }];
+const ALL_ENTRIES = { steps: ["sql-course", "sql-project", "dashboard-course"], alongside: ["data-club"] };
 
 function mockPlan(items: PlanItem[] = [], pending: string[] = []) {
   vi.mocked(usePlan).mockReturnValue({
     family: "data_analyst", status: "ready", resources, items,
     saved: new Map(items.map((item) => [item.resource_id, item])), pending: new Set(pending),
-    justCompleted: null, justSaved: null, setStatus: vi.fn(), remove, toggleSaved: vi.fn(), addItems,
+    justCompleted: null, justSaved: null, setStatus: vi.fn(), remove: vi.fn(), toggleSaved, addSuggested,
   });
 }
 
@@ -49,7 +48,7 @@ const skillChips = () => within(screen.getByRole("list", { name: "Skills this pl
 describe("SuggestedPlan", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    addItems.mockResolvedValue(true);
+    addSuggested.mockResolvedValue(true);
     mockPlan();
   });
 
@@ -130,16 +129,12 @@ describe("SuggestedPlan", () => {
   });
 
   describe("adding", () => {
-    it("adds a single main-path card with its step number as position", async () => {
+    it("saves a single card like any resource, so it slots in by gap", async () => {
+      // Review on PR #58: only "Add all" sets an order; one card must not jump ahead of top-gap steps.
       await renderReady();
       await userEvent.click(within(card("Analyze a public dataset with SQL")).getByRole("button", { name: /Add to plan/ }));
-      expect(addItems).toHaveBeenCalledWith([{ resourceId: "sql-project", position: 2 }]);
-    });
-
-    it("adds an alongside card without a position", async () => {
-      await renderReady();
-      await userEvent.click(within(card("Data Science Club")).getByRole("button", { name: /Add to plan/ }));
-      expect(addItems).toHaveBeenCalledWith([{ resourceId: "data-club", position: undefined }]);
+      expect(toggleSaved).toHaveBeenCalledWith("sql-project");
+      expect(addSuggested).not.toHaveBeenCalled();
     });
 
     it("shows a saved card as in your plan, and pressing it again removes it", async () => {
@@ -148,8 +143,7 @@ describe("SuggestedPlan", () => {
       const button = within(card("Analyze a public dataset with SQL")).getByRole("button", { name: /In your plan/ });
       expect(button).toHaveAttribute("aria-pressed", "true");
       await userEvent.click(button);
-      expect(remove).toHaveBeenCalledWith("sql-project");
-      expect(addItems).not.toHaveBeenCalled();
+      expect(toggleSaved).toHaveBeenCalledWith("sql-project");
     });
 
     it("disables a card's button while it saves", async () => {
@@ -158,22 +152,22 @@ describe("SuggestedPlan", () => {
       expect(within(card("SQL for Data Analysis")).getByRole("button", { name: /Add to plan/ })).toBeDisabled();
     });
 
-    it("adds the whole plan in order, alongside items without a position, then closes", async () => {
+    it("adds the whole plan in one call, steps in order, then closes", async () => {
       const onClose = await renderReady();
       await userEvent.click(screen.getByRole("button", { name: "Add all to my plan" }));
-      expect(addItems).toHaveBeenCalledWith(ALL_ENTRIES);
+      expect(addSuggested).toHaveBeenCalledWith(ALL_ENTRIES);
       expect(onClose).toHaveBeenCalledOnce();
     });
 
     it("stays open when adding fails", async () => {
-      addItems.mockResolvedValue(false);
+      addSuggested.mockResolvedValue(false);
       const onClose = await renderReady();
       await userEvent.click(screen.getByRole("button", { name: "Add all to my plan" }));
       expect(onClose).not.toHaveBeenCalled();
     });
 
     it("says all in your plan once every card is saved", async () => {
-      mockPlan(ALL_ENTRIES.map((entry) => planItem(entry.resourceId)));
+      mockPlan([...ALL_ENTRIES.steps, ...ALL_ENTRIES.alongside].map((id) => planItem(id)));
       await renderReady();
       expect(screen.getByRole("button", { name: "All in your plan" })).toBeDisabled();
     });
@@ -201,7 +195,7 @@ describe("SuggestedPlan", () => {
     const onClose = await renderReady();
     await userEvent.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(onClose).toHaveBeenCalledOnce();
-    expect(addItems).not.toHaveBeenCalled();
+    expect(addSuggested).not.toHaveBeenCalled();
   });
 
   it("notes a rule plan in the footer", async () => {

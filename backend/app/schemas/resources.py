@@ -52,8 +52,24 @@ class PlanItemUpdate(BaseModel):
 
     job_family: JobFamily
     status: PlanStatus = "saved"
-    # Set when saving a suggested action plan; omitted keeps the item's current position.
-    position: int | None = Field(default=None, ge=1)
+
+
+class SuggestedPlanSave(BaseModel):
+    """A suggested action plan added as a whole ("Add all"). steps are in order and get positions 1..n;
+    alongside items are saved without one. Every other saved item loses its position."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    job_family: JobFamily
+    steps: list[str] = Field(min_length=1)
+    alongside: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _unique(self) -> "SuggestedPlanSave":
+        ids = [*self.steps, *self.alongside]
+        if len(ids) != len(set(ids)):
+            raise ValueError("A resource can appear only once in a suggested plan")
+        return self
 
 
 # Project recommendations from the resources agent (app/services/resources_agent.py).

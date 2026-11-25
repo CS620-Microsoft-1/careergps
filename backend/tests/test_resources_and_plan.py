@@ -127,6 +127,25 @@ class PlanApiTests(unittest.TestCase):
         self.assertEqual(422, self.client.put("/plan/items/sqlbolt", json={"job_family": "data_analyst",
                                               "status": "archived"}, headers=self.headers).status_code)
 
+    def test_add_a_suggested_plan(self) -> None:
+        self.client.put("/plan/items/sqlbolt", json={"job_family": "data_analyst"}, headers=self.headers)
+        body = {"job_family": "data_analyst", "steps": ["uw-cs-564", "mode-sql-tutorial"], "alongside": []}
+        response = self.client.put("/plan/suggested", json=body, headers=self.headers)
+        self.assertEqual(200, response.status_code, response.text)
+        positions = {i["resource_id"]: i["position"] for i in response.json()["items"]}
+        self.assertEqual({"uw-cs-564": 1, "mode-sql-tutorial": 2, "sqlbolt": None}, positions)
+        self.assertEqual(positions, {i["resource_id"]: i["position"] for i in self.plan()})
+
+    def test_a_suggested_plan_with_an_unknown_resource_saves_nothing(self) -> None:
+        body = {"job_family": "data_analyst", "steps": ["sqlbolt", "neetcode-150"]}
+        self.assertEqual(404, self.client.put("/plan/suggested", json=body, headers=self.headers).status_code)
+        self.assertEqual([], self.plan())
+
+    def test_a_single_save_rejects_a_position(self) -> None:
+        response = self.client.put("/plan/items/sqlbolt", json={"job_family": "data_analyst", "position": 1},
+                                   headers=self.headers)
+        self.assertEqual(422, response.status_code)
+
     def test_plans_are_per_student(self) -> None:
         self.client.put("/plan/items/sqlbolt", json={"job_family": "data_analyst"}, headers=self.headers)
         self.assertEqual([], self.store.items(uuid.uuid4(), "data_analyst"))

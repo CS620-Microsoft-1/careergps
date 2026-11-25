@@ -98,7 +98,7 @@ export function PlanView() {
             <p className="mt-2 text-sm/6 text-muted-foreground">
               {next?.skill ? `${skillLabel(next.skill)} is the biggest gap you saved a step for, so it comes first. ` : ""}
               After that, steps follow your gap ranking. Within one gap, projects and courses come before the
-              certifications they prepare you for. Steps added from a suggested plan keep the order it set.
+              certifications they prepare you for. A suggested plan added with “Add all” keeps its order.
               Clubs and meetups run alongside everything else.
             </p>
           </section>

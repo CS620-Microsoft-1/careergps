@@ -36,20 +36,32 @@ class LocalPlanStore:
             saved = self._read(user_id)["families"].get(family, {})
         return [{"resource_id": key, **value} for key, value in saved.items()]
 
-    def set_status(self, user_id: UUID, family: str, resource_id: str, status: str,
-                   position: int | None = None) -> dict:
-        """Save or update an item. position (from a suggested action plan) is kept until replaced."""
+    def set_status(self, user_id: UUID, family: str, resource_id: str, status: str) -> dict:
+        """Save or update an item. An existing position (from a suggested action plan) is kept."""
         with self._lock:
             data = self._read(user_id)
             saved = data["families"].setdefault(family, {})
             item = saved.get(resource_id) or {"saved_at": _now()}
             item["status"] = status
             item["done_at"] = (item.get("done_at") or _now()) if status == "done" else None
-            if position is not None:
-                item["position"] = position
             saved[resource_id] = item
             save_json(self._path(user_id), data)
         return {"resource_id": resource_id, **item}
+
+    def save_suggested(self, user_id: UUID, family: str, steps: list[str], alongside: list[str]) -> list[dict]:
+        """Add a suggested action plan in one write. Its steps get positions 1..n in order; every other
+        item loses its position, so an earlier suggested plan no longer sorts ahead. Done items stay done."""
+        with self._lock:
+            data = self._read(user_id)
+            saved = data["families"].setdefault(family, {})
+            for item in saved.values():
+                item.pop("position", None)
+            for resource_id in [*steps, *alongside]:
+                saved.setdefault(resource_id, {"saved_at": _now(), "status": "saved", "done_at": None})
+            for index, resource_id in enumerate(steps, start=1):
+                saved[resource_id]["position"] = index
+            save_json(self._path(user_id), data)
+        return [{"resource_id": key, **value} for key, value in saved.items()]
 
     def remove(self, user_id: UUID, family: str, resource_id: str) -> None:
         with self._lock:

@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { errorMessage } from "@/lib/api/client";
-import { getPlan, getResources, removePlanItem, setPlanItem } from "@/lib/api/resources";
+import { getPlan, getResources, removePlanItem, saveSuggestedPlan, setPlanItem } from "@/lib/api/resources";
 import type { JobFamily, PlanItem, PlanStatus, Resource } from "@/types/api";
 
 type PlanState = {
@@ -28,16 +28,15 @@ type PlanContextValue = PlanState & {
   remove: (resourceId: string) => Promise<void>;
   toggleSaved: (resourceId: string) => Promise<void>;
   /**
-   * Save items from a suggested plan, each with its step number as position (none for alongside items).
-   * Saved one at a time; resolves false (with actionError set) at the first failure, keeping what was
-   * saved before it. Used by "Add all" and by a single card's "Add to plan".
+   * "Add all" from a suggested plan: one request that saves every item, orders the steps 1..N and clears
+   * older positions. Resolves false (with actionError set) when it fails; nothing is saved then.
    */
-  addItems: (entries: PlanEntry[]) => Promise<boolean>;
+  addSuggested: (plan: SuggestedEntries) => Promise<boolean>;
   actionError?: string;
 };
 
-/** One item to save from a suggested plan; position is its step number (1 = do first). */
-export type PlanEntry = { resourceId: string; position?: number };
+/** A suggested plan's resource ids: main-path steps in order, then alongside items. */
+export type SuggestedEntries = { steps: string[]; alongside: string[] };
 
 const PlanContext = createContext<PlanContextValue | null>(null);
 
@@ -112,31 +111,28 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
 
   const saved = useMemo(() => new Map(state.items.map((item) => [item.resource_id, item])), [state.items]);
 
-  const addItems = useCallback(async (entries: PlanEntry[]) => {
+  const addSuggested = useCallback(async ({ steps, alongside }: SuggestedEntries) => {
     const family = state.family;
     if (!family) return false;
-    setPending((current) => new Set([...current, ...entries.map((entry) => entry.resourceId)]));
+    const ids = [...steps, ...alongside];
+    setPending((current) => new Set([...current, ...ids]));
     setActionError(undefined);
     try {
-      for (const { resourceId: id, position } of entries) {
-        // Keep a done item done; everything else is saved.
-        const status = saved.get(id)?.status ?? "saved";
-        const item = await setPlanItem(family, id, status, position);
-        setState((current) => current.family !== family ? current
-          : { ...current, items: [...current.items.filter((i) => i.resource_id !== id), item] });
-      }
+      // The backend returns the whole plan, since older items' positions change too.
+      const plan = await saveSuggestedPlan(family, steps, alongside);
+      setState((current) => current.family !== family ? current : { ...current, items: plan.items });
       return true;
     } catch (error) {
-      setActionError(errorMessage(error, "The suggested plan could not be fully added. Try again."));
+      setActionError(errorMessage(error, "The suggested plan could not be added. Try again."));
       return false;
     } finally {
       setPending((current) => {
         const next = new Set(current);
-        entries.forEach((entry) => next.delete(entry.resourceId));
+        ids.forEach((id) => next.delete(id));
         return next;
       });
     }
-  }, [saved, state.family]);
+  }, [state.family]);
   const toggleSaved = useCallback(
     (resourceId: string) => saved.has(resourceId) ? remove(resourceId) : setStatus(resourceId, "saved"),
     [remove, saved, setStatus],
@@ -146,7 +142,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     : { family: activeFamily, status: activeFamily ? "loading" as const : "idle" as const, resources: [], items: [] };
   return (
     <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, justCompleted, justSaved, setStatus, remove,
-      toggleSaved, addItems, actionError }}>
+      toggleSaved, addSuggested, actionError }}>
       {children}
     </PlanContext>
   );

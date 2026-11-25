@@ -88,12 +88,23 @@ export async function mockApi(page: Page, options: Options = {}) {
     }
     if (method === "GET" && path === "/plan") return ok({ job_family: family, items } satisfies Plan);
     if (method === "PUT" && (match = path.match(/^\/plan\/items\/(.+)$/))) {
-      const { status, position } = body as { status: PlanItem["status"]; position?: number };
+      const { status } = body as { status: PlanItem["status"] };
       const previous = items.find((i) => i.resource_id === decodeURIComponent(match![1]));
-      // Like the backend: a position is kept until a new one replaces it.
-      const item = { ...planItem(decodeURIComponent(match[1]), status), position: position ?? previous?.position ?? null };
+      // Like the backend: an item keeps its position.
+      const item = { ...planItem(decodeURIComponent(match[1]), status), position: previous?.position ?? null };
       items.splice(0, items.length, ...items.filter((i) => i.resource_id !== item.resource_id), item);
       return ok(item);
+    }
+    if (method === "PUT" && path === "/plan/suggested") {
+      // Like the backend: steps get 1..N, every other item loses its position, done items stay done.
+      const { steps, alongside } = body as { steps: string[]; alongside: string[] };
+      const kept: PlanItem[] = items.map((i) => ({ ...i, position: null }));
+      for (const id of [...steps, ...alongside]) {
+        if (!kept.some((i) => i.resource_id === id)) kept.push(planItem(id, "saved"));
+      }
+      for (const i of kept) i.position = steps.includes(i.resource_id) ? steps.indexOf(i.resource_id) + 1 : null;
+      items.splice(0, items.length, ...kept);
+      return ok({ job_family: family, items } satisfies Plan);
     }
     if (method === "DELETE" && (match = path.match(/^\/plan\/items\/(.+)$/))) {
       const id = decodeURIComponent(match[1]);

@@ -8,7 +8,7 @@ from app.core.config import BACKEND_ROOT
 from app.schemas.action_plans import (
     ActionPlanRequest, ActionPlanStrategy, AgentOutput, AgentPlan, AgentPlanItem,
 )
-from app.schemas.resources import PlanItem, PlanItemUpdate
+from app.schemas.resources import PlanItem, PlanItemUpdate, SuggestedPlanSave
 
 RESPONSE_FORMAT = BACKEND_ROOT / "app" / "prompts" / "action_plan" / "response-format.json"
 
@@ -69,12 +69,18 @@ class ActionPlanRequestTest(unittest.TestCase):
 
 
 class PlanPositionSchemaTest(unittest.TestCase):
-    def test_update_accepts_a_positive_position_or_none(self) -> None:
-        self.assertIsNone(PlanItemUpdate(job_family="data_analyst").position)
-        self.assertEqual(PlanItemUpdate(job_family="data_analyst", position=1).position, 1)
-        for bad in (0, -2):
-            with self.subTest(position=bad), self.assertRaises(ValidationError):
-                PlanItemUpdate(job_family="data_analyst", position=bad)
+    def test_a_single_save_cannot_set_a_position(self) -> None:
+        # Only a whole suggested plan sets positions (PUT /plan/suggested).
+        with self.assertRaises(ValidationError):
+            PlanItemUpdate(job_family="data_analyst", position=1)
+
+    def test_suggested_save_needs_steps_and_unique_ids(self) -> None:
+        self.assertEqual(SuggestedPlanSave(job_family="data_analyst", steps=["a"]).alongside, [])
+        for name, data in {"no steps": {"steps": []}, "repeated step": {"steps": ["a", "a"]},
+                           "step also alongside": {"steps": ["a"], "alongside": ["a"]},
+                           "extra field": {"steps": ["a"], "position": 1}}.items():
+            with self.subTest(name), self.assertRaises(ValidationError):
+                SuggestedPlanSave(job_family="data_analyst", **data)
 
     def test_item_position_is_optional(self) -> None:
         self.assertIsNone(PlanItem(resource_id="x", status="saved", saved_at="2026-01-01T00:00:00+00:00").position)

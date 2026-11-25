@@ -1109,6 +1109,11 @@ When the project Agent's shortlist gets shorter, revisit `PROJECT_CAP` in `servi
 Each item has a mentor-voice `reason`. `covered_skill_ids`, `project_hours` and `uncovered_skill_ids`
 are computed in Python, never by the Agent.
 
+**Saving it.** "Add all" calls `PUT /plan/suggested` (`job_family`, `steps`, `alongside`) once: under the
+plan store's lock, every saved item loses its position, new ids are saved, and `steps` get positions 1..N.
+Done items stay done. Any id not in the student's resources → 404 and nothing is saved.
+`PUT /plan/items/{id}` (one card) never sets a position, so a single step slots in by gap.
+
 **Flow** (`services/action_plans/`):
 
 ```text
@@ -1118,7 +1123,8 @@ gaps → candidates.py (shortlists) → agent.py (action-plan-agent) → validat
 
 - `validation.py` keeps only candidate ids and skills each candidate really closes, puts clubs in
   `alongside`, drops items over a type's maximum and fills a missed minimum with the best-ranked unused
-  candidate (its reason ends "added to complete your plan").
+  candidate (its reason ends "added to complete your plan"). A filler goes before the first step that
+  should come after it (biggest gap, then learn → prove → certify); the Agent's own steps keep their order.
 - Only Agent plans are cached, at `local_results/action_plans/{run_id}/{key}.json`. The key hashes the
   Agent input, `Instructions.md`, `response-format.json` and the Agent version, so a taken course, new
   specialist picks, a prompt edit or a new version gets a fresh plan. Rule plans are never cached.
