@@ -127,7 +127,7 @@ def invoke(payload, save, on_request=lambda: None, timings=None):
     if not settings.skill_gap_foundry_project_endpoint or not settings.skill_gap_foundry_agent_name:
         raise SkillGapConfigurationError("agent_not_configured",
             "The local Skill Gap Agent connection is not configured. Set its project endpoint and Agent name, then retry.")
-    with DefaultAzureCredential(exclude_managed_identity_credential=True) as credential:
+    with DefaultAzureCredential() as credential:
         with AIProjectClient(endpoint=settings.skill_gap_foundry_project_endpoint,
                              credential=credential, allow_preview=True) as project:
             version = next(iter(project.agents.list_versions(
