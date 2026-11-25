@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "lucide-react";
+import { Check, CircleCheck, LoaderCircle, Plus, RotateCcw, X } from "lucide-react";
 
 import { RESOURCE_TYPES, ResourceIcon, skillLabel } from "@/components/career/route-parts";
 import { type SuggestedEntries, usePlan } from "@/components/plan/plan-provider";
@@ -89,7 +89,7 @@ export function SuggestedPlan({ family, gapOrder, onClose }: {
     <section aria-labelledby="suggested-plan" className="rounded-2xl border border-border bg-card p-5 shadow-card sm:p-8">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="eyebrow flex items-center gap-2"><Sparkles aria-hidden className="size-4" />Suggested plan</p>
+          <p className="eyebrow">Suggested plan</p>
           <h2 id="suggested-plan" className="mt-1 text-section">{suggested ? suggested.title : "A plan for your biggest gaps"}</h2>
           {suggested && <p className="mt-2 max-w-3xl text-muted-foreground">{suggested.summary}</p>}
         </div>

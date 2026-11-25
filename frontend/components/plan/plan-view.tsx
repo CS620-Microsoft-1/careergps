@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import NumberFlow from "@number-flow/react";
-import { ArrowRight, Check, CircleCheck, Flag, LoaderCircle, Plus, RotateCcw, Sparkles, X } from "lucide-react";
+import { ArrowRight, Check, CircleCheck, Flag, LoaderCircle, Plus, RotateCcw, Route, X } from "lucide-react";
 import { MotionConfig, motion } from "motion/react";
 
 import {
@@ -54,7 +54,7 @@ export function PlanView() {
         </div>
         <Button asChild variant="outline" size="lg"><Link href="/resources"><Plus data-icon="inline-start" />Add resources</Link></Button>
         {canSuggest && <Button variant="outline" size="lg" aria-expanded={suggesting} onClick={() => setSuggesting(true)}>
-          <Sparkles data-icon="inline-start" />Suggest a plan
+          <Route data-icon="inline-start" />Suggest a plan
         </Button>}
       </div>} />
 
