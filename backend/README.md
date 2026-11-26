@@ -263,6 +263,7 @@ app/
 ├── models/
 │   ├── __init__.py          # import every model here so Alembic can see it
 │   ├── agent_call.py        # agent_calls (latency, tokens and cost of each Agent call)
+│   ├── audit_log.py         # audit_log (one row per data write)
 │   ├── catalog.py           # certifications, school_courses, student_orgs, catalog_versions
 │   ├── job_posting.py       # job_postings + ingest_runs
 │   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
@@ -275,6 +276,7 @@ app/
 └── services/
     ├── accounts.py          # creates and updates users + their confirmed résumés
     ├── agent_calls.py       # records every Foundry Agent call in agent_calls
+    ├── audit.py             # records every data write in audit_log
     ├── model_prices.py      # token prices for the cost estimate
     ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
     ├── catalog_writes.py    # writes them: seed script and catalog refresh
@@ -1118,6 +1120,29 @@ SELECT agent, count(*) AS calls,
 FROM agent_calls
 WHERE created_at > now() - interval '7 days'
 GROUP BY agent ORDER BY cost_usd DESC NULLS LAST;
+```
+
+## Audit log
+
+`audit_log` (migration `3cbf0057f8a3`) has one row per data write: `action`, `target_type` /
+`target_id`, the student whose data changed (`user_id`), `source` (`api` for a signed-in request or
+work it started, `script` for a command an operator runs) and `details`. `details` holds ids,
+statuses, counts and changed field names, **never résumé content or field values**.
+
+- **Same transaction:** a database write adds its row with `audit.record(session, ...)` before it
+  commits, so the change and its record commit or roll back together.
+- **Plan files:** the plan is local JSON, not a table, so `audit.record_detached(...)` writes its
+  row in a separate transaction after the file is saved; a failure there is logged, not raised.
+- **Account deletion:** `user_id` references `auth.users` with `ON DELETE CASCADE`, like
+  `agent_calls`, so `DELETE /me` removes the student's records. Shared data (catalog, ingest) has no user.
+- **`audit_events` view:** `audit_log` and `agent_calls` as one timeline (`occurred_at`, `user_id`,
+  `kind` = `data_write` / `agent_call`, `source`, `action`, `target_type`, `target_id`, `status`,
+  `details`).
+
+```sql
+-- One student's timeline, newest first
+SELECT occurred_at, kind, source, action, target_type, target_id, status, details
+FROM audit_events WHERE user_id = '<user id>' ORDER BY occurred_at DESC LIMIT 50;
 ```
 
 ## Changing the schema

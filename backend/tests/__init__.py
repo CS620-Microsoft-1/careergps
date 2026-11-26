@@ -8,3 +8,8 @@ catalog_store.use_source(catalog_store.FileCatalogSource())
 from app.services import agent_calls  # noqa: E402
 
 agent_calls.use_sink(agent_calls.MemorySink())
+
+# Plan writes record their audit row in a separate session; keep those in memory too.
+from app.services import audit  # noqa: E402
+
+audit.use_writer(audit.MemoryWriter())

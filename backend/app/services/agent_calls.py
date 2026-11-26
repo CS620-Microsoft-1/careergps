@@ -53,6 +53,16 @@ def set_user(user_id: uuid.UUID | str | None) -> None:
         holder["user_id"] = _uuid(user_id)
 
 
+def current_user_id() -> uuid.UUID | None:
+    """The signed-in user of the current request (or of the work it started), if any."""
+    return (_request.get() or {}).get("user_id")
+
+
+def in_request() -> bool:
+    """True inside an HTTP request or work started from one with in_context; False in scripts."""
+    return _request.get() is not None
+
+
 @contextmanager
 def bind_run(run_id: uuid.UUID | str | None) -> Iterator[None]:
     """Mark Agent calls inside this block as part of one Skill Gap run."""
