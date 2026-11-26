@@ -27,6 +27,7 @@ from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app.models import Resume
+from app.services import audit
 from app.services.resume_children import CHILD_MODELS, rebuild_children
 
 
@@ -49,9 +50,12 @@ def backfill(session: Session, *, dry_run: bool, on_result=None) -> list[ResumeR
     for resume_id in resume_ids:
         result = ResumeResult(resume_id)
         try:
-            rows = rebuild_children(session, session.get(Resume, resume_id))
-            session.flush()  # the database checks every row here, inside the try
+            resume = session.get(Resume, resume_id)
+            rows = rebuild_children(session, resume)
             result.counts.update(row.__tablename__ for row in rows)
+            audit.record(session, "resume.children_rebuilt", user_id=resume.user_id, target=("resume", resume_id),
+                         details=dict(result.counts))
+            session.flush()  # the database checks every row here, inside the try
         except Exception as error:
             session.rollback()
             result.error = describe_error(error)

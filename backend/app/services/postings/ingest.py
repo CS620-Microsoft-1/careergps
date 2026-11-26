@@ -11,6 +11,7 @@ from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 from app.models.job_posting import IngestRun, JobPosting
+from app.services import audit
 from app.schemas.market import NormalizedPosting
 from app.services.postings.base import BoardFetchError, BoardNotFoundError, PostingSourceAdapter
 from app.services.postings.companies import Board, Company
@@ -167,4 +168,10 @@ def ingest(
             results.append(result)
             if on_result:
                 on_result(result)
+    # One summary record per run; ingest_runs keeps the per-board detail.
+    audit.record(session, "postings.ingested", details={
+        "boards": len(results), "failed": sum(result.status == "failed" for result in results),
+        **{name: sum(getattr(result, name) for result in results)
+           for name in ("fetched", "inserted", "updated", "reopened", "closed")}})
+    session.commit()
     return results

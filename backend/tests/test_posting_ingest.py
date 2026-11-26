@@ -2,6 +2,7 @@ import os
 import sys
 import unittest
 from datetime import UTC, datetime, timedelta
+from unittest.mock import patch
 from pathlib import Path
 
 os.environ.setdefault(
@@ -20,6 +21,7 @@ from app.models.job_posting import IngestRun, JobPosting
 from app.schemas.market import NormalizedPosting
 from app.services.postings.base import BoardFetchError
 from app.services.postings.companies import Board, Company
+from app.services.postings import ingest as ingest_module
 from app.services.postings.ingest import content_hash, ingest
 
 START = datetime(2026, 10, 1, 12, tzinfo=UTC)
@@ -64,6 +66,12 @@ class IngestTests(unittest.TestCase):
         # Only the ingest tables: others use Postgres-only types (ARRAY, JSONB) that SQLite can't create.
         Base.metadata.create_all(engine, tables=[JobPosting.__table__, IngestRun.__table__])
         self.session = Session(engine)
+        # audit_log uses JSONB, which SQLite can't create; collect the summary records instead.
+        self.audit: list[tuple[str, dict]] = []
+        patcher = patch.object(ingest_module.audit, "record",
+                               lambda session, action, **kwargs: self.audit.append((action, kwargs["details"])))
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.adapter = FakeAdapter()
         self.day = 0
         self.sleeps: list[float] = []
@@ -155,6 +163,10 @@ class IngestTests(unittest.TestCase):
         runs = self.session.scalars(select(IngestRun).order_by(IngestRun.started_at)).all()
         self.assertEqual(["success", "failed", "success"], [run.status for run in runs])
         self.assertEqual([1.0], self.sleeps)
+        # One audit summary per run, not one per board or posting.
+        self.assertEqual(["postings.ingested", "postings.ingested"], [action for action, _ in self.audit])
+        self.assertEqual({"boards": 2, "failed": 1, "fetched": 1, "inserted": 0, "updated": 0, "reopened": 0,
+                          "closed": 0}, self.audit[-1][1])
 
     def test_database_error_fails_only_that_board(self) -> None:
         # Stands in for Postgres rejecting a row, e.g. a salary out of INTEGER range.

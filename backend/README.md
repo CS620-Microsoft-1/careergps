@@ -1139,6 +1139,23 @@ statuses, counts and changed field names, **never résumé content or field valu
   `kind` = `data_write` / `agent_call`, `source`, `action`, `target_type`, `target_id`, `status`,
   `details`).
 
+What is recorded:
+
+| Action | Written by |
+| --- | --- |
+| `account.created`, `account.updated` (field names), `account.email_synced` | `AccountService` |
+| `resume.added`, `destination.resume_selected` | `AccountService.add_resume` / `use_resume` |
+| `course.marked_taken` (only when new), `course.unmarked_taken` | `student_courses` |
+| `plan.item_saved`, `plan.item_removed` | `LocalPlanStore` (separate transaction) |
+| `skill_gap.run_created`, `skill_gap.run_completed` | `DbRunStore` |
+| `catalog.seeded` (counts per table) | `scripts/seed_catalog.py` |
+| `resume.children_rebuilt` (row counts) | `scripts/backfill_resume_children.py` |
+| `postings.ingested` (one summary per run; `ingest_runs` has each board) | `services/postings/ingest.py` |
+
+A new write method must call `audit.record` and be added to `RECORDING` in `tests/test_audit.py`,
+or be listed in `NOT_RECORDING` with the reason. That test fails for any unlisted method that
+commits or saves a plan file.
+
 ```sql
 -- One student's timeline, newest first
 SELECT occurred_at, kind, source, action, target_type, target_id, status, details
