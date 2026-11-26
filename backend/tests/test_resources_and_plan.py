@@ -10,7 +10,8 @@ from app.api import deps
 from app.core.security import SupabaseTokenVerifier
 from app.main import app
 from app.services.plans import LocalPlanStore, get_plan_store
-from app.services.resources import family_skills, load_catalog, resources_for
+from app.schemas.certifications import Certification
+from app.services.resources import _certification, family_skills, load_catalog, resources_for
 from app.services.skill_gaps.match import summarize_match
 from tests.support import SUPABASE_URL, FakeJwks, make_token, new_signing_key
 from tests.test_me import FakeAccountService, onboarding_body
@@ -46,6 +47,17 @@ class ResourceCatalogTests(unittest.TestCase):
         for family in ("software_engineer", "data_analyst", "ai_engineer"):
             family_ids = [entry["id"] for entry in resources_for(family, None)]
             self.assertEqual(len(family_ids), len(set(family_ids)), family)
+
+    def test_certification_cost_text(self) -> None:
+        def meta(cost_usd: float | None) -> str:
+            item = Certification(id="c", name="C", provider="P", url="https://example.com", cost_usd=cost_usd,
+                                 cost_note="Included with Coursera Plus", level="beginner",
+                                 skills={"data_analyst": ["sql"]}, last_verified="2026-11-01")
+            return _certification(item, "data_analyst")["meta"]
+
+        self.assertEqual("Beginner · Included with Coursera Plus", meta(None))
+        self.assertEqual("Beginner · Free", meta(0))
+        self.assertEqual("Beginner · $150 · Included with Coursera Plus", meta(150))
 
     def test_catalog_skill_ids_exist(self) -> None:
         known = family_skills("software_engineer") | family_skills("data_analyst") | family_skills("ai_engineer")
