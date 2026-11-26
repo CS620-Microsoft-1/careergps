@@ -1128,7 +1128,9 @@ gaps → candidates.py (shortlists) → agent.py (action-plan-agent) → validat
   should come after it (biggest gap, then learn → prove → certify); the Agent's own steps keep their order.
 - Only Agent plans are cached, at `local_results/action_plans/{run_id}/{key}.json`. The key hashes the
   Agent input, `Instructions.md`, `response-format.json` and the Agent version, so a taken course, new
-  specialist picks, a prompt edit or a new version gets a fresh plan. Rule plans are never cached.
+  specialist picks, a prompt edit or a new version gets a fresh plan. Rule plans are never cached. The cache
+  is best-effort: if it can't be read or written, the student still gets the plan (the Agent is just
+  asked again next time).
   One lock per run: two requests at once make one Agent call.
 - Errors: 404 no run for the direction, 409 run running or failed, 503 storage unavailable. An Agent
   failure is not an error: the answer is the rule plan with `"source": "rules"`.

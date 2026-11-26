@@ -105,7 +105,12 @@ class ActionPlanner:
             plans = self._agent_plans(payload, candidates, gaps, mode, emit) if candidates.items else None
             if plans is not None:
                 record = _Cached(generated_at=_now(), plans=plans)
-                save_json(path, record.model_dump(mode="json"))
+                try:
+                    save_json(path, record.model_dump(mode="json"))
+                except OSError:
+                    # Best effort, like _read: a cache that can't be written must not cost the student a
+                    # plan already built. The next request calls the Agent again. Run id only, no plan data.
+                    logger.warning("Could not cache the action plan for run %s", run.id)
                 return self._response(run, mode, "agent", record.generated_at, plans, candidates, gaps)
 
         emit("rules")

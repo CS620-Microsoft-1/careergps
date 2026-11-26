@@ -4,6 +4,7 @@ import time
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 from uuid import UUID
 
 from app.core.config import ActionPlanSettings
@@ -144,6 +145,36 @@ class AgentPathTest(PlannerTestCase):
             thread.join()
         self.assertEqual(len(agent.payloads), 1)
         self.assertEqual([result.source for result in results], ["agent", "agent"])
+
+
+class CacheWriteFailureTest(PlannerTestCase):
+    """Review on PR #58: a failed cache write used to turn a good Agent plan into a 503."""
+
+    def test_the_agent_plan_is_still_returned(self) -> None:
+        agent = FakeAgent()
+        planner = self.planner(agent)
+        stages: list[str] = []
+        with patch("app.services.action_plans.planner.save_json", side_effect=OSError("read-only file system")), \
+                self.assertLogs("app.services.action_plans.planner", "WARNING") as logs:
+            first = planner.suggest(run(), on_event=lambda event: stages.append(event["stage"]))
+            second = planner.suggest(run())
+        self.assertEqual(first.source, "agent")
+        self.assertEqual([item.resource_id for item in first.plans[0].steps],
+                         ["cs_design", "p_design", "online_test", "p_test", "cert_sec"])
+        # No exception escapes, so the stream route sends its result line after the usual stages.
+        self.assertEqual(stages, ["gaps", "candidates", "agent", "checking"])
+        # Nothing was cached, so the next request asks the Agent again.
+        self.assertEqual(second.source, "agent")
+        self.assertEqual(len(agent.payloads), 2)
+        self.assertEqual(self.cache_files(), [])
+        self.assertIn(RUN_ID, logs.output[0])
+        self.assertNotIn("read-only file system", "".join(logs.output))
+
+    def test_other_storage_errors_still_raise(self) -> None:
+        # Only the cache write is best-effort; unreadable prompt files are still a 503 in the routes.
+        (self.prompts / "Instructions.md").unlink()
+        with self.assertRaises(OSError):
+            self.planner().suggest(run())
 
 
 class FallbackTest(PlannerTestCase):
