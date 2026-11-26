@@ -259,6 +259,10 @@ export type Resource = {
   title: string;
   provider: string;
   meta: string;
+  /** Short card details, shown as time · cost · level; missing when a type doesn't have one. */
+  time?: string | null;
+  cost?: string | null;
+  level?: string | null;
   description: string;
   skills: string[];
   url: string | null;
@@ -295,8 +299,67 @@ export type ProjectRecommendations = {
 
 /** GET /plan: saved resources for one role; the browser orders them from the gap ranking. */
 export type PlanStatus = "saved" | "done";
-export type PlanItem = { resource_id: string; status: PlanStatus; saved_at: string; done_at: string | null };
+/** position: the order a suggested plan was added in (1 = do first); null for items saved one by one. */
+export type PlanItem = {
+  resource_id: string;
+  status: PlanStatus;
+  saved_at: string;
+  done_at: string | null;
+  position?: number | null;
+};
 export type Plan = { job_family: JobFamily; items: PlanItem[] };
+
+/**
+ * POST /action-plans/suggestions (backend: app/schemas/action_plans.py). A plan from action-plan-agent, or
+ * from the rule planner when source is "rules". covered_skill_ids, project_hours and uncovered_skill_ids
+ * are computed by the backend, never by the Agent.
+ */
+export type ActionPlanMode = "full";
+export type ActionPlanStrategy = "balanced" | "fastest" | "hands_on" | "credential" | "campus";
+export type ActionPlanItem = {
+  resource_id: string;
+  /** Gap skills this resource closes, highest priority first. */
+  skill_ids: string[];
+  /** The mentor's sentence; "" when there is none (rule plan, filled-in step). */
+  reason: string;
+  resource: Resource;
+};
+export type ActionPlan = {
+  strategy: ActionPlanStrategy;
+  title: string;
+  summary: string;
+  /** Main path in order: steps[0] is what the student starts now. */
+  steps: ActionPlanItem[];
+  /** Ongoing commitments (clubs) next to the main path. */
+  alongside: ActionPlanItem[];
+  covered_skill_ids: string[];
+  /** Sum of the projects' estimated hours; null when no project has an estimate. */
+  project_hours: number | null;
+};
+export type ActionPlanSuggestions = {
+  job_family: JobFamily;
+  skill_gap_run_id: string;
+  mode: ActionPlanMode;
+  source: "agent" | "rules";
+  generated_at: string;
+  plans: ActionPlan[];
+  /** Top gaps no item in any plan closes. */
+  uncovered_skill_ids: string[];
+};
+
+/**
+ * POST /action-plans/suggestions/stream: one line per build stage, then "result" or "error".
+ * Stages: gaps → candidates → cached | agent → checking | rules. samples are catalog titles only.
+ */
+export type ActionPlanBuildStage =
+  | { type: "stage"; stage: "gaps"; gaps: { skill_id: string; skill_name: string }[] }
+  | { type: "stage"; stage: "candidates"; counts: Partial<Record<ResourceType, number>>;
+      samples: { title: string; type: ResourceType }[] }
+  | { type: "stage"; stage: "cached" | "agent" | "checking" | "rules" };
+export type ActionPlanStreamEvent =
+  | ActionPlanBuildStage
+  | { type: "result"; suggestions: ActionPlanSuggestions }
+  | { type: "error"; status: number; detail: string };
 
 /** The stages POST /resumes/analyze/stream reports. "ocr" appears only when a PDF page is an image. */
 export type ResumeAnalysisStep = "upload" | "extract" | "ocr" | "classify";

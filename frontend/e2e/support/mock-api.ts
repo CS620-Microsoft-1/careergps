@@ -1,6 +1,6 @@
 import type { Page, Route } from "@playwright/test";
 
-import { destinations, market, planItem, resources, resume, run, user } from "../../test/fixtures";
+import { actionPlanSuggestions, destinations, market, planItem, resources, resume, run, user } from "../../test/fixtures";
 import type {
   CertificationRecommendations,
   JobFamily,
@@ -18,7 +18,8 @@ import type {
 export const API_URL = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000").replace(/\/+$/, "");
 
 type Call = { method: string; path: string; body: unknown };
-type Reply = { status: number; json?: unknown };
+/** json: a JSON body; lines: an NDJSON body, one JSON value per line (a streaming endpoint). */
+type Reply = { status: number; json?: unknown; lines?: unknown[] };
 
 type Options = {
   planItems?: PlanItem[];
@@ -87,9 +88,23 @@ export async function mockApi(page: Page, options: Options = {}) {
     }
     if (method === "GET" && path === "/plan") return ok({ job_family: family, items } satisfies Plan);
     if (method === "PUT" && (match = path.match(/^\/plan\/items\/(.+)$/))) {
-      const item = planItem(decodeURIComponent(match[1]), (body as { status: PlanItem["status"] }).status);
+      const { status } = body as { status: PlanItem["status"] };
+      const previous = items.find((i) => i.resource_id === decodeURIComponent(match![1]));
+      // Like the backend: an item keeps its position.
+      const item = { ...planItem(decodeURIComponent(match[1]), status), position: previous?.position ?? null };
       items.splice(0, items.length, ...items.filter((i) => i.resource_id !== item.resource_id), item);
       return ok(item);
+    }
+    if (method === "PUT" && path === "/plan/suggested") {
+      // Like the backend: steps get 1..N, every other item loses its position, done items stay done.
+      const { steps, alongside } = body as { steps: string[]; alongside: string[] };
+      const kept: PlanItem[] = items.map((i) => ({ ...i, position: null }));
+      for (const id of [...steps, ...alongside]) {
+        if (!kept.some((i) => i.resource_id === id)) kept.push(planItem(id, "saved"));
+      }
+      for (const i of kept) i.position = steps.includes(i.resource_id) ? steps.indexOf(i.resource_id) + 1 : null;
+      items.splice(0, items.length, ...kept);
+      return ok({ job_family: family, items } satisfies Plan);
     }
     if (method === "DELETE" && (match = path.match(/^\/plan\/items\/(.+)$/))) {
       const id = decodeURIComponent(match[1]);
@@ -100,6 +115,18 @@ export async function mockApi(page: Page, options: Options = {}) {
       return ok({ job_family: family, skill_gap_run_id: run.id, generated_at: run.created_at,
         recommendations: (options.certificationPicks ?? []).map((certification_id) => ({ certification_id, skill_ids: [] })),
       } satisfies CertificationRecommendations);
+    }
+    if (method === "POST" && path === "/action-plans/suggestions") return ok(actionPlanSuggestions);
+    if (method === "POST" && path === "/action-plans/suggestions/stream") {
+      return { status: 200, lines: [
+        { type: "stage", stage: "gaps", gaps: [{ skill_id: "sql", skill_name: "SQL" },
+          { skill_id: "dashboarding", skill_name: "Dashboard development" }] },
+        { type: "stage", stage: "candidates", counts: { project: 1, online_course: 2, student_org: 1 },
+          samples: listed.map((resource) => ({ title: resource.title, type: resource.type })) },
+        { type: "stage", stage: "agent" },
+        { type: "stage", stage: "checking" },
+        { type: "result", suggestions: actionPlanSuggestions },
+      ] };
     }
     if (method === "POST" && path === "/resources/projects/from-skill-gap") {
       return ok({ source: "rules", recommendations: [], no_match_reason: null } satisfies ProjectRecommendations);
@@ -123,7 +150,11 @@ export async function mockApi(page: Page, options: Options = {}) {
     calls.push({ method: request.method(), path, body });
     // Recorded above, answered only once a test that is holding course saves lets go.
     if (request.method() === "PUT" && path.startsWith("/me/courses/")) await held;
-    const { status, json } = reply(request.method(), path, url.searchParams, body);
+    const { status, json, lines } = reply(request.method(), path, url.searchParams, body);
+    if (lines) {
+      return route.fulfill({ status, headers: { ...headers, "content-type": "application/x-ndjson" },
+        body: lines.map((line) => JSON.stringify(line)).join("\n") + "\n" });
+    }
     return json === undefined ? route.fulfill({ status, headers }) : route.fulfill({ status, headers, json });
   });
 

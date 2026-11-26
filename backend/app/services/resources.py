@@ -68,15 +68,47 @@ def _project(project: dict) -> dict:
     # Projects have no provider to name; the card's spot for it stays empty.
     return {"id": project["id"], "type": "project", "title": project["title"], "provider": "",
             "meta": f"{project['difficulty'].capitalize()} · about {project['estimated_hours']} hours",
+            "time": f"{project['estimated_hours']} h", "level": project["difficulty"].capitalize(),
             "description": project["description"], "skills": project["supported_skill_ids"],
             "url": project.get("url")}
+
+
+def certification_cost(item) -> str:
+    """Short cost for a card: "Free", "$150 exam", "$59/mo with Coursera Plus"."""
+    if item.cost_usd is None:
+        return item.cost_note
+    if item.cost_usd == 0:
+        return "Free"
+    price = f"${item.cost_usd:g}"
+    note = item.cost_note.lower()
+    if "coursera plus" in note:
+        return f"{price}/mo with Coursera Plus"
+    if "voucher" in note:
+        return f"{price} voucher"
+    return f"{price} exam" if "exam" in note else price
+
+
+def school_details(entry: dict) -> dict:
+    """time / cost for database rows, which store only meta text (a migration could add columns).
+
+    A course's time is its credits. A club's meta reads "When · cost" ("Weekly coding meetups · free");
+    any other shape becomes its time as written, so nothing is lost.
+    """
+    if entry["type"] == "school_course":
+        credits = entry.get("credits")
+        return {"time": f"{credits} credit" + ("" if credits == "1" else "s")} if credits else {}
+    when, _, cost = entry["meta"].rpartition(" · ")
+    if when and (cost.lower().startswith("free") or cost.startswith("$")):
+        return {"time": when, "cost": cost[0].upper() + cost[1:]}
+    return {"time": entry["meta"]} if entry["meta"] else {}
 
 
 def _certification(item, family: str) -> dict:
     """A certifications.json entry as a resource; its skills are listed per role."""
     cost = "Free" if item.cost_usd == 0 else f"${item.cost_usd:g} · {item.cost_note}"
     return {"id": item.id, "type": "certification", "title": item.name, "provider": item.provider,
-            "meta": f"{item.level.capitalize()} · {cost}", "description": "", "skills": item.skills[family],
+            "meta": f"{item.level.capitalize()} · {cost}", "cost": certification_cost(item),
+            "level": item.level.capitalize(), "description": "", "skills": item.skills[family],
             "url": item.url}
 
 
@@ -105,5 +137,6 @@ def resources_for(family: str, university: str | None) -> list[dict]:
             continue
         closes = [skill for skill in entry["skills"] if skill in skills]
         if closes:
-            result.append({**entry, "skills": closes})
+            extra = school_details(entry) if entry["type"] in catalog_store.DATABASE_TYPES else {}
+            result.append({**entry, **extra, "skills": closes})
     return result

@@ -65,6 +65,17 @@ describe("orderPlan", () => {
     assert.equal(plan.ahead[0].skill, "viz");
   });
 
+  it("puts steps from a suggested plan first, in its order, then the rest by gap", () => {
+    const positioned = (resource_id: string, position: number) => ({ ...item(resource_id, "saved", "2026-10-01"), position });
+    const plan = orderPlan([
+      item("course", "saved", "2026-10-02"), positioned("sql-project", 2), positioned("cert", 1),
+      { ...positioned("done", 3), status: "done" as const, done_at: "2026-10-05" }, positioned("club", 4),
+    ], resources, ["viz", "sql"]);
+    assert.deepEqual(plan.ahead.map((s) => s.resource.id), ["cert", "sql-project", "course"]);
+    assert.deepEqual(plan.done.map((s) => s.resource.id), ["done"]);
+    assert.deepEqual(plan.alongside.map((s) => s.resource.id), ["club"]);
+  });
+
   it("finds resources for a skill, most direct first", () => {
     assert.deepEqual(resourcesForSkill(resources, "sql").map((r) => r.id), ["done", "sql-project"]);
   });

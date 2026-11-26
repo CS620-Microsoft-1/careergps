@@ -251,6 +251,7 @@ app/
 ├── api/
 │   ├── deps.py              # get_db, get_current_user (token), get_current_db_user (token + users row)
 │   └── routes/
+│       ├── action_plans.py  # POST /action-plans/suggestions (suggested action plan)
 │       ├── health.py        # GET /health, GET /health/db
 │       ├── me.py            # POST /me, GET /me, PATCH /me, GET /me/resume, POST /me/resumes
 │       ├── resumes.py       # POST /resumes/analyze, /analyze/stream (no persistence)
@@ -270,8 +271,10 @@ app/
 ├── schemas/
 │   ├── me.py                # /me requests and responses
 │   └── market.py            # NormalizedPosting, MarketProfile
+├── prompts/action_plan/     # action-plan-agent Instructions + response format (paste into Foundry)
 └── services/
     ├── accounts.py          # creates and updates users + their confirmed résumés
+    ├── action_plans/        # suggested action plan: candidates, Agent call, checks, rule fallback, cache
     ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
     ├── catalog_writes.py    # writes them: seed script and catalog refresh
     ├── course_listing.py    # hides school courses not taught in the last four semesters
@@ -1080,6 +1083,79 @@ scores don't change.
   - Not found: shortened names ("Databases", "Data Structures"). A sentence under an education
     entry that uses a course name ("built a machine learning model") is found by mistake; the
     student answers "Not now".
+
+## Action plan Agent
+
+`POST /action-plans/suggestions` builds one suggested action plan for the latest completed Skill Gap run
+of a direction. The `/plan` page shows it on request; nothing is saved until the student adds it.
+
+**What goes in.** The run's top gaps, by name and in priority order (no scores or grades), and
+*candidates*: the specialists' own shortlists, never the whole catalog.
+
+| Type | Shortlist | Cap |
+| --- | --- | --- |
+| project | the project Agent's shortlist (`resources_agent._candidates`), its picks first | 20 |
+| certification | the role's certification catalog (`certifications.catalog.for_family`), the skill-match picks (`certifications.ranking.rank`) first | 12 |
+| school course, online course, student org | the Resources list (`resources.resources_for`) | 8 each |
+
+Project Agent picks come from its per-run cache (`local_results/project_recommendations/`); without
+one, the free rule ranking stands in. No specialist Agent is called. The top gaps follow the Gaps page
+(`certifications.ranking.top_gaps`: a positive gap and evidence below 0.7). Taken school courses and plan items marked done are removed; saved-but-not-done items stay.
+When the project Agent's shortlist gets shorter, revisit `PROJECT_CAP` in `services/action_plans/candidates.py`.
+
+**What comes out.** One `balanced` plan: an ordered main path (`steps`, the first is "now") and
+`alongside` (clubs). Composition: 2–3 projects, 1–2 classes, 1–2 online courses, 1–2 certifications and
+1–2 clubs, each only when a candidate exists and never padded. Order: learn, then prove, then certify.
+Each item has a mentor-voice `reason`, or `""` when there is none (rule plan, filled-in step); the card
+then shows only the skills it closes. `covered_skill_ids`, `project_hours` and `uncovered_skill_ids`
+are computed in Python, never by the Agent.
+
+**Saving it.** "Add all" calls `PUT /plan/suggested` (`job_family`, `steps`, `alongside`) once: under the
+plan store's lock, every saved item loses its position, new ids are saved, and `steps` get positions 1..N.
+Done items stay done. Any id not in the student's resources → 404 and nothing is saved.
+`PUT /plan/items/{id}` (one card) never sets a position, so a single step slots in by gap.
+
+**Flow** (`services/action_plans/`):
+
+```text
+gaps → candidates.py (shortlists) → agent.py (action-plan-agent) → validation.py → planner.py (cards, totals, cache)
+                                                └─ error, bad answer or not configured → rules.py (free rule plan)
+```
+
+- `validation.py` keeps only candidate ids and skills each candidate really closes, puts clubs in
+  `alongside`, drops items over a type's maximum and fills a missed minimum with the best-ranked unused
+  candidate (with an empty `reason`). A filler goes before the first step that
+  should come after it (biggest gap, then learn → prove → certify); the Agent's own steps keep their order.
+- Only Agent plans are cached, at `local_results/action_plans/{run_id}/{key}.json`. The key hashes the
+  Agent input, `Instructions.md`, `response-format.json` and the Agent version, so a taken course, new
+  specialist picks, a prompt edit or a new version gets a fresh plan. Rule plans are never cached. The cache
+  is best-effort: if it can't be read or written, the student still gets the plan (the Agent is just
+  asked again next time).
+  One lock per run: two requests at once make one Agent call.
+- Errors: 404 no run for the direction, 409 run running or failed, 503 storage unavailable. An Agent
+  failure is not an error: the answer is the rule plan with `"source": "rules"`.
+- `POST /action-plans/suggestions/stream` returns the same plan as NDJSON for the live view: one
+  `{"type": "stage"}` line per build stage (`gaps` with the gap names, `candidates` with counts per type
+  and up to 12 catalog titles, then `cached`, or `agent` → `checking`, or `rules`), then a `result` line
+  (`{"suggestions": …}`) or an `error` line (`{"status", "detail"}`). Run and storage problems are still
+  plain 404/409/503 before streaming starts. The stages come from `planner.suggest(..., on_event=...)`.
+
+**Configuration** (`backend/.env`, see `.env.example`): `ACTION_PLAN_FOUNDRY_PROJECT_ENDPOINT`,
+`ACTION_PLAN_FOUNDRY_AGENT_NAME` (default `action-plan-agent`) and `ACTION_PLAN_FOUNDRY_AGENT_VERSION`
+(`latest`, or a number to pin one). Without an endpoint, every request gets the rule plan.
+
+**Changing the prompt.**
+
+1. Edit `app/prompts/action_plan/Instructions.md` (and `response-format.json` if the shape changes;
+   `tests/test_action_plan_schemas.py` keeps it in sync with `app/schemas/action_plans.py`).
+2. In the Foundry portal, paste both into `action-plan-agent` (model gpt-6-luna, reasoning medium,
+   no tools, response format JSON schema) and save.
+3. Run the live check with fake data (needs `az login`; not part of CI):
+   ```bash
+   python -m tests.manual_action_plan_smoke   # input: docs/contracts/action-plan-input.example.json
+   ```
+   It prints the plan, counts per type, what the checks dropped or filled, and text-rule warnings.
+   Fills or warnings mean the prompt needs work.
 
 ## Changing the schema
 

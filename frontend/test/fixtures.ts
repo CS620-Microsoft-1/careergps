@@ -2,6 +2,7 @@
 // Typed against the API types, so `npm run typecheck` catches fixtures that drift from the API.
 
 import type {
+  ActionPlanSuggestions,
   CoreSkillGapReport,
   CoreSkillResult,
   Destination,
@@ -77,14 +78,16 @@ export const run: SkillGapRun = {
 
 export const resources: Resource[] = [
   { id: "sql-course", type: "online_course", title: "SQL for Data Analysis", provider: "Example Courses",
-    meta: "6 weeks", description: "Queries, joins and aggregates.", skills: ["sql"],
+    meta: "6 weeks · free", time: "6 weeks", cost: "Free", description: "Queries, joins and aggregates.", skills: ["sql"],
     url: "https://example.com/sql", school: null, alongside: false },
   { id: "sql-project", type: "project", title: "Analyze a public dataset with SQL", provider: "CareerGPS",
-    meta: "2 weekends", description: "", skills: ["sql"], url: null, school: null, alongside: false },
+    meta: "2 weekends", time: "12 h", level: "Beginner", description: "", skills: ["sql"], url: null, school: null,
+    alongside: false },
   { id: "dashboard-course", type: "online_course", title: "Building Dashboards", provider: "Example Courses",
     meta: "4 weeks", description: "", skills: ["dashboarding"], url: null, school: null, alongside: false },
   { id: "data-club", type: "student_org", title: "Data Science Club", provider: "Example University",
-    meta: "Weekly", description: "", skills: ["dashboarding"], url: null, school: null, alongside: true },
+    meta: "Weekly · free", time: "Weekly", cost: "Free", description: "", skills: ["dashboarding"], url: null,
+    school: null, alongside: true },
 ];
 
 export const market: MarketDemandSnapshot = {
@@ -99,3 +102,25 @@ export const market: MarketDemandSnapshot = {
 export function planItem(resource_id: string, status: PlanItem["status"] = "saved"): PlanItem {
   return { resource_id, status, saved_at: "2026-10-02T00:00:00Z", done_at: status === "done" ? "2026-10-03T00:00:00Z" : null };
 }
+
+/** POST /action-plans/suggestions for the fixture student: SQL first, then dashboards, a club alongside. */
+export const actionPlanSuggestions: ActionPlanSuggestions = {
+  job_family: "data_analyst", skill_gap_run_id: run.id, mode: "full", source: "agent",
+  generated_at: "2026-10-04T00:00:00Z",
+  plans: [{
+    strategy: "balanced", title: "SQL first, then dashboards",
+    summary: "SQL comes first because every dashboard you build depends on the queries behind it.",
+    steps: [
+      { resource_id: "sql-course", skill_ids: ["sql"], reason: "Learn joins and aggregates before you query real data.",
+        resource: resources[0] },
+      { resource_id: "sql-project", skill_ids: ["sql"], reason: "Publish an analysis with your queries to prove SQL.",
+        resource: resources[1] },
+      { resource_id: "dashboard-course", skill_ids: ["dashboarding"],
+        reason: "Turn those queries into a dashboard a manager could read.", resource: resources[2] },
+    ],
+    alongside: [{ resource_id: "data-club", skill_ids: ["dashboarding"],
+      reason: "Show your dashboards to peers and take their critique.", resource: resources[3] }],
+    covered_skill_ids: ["sql", "dashboarding"], project_hours: 12,
+  }],
+  uncovered_skill_ids: [],
+};

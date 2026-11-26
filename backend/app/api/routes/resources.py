@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_account_service, get_current_db_user, get_current_user, get_db
 from app.core.config import BACKEND_ROOT, get_settings
 from app.models import User
-from app.schemas.resources import Plan, PlanItem, PlanItemUpdate, ResourceList
+from app.schemas.resources import Plan, PlanItem, PlanItemUpdate, ResourceList, SuggestedPlanSave
 from app.schemas.skill_gap_web import JobFamily
 from app.services.accounts import AccountService
 from app.services.plans import LocalPlanStore, get_plan_store
@@ -63,6 +63,22 @@ def save_plan_item(resource_id: str, data: PlanItemUpdate, user: User = Depends(
     if data.status == "done" and entry["type"] == "school_course":
         record_done_course(db, user.id, resource_id, user.university)
     return item
+
+
+@router.put("/plan/suggested", response_model=Plan)
+def save_suggested_plan(data: SuggestedPlanSave, user: User = Depends(get_current_db_user),
+                        store: LocalPlanStore = Depends(get_plan_store)) -> Plan:
+    """Add a whole suggested action plan: steps keep its order, and older plans' positions are cleared."""
+    available = {entry["id"] for entry in resources_for(data.job_family, user.university)}
+    missing = [resource_id for resource_id in [*data.steps, *data.alongside] if resource_id not in available]
+    if missing:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Resource not found for this role")
+    try:
+        items = store.save_suggested(user.id, data.job_family, data.steps, data.alongside)
+    except OSError:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Plan storage is unavailable") from None
+    # Same filter as GET /plan: hide saves for resources that left the catalog.
+    return Plan(job_family=data.job_family, items=[item for item in items if item["resource_id"] in available])
 
 
 @router.delete("/plan/items/{resource_id}", status_code=status.HTTP_204_NO_CONTENT)

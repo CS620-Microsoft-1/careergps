@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useTakenCourses } from "@/components/plan/taken-courses-provider";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { errorMessage } from "@/lib/api/client";
-import { getPlan, getResources, removePlanItem, setPlanItem } from "@/lib/api/resources";
+import { getPlan, getResources, removePlanItem, saveSuggestedPlan, setPlanItem } from "@/lib/api/resources";
 import type { JobFamily, PlanItem, PlanStatus, Resource } from "@/types/api";
 
 type PlanState = {
@@ -27,8 +27,16 @@ type PlanContextValue = PlanState & {
   setStatus: (resourceId: string, status: PlanStatus) => Promise<void>;
   remove: (resourceId: string) => Promise<void>;
   toggleSaved: (resourceId: string) => Promise<void>;
+  /**
+   * "Add all" from a suggested plan: one request that saves every item, orders the steps 1..N and clears
+   * older positions. Resolves false (with actionError set) when it fails; nothing is saved then.
+   */
+  addSuggested: (plan: SuggestedEntries) => Promise<boolean>;
   actionError?: string;
 };
+
+/** A suggested plan's resource ids: main-path steps in order, then alongside items. */
+export type SuggestedEntries = { steps: string[]; alongside: string[] };
 
 const PlanContext = createContext<PlanContextValue | null>(null);
 
@@ -102,6 +110,29 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
   }), [state.family, track]);
 
   const saved = useMemo(() => new Map(state.items.map((item) => [item.resource_id, item])), [state.items]);
+
+  const addSuggested = useCallback(async ({ steps, alongside }: SuggestedEntries) => {
+    const family = state.family;
+    if (!family) return false;
+    const ids = [...steps, ...alongside];
+    setPending((current) => new Set([...current, ...ids]));
+    setActionError(undefined);
+    try {
+      // The backend returns the whole plan, since older items' positions change too.
+      const plan = await saveSuggestedPlan(family, steps, alongside);
+      setState((current) => current.family !== family ? current : { ...current, items: plan.items });
+      return true;
+    } catch (error) {
+      setActionError(errorMessage(error, "The suggested plan could not be added. Try again."));
+      return false;
+    } finally {
+      setPending((current) => {
+        const next = new Set(current);
+        ids.forEach((id) => next.delete(id));
+        return next;
+      });
+    }
+  }, [state.family]);
   const toggleSaved = useCallback(
     (resourceId: string) => saved.has(resourceId) ? remove(resourceId) : setStatus(resourceId, "saved"),
     [remove, saved, setStatus],
@@ -111,7 +142,7 @@ export function PlanProvider({ children }: { children: React.ReactNode }) {
     : { family: activeFamily, status: activeFamily ? "loading" as const : "idle" as const, resources: [], items: [] };
   return (
     <PlanContext value={{ ...current, saved: current === state ? saved : new Map(), pending, justCompleted, justSaved, setStatus, remove,
-      toggleSaved, actionError }}>
+      toggleSaved, addSuggested, actionError }}>
       {children}
     </PlanContext>
   );

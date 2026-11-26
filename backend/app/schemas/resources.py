@@ -14,6 +14,11 @@ class Resource(BaseModel):
     title: str
     provider: str
     meta: str
+    # Short card details, shown as time · cost · level; None when a type doesn't have one.
+    # "20 h", "9 weeks", "3 credits", "Weekly" · "Free", "$150 exam", "$59/mo with Coursera Plus" · "Intermediate".
+    time: str | None = None
+    cost: str | None = None
+    level: str | None = None
     description: str
     # Only the skills in the requested role's catalog.
     skills: list[str]
@@ -36,10 +41,12 @@ class PlanItem(BaseModel):
     status: PlanStatus
     saved_at: str
     done_at: str | None = None
+    # Place in a suggested action plan (1 = first step). None: ordered by the gap ranking.
+    position: int | None = None
 
 
 class Plan(BaseModel):
-    """Saved resources for one role. The order is chosen in the browser from the gap ranking."""
+    """Saved resources for one role. The browser orders them by position when set, else by the gap ranking."""
 
     job_family: JobFamily
     items: list[PlanItem]
@@ -50,6 +57,24 @@ class PlanItemUpdate(BaseModel):
 
     job_family: JobFamily
     status: PlanStatus = "saved"
+
+
+class SuggestedPlanSave(BaseModel):
+    """A suggested action plan added as a whole ("Add all"). steps are in order and get positions 1..n;
+    alongside items are saved without one. Every other saved item loses its position."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    job_family: JobFamily
+    steps: list[str] = Field(min_length=1)
+    alongside: list[str] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def _unique(self) -> "SuggestedPlanSave":
+        ids = [*self.steps, *self.alongside]
+        if len(ids) != len(set(ids)):
+            raise ValueError("A resource can appear only once in a suggested plan")
+        return self
 
 
 # Project recommendations from the resources agent (app/services/resources_agent.py).

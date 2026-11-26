@@ -17,9 +17,17 @@ export function getPlan(family: JobFamily) {
   return apiGet<Plan>(`/plan?job_family=${encodeURIComponent(family)}`);
 }
 
-/** Save a resource to the plan ("saved"), or mark it done or not done. */
+/** Save a resource to the plan ("saved"), or mark it done or not done. Its position, if any, is kept. */
 export function setPlanItem(family: JobFamily, resourceId: string, status: PlanStatus) {
   return apiPut<PlanItem>(`/plan/items/${encodeURIComponent(resourceId)}`, { json: { job_family: family, status } });
+}
+
+/**
+ * Add a whole suggested action plan in one request: steps get positions 1..N in order, alongside items
+ * none, and every other saved item loses its position. Returns the whole plan.
+ */
+export function saveSuggestedPlan(family: JobFamily, steps: string[], alongside: string[]) {
+  return apiPut<Plan>("/plan/suggested", { json: { job_family: family, steps, alongside } });
 }
 
 export function removePlanItem(family: JobFamily, resourceId: string) {

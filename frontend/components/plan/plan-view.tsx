@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import NumberFlow from "@number-flow/react";
-import { ArrowRight, Check, CircleCheck, Flag, LoaderCircle, Plus, RotateCcw, X } from "lucide-react";
+import { ArrowRight, Check, CircleCheck, Flag, LoaderCircle, Plus, RotateCcw, Route, X } from "lucide-react";
 import { MotionConfig, motion } from "motion/react";
 
 import {
@@ -16,6 +16,7 @@ import {
   skillLabel,
 } from "@/components/career/route-parts";
 import { usePlan } from "@/components/plan/plan-provider";
+import { SuggestedPlan } from "@/components/plan/suggested-plan";
 import { useSkillGapAnalysis } from "@/components/skill-gaps/skill-gap-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,9 @@ export function PlanView() {
   const { family, run, snapshot, loaded, error } = useSkillGapAnalysis();
   const plan = usePlan();
   const [view, setView] = useState<"flowchart" | "list">("flowchart");
+  // The suggested plan is an add-on: closed until the student asks for it.
+  const [suggesting, setSuggesting] = useState(false);
+  const canSuggest = loaded && Boolean(snapshot) && plan.status === "ready";
   const report = run?.status === "completed" ? run.report : null;
   const gaps = report ? rankGaps(report).map((gap) => gap.skill_id) : [];
   const ordered = orderPlan(plan.items, plan.resources, gaps);
@@ -49,7 +53,12 @@ export function PlanView() {
           ))}
         </div>
         <Button asChild variant="outline" size="lg"><Link href="/resources"><Plus data-icon="inline-start" />Add resources</Link></Button>
+        {canSuggest && <Button variant="outline" size="lg" aria-expanded={suggesting} onClick={() => setSuggesting(true)}>
+          <Route data-icon="inline-start" />Suggest a plan
+        </Button>}
       </div>} />
+
+    {canSuggest && suggesting && <div className="mb-6"><SuggestedPlan key={family} family={family} gapOrder={gaps} onClose={() => setSuggesting(false)} /></div>}
 
     {!loaded || plan.status === "loading" ? <p role="status" className="flex items-center gap-2 text-muted-foreground"><LoaderCircle aria-hidden className="size-4 motion-safe:animate-spin" />Loading your plan…</p>
       // No snapshot because the profile couldn't be loaded, not because there's no résumé.
@@ -60,6 +69,8 @@ export function PlanView() {
         <h2 className="text-section">Your plan is empty</h2>
         <p className="max-w-md text-muted-foreground">Save a few courses, projects or clubs that close your gaps. We’ll order them so the biggest gap comes first.</p>
         <Button asChild size="lg" className="mt-2"><Link href={gaps[0] ? `/resources?gap=${gaps[0]}` : "/resources"}>Browse resources<ArrowRight data-icon="inline-end" /></Link></Button>
+        {!suggesting && <button type="button" onClick={() => setSuggesting(true)}
+          className="min-h-9 text-sm text-muted-foreground underline underline-offset-4 hover:text-foreground">or let us suggest a plan</button>}
       </div>
       : <div className="grid gap-6">
         {plan.actionError && <p role="alert" className="text-sm text-destructive">{plan.actionError}</p>}
@@ -87,7 +98,8 @@ export function PlanView() {
             <p className="mt-2 text-sm/6 text-muted-foreground">
               {next?.skill ? `${skillLabel(next.skill)} is the biggest gap you saved a step for, so it comes first. ` : ""}
               After that, steps follow your gap ranking. Within one gap, projects and courses come before the
-              certifications they prepare you for. Clubs and meetups run alongside everything else.
+              certifications they prepare you for. A suggested plan added with “Add all” keeps its order.
+              Clubs and meetups run alongside everything else.
             </p>
           </section>
           <section aria-labelledby="change" className="rounded-2xl border border-border bg-card p-6 shadow-card">
