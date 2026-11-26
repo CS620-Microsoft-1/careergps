@@ -6,12 +6,16 @@ import sys
 import tempfile
 import io
 import zipfile
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from itertools import groupby
 from pathlib import Path
 from typing import Any
 
 import pymupdf
 from docx import Document
+from docx.document import Document as WordDocument
+from docx.enum.section import WD_HEADER_FOOTER
+from docx.oxml.ns import qn
 
 OCR_TEXT_THRESHOLD = 40
 
@@ -43,13 +47,45 @@ def detect_file_type(data: bytes) -> str:
     except (zipfile.BadZipFile, OSError):
         pass
     raise UnsupportedResumeError("Upload a valid PDF or DOCX file.")
+
+
+def _docx_header_lines(document: WordDocument) -> Iterator[str]:
+    # A section inherits the previous definition for each header type it omits.
+    references = {}
+    seen_parts = set()
+    for section in document.sections:
+        for reference in section._sectPr.headerReference_lst:
+            references[reference.type_] = reference.rId
+
+        header_types = [WD_HEADER_FOOTER.PRIMARY]
+        if section.different_first_page_header_footer:
+            header_types.insert(0, WD_HEADER_FOOTER.FIRST_PAGE)
+        if document.settings.odd_and_even_pages_header_footer:
+            header_types.append(WD_HEADER_FOOTER.EVEN_PAGE)
+
+        for header_type in header_types:
+            if header_type not in references:
+                continue
+            part = document.part.header_part(references[header_type])
+            if part.partname in seen_parts:
+                continue
+            seen_parts.add(part.partname)
+            # Read runs inside template fields and table cells once, keeping paragraph breaks.
+            runs = part.element.xpath(".//w:r[not(ancestor::w:del or ancestor::w:moveFrom)]")
+            for _, paragraph_runs in groupby(runs, key=lambda run: next(run.iterancestors(qn("w:p")), None)):
+                text = "".join(run.text for run in paragraph_runs)
+                if text.strip():
+                    yield text
+
+
 def _docx_text(path: Path) -> str:
     try:
         document = Document(path)
     except Exception as error:
         raise InvalidResumeError("This DOCX file cannot be opened. Try exporting it again.") from error
 
-    parts = [paragraph.text for paragraph in document.paragraphs if paragraph.text.strip()]
+    parts = list(_docx_header_lines(document))
+    parts.extend(paragraph.text for paragraph in document.paragraphs if paragraph.text.strip())
     for table in document.tables:
         for row in table.rows:
             parts.extend(cell.text for cell in row.cells if cell.text.strip())
