@@ -1,6 +1,6 @@
 // Where to send the user after logging in: the page they were on before /login.
 
-const AUTH_PATHS = ["/login", "/signup", "/auth"];
+const AUTH_PATHS = ["/login", "/signup", "/forgot-password", "/auth"];
 
 /**
  * The `next` value if it is a path on this site, otherwise null. Rejects absolute URLs and

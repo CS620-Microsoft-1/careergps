@@ -133,7 +133,7 @@ Accounts live in Supabase Auth (SPEC-001). Set `NEXT_PUBLIC_SUPABASE_URL` and
   code on), which creates the session and calls `POST /me`.
 - `/login` calls `signInWithPassword`, then `POST /me` too if sign-up wasn't finished yet.
 - `proxy.ts` refreshes the session cookies and redirects: logged out → `/login` for app pages,
-  logged in → `/dashboard` from `/login` and `/signup`. The API checks the token again on every call.
+  logged in → `/dashboard` from `/login`, `/signup` and `/forgot-password`. The API checks the token again on every call.
 - `lib/supabase/client.ts` registers the access token with `lib/api/client.ts`, so every API call
   sends `Authorization: Bearer <token>`.
 - **Profile → Delete account** permanently deletes the account after the student types their email
@@ -142,6 +142,23 @@ Accounts live in Supabase Auth (SPEC-001). Set `NEXT_PUBLIC_SUPABASE_URL` and
   `SUPABASE_SERVICE_ROLE_KEY`, the dialog says deletion isn't available right now.
 - Supabase's built-in mailer sends 2 emails an hour, only to members of the Supabase organization.
   For testing, create confirmed users in Supabase → Authentication → Users instead.
+
+### Password reset
+
+- "Forgot password?" on `/login` opens `/forgot-password` (with the typed email as `?email=`),
+  which calls `resetPasswordForEmail`. It always shows "Check your inbox", whether or not the
+  account exists; only rate limits, invalid emails and network errors are shown.
+- The email links to `/auth/reset?token_hash=…&type=recovery`. That page asks for the new password
+  twice and only then calls `verifyOtp` (type `recovery`) and `updateUser`, so a mail scanner that
+  opens the link can't use it up. Other sessions are then signed out and the student goes to
+  their home page. A used or expired link offers a new one.
+- One-time Supabase setup (dashboard, shared project):
+  1. **Authentication → Emails → Templates → Reset password:** paste the body of
+     `docs/supabase/reset-password.html`. Without it, Supabase's default link has no `token_hash`
+     and `/auth/reset` rejects it as incomplete.
+  2. **Authentication → URL Configuration → Redirect URLs:** add `http://localhost:3000/auth/reset`
+     and `<deployed frontend>/auth/reset`.
+  3. **Site URL** must be the deployed frontend, or email links will point to localhost.
 
 The **backend status badge** (bottom of the sidebar, and in the account menu on small screens)
 shows whether the app can reach the API and database. Hover it for details.
