@@ -23,6 +23,9 @@ class Settings(BaseSettings):
     supabase_url: str | None = None
     # Only for projects still on the legacy shared JWT secret (HS256). Leave unset with signing keys.
     supabase_jwt_secret: str | None = None
+    # Server-only Supabase secret (service_role) key, used only to delete accounts through the
+    # Admin API. Never expose it to the frontend. Account deletion returns 503 while it is unset.
+    supabase_service_role_key: SecretStr | None = None
 
     # Existing Microsoft Foundry resume-classification Agent. Authentication uses
     # DefaultAzureCredential (Azure CLI locally; managed identity when deployed).

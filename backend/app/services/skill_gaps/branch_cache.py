@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import tempfile
 from typing import Callable
 from uuid import UUID
@@ -33,6 +34,13 @@ def _canonical(value: object) -> bytes:
 
 def _digest(value: object) -> str:
     return hashlib.sha256(_canonical(value)).hexdigest()
+
+
+def _remove_tree(folder: Path) -> bool:
+    if not folder.is_dir():
+        return False
+    shutil.rmtree(folder)
+    return True
 
 
 def _sources(payload: dict) -> list[dict]:
@@ -185,6 +193,14 @@ class BranchCache:
     def _path(self, identity: dict, key: str) -> Path:
         namespace = _digest({"owner": identity["owner"]})
         return self.directory / BRANCH_CACHE_VERSION / namespace / (key + ".json")
+
+    def owner_folder(self, owner: str) -> Path:
+        """The folder holding every cached response for one owner (a user id)."""
+        return self.directory / BRANCH_CACHE_VERSION / _digest({"owner": str(UUID(str(owner)))})
+
+    def delete_owner(self, owner: str) -> bool:
+        """Remove all of one owner's cached responses (account deletion). True if any were removed."""
+        return _remove_tree(self.owner_folder(owner))
 
     def store(self, *, owner: str, resume_id: str, branch: str, payload: dict,
               binding: dict, dependencies: dict, output: dict, validation: dict,

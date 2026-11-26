@@ -33,7 +33,7 @@ from .input import prepare
 from .core_cards import CoreSkillCards
 from .branch_cache import BRANCH_CACHE_VERSION, BranchCache
 from .match import summarize_match
-from .run_store import DbRunStore, JsonRunStore, run_folder
+from .run_store import DbRunStore, JsonRunStore, delete_run_folders, run_folder
 from .storage import load, save_json
 from .schema import SCHEMA_NAME
 from .skill_groups import (
@@ -83,6 +83,10 @@ def _sha(value: object) -> str:
     return hashlib.sha256(_canonical(value)).hexdigest()
 
 
+class RunCancelled(RuntimeError):
+    """The run's account was deleted; the worker stops and writes nothing more."""
+
+
 class SkillGapRunManager:
     def __init__(self, directory: Path | None = None, *, settings: SkillGapSettings | None = None,
                  group_invoker: Callable | None = None, group_preflight: Callable | None = None,
@@ -126,6 +130,9 @@ class SkillGapRunManager:
         self._lock = RLock()
         self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="local-skill-gap")
         self._states: dict[str, dict] = {}
+        # Queued/running runs of deleted accounts (run id -> owner). Their worker stops at the next
+        # checkpoint, persists nothing and removes the files it wrote.
+        self._cancelled: dict[str, str] = {}
         self._keys: dict[str, str] = {}
         self.catalog = load(ASSET_ROOT / "core_catalog.json")
         self.market = load(ASSET_ROOT / "market_snapshot.json")
@@ -165,7 +172,14 @@ class SkillGapRunManager:
     def _folder(self, identifier: str) -> Path:
         return run_folder(self.directory, identifier)
 
+    def _raise_if_cancelled(self, identifier: str) -> None:
+        if identifier in self._cancelled:
+            raise RunCancelled(identifier)
+
     def _persist(self, state: dict) -> None:
+        # Every state write goes through here, so this is also the worker's cancellation checkpoint
+        # (including on_request, right before each paid Agent call).
+        self._raise_if_cancelled(state["id"])
         reviewed = self._unsaved.pop(state["id"], None)
         if reviewed is not None:
             self.store.create(state, reviewed, **self._run_fields(state["job_family"]))
@@ -182,6 +196,7 @@ class SkillGapRunManager:
 
     def _complete(self, state: dict, report: dict, extraction_audit: dict, output: dict, folder: Path) -> None:
         """Hand the finished run to the store with each branch's saved input, answer and checks."""
+        self._raise_if_cancelled(state["id"])
         def artifact(branch: str, name: str):
             path = folder / "branches" / branch / name
             return load(path) if path.is_file() else None
@@ -358,6 +373,42 @@ class SkillGapRunManager:
                     self._keys[cache_key] = prior_id
                 raise
             return self._view(state)
+
+    def forget_user(self, user_id: UUID) -> list[str]:
+        """Account deletion: drop every in-memory run of this user and cancel the active ones.
+
+        Returns the cancelled run ids. Their rows are already gone (or about to be) through the
+        database cascade, so a cancelled worker never persists again. It stops at its next
+        checkpoint and removes the run folder and the owner's branch cache. An Agent request
+        already in flight cannot be recalled; its answer is discarded.
+        Covers this process only; the API runs one worker process.
+        """
+        owner = str(UUID(str(user_id)))
+        with self._lock:
+            identifiers = [identifier for identifier, state in self._states.items() if state["user_id"] == owner]
+            cancelled = []
+            for identifier in identifiers:
+                state = self._states.pop(identifier)
+                self._unsaved.pop(identifier, None)
+                self._prepared_runs.pop(identifier, None)
+                if state["status"] in ("queued", "running"):
+                    self._cancelled[identifier] = owner
+                    cancelled.append(identifier)
+            for key in [key for key, identifier in self._keys.items() if identifier in identifiers]:
+                del self._keys[key]
+        return cancelled
+
+    def _discard_cancelled(self, identifier: str) -> None:
+        """Remove what a cancelled run wrote locally, once its worker has stopped."""
+        with self._lock:
+            owner = self._cancelled.pop(identifier, None)
+        if owner is None:
+            return
+        try:
+            delete_run_folders(self.directory, [identifier])
+            self.branch_cache.delete_owner(owner)
+        except OSError:
+            logger.warning("Could not remove the files of cancelled skill-gap run %s", identifier, exc_info=True)
 
     def get(self, identifier: str, *, user_id: UUID) -> SkillGapRun:
         with self._lock:
@@ -695,7 +746,12 @@ class SkillGapRunManager:
     def _work(self, identifier: str, reviewed: dict) -> None:
         started = time.perf_counter()
         with self._lock:
-            state = self._states[identifier]
+            state = self._states.get(identifier)
+            cancelled = identifier in self._cancelled
+        if state is None or cancelled:
+            # The account was deleted while this run was still queued.
+            self._discard_cancelled(identifier)
+            return
         folder = self._folder(identifier)
 
         def save(name: str, value: object) -> None:
@@ -733,26 +789,35 @@ class SkillGapRunManager:
                     datetime.fromisoformat(state['created_at'])).total_seconds(), 3)
                 self._complete(state, report, extraction_audit, output, folder)
         except Exception as error:
+            if isinstance(error, RunCancelled) or identifier in self._cancelled:
+                # Account deleted: nothing to report and nothing to persist; the finally block cleans up.
+                logger.info("Skill-gap run %s stopped: its account was deleted", identifier)
+                return
             # Keep detailed SDK errors out of HTTP responses and do not retry.
             # The original response/artifacts, if any, remain local for diagnosis.
-            with self._lock:
-                for branch in state.get("branches", {}).values():
-                    if branch["status"] in {"pending", "ready"}:
-                        branch.update(status="not_started", error_code="preflight_or_parent_failed")
-                state.update(status="failed", phase="failed", completed_at=_now(),
-                             worker_seconds=round(time.perf_counter() - started, 3),
-                             error=error.public_message if isinstance(error, SkillGapConfigurationError) else
-                                 "Analysis could not finish. Check the local Agent configuration and login, then retry explicitly.",
-                             error_code=error.code if isinstance(error, SkillGapConfigurationError) else "analysis_failed",
-                             azure_phase_timings=timings,
-                             error_type=type(error).__name__)
-                state['elapsed_seconds'] = round((datetime.now(timezone.utc) -
-                    datetime.fromisoformat(state['created_at'])).total_seconds(), 3)
-                self._persist(state)
+            try:
+                with self._lock:
+                    for branch in state.get("branches", {}).values():
+                        if branch["status"] in {"pending", "ready"}:
+                            branch.update(status="not_started", error_code="preflight_or_parent_failed")
+                    state.update(status="failed", phase="failed", completed_at=_now(),
+                                 worker_seconds=round(time.perf_counter() - started, 3),
+                                 error=error.public_message if isinstance(error, SkillGapConfigurationError) else
+                                     "Analysis could not finish. Check the local Agent configuration and login, then retry explicitly.",
+                                 error_code=error.code if isinstance(error, SkillGapConfigurationError) else "analysis_failed",
+                                 azure_phase_timings=timings,
+                                 error_type=type(error).__name__)
+                    state['elapsed_seconds'] = round((datetime.now(timezone.utc) -
+                        datetime.fromisoformat(state['created_at'])).total_seconds(), 3)
+                    self._persist(state)
+            except RunCancelled:
+                logger.info("Skill-gap run %s stopped: its account was deleted", identifier)
 
         finally:
             with self._lock:
                 self._prepared_runs.pop(identifier, None)
+            if identifier in self._cancelled:
+                self._discard_cancelled(identifier)
 
     def close(self) -> None:
         self._executor.shutdown(wait=True)
@@ -774,6 +839,18 @@ def _cached_skill_gap_run_manager() -> SkillGapRunManager:
     return SkillGapRunManager(store=DbRunStore(SessionLocal), settings=settings,
                              entry_level_workflow=selection["effective"] == "entry_level",
                              workflow_selection=selection)
+
+
+def forget_user_runs(user_id: UUID) -> list[str]:
+    """Account deletion: cancel the user's runs in this process's manager, if it was ever started.
+
+    A manager that was never created has no runs in memory, so none is created just for this.
+    """
+    with _manager_lock:
+        if _cached_skill_gap_run_manager.cache_info().currsize == 0:
+            return []
+        manager = _cached_skill_gap_run_manager()
+    return manager.forget_user(user_id)
 
 
 def get_skill_gap_run_manager() -> SkillGapRunManager:

@@ -1,4 +1,4 @@
-import { ApiError, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api/client";
+import { ApiError, apiDelete, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api/client";
 import type {
   AccountCreateRequest,
   Destination,
@@ -27,6 +27,15 @@ export function createAccount(body: AccountCreateRequest) {
 /** Change the name, university or career goal; only the fields sent change. */
 export function updateAccount(body: Partial<Goals & PersonalDetails>) {
   return apiPatch<User>("/me", { json: body });
+}
+
+/**
+ * Permanently delete the account and all its data. 204 on success; ApiError 502/503 otherwise.
+ * The backend waits up to 10 s for Supabase, so the default 5 s timeout could report a failure
+ * for a deletion that actually succeeded.
+ */
+export function deleteAccount() {
+  return apiDelete("/me", { timeoutMs: 20_000 });
 }
 
 /** Save a confirmed résumé; the destination for job_family uses it from now on (added if new). */

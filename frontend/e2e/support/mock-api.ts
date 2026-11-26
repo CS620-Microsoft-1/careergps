@@ -30,6 +30,8 @@ type Options = {
   takenCourses?: string[];
   /** School course ids GET /me/courses/resume-matches finds in the résumé. */
   resumeCourseMatches?: string[];
+  /** Status DELETE /me answers with: 204 (deleted) when left out. The real account is never touched. */
+  deleteAccountStatus?: number;
 };
 
 const takenCourse = (course_id: string): TakenCourse => ({ course_id, source: "manual", created_at: "2026-10-02T00:00:00Z" });
@@ -56,6 +58,10 @@ export async function mockApi(page: Page, options: Options = {}) {
     if (method === "GET" && path === "/health/db") return ok({ status: "ok", database: "connected" });
     if (method === "GET" && path === "/me") return ok({ user });
     if (method === "PATCH" && path === "/me") return ok({ ...user, ...(body as object) });
+    if (method === "DELETE" && path === "/me") {
+      const status = options.deleteAccountStatus ?? 204;
+      return status === 204 ? { status } : { status, json: { detail: "We couldn't delete your account. Try again." } };
+    }
     if (method === "GET" && path === "/me/resume") return ok(resume);
     if (method === "GET" && path === "/me/destinations") return ok(destinations);
     if (method === "GET" && path === "/me/resumes") {
