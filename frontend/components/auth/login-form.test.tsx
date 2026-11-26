@@ -3,7 +3,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { LoginForm } from "@/components/auth/login-form";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { homeFor } from "@/lib/auth/account";
 import { getSupabase } from "@/lib/supabase/client";
 
@@ -14,8 +13,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ replace }) }));
 vi.mock("@/lib/auth/account", () => ({ homeFor: vi.fn() }));
 vi.mock("@/lib/supabase/client", () => ({ getSupabase: vi.fn() }));
 
-// The app's root layout provides this; the form's "Forgot password?" tooltip needs it.
-const renderForm = () => render(<TooltipProvider><LoginForm /></TooltipProvider>);
+const renderForm = () => render(<LoginForm />);
 
 async function fillIn(email: string, password: string) {
   await userEvent.type(screen.getByLabelText("Email"), email);
@@ -56,5 +54,13 @@ describe("LoginForm", () => {
     await fillIn("student@example.edu", "wrong");
     expect(await screen.findByRole("alert")).toBeInTheDocument();
     expect(replace).not.toHaveBeenCalled();
+  });
+
+  it("links to the password reset with the email typed so far", async () => {
+    renderForm();
+    const link = screen.getByRole("link", { name: "Forgot password?" });
+    expect(link).toHaveAttribute("href", "/forgot-password");
+    await userEvent.type(screen.getByLabelText("Email"), "student+cs@example.edu");
+    expect(link).toHaveAttribute("href", "/forgot-password?email=student%2Bcs%40example.edu");
   });
 });
