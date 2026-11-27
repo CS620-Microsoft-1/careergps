@@ -5,8 +5,8 @@ Revises: 9aa1698efdd2
 
 One row per responses.create, written by app.services.agent_calls. No prompts or answers are stored.
 user_id references auth.users, not users: onboarding analyses a résumé before the users row exists.
-ON DELETE CASCADE, so deleting an account (DELETE /me removes the Supabase Auth user) removes its
-rows. run_id is the Skill Gap run id, without a foreign key, since local runs may not be saved to
+ON DELETE SET NULL, so deleting an account (DELETE /me removes the Supabase Auth user) unlinks its
+rows but keeps their latency and cost in the totals (they hold no prompts or answers). run_id is the Skill Gap run id, without a foreign key, since local runs may not be saved to
 skill_gap_runs.
 Schema only: no data copy. RLS follows the backend-only access model (Supabase Data API disabled);
 no anonymous/authenticated policies. The database owner applies this after merge.
@@ -54,7 +54,7 @@ def upgrade() -> None:
     # migrations/env.py keeps autogenerate from dropping it (see the users migration).
     op.execute(
         'ALTER TABLE agent_calls ADD CONSTRAINT fk_agent_calls_user '
-        'FOREIGN KEY (user_id) REFERENCES auth.users (id) ON DELETE CASCADE'
+        'FOREIGN KEY (user_id) REFERENCES auth.users (id) ON DELETE SET NULL'
     )
 
     # Added by hand (autogenerate doesn't know about RLS); see the users migration.

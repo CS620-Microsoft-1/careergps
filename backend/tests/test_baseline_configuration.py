@@ -89,7 +89,7 @@ class RepositorySafetyTests(unittest.TestCase):
 
 
 class BackendConfigurationTests(unittest.TestCase):
-    def test_engine_disables_prepared_statements_for_the_transaction_pooler(self) -> None:
+    def test_engine_disables_prepared_statements_and_sets_a_connect_timeout(self) -> None:
         env = {"DATABASE_URL": "postgresql+psycopg://tester:placeholder@localhost:6543/test"}
         with patch.dict(os.environ, env), patch("sqlalchemy.create_engine") as create_engine:
             get_settings.cache_clear()
@@ -99,7 +99,9 @@ class BackendConfigurationTests(unittest.TestCase):
                 get_settings.cache_clear()
         importlib.reload(app.db.session)
 
-        self.assertEqual({"prepare_threshold": None}, create_engine.call_args.kwargs["connect_args"])
+        # connect_timeout: an unreachable database fails in seconds instead of hanging requests (PR #65 review).
+        self.assertEqual({"prepare_threshold": None, "connect_timeout": 5},
+                         create_engine.call_args.kwargs["connect_args"])
 
     def test_migration_url_is_optional(self) -> None:
         settings = Settings(_env_file=None, database_url="postgresql+psycopg://x:y@localhost:6543/z")

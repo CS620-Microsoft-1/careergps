@@ -1105,10 +1105,13 @@ answers are never stored; an error keeps only its class name.
 - **Who:** `RequestContextMiddleware` starts a holder per request and `get_current_user` fills in the
   user. Work moved to another thread must use `agent_calls.in_context(fn)` as its target, or its
   calls have no user. Job posting analysis runs without a signed-in user, so `user_id` is empty.
-- **Account deletion:** `user_id` references `auth.users` with `ON DELETE CASCADE`, so `DELETE /me`
-  (which removes the Supabase Auth user) also removes that student's rows.
+- **Account deletion:** `user_id` references `auth.users` with `ON DELETE SET NULL`, so `DELETE /me`
+  (which removes the Supabase Auth user) unlinks that student's rows but keeps them in the latency and
+  cost totals. The rows hold no prompts or answers.
 - **Never in the way:** the row is written in its own short session after the call. If that write
-  fails, the call's result or error is returned unchanged and a warning is logged.
+  fails, the call's result or error is returned unchanged and a warning is logged. The engine's
+  5-second `connect_timeout` (`app/db/session.py`) keeps an unreachable database from holding the
+  response for long.
 
 ```sql
 -- Calls, p50/p95 latency and cost per Agent over the last 7 days
