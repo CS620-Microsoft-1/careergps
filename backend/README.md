@@ -1135,9 +1135,12 @@ statuses, counts and changed field names, **never résumé content or field valu
 - **Same transaction:** a database write adds its row with `audit.record(session, ...)` before it
   commits, so the change and its record commit or roll back together.
 - **Plan files:** the plan is local JSON, not a table, so `audit.record_detached(...)` writes its
-  row in a separate transaction after the file is saved; a failure there is logged, not raised.
-- **Account deletion:** `user_id` references `auth.users` with `ON DELETE CASCADE`, like
-  `agent_calls`, so `DELETE /me` removes the student's records. Shared data (catalog, ingest) has no user.
+  row in a separate transaction after the file is saved; a failure there is logged, not raised. The
+  engine's 5-second `connect_timeout` keeps an unreachable database from holding Save, Done or Remove.
+- **Account deletion:** `user_id` references `auth.users` with `ON DELETE CASCADE`, so `DELETE /me`
+  removes the student's records too. This is on purpose: the rows say what the student did and when,
+  and deleting an account means deleting that history. (`agent_calls` uses `SET NULL` instead: its
+  rows only count latency and cost.) Shared data (catalog, ingest) has no user.
 - **`audit_events` view:** `audit_log` and `agent_calls` as one timeline (`occurred_at`, `user_id`,
   `kind` = `data_write` / `agent_call`, `source`, `action`, `target_type`, `target_id`, `status`,
   `details`).
