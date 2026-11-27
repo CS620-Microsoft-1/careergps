@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 
-import { ComingSoon } from "@/components/common/coming-soon";
 import { PasswordField, TextField } from "@/components/common/form-fields";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field";
@@ -24,6 +24,9 @@ export function LoginForm() {
   });
 
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Carry what was typed over to /forgot-password, so the student doesn't type it twice.
+  const email = useWatch({ control: form.control, name: "email" }).trim();
+  const forgotHref = email ? `/forgot-password?email=${encodeURIComponent(email)}` : "/forgot-password";
 
   async function onSubmit(values: LoginValues) {
     setSubmitError(null);
@@ -63,11 +66,9 @@ export function LoginForm() {
           autoComplete="current-password"
         />
         <div className="flex justify-end">
-          <ComingSoon>
-            <Button type="button" variant="link" disabled className="h-auto text-sm">
-              Forgot password?
-            </Button>
-          </ComingSoon>
+          <Button asChild variant="link" className="h-auto text-sm">
+            <Link href={forgotHref}>Forgot password?</Link>
+          </Button>
         </div>
         {submitError && (
           <p role="alert" className="text-control text-destructive">

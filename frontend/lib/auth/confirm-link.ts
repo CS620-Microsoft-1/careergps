@@ -23,3 +23,21 @@ export function readConfirmLink(search: string, hash: string): ConfirmLink {
   // already confirmed the email by then, so the message suggests signing in.
   return { kind: "error", code: "otp_expired" };
 }
+
+export type RecoveryLink =
+  /** Used only when the student submits a new password, so mail scanners can't spend it. */
+  | { kind: "token"; tokenHash: string }
+  /** Supabase's error_code, or null for a link that isn't a recovery link at all. */
+  | { kind: "error"; code: string | null };
+
+/**
+ * A password reset link (docs/supabase/reset-password.html sends ?token_hash=…&type=recovery).
+ * Only type=recovery is accepted, so a sign-up link can't be used to set a password.
+ */
+export function readRecoveryLink(search: string, hash: string): RecoveryLink {
+  const params = new URLSearchParams(search + hash.replace("#", "&"));
+  if (params.has("error_code")) return { kind: "error", code: params.get("error_code") };
+  const tokenHash = params.get("token_hash");
+  if (tokenHash && params.get("type") === "recovery") return { kind: "token", tokenHash };
+  return { kind: "error", code: null };
+}
