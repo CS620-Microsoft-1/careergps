@@ -1,5 +1,6 @@
 # Import every model here so Alembic's autogenerate can see it.
 from app.models.agent_call import AgentCall
+from app.models.audit_log import AuditLog
 from app.models.catalog import CatalogCertification, CatalogVersion, SchoolCourse, StudentOrg
 from app.models.destination import Destination
 from app.models.job_posting import IngestRun, JobPosting
@@ -25,6 +26,7 @@ from app.models.user import User
 
 __all__ = [
     "AgentCall",
+    "AuditLog",
     "CatalogCertification",
     "CatalogVersion",
     "Destination",

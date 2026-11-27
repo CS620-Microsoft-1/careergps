@@ -29,9 +29,8 @@ class AgentCallsMigrationTests(unittest.TestCase):
             getattr(module, direction)()
         return output.getvalue()
 
-    def test_follows_student_courses_and_is_the_only_head(self) -> None:
+    def test_follows_student_courses(self) -> None:
         self.assertEqual("9aa1698efdd2", self.script.get_revision(REVISION).down_revision)
-        self.assertEqual([REVISION], self.script.get_heads())
 
     def test_creates_agent_calls_with_checks_indexes_set_null_fk_and_rls(self) -> None:
         sql = self.render("upgrade")

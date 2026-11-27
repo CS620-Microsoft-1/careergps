@@ -14,7 +14,7 @@ from datetime import date
 from sqlalchemy.orm import Session
 
 from app.models.catalog import CatalogVersion
-from app.services import catalog_writes
+from app.services import audit, catalog_writes
 from app.services.certifications.catalog import CATALOG_PATH, load_catalog as load_certifications
 from app.services.resources import load_catalog as load_resources
 
@@ -47,6 +47,9 @@ def seed(session: Session, *, update: bool = False) -> dict[str, Counter]:
     # A fresh database starts at the file's version, so recommendations cached from the file stay valid.
     if not had_version:
         catalog_writes.set_catalog_version(session, catalog_writes.CERTIFICATIONS, certifications["version"])
+    # Written with the rows, so a dry run (rolled back) leaves no record either.
+    audit.record(session, "catalog.seeded", details={
+        "update": update, **{table: dict(counter) for table, counter in counts.items()}})
     return counts
 
 

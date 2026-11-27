@@ -63,6 +63,19 @@ def onboarding_body(**changes) -> dict:
     return body
 
 
+class AuditSession:
+    """Stands in for the session where AccountService adds audit_log rows; keeps them for assertions."""
+
+    def __init__(self) -> None:
+        self.added: list = []
+
+    def add(self, row) -> None:
+        self.added.append(row)
+
+    def actions(self) -> list[str]:
+        return [row.action for row in self.added]
+
+
 class FakeAccountService(accounts.AccountService):
     """In-memory stand-in for the database part of AccountService (the API tests need no database).
 
@@ -71,7 +84,7 @@ class FakeAccountService(accounts.AccountService):
     """
 
     def __init__(self) -> None:
-        super().__init__(db=None)  # type: ignore[arg-type]
+        super().__init__(db=AuditSession())  # type: ignore[arg-type]
         self.users: dict[uuid.UUID, User] = {}
         self.resumes: dict[uuid.UUID, Resume] = {}
         self.destinations: dict[tuple[uuid.UUID, str], Destination] = {}

@@ -10,6 +10,7 @@ from threading import Lock
 from uuid import UUID
 
 from app.core.config import BACKEND_ROOT
+from app.services import audit
 from app.services.skill_gaps.storage import load, save_json
 
 
@@ -45,13 +46,20 @@ class LocalPlanStore:
             item["done_at"] = (item.get("done_at") or _now()) if status == "done" else None
             saved[resource_id] = item
             save_json(self._path(user_id), data)
+        # The plan is a file, not a table, so its record is written separately (record_detached).
+        audit.record_detached("plan.item_saved", user_id=user_id, target=("resource", resource_id),
+                              details={"job_family": family, "status": status})
         return {"resource_id": resource_id, **item}
 
     def remove(self, user_id: UUID, family: str, resource_id: str) -> None:
         with self._lock:
             data = self._read(user_id)
-            if data["families"].get(family, {}).pop(resource_id, None) is not None:
+            removed = data["families"].get(family, {}).pop(resource_id, None) is not None
+            if removed:
                 save_json(self._path(user_id), data)
+        if removed:
+            audit.record_detached("plan.item_removed", user_id=user_id, target=("resource", resource_id),
+                                  details={"job_family": family})
 
 
 @lru_cache

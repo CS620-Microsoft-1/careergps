@@ -18,6 +18,7 @@ from app.core.security import AuthenticatedUser
 from app.models import Destination, Resume, User
 from app.schemas.me import AccountCreate, AccountUpdate, ResumeSubmit
 from app.schemas.resume import ResumeClassification
+from app.services import audit
 from app.services.resume_children import rebuild_children
 
 logger = logging.getLogger(__name__)
@@ -151,6 +152,8 @@ class AccountService:
             self._insert_resume(resume)  # then the résumé the destination points at
             if family is not None:
                 self.db.add(Destination(user_id=user.id, job_family=family, resume_id=resume.id))
+            audit.record(self.db, "account.created", user_id=user.id, target=("user", user.id),
+                         details={"resume_id": str(resume.id), "job_family": family})
             self.db.commit()
         except IntegrityError as error:
             # Two requests raced, or the email belongs to another users row.
@@ -160,8 +163,11 @@ class AccountService:
         return user
 
     def update_account(self, user: User, data: AccountUpdate) -> User:
-        for field, value in data.model_dump(exclude_unset=True).items():
+        changes = data.model_dump(exclude_unset=True)
+        for field, value in changes.items():
             setattr(user, field, value)
+        audit.record(self.db, "account.updated", user_id=user.id, target=("user", user.id),
+                     details={"fields": sorted(changes)})
         self.db.commit()
         self.db.refresh(user)
         return user
@@ -171,13 +177,17 @@ class AccountService:
         fill_empty_contacts(user, data.classification)
         resume = new_resume(user.id, data)
         self._insert_resume(resume)
-        self._point(user, job_family, resume.id)
+        audit.record(self.db, "resume.added", user_id=user.id, target=("resume", resume.id),
+                     details={"job_family": job_family})
+        self._point(user, job_family, resume.id)  # commits the résumé, its audit row and the destination
         return resume
 
     def use_resume(self, user: User, job_family: JobFamily, resume_id: uuid.UUID) -> Resume | None:
         """Match a destination (new or existing) against one of the student's résumés. None if it isn't theirs."""
         resume = self.get_owned_resume(user, resume_id)
         if resume is not None:
+            audit.record(self.db, "destination.resume_selected", user_id=user.id, target=("resume", resume.id),
+                         details={"job_family": job_family})
             self._point(user, job_family, resume.id)
         return resume
 
@@ -232,6 +242,8 @@ class AccountService:
         if user.primary_email == email:
             return
         user.primary_email = email
+        audit.record(self.db, "account.email_synced", user_id=user.id, target=("user", user.id),
+                     details={"fields": ["primary_email"]})
         try:
             self.db.commit()
         except IntegrityError:

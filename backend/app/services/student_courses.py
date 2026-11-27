@@ -17,7 +17,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 from app.models import StudentCourse
-from app.services import catalog_writes
+from app.services import audit, catalog_writes
 from app.services.resources import same_school
 
 logger = logging.getLogger(__name__)
@@ -47,8 +47,12 @@ def mark_taken(session: Session, user_id: uuid.UUID, course_id: str, source: str
     course = catalog_writes.get_row(session, "school_course", course_id)
     if course is None or not same_school(course.school, university):
         raise KeyError(course_id)
-    session.execute(insert(StudentCourse).values(user_id=user_id, course_id=course_id, source=source)
-                    .on_conflict_do_nothing(index_elements=["user_id", "course_id"]))
+    inserted = session.execute(insert(StudentCourse).values(user_id=user_id, course_id=course_id, source=source)
+                               .on_conflict_do_nothing(index_elements=["user_id", "course_id"])
+                               .returning(StudentCourse.course_id)).scalar_one_or_none()
+    if inserted is not None:
+        audit.record(session, "course.marked_taken", user_id=user_id, target=("school_course", course_id),
+                     details={"source": source})
     session.commit()
     return session.get(StudentCourse, (user_id, course_id), populate_existing=True)
 
@@ -67,6 +71,7 @@ def unmark_taken(session: Session, user_id: uuid.UUID, course_id: str) -> None:
     row = session.get(StudentCourse, (user_id, course_id))
     if row is not None:
         session.delete(row)
+        audit.record(session, "course.unmarked_taken", user_id=user_id, target=("school_course", course_id))
         session.commit()
 
 

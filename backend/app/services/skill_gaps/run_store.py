@@ -24,6 +24,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.models.skill_gap import SkillGapResult, SkillGapRunBranch, SkillGapRunRecord
+from app.services import audit
 from .persistence import branch_row, completion_fields, queued_run_row, result_rows, run_uuid
 from .schema import SCHEMA_NAME
 from .scoring import POLICY_VERSION
@@ -137,6 +138,9 @@ class DbRunStore:
             with self.session_factory() as session, session.begin():
                 row["reuse_from_run_id"] = self._existing(session, row["reuse_from_run_id"])
                 session.add(SkillGapRunRecord(**row))
+                audit.record(session, "skill_gap.run_created", user_id=state["user_id"],
+                             target=("skill_gap_run", run_uuid(state["id"])),
+                             details={"job_family": state["job_family"], "resume_id": state["resume_id"]})
         except IntegrityError as error:
             if "uq_skill_gap_runs_one_active" in str(error.orig):
                 raise ActiveRunExists("This résumé already has an analysis in progress.") from None
@@ -184,6 +188,8 @@ class DbRunStore:
                 self._upsert_branch(session, row)
             session.execute(delete(SkillGapResult).where(SkillGapResult.run_id == run_id))
             session.add_all(SkillGapResult(**row) for row in results)
+            audit.record(session, "skill_gap.run_completed", user_id=user_id, target=("skill_gap_run", run_id),
+                         details={"job_family": state["job_family"], "skills": len(results)})
 
     # -- reads ------------------------------------------------------------------------------------
 
