@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { readConfirmLink } from "./confirm-link.ts";
+import { readConfirmLink, readRecoveryLink } from "./confirm-link.ts";
 
 describe("readConfirmLink", () => {
   it("reads a token link", () => {
@@ -35,5 +35,28 @@ describe("readConfirmLink", () => {
   it("treats a link without a token as already used", () => {
     assert.deepEqual(readConfirmLink("?code=xyz", ""), { kind: "error", code: "otp_expired" });
     assert.deepEqual(readConfirmLink("", ""), { kind: "error", code: "otp_expired" });
+  });
+});
+
+describe("readRecoveryLink", () => {
+  it("reads a recovery token", () => {
+    assert.deepEqual(readRecoveryLink("?token_hash=abc&type=recovery", ""), { kind: "token", tokenHash: "abc" });
+  });
+
+  it("rejects other link types and links without a token", () => {
+    for (const search of ["?token_hash=abc&type=email", "?token_hash=abc", "?type=recovery", "?code=xyz", ""]) {
+      assert.deepEqual(readRecoveryLink(search, ""), { kind: "error", code: null }, search);
+    }
+  });
+
+  it("reports Supabase's error from the query or the fragment", () => {
+    assert.deepEqual(readRecoveryLink("", "#error=access_denied&error_code=otp_expired"), {
+      kind: "error",
+      code: "otp_expired",
+    });
+    assert.deepEqual(readRecoveryLink("?token_hash=abc&type=recovery&error_code=flow_state_expired", ""), {
+      kind: "error",
+      code: "flow_state_expired",
+    });
   });
 });
