@@ -12,6 +12,7 @@ from app.schemas.job_posting_analysis import (
     JobPostingAnalysisValidationError,
     validate_analysis_response,
 )
+from app.services import agent_calls
 
 AGENT_NAME = "job-analysis-agent"
 AGENT_VERSION = "13"
@@ -77,7 +78,8 @@ class FoundryJobPostingAnalysisService:
                 )
                 conversation = client.conversations.create()
                 try:
-                    response = client.responses.create(
+                    response = agent_calls.call(
+                        AGENT_NAME, AGENT_VERSION, client.responses.create,
                         conversation=conversation.id,
                         input=[{"role": "user", "content": content}],
                         extra_body={

@@ -247,6 +247,7 @@ app/
 ├── core/
 │   ├── config.py            # Settings read from .env (database, CORS, Supabase Auth, Foundry)
 │   ├── options.py           # career goal choices (target roles, experience levels); mirrors the frontend
+│   ├── request_context.py   # per-request holder for the user id on agent_calls rows
 │   └── security.py          # verifies Supabase Auth access tokens (JWTs)
 ├── api/
 │   ├── deps.py              # get_db, get_current_user (token), get_current_db_user (token + users row)
@@ -261,6 +262,7 @@ app/
 │   └── check_connection.py  # connectivity test
 ├── models/
 │   ├── __init__.py          # import every model here so Alembic can see it
+│   ├── agent_call.py        # agent_calls (latency, tokens and cost of each Agent call)
 │   ├── catalog.py           # certifications, school_courses, student_orgs, catalog_versions
 │   ├── job_posting.py       # job_postings + ingest_runs
 │   ├── resume.py            # resumes + experiences, educations, projects, achievements, skills
@@ -272,6 +274,8 @@ app/
 │   └── market.py            # NormalizedPosting, MarketProfile
 └── services/
     ├── accounts.py          # creates and updates users + their confirmed résumés
+    ├── agent_calls.py       # records every Foundry Agent call in agent_calls
+    ├── model_prices.py      # token prices for the cost estimate
     ├── catalog_store.py     # reads certifications, courses and clubs (cached; falls back to data/)
     ├── catalog_writes.py    # writes them: seed script and catalog refresh
     ├── course_listing.py    # hides school courses not taught in the last four semesters
@@ -1080,6 +1084,44 @@ scores don't change.
   - Not found: shortened names ("Databases", "Data Structures"). A sentence under an education
     entry that uses a course name ("built a machine learning model") is found by mistake; the
     student answers "Not now".
+
+## Agent call metrics
+
+Every Foundry Agent request (`responses.create`) writes one row to `agent_calls` (migration
+`9ea89c504d80`): the Agent name and version, the model, the student (`user_id`), the Skill Gap run
+(`run_id`), `status`, `error_type`, `latency_ms`, the four token counts and `cost_usd`. Prompts and
+answers are never stored; an error keeps only its class name.
+
+- **Which calls:** résumé classification, job posting analysis, the resources (projects) Agent and
+  the three Skill Gap groups (through `skill_gaps/transport.create_response`). A new call site must
+  wrap its request: `agent_calls.call(name, version, client.responses.create, **kwargs)`.
+  `tests/test_agent_calls.py` fails if any `responses.create(` in `app/` is called directly.
+- **Latency** is `responses.create` alone, not creating or deleting the conversation.
+- **Cost** is an estimate from `app/services/model_prices.py` (USD per 1M tokens, Azure Global
+  Standard list prices, checked 2026-11-25). A model with no listed price gets tokens but no cost,
+  and a warning in the log. Cache writes and the long-context tier are not counted.
+- **Who:** `RequestContextMiddleware` starts a holder per request and `get_current_user` fills in the
+  user. Work moved to another thread must use `agent_calls.in_context(fn)` as its target, or its
+  calls have no user. Job posting analysis runs without a signed-in user, so `user_id` is empty.
+- **Account deletion:** `user_id` references `auth.users` with `ON DELETE SET NULL`, so `DELETE /me`
+  (which removes the Supabase Auth user) unlinks that student's rows but keeps them in the latency and
+  cost totals. The rows hold no prompts or answers.
+- **Never in the way:** the row is written in its own short session after the call. If that write
+  fails, the call's result or error is returned unchanged and a warning is logged. The engine's
+  5-second `connect_timeout` (`app/db/session.py`) keeps an unreachable database from holding the
+  response for long.
+
+```sql
+-- Calls, p50/p95 latency and cost per Agent over the last 7 days
+SELECT agent, count(*) AS calls,
+       percentile_cont(0.5) WITHIN GROUP (ORDER BY latency_ms) AS p50_ms,
+       percentile_cont(0.95) WITHIN GROUP (ORDER BY latency_ms) AS p95_ms,
+       sum(cost_usd) AS cost_usd,
+       count(*) FILTER (WHERE status <> 'completed') AS not_completed
+FROM agent_calls
+WHERE created_at > now() - interval '7 days'
+GROUP BY agent ORDER BY cost_usd DESC NULLS LAST;
+```
 
 ## Changing the schema
 

@@ -14,6 +14,7 @@ from fastapi.responses import StreamingResponse
 
 from app.api.deps import get_current_user, get_resume_pipeline
 from app.schemas.resume import ResumeAnalysis
+from app.services import agent_calls
 from app.services.foundry_agent import ClassificationValidationError, FoundryAgentError
 from app.services.resume_extraction import (
     InvalidResumeError,
@@ -128,7 +129,7 @@ def _stream_analysis(pipeline: ResumePipeline, data: bytes, suffix: str, filenam
     )
     # If the student leaves, the thread still finishes (the Agent call can't be cancelled) and
     # deletes the temporary file.
-    threading.Thread(target=run, name="resume-analysis", daemon=True).start()
+    threading.Thread(target=agent_calls.in_context(run), name="resume-analysis", daemon=True).start()
     while (event := events.get()) is not None:
         yield _event_line(event)
 
